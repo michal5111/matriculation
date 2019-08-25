@@ -10,7 +10,8 @@ import javax.persistence.*
 @Table(name = "DZ_URZEDY_SKARBOWE")
 data class TaxOffice(
         @Id
-        @GeneratedValue
+        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_US_SEQ")
+        @SequenceGenerator(sequenceName = "DZ_US_SEQ", allocationSize = 1, name = "DZ_US_SEQ")
         @Column(name = "ID")
         val id: Long,
 

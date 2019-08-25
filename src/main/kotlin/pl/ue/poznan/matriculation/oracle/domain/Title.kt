@@ -10,6 +10,8 @@ import javax.persistence.*
 @Table(name = "DZ_TYTULY")
 data class Title(
         @Id
+        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_TYT_SEQ")
+        @SequenceGenerator(sequenceName = "DZ_TYT_SEQ", allocationSize = 1, name = "DZ_TYT_SEQ")
         @Column(name = "ID")
         val id: Long,
 

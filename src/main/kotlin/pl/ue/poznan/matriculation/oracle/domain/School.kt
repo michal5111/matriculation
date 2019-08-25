@@ -2,15 +2,18 @@ package pl.ue.poznan.matriculation.oracle.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import org.hibernate.validator.constraints.URL
 import java.util.*
 import javax.persistence.*
+import javax.validation.constraints.Email
 
 @JsonIgnoreProperties("hibernateLazyInitializer", "handler")
 @Entity
 @Table(name = "DZ_SZKOLY")
 data class School(
         @Id
-        @GeneratedValue
+        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_SZK_SEQ")
+        @SequenceGenerator(sequenceName = "DZ_SZK_SEQ", allocationSize = 1, name = "DZ_SZK_SEQ")
         @Column(name = "ID")
         val id: Long,
 
@@ -29,6 +32,7 @@ data class School(
         @Column(name = "KOD_SZK")
         val schoolCode: String?,
 
+        @URL
         @Column(name = "WWW")
         val www: String?,
 
@@ -66,6 +70,7 @@ data class School(
         @Column(name = "SKALA_OCEN_ANG")
         val gradingScaleEng: String?,
 
+        @Email
         @Column(name = "EMAIL")
         val email: String?,
 
@@ -95,12 +100,14 @@ data class School(
         @Column(name = "INFOKARTA_UWAGI")
         val factSheetComments: String?,
 
+        @URL
         @Column(name = "INFOKARTA_WWW")
         val factSheetWWW: String?,
 
         @Column(name = "CZY_WYSWIETLAC")
         val display: String,
 
+        @Email
         @Column(name = "EMAIL_NOMINACJE")
         val emailNominations: String?,
 

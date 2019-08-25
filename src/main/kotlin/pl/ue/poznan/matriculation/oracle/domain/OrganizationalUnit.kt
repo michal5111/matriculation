@@ -2,8 +2,10 @@ package pl.ue.poznan.matriculation.oracle.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import org.hibernate.validator.constraints.pl.REGON
 import java.util.*
 import javax.persistence.*
+import javax.validation.constraints.Email
 
 @JsonIgnoreProperties("hibernateLazyInitializer", "handler")
 @Entity
@@ -101,6 +103,7 @@ data class OrganizationalUnit(
         @Column(name = "DATA_ZALOZENIA")
         val dateOfEstablishment: Date?,
 
+        @REGON
         @Column(name = "REGON")
         val regon: String?,
 
@@ -127,6 +130,7 @@ data class OrganizationalUnit(
         @Column(name = "SKROT_DO_JRWA")
         val jrwaAbbreviation: String?,
 
+        @Email
         @Column(name = "EMAIL")
         val email: String?,
 

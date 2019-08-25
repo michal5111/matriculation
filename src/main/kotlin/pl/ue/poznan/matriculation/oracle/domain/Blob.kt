@@ -10,7 +10,8 @@ import javax.persistence.*
 @Table(name = "DZ_BLOBY")
 data class Blob(
         @Id
-        @GeneratedValue
+        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_BLOB_SEQ")
+        @SequenceGenerator(sequenceName = "DZ_BLOB_SEQ", allocationSize = 1, name = "DZ_BLOB_SEQ")
         @Column(name = "ID")
         val id: Long,
 

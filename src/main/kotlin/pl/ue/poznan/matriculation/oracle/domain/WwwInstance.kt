@@ -2,6 +2,7 @@ package pl.ue.poznan.matriculation.oracle.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import org.hibernate.validator.constraints.URL
 import java.util.*
 import javax.persistence.*
 
@@ -13,6 +14,7 @@ data class WwwInstance(
         @Column(name = "KOD")
         val code: String,
 
+        @URL
         @Column(name = "URL")
         val url: String,
 

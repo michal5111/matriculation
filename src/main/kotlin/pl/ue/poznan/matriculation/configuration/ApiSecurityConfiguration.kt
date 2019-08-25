@@ -12,9 +12,9 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint
 class ApiSecurityConfiguration: WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http
-                .antMatcher("/api/user")
-                    .authorizeRequests().antMatchers("/api/user").permitAll()
-                .and().antMatcher("/api/**")
+                .authorizeRequests().antMatchers("/api/user").permitAll()
+                .and()
+                .antMatcher("/api/**")
                     .exceptionHandling()
                         .authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                     .and()
