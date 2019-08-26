@@ -124,13 +124,32 @@ class SecurityConfiguration: WebSecurityConfigurerAdapter() {
 //                .antMatchers("/views/**").antMatchers("/i18n/**").antMatchers("/webjars/**")
 //    }
 
+//    @Bean
+//    fun corsFilter(): CorsFilter {
+//        val source = UrlBasedCorsConfigurationSource()
+//        val config = CorsConfiguration()
+//        config.allowCredentials = true
+//        config.addAllowedOrigin("*")
+//        config.addAllowedHeader("*")
+//        config.addAllowedMethod("OPTIONS")
+//        config.addAllowedMethod("GET")
+//        config.addAllowedMethod("POST")
+//        config.addAllowedMethod("PUT")
+//        config.addAllowedMethod("DELETE")
+//        source.registerCorsConfiguration("/**", config)
+//        return CorsFilter(source)
+//    }
+
     override fun configure(http: HttpSecurity) {
         http
+//                .authorizeRequests().antMatchers("/").permitAll()
+//                .and()
                 .antMatcher("/**")
                 .exceptionHandling()
                     .authenticationEntryPoint(casAuthenticationEntryPoint())
                 .and()
                     .addFilter(casAuthenticationFilter())
+                    //.addFilterBefore(corsFilter(), CorsFilter::class.java)
                     .addFilterBefore(singleSignOutFilter(), CasAuthenticationFilter::class.java)
                     .addFilterBefore(requestCasGlobalLogoutFilter(), LogoutFilter::class.java)
                     .authorizeRequests().anyRequest().authenticated()
