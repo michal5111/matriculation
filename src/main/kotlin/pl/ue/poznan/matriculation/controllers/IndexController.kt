@@ -21,18 +21,18 @@ class IndexController(
         private val personsRepository: PersonsRepository
 ) {
 
-    @GetMapping("/")
-    fun hello(authentication: Authentication?, model: Model): String {
-        if (authentication != null) {
-            val optionalPerson: Optional<Person> = personsRepository.findById(authentication.name.toLong())
-            if (optionalPerson.isPresent) {
-                val user: Person = optionalPerson.get()
-                model.addAttribute("user",user)
-                model.addAttribute("isAuthenticated",authentication.isAuthenticated)
-            }
-        }
-        return "index"
-    }
+//    @GetMapping("/")
+//    fun hello(authentication: Authentication?, model: Model): String {
+//        if (authentication != null) {
+//            val optionalPerson: Optional<Person> = personsRepository.findById(authentication.name.toLong())
+//            if (optionalPerson.isPresent) {
+//                val user: Person = optionalPerson.get()
+//                model.addAttribute("user",user)
+//                model.addAttribute("isAuthenticated",authentication.isAuthenticated)
+//            }
+//        }
+//        return "index.html"
+//    }
 
     @GetMapping("/login")
     fun login(@RequestParam service: String): ResponseEntity<String> {
