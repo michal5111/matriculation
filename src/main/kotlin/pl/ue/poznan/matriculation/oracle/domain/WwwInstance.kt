@@ -11,32 +11,34 @@ import javax.persistence.*
 @Table(name = "DZ_INSTALACJE_WWW")
 data class WwwInstance(
         @Id
-        @Column(name = "KOD")
+        @Column(name = "KOD", length = 20, nullable = false)
         val code: String,
 
         @URL
-        @Column(name = "URL")
+        @Column(name = "URL", length = 2000, nullable = false)
         val url: String,
 
-        @Column(name = "HOSTNAME")
+        @Column(name = "HOSTNAME", length = 50, nullable = true)
         val hostname: String?,
 
-        @Column(name = "DATABASENAME")
+        @Column(name = "DATABASENAME", length = 50, nullable = true)
         val dataBaseName: String?,
 
-        @Column(name = "INST_WWW_ID")
+        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_INST_WWW_ID_SEQ")
+        @SequenceGenerator(sequenceName = "DZ_INST_WWW_ID_SEQ", allocationSize = 1, name = "DZ_INST_WWW_ID_SEQ")
+        @Column(name = "INST_WWW_ID", nullable = false)
         val wwwInstanceId: Int,
 
-        @Column(name = "MOD_DATA")
+        @Column(name = "MOD_DATA", nullable = false)
         val modificationDate: Date,
 
-        @Column(name = "MOD_ID")
+        @Column(name = "MOD_ID", length = 30, nullable = false)
         val modificationUser: String,
 
-        @Column(name = "UTW_DATA")
+        @Column(name = "UTW_DATA", nullable = false)
         val creationDate: Date,
 
-        @Column(name = "UTW_ID")
+        @Column(name = "UTW_ID", length = 30, nullable = false)
         val creationUser: String,
 
         @JsonIgnore

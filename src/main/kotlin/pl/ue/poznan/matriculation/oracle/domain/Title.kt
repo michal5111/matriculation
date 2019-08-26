@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.util.*
 import javax.persistence.*
+import javax.validation.constraints.NotBlank
 
 @JsonIgnoreProperties("hibernateLazyInitializer", "handler")
 @Entity
@@ -15,28 +16,29 @@ data class Title(
         @Column(name = "ID")
         val id: Long,
 
-        @Column(name = "NAZWA")
+        @NotBlank
+        @Column(name = "NAZWA", length = 30, nullable = false)
         val name: String,
 
-        @Column(name = "OPIS")
+        @Column(name = "OPIS", length = 200, nullable = true)
         val description: String?,
 
-        @Column(name = "KOD")
+        @Column(name = "KOD", length = 20, nullable = true)
         val code: String?,
 
-        @Column(name = "KOD_POLON")
+        @Column(name = "KOD_POLON", length = 20, nullable = true)
         val polonCode: String?,
 
-        @Column(name = "MOD_DATA")
+        @Column(name = "MOD_DATA", nullable = false)
         val modificationDate: Date,
 
-        @Column(name = "MOD_ID")
+        @Column(name = "MOD_ID", length = 30, nullable = false)
         val modificationUser: String,
 
-        @Column(name = "UTW_DATA")
+        @Column(name = "UTW_DATA", nullable = false)
         val creationDate: Date,
 
-        @Column(name = "UTW_ID")
+        @Column(name = "UTW_ID", length = 30, nullable = false)
         val creationUser: String,
 
         @JsonIgnore

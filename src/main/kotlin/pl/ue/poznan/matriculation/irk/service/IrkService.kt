@@ -17,7 +17,7 @@ class IrkService {
     private val restTemplate: RestTemplate = RestTemplate()
 
     fun getApplicant(id: Long): Applicant? {
-        val httpHeaders: HttpHeaders = HttpHeaders()
+        val httpHeaders = HttpHeaders()
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set("Authorization","Token $apiKey")
         val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
@@ -31,7 +31,7 @@ class IrkService {
     }
 
     fun getRegistration(id: String): Registration? {
-        val httpHeaders: HttpHeaders = HttpHeaders()
+        val httpHeaders = HttpHeaders()
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set("Authorization","Token $apiKey")
         val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
@@ -45,7 +45,7 @@ class IrkService {
     }
 
     fun getApplication(id: Long): Application? {
-        val httpHeaders: HttpHeaders = HttpHeaders()
+        val httpHeaders = HttpHeaders()
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set("Authorization","Token $apiKey")
         val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
@@ -73,7 +73,7 @@ class IrkService {
 //    }
 
     fun getProgrammesGroups(id: String): ProgrammeGroups? {
-        val httpHeaders: HttpHeaders = HttpHeaders()
+        val httpHeaders = HttpHeaders()
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set("Authorization","Token $apiKey")
         val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)

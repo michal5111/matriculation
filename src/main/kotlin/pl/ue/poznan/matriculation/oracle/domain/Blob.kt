@@ -12,30 +12,30 @@ data class Blob(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_BLOB_SEQ")
         @SequenceGenerator(sequenceName = "DZ_BLOB_SEQ", allocationSize = 1, name = "DZ_BLOB_SEQ")
-        @Column(name = "ID")
+        @Column(name = "ID", length = 10)
         val id: Long,
 
-        @Column(name = "MOD_DATA")
+        @Column(name = "MOD_DATA", nullable = false)
         val modificationDate: Date,
 
-        @Column(name = "MOD_ID")
+        @Column(name = "MOD_ID", length = 30, nullable = false)
         val modificationUser: String,
 
-        @Column(name = "UTW_DATA")
+        @Column(name = "UTW_DATA", nullable = false)
         val creationDate: Date,
 
-        @Column(name = "UTW_ID")
+        @Column(name = "UTW_ID", length = 30, nullable = false)
         val creationUser: String,
 
         @JsonIgnore
         @Lob
-        @Column(name = "OBIEKT")
+        @Column(name = "OBIEKT", nullable = false)
         val blob: ByteArray,
 
-        @Column(name = "KATEGORIA")
+        @Column(name = "KATEGORIA", length = 100, nullable = true)
         val category: String?,
 
-        @Column(name = "OPIS")
+        @Column(name = "OPIS", length = 1000, nullable = false)
         val description: String?,
 
         @JsonIgnore

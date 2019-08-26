@@ -15,22 +15,22 @@ data class TaxOffice(
         @Column(name = "ID")
         val id: Long,
 
-        @Column(name = "NAZWA")
+        @Column(name = "NAZWA", length = 100, nullable = false)
         val name: String,
 
-        @Column(name = "KOD")
+        @Column(name = "KOD", length = 4, nullable = false)
         val code: String,
 
-        @Column(name = "MOD_DATA")
+        @Column(name = "MOD_DATA", nullable = false)
         val modificationDate: Date,
 
-        @Column(name = "MOD_ID")
+        @Column(name = "MOD_ID", length = 30, nullable = false)
         val modificationUser: String,
 
-        @Column(name = "UTW_DATA")
+        @Column(name = "UTW_DATA", nullable = false)
         val creationDate: Date,
 
-        @Column(name = "UTW_ID")
+        @Column(name = "UTW_ID", length = 30, nullable = false)
         val creationUser: String,
 
         @JsonIgnore
