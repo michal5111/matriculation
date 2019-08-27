@@ -46,8 +46,8 @@ data class Applicant(
         val additionalData: AdditionalData?,
 
         @JsonProperty("foreigner_data")
-        val foreignerData: String?,
+        val foreignerData: ForeignerData?,
 
         @JsonProperty("education_data")
-        val educationData: String?
+        val educationData: EducationData?
 )

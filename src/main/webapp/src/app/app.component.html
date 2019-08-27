@@ -3,9 +3,10 @@
   <span class="fill-remaining-space"></span>
   <ng-template [ngIf]="isAuthenticated" [ngIfElse]="loggedOut">
     <span>{{user.casAssertion.principal.attributes.givenname}} {{user.casAssertion.principal.attributes.lastname}}</span>
-    <a href="/logout">Wyloguj</a>
+    <a mat-button href="/logout">Wyloguj</a>
   </ng-template>
   <ng-template #loggedOut>
-    <a href="/l?service=/">Zaloguj</a>
+    <a mat-button href="/l?service=/">Zaloguj</a>
   </ng-template>
 </mat-toolbar>
+<router-outlet></router-outlet>

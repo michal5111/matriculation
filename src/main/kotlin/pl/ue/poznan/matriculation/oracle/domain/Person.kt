@@ -66,7 +66,7 @@ class Person(
         @JsonIdentityReference(alwaysAsId = true)
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "WKU_KOD", referencedColumnName = "KOD", nullable = true)
-        val wku: Wku,
+        val wku: Wku?,
 
         @Column(name = "KAT_WOJSKOWA")
         val militaryCategory: String?,
@@ -88,13 +88,13 @@ class Person(
         @JsonIdentityReference(alwaysAsId = true)
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "NAR_KOD", referencedColumnName = "KOD")
-        val nationality: Citizenship,
+        val nationality: Citizenship?,
 
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
         @JsonIdentityReference(alwaysAsId = true)
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "OB_KOD", referencedColumnName = "KOD")
-        val citizenship: Citizenship,
+        val citizenship: Citizenship?,
 
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
         @JsonIdentityReference(alwaysAsId = true)
@@ -125,10 +125,10 @@ class Person(
         @JoinColumn(name = "TYTUL_PO", nullable = true)
         val titleSuffix: Title?,
 
-        @Column(name = "CZY_POLONIA", length = 1)
+        @Column(name = "CZY_POLONIA", length = 1, nullable = true)
         val isPolish: String?,
 
-        @Column(name = "ZAMIEJSCOWA", length = 1)
+        @Column(name = "ZAMIEJSCOWA", length = 1, nullable = true)
         val nonresident: String?,
 
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")

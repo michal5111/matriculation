@@ -1,0 +1,47 @@
+<div *ngIf="page">
+  <mat-paginator [length]="page.count" [pageSize]="10"></mat-paginator>
+  <form [formGroup]="filterFormGroup">
+    <mat-form-field>
+      <mat-label>ID użyrkownika</mat-label>
+      <input matInput formControlName="idInput">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Kod programu</mat-label>
+      <input matInput formControlName="programmeInput">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Kod rekrutacji</mat-label>
+      <input matInput formControlName="registrationInput">
+    </mat-form-field>
+    <!-- <mat-form-field>
+        <mat-slide-toggle formControlName="qualifiedCheckBox">Slide me!</mat-slide-toggle>
+    </mat-form-field> -->
+    <button mat-button type="submit">Filtruj</button>
+  </form>
+  <mat-card *ngFor="let application of page.results">
+    <mat-card-title>
+      <div *ngIf="(application.applicant$ | async) as applicant">
+        <a mat-button [routerLink]="['/applicant/',applicant.id]">{{applicant.name.given}} {{applicant.name.middle}} {{applicant.name.maiden}} {{applicant.name.family}}</a>
+      </div>
+    </mat-card-title>
+    <mat-card-subtitle>
+      <div *ngIf="application.payment=='paid'; else notPaid">
+        Zapłacone
+      </div>
+      <ng-template #notPaid>
+        Nie zapłacone
+      </ng-template>
+    </mat-card-subtitle>
+    <mat-card-subtitle>
+      <div *ngIf="application.qualified=='qualified'">
+        Zakwalifikowany
+      </div>
+    </mat-card-subtitle>
+    <mat-card-content>
+      <p>Program: {{application.turn.programme}}</p>
+      <p>Rejestracja: {{application.turn.registration}}</p>
+      <p>Data od: {{application.turn.date_from}}</p>
+      <p>Data do: {{application.turn.date_to}}</p>
+    </mat-card-content>
+  </mat-card>
+</div>

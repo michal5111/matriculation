@@ -1,0 +1,47 @@
+<div *ngIf="applicant">
+  <mat-card>
+    <div *ngIf="applicant.photo"></div>
+    <div *ngIf="false && applicatService.getPhoto(applicant.photo) | async as photo">
+      <mat-card-subtitle>test</mat-card-subtitle>
+      <img mat-card-image src={{photo}}>
+    </div>
+    <mat-card-title>{{applicant.name.given}} {{applicant.name.middle}} {{applicant.name.maiden}} {{applicant.name.family}}</mat-card-title>
+    <mat-card-subtitle>{{applicant.email}} </mat-card-subtitle>
+    <mat-card-content>
+      <p>Numer telefonu: {{applicant.phone}}</p>
+      <p>Obywatelstwo: {{applicant.citizenship}}</p>
+      <p>Data ostatniej modyfikacji: {{applicant.modification_date}}</p>
+      <h2>Dane podstawowe:</h2>
+      <mat-list>
+          <mat-list-item> Płeć: {{applicant.basic_data.sex}}</mat-list-item>
+          <mat-list-item> PESEL: {{applicant.basic_data.pesel}}</mat-list-item>
+          <mat-list-item> Data urodzenia: {{applicant.basic_data.date_of_birth}}</mat-list-item>
+          <mat-list-item> Miasto urodzenia: {{applicant.basic_data.city_of_birth}}</mat-list-item>
+          <mat-list-item> Kraj urodzenia: {{applicant.basic_data.country_of_birth}}</mat-list-item>
+          <mat-list-item> Źródło danych: {{applicant.basic_data.data_source}}</mat-list-item>
+      </mat-list>
+      <h2>Dane kontaktowe:</h2>
+      <mat-list>
+        <mat-list-item>Numer telefonu: {{applicant.contact_data.phone_number}}</mat-list-item>
+        <mat-list-item>Typ numeru telefonu: {{applicant.contact_data.phone_number_type}}</mat-list-item>
+        <mat-list-item>Drugi numer telefonu: {{applicant.contact_data.phone_number2}}</mat-list-item>
+        <mat-list-item>Typ drugiego numeru telefonu: {{applicant.contact_data.phone_number2_type}}</mat-list-item>
+        <mat-list-item>Nazwa ulicy zameldowania: {{applicant.contact_data.official_street}}</mat-list-item>
+        <mat-list-item>Numer ulicy zameldowania: {{applicant.contact_data.official_street_number}}</mat-list-item>
+        <mat-list-item>Numer mieszkania zameldowania: {{applicant.contact_data.official_flat_number}}</mat-list-item>
+        <mat-list-item>Kod pocztowy zameldowania: {{applicant.contact_data.official_post_code}}</mat-list-item>
+        <mat-list-item>Nazwa miejsca zameldowania: {{applicant.contact_data.official_city}}</mat-list-item>
+        <mat-list-item>
+          Czy miasto:
+            <div *ngIf="applicant.contact_data.official_city_is_city">
+                Tak
+            </div>
+            <div *ngIf="!applicant.contact_data.official_city_is_city">
+              Nie
+            </div>
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+    <mat-card-actions></mat-card-actions>
+  </mat-card>
+</div>

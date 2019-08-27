@@ -3,7 +3,7 @@ package pl.ue.poznan.matriculation.irk.domain.applicants
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class foreignerData(
+data class ForeignerData(
     @JsonProperty("base_of_stay")
     val baseOfStay: String?,
     @JsonProperty("foreigner_status")
