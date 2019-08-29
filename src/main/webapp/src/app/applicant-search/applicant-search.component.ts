@@ -11,20 +11,20 @@ import { map, tap, switchMap, flatMap } from 'rxjs/operators';
 })
 export class ApplicantSearchComponent implements OnInit {
 
-  selectSearchMethodFormGroup: FormGroup
-  inputDataFormGroup: FormGroup
-  applicantFromGroup: FormGroup
-  applicants: [Applicant]
+  selectSearchMethodFormGroup: FormGroup;
+  inputDataFormGroup: FormGroup;
+  applicantFromGroup: FormGroup;
+  applicants: [Applicant];
 
   constructor(private formBuilder: FormBuilder, private applicantService: ApplicantService) { }
 
   ngOnInit() {
     this.selectSearchMethodFormGroup = this.formBuilder.group({
       searchMethod: ['', Validators.required]
-    })
+    });
     this.inputDataFormGroup = this.formBuilder.group({
       input: ['', Validators.required]
-    })
+    });
     this.applicantFromGroup = this.formBuilder.group({
       applicant: ['', Validators.required]
     })
@@ -36,6 +36,7 @@ export class ApplicantSearchComponent implements OnInit {
     ).pipe(
       map(page => page.results),
       tap(results => this.applicants = results),
+      tap(applicant => console.log(applicant)),
       flatMap(applicants => applicants),
       map(applicant => applicant.image$ = this.applicantService.getPhoto(applicant.photo))
     ).subscribe()

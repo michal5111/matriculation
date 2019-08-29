@@ -10,18 +10,20 @@ import { ActivatedRoute } from '@angular/router'
 })
 export class ApplicantComponent implements OnInit {
 
-  id: string
-  applicant: Applicant
+  id: string;
+  applicant: Applicant;
 
   constructor(private applicantService: ApplicantService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.id = this.route.snapshot.params.id
+    this.id = this.route.snapshot.params.id;
+    console.log(this.id)
     if (!this.id) {
       return
     }
     this.applicantService.getApplicantById(this.id).subscribe(applicant => {
       this.applicant = applicant
+      console.log(applicant)
     })
   }
 

@@ -1,10 +1,9 @@
 package pl.ue.poznan.matriculation.controllers
 
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
+import pl.ue.poznan.matriculation.irk.domain.Page
 import pl.ue.poznan.matriculation.irk.domain.applicants.Applicant
 import pl.ue.poznan.matriculation.irk.domain.applications.Application
 import pl.ue.poznan.matriculation.irk.domain.programmes.ProgrammeGroups
@@ -43,8 +42,20 @@ class RestController(
     }
 
     @GetMapping("applicants/{id}")
-    fun applicant(@PathVariable("id") id: Long): Applicant? {
-        return irkService.getApplicant(id)
+    fun getApplicantById(@PathVariable("id") id: Long): Applicant? {
+        return irkService.getApplicantById(id)
+    }
+
+    @GetMapping("applicants/")
+    fun getApplicantByParam(
+            @RequestParam(required = false) pesel: String?,
+            @RequestParam(required = false) surname: String?,
+            @RequestParam(required = false) email: String?
+    ): Page<Applicant>? {
+        if (pesel != null) return irkService.getApplicantsByPesel(pesel)
+        if (surname != null) return irkService.getApplicantsBySurname(surname)
+        if (email != null) return irkService.getApplicantsByEmail(email)
+        throw IllegalArgumentException()
     }
 
     @GetMapping("registrations/{id}")

@@ -1,9 +1,11 @@
 <div *ngIf="applicant">
   <mat-card>
-    <div *ngIf="applicant.photo"></div>
-    <div *ngIf="false && applicatService.getPhoto(applicant.photo) | async as photo">
+    <div *ngIf="applicantService.getPhoto(applicant.photo) | async as photo">
       <mat-card-subtitle>test</mat-card-subtitle>
-      <img mat-card-image src={{photo}}>
+      <img mat-card-image src={{photo}} alt="">
+    </div>
+    <div>
+
     </div>
     <mat-card-title>{{applicant.name.given}} {{applicant.name.middle}} {{applicant.name.maiden}} {{applicant.name.family}}</mat-card-title>
     <mat-card-subtitle>{{applicant.email}} </mat-card-subtitle>

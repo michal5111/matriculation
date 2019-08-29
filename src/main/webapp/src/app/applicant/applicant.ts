@@ -61,7 +61,7 @@ export class Applicant {
         country_of_birth: string;
         mothers_name: string;
         fathers_name: string;
-    }
+    };
     foreigner_data: string;
     education_data: {
         high_school_type: string;

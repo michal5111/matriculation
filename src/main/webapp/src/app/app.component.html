@@ -1,5 +1,5 @@
 <mat-toolbar>
-  <span>My Application</span>
+  <button mat-button routerLink="/">Immatrykulator 5000</button>
   <span class="fill-remaining-space"></span>
   <ng-template [ngIf]="isAuthenticated" [ngIfElse]="loggedOut">
     <span>{{user.casAssertion.principal.attributes.givenname}} {{user.casAssertion.principal.attributes.lastname}}</span>

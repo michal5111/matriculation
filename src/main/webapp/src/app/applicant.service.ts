@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Page } from './page'
-import { tap } from 'rxjs/operators'
 import { Applicant } from './applicant/applicant';
 
 const httpOptions = {
@@ -19,7 +18,7 @@ export class ApplicantService {
 
   constructor(private http: HttpClient) { }
 
-  getApplicantsList() { 
+  getApplicantsList() {
     return this.http.get<Page>(this.apiUrl, httpOptions)
   }
 
@@ -64,7 +63,7 @@ export class ApplicantService {
     reader.addEventListener("load", () => {
        applicant.image = reader.result;
     }, false);
- 
+
     if (image) {
        reader.readAsDataURL(image);
     }
