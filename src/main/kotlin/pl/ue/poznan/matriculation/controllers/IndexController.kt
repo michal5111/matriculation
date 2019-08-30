@@ -30,10 +30,10 @@ class IndexController(
 //        return "index.html"
 //    }
 
-    @GetMapping("/l")
+    @GetMapping("/login")
     fun login(@RequestParam service: String): ResponseEntity<String> {
         val httpHeaders = HttpHeaders()
         httpHeaders.location = URI(service)
-        return ResponseEntity(httpHeaders, HttpStatus.FOUND)
+        return ResponseEntity(httpHeaders, HttpStatus.MOVED_PERMANENTLY)
     }
 }

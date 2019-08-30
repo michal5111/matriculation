@@ -142,9 +142,6 @@ class SecurityConfiguration: WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity) {
         http
-//                .authorizeRequests().antMatchers("/").permitAll()
-//                .and()
-                .antMatcher("/**")
                 .exceptionHandling()
                     .authenticationEntryPoint(casAuthenticationEntryPoint())
                 .and()
@@ -152,6 +149,8 @@ class SecurityConfiguration: WebSecurityConfigurerAdapter() {
                     //.addFilterBefore(corsFilter(), CorsFilter::class.java)
                     .addFilterBefore(singleSignOutFilter(), CasAuthenticationFilter::class.java)
                     .addFilterBefore(requestCasGlobalLogoutFilter(), LogoutFilter::class.java)
-                    .authorizeRequests().anyRequest().authenticated()
+                    .authorizeRequests().antMatchers("/s/*").authenticated()
+                .antMatchers("/login").authenticated()
+                .antMatchers("/*").permitAll()
     }
 }

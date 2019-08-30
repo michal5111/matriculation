@@ -18,8 +18,6 @@ class ApiSecurityConfiguration: WebSecurityConfigurerAdapter() {
                     .exceptionHandling()
                         .authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                     .and()
-                    .authorizeRequests()
-                    .and()
                     .authorizeRequests().anyRequest().authenticated()
 
     }

@@ -6,7 +6,7 @@
     <a mat-button href="/logout">Wyloguj</a>
   </ng-template>
   <ng-template #loggedOut>
-    <a mat-button href="/l?service=/">Zaloguj</a>
+    <a mat-button href="/login?service={{appHome}}">Zaloguj</a>
   </ng-template>
 </mat-toolbar>
 <router-outlet></router-outlet>

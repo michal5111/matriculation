@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { UserService } from "./user.service";
 import {User} from "./user/user";
+import {AppSettings} from "./app-settings";
 
 @Component({
   selector: 'app-root',
@@ -10,7 +11,8 @@ import {User} from "./user/user";
 export class AppComponent {
   title = 'angularmatriculation';
   user: User;
-  isAuthenticated = false
+  isAuthenticated = false;
+  appHome = AppSettings.APP_HOME;
 
   constructor(private userService: UserService) {
     this.getUser()
