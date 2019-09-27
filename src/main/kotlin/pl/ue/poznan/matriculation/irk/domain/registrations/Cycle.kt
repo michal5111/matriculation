@@ -2,7 +2,7 @@ package pl.ue.poznan.matriculation.irk.domain.registrations
 
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import pl.ue.poznan.matriculation.irk.domain.Name
+import pl.ue.poznan.matriculation.local.domain.Name
 import java.util.*
 
 data class Cycle(

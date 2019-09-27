@@ -2,7 +2,6 @@ package pl.ue.poznan.matriculation.oracle.domain
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.JsonIdentityReference
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import org.hibernate.validator.constraints.pl.PESEL
 import java.util.*
@@ -10,7 +9,7 @@ import javax.persistence.*
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 
-@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
+//@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
 @Entity
 @Table(name = "DZ_OSOBY")
 class Person(

@@ -17,7 +17,7 @@ data class ContactData(
     @JsonProperty("official_post_code")
     val officialPostCode: String?,
     @JsonProperty("official_street")
-    val officialStreet: Any?,
+    val officialStreet: String?,
     @JsonProperty("official_street_number")
     val officialStreetNumber: String,
     @JsonProperty("phone_number")

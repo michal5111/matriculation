@@ -1,12 +1,11 @@
 package pl.ue.poznan.matriculation.oracle.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.NotBlank
 
-@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
+//@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
 @Entity
 @Table(name = "DZ_REGIONY_NUTS")
 data class NUTSRegion(

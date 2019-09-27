@@ -152,5 +152,7 @@ class SecurityConfiguration: WebSecurityConfigurerAdapter() {
                     .authorizeRequests().antMatchers("/s/*").authenticated()
                 .antMatchers("/login").authenticated()
                 .antMatchers("/*").permitAll()
+        http.csrf().disable()
+        http.headers().frameOptions().disable()
     }
 }

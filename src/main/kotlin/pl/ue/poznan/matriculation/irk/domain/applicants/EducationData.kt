@@ -6,11 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class EducationData(
         val documents: List<Document>,
         @JsonProperty("high_school_city")
-    val highSchoolCity: String?,
+        val highSchoolCity: String?,
         @JsonProperty("high_school_name")
-    val highSchoolName: String?,
+        val highSchoolName: String?,
         @JsonProperty("high_school_type")
-    val highSchoolType: String?,
+        val highSchoolType: String?,
         @JsonProperty("high_school_usos_code")
-    val highSchoolUsosCode: String?
+        val highSchoolUsosCode: String?
 )

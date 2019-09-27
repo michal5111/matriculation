@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.util.*
 import javax.persistence.*
 
-@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
+//@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
 @Entity
 @Table(name = "DZ_BLOBY")
 data class Blob(

@@ -1,6 +1,6 @@
 package pl.ue.poznan.matriculation.irk.domain.programmes
 
-import pl.ue.poznan.matriculation.irk.domain.Name
+import pl.ue.poznan.matriculation.local.domain.Name
 
 
 data class ProgrammeGroups(

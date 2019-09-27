@@ -1,14 +1,13 @@
 package pl.ue.poznan.matriculation.oracle.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import org.hibernate.validator.constraints.URL
 import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 
-@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
+//@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
 @Entity
 @Table(name = "DZ_SZKOLY")
 data class School(

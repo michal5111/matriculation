@@ -1,13 +1,14 @@
 package pl.ue.poznan.matriculation.controllers
 
+import org.springframework.data.domain.Pageable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
 import pl.ue.poznan.matriculation.irk.domain.Page
-import pl.ue.poznan.matriculation.irk.domain.applicants.Applicant
-import pl.ue.poznan.matriculation.irk.domain.applications.Application
-import pl.ue.poznan.matriculation.irk.domain.programmes.ProgrammeGroups
-import pl.ue.poznan.matriculation.irk.domain.registrations.Registration
+import pl.ue.poznan.matriculation.local.domain.applicants.Applicant
+import pl.ue.poznan.matriculation.local.domain.applications.Application
+import pl.ue.poznan.matriculation.local.domain.programmes.ProgrammeGroups
+import pl.ue.poznan.matriculation.local.domain.registrations.Registration
 import pl.ue.poznan.matriculation.irk.service.IrkService
 import pl.ue.poznan.matriculation.oracle.domain.Person
 import pl.ue.poznan.matriculation.oracle.repo.PersonsRepository
@@ -31,9 +32,14 @@ class RestController(
         return "test"
     }
 
-    @GetMapping("persons")
+    @GetMapping("person")
     fun person(): Person {
         return personsRepository.getOne(SecurityContextHolder.getContext().authentication.name.toLong())
+    }
+
+    @GetMapping("persons")
+    fun person(pageable: Pageable): org.springframework.data.domain.Page<Person> {
+        return personsRepository.findAll(pageable)
     }
 
     @GetMapping("persons/{id}")
@@ -66,6 +72,15 @@ class RestController(
     @GetMapping("applications/{id}")
     fun getApplication(@PathVariable("id") id: Long): Application? {
         return irkService.getApplication(id)
+    }
+
+    @GetMapping("applications")
+    fun getApplications(
+            @RequestParam(required = false) qualified: Boolean,
+            @RequestParam(required = false) paid: Boolean,
+            @RequestParam(required = false) pageNumber: Int?
+    ): Page<Application>? {
+        return irkService.getApplications(qualified, paid, pageNumber)
     }
 
     @GetMapping("programmesGroups/{id}")

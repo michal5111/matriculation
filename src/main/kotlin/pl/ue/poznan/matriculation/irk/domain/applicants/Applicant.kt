@@ -2,14 +2,8 @@ package pl.ue.poznan.matriculation.irk.domain.applicants
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
 
-@Entity
 data class Applicant(
-        @Id
-        @GeneratedValue
         val id: Long,
 
         val email: String,
