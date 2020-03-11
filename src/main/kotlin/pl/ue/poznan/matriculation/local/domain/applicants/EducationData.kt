@@ -1,7 +1,7 @@
 package pl.ue.poznan.matriculation.local.domain.applicants
 
 
-import pl.ue.poznan.matriculation.irk.domain.applicants.EducationData
+import pl.ue.poznan.matriculation.irk.dto.applicants.EducationDataDTO
 import java.util.stream.Collectors
 import javax.persistence.*
 
@@ -17,14 +17,14 @@ data class EducationData(
         val highSchoolType: String?,
         val highSchoolUsosCode: String?
 ) {
-        constructor(educationData: EducationData): this(
-                documents = educationData.documents
+        constructor(educationDataDTO: EducationDataDTO): this(
+                documents = educationDataDTO.documentDTOS
                         .stream()
                         .map { document -> Document(document) }
                         .collect(Collectors.toList()),
-                highSchoolCity = educationData.highSchoolCity,
-                highSchoolName = educationData.highSchoolName,
-                highSchoolType = educationData.highSchoolType,
-                highSchoolUsosCode = educationData.highSchoolUsosCode
+                highSchoolCity = educationDataDTO.highSchoolCity,
+                highSchoolName = educationDataDTO.highSchoolName,
+                highSchoolType = educationDataDTO.highSchoolType,
+                highSchoolUsosCode = educationDataDTO.highSchoolUsosCode
         )
 }

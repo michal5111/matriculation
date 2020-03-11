@@ -1,7 +1,7 @@
 package pl.ue.poznan.matriculation.local.domain.applicants
 
 
-import pl.ue.poznan.matriculation.irk.domain.applicants.Document
+import pl.ue.poznan.matriculation.irk.dto.applicants.DocumentDTO
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -25,18 +25,18 @@ data class Document(
         val issueInstitutionUsosCode: String?,
         val modificationDate: String?
 ) {
-        constructor(document:Document): this(
-                certificateType = document.certificateType,
-                certificateTypeCode = document.certificateTypeCode,
-                certificateUsosCode = document.certificateUsosCode,
-                comment = document.comment,
-                documentNumber = document.documentNumber,
-                documentYear = document.documentYear,
-                issueCity = document.issueCity,
-                issueCountry = document.issueCountry,
-                issueDate = document.issueDate,
-                issueInstitution = document.issueInstitution,
-                issueInstitutionUsosCode = document.issueInstitutionUsosCode,
-                modificationDate = document.modificationDate
+        constructor(documentDTO:DocumentDTO): this(
+                certificateType = documentDTO.certificateType,
+                certificateTypeCode = documentDTO.certificateTypeCode,
+                certificateUsosCode = documentDTO.certificateUsosCode,
+                comment = documentDTO.comment,
+                documentNumber = documentDTO.documentNumber,
+                documentYear = documentDTO.documentYear,
+                issueCity = documentDTO.issueCity,
+                issueCountry = documentDTO.issueCountry,
+                issueDate = documentDTO.issueDate,
+                issueInstitution = documentDTO.issueInstitution,
+                issueInstitutionUsosCode = documentDTO.issueInstitutionUsosCode,
+                modificationDate = documentDTO.modificationDate
         )
 }

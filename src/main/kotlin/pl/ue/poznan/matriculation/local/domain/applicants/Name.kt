@@ -1,6 +1,6 @@
 package pl.ue.poznan.matriculation.local.domain.applicants
 
-import pl.ue.poznan.matriculation.irk.domain.applicants.Name
+import pl.ue.poznan.matriculation.irk.dto.applicants.NameDTO
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -16,10 +16,10 @@ data class Name(
         val given: String?,
         val maiden: String?
 ) {
-        constructor(name: Name): this(
-                middle = name.middle,
-                family = name.family,
-                given = name.given,
-                maiden = name.maiden
+        constructor(nameDTO: NameDTO): this(
+                middle = nameDTO.middle,
+                family = nameDTO.family,
+                given = nameDTO.given,
+                maiden = nameDTO.maiden
         )
 }

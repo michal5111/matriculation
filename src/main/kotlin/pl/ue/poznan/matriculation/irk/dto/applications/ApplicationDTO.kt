@@ -1,12 +1,10 @@
-package pl.ue.poznan.matriculation.irk.domain.applications
+package pl.ue.poznan.matriculation.irk.dto.applications
 
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import pl.ue.poznan.matriculation.irk.dto.applications.ForeignerDataDTO
-import pl.ue.poznan.matriculation.local.domain.Turn
-import pl.ue.poznan.matriculation.local.domain.applicants.Applicant
+import pl.ue.poznan.matriculation.irk.dto.TurnDTO
 
-data class Application(
+data class ApplicationDTO(
         val admitted: String?,
         val comment: String?,
         @JsonProperty("foreigner_data")
@@ -16,6 +14,6 @@ data class Application(
         val position: String?,
         val qualified: String?,
         val score: String?,
-        val turnDTO: Turn?,
-        var user: Applicant?
+        val turn: TurnDTO?,
+        val user: Long
 )

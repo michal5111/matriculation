@@ -1,4 +1,4 @@
-package pl.ue.poznan.matriculation.irk.domain.registrations
+package pl.ue.poznan.matriculation.irk.dto.registrations
 
 
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -6,7 +6,7 @@ import pl.ue.poznan.matriculation.local.domain.Name
 import pl.ue.poznan.matriculation.irk.dto.TurnDTO
 import pl.ue.poznan.matriculation.local.domain.registrations.Cycle
 
-data class Registration(
+data class RegistrationDTO(
         val code: String?,
         val cycle: Cycle?,
         @JsonProperty("employees_only")
@@ -15,5 +15,5 @@ data class Registration(
         val programmes: List<String?>?,
         val status: String?,
         val tag: String?,
-        val turnDTOS: List<TurnDTO?>?
+        val turn: List<TurnDTO?>?
 )

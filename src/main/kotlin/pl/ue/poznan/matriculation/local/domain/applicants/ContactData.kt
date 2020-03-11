@@ -1,7 +1,7 @@
 package pl.ue.poznan.matriculation.local.domain.applicants
 
 
-import pl.ue.poznan.matriculation.irk.domain.applicants.ContactData
+import pl.ue.poznan.matriculation.irk.dto.applicants.ContactDataDTO
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -32,25 +32,25 @@ data class ContactData(
         val realStreet: String?,
         val realStreetNumber: String?
 ) {
-        constructor(contactData: ContactData): this(
-                modificationDate = contactData.modificationDate,
-                officialCity = contactData.officialCity,
-                officialCityIsCity = contactData.officialCityIsCity,
-                officialCountry = contactData.officialCountry,
-                officialFlatNumber = contactData.officialFlatNumber,
-                officialPostCode = contactData.officialPostCode,
-                officialStreet = contactData.officialStreet,
-                officialStreetNumber = contactData.officialStreetNumber,
-                phoneNumber = contactData.phoneNumber,
-                phoneNumber2 = contactData.phoneNumber2,
-                phoneNumber2Type = contactData.phoneNumber2Type,
-                phoneNumberType = contactData.phoneNumber2Type,
-                realCity = contactData.realCity,
-                realCountry = contactData.realCountry,
-                realCityIsCity = contactData.realCityIsCity,
-                realFlatNumber = contactData.realFlatNumber,
-                realPostCode = contactData.realPostCode,
-                realStreet = contactData.realStreet,
-                realStreetNumber = contactData.realStreetNumber
+        constructor(contactDataDTO: ContactDataDTO): this(
+                modificationDate = contactDataDTO.modificationDate,
+                officialCity = contactDataDTO.officialCity,
+                officialCityIsCity = contactDataDTO.officialCityIsCity,
+                officialCountry = contactDataDTO.officialCountry,
+                officialFlatNumber = contactDataDTO.officialFlatNumber,
+                officialPostCode = contactDataDTO.officialPostCode,
+                officialStreet = contactDataDTO.officialStreet,
+                officialStreetNumber = contactDataDTO.officialStreetNumber,
+                phoneNumber = contactDataDTO.phoneNumber,
+                phoneNumber2 = contactDataDTO.phoneNumber2,
+                phoneNumber2Type = contactDataDTO.phoneNumber2Type,
+                phoneNumberType = contactDataDTO.phoneNumber2Type,
+                realCity = contactDataDTO.realCity,
+                realCountry = contactDataDTO.realCountry,
+                realCityIsCity = contactDataDTO.realCityIsCity,
+                realFlatNumber = contactDataDTO.realFlatNumber,
+                realPostCode = contactDataDTO.realPostCode,
+                realStreet = contactDataDTO.realStreet,
+                realStreetNumber = contactDataDTO.realStreetNumber
         )
 }

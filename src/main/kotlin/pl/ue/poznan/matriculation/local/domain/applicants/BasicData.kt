@@ -1,6 +1,6 @@
 package pl.ue.poznan.matriculation.local.domain.applicants
 
-import pl.ue.poznan.matriculation.irk.domain.applicants.BasicData
+import pl.ue.poznan.matriculation.irk.dto.applicants.BasicDataDTO
 import java.util.*
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -25,12 +25,12 @@ data class BasicData(
 
         val dataSource: String
 ) {
-        constructor(basicData: BasicData): this(
-                sex = basicData.sex,
-                pesel = basicData.pesel,
-                dateOfBirth = basicData.dateOfBirth,
-                countryOfBirth = basicData.countryOfBirth,
-                cityOfBirth = basicData.cityOfBirth,
-                dataSource = basicData.dataSource
+        constructor(basicDataDTO: BasicDataDTO): this(
+                sex = basicDataDTO.sex,
+                pesel = basicDataDTO.pesel,
+                dateOfBirth = basicDataDTO.dateOfBirth,
+                countryOfBirth = basicDataDTO.countryOfBirth,
+                cityOfBirth = basicDataDTO.cityOfBirth,
+                dataSource = basicDataDTO.dataSource
         )
 }

@@ -1,6 +1,6 @@
 package pl.ue.poznan.matriculation.local.domain.applications
 
-import pl.ue.poznan.matriculation.irk.domain.applications.ForeignerData
+import pl.ue.poznan.matriculation.irk.dto.applications.ForeignerDataDTO
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -15,9 +15,9 @@ data class ForeignerData(
         val basisOfAdmission: String?,
         val sourceOfFinancing: String?
 ) {
-    constructor(foreignerData: ForeignerData) : this(
-            baseOfStay = foreignerData.baseOfStay,
-            basisOfAdmission = foreignerData.basisOfAdmission,
-            sourceOfFinancing = foreignerData.sourceOfFinancing
+    constructor(foreignerDataDTO: ForeignerDataDTO) : this(
+            baseOfStay = foreignerDataDTO.baseOfStay,
+            basisOfAdmission = foreignerDataDTO.basisOfAdmission,
+            sourceOfFinancing = foreignerDataDTO.sourceOfFinancing
     )
 }

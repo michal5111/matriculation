@@ -1,6 +1,6 @@
 package pl.ue.poznan.matriculation.local.domain.applicants
 
-import pl.ue.poznan.matriculation.irk.domain.applicants.Applicant
+import pl.ue.poznan.matriculation.irk.dto.applicants.ApplicantDTO
 import java.util.*
 import javax.persistence.*
 
@@ -46,21 +46,21 @@ data class Applicant(
         @OneToOne
         val educationData: EducationData?
 ) {
-    constructor(applicant: Applicant) : this(
-            email = applicant.email,
-            indexNumber = applicant.indexNumber,
-            password = applicant.password,
-            name = Name(applicant.name),
-            phone = applicant.phone,
-            citizenship = applicant.citizenship,
-            photo = applicant.photo,
-            photoPermission = applicant.photoPermission,
-            casPasswordOverride = applicant.casPasswordOverride,
-            modificationDate = applicant.modificationDate,
-            basicData = BasicData(applicant.basicData),
-            contactData = ContactData(applicant.contactData!!),
-            additionalData = AdditionalData(applicant.additionalData!!),
-            foreignerData = ForeignerData(applicant.foreignerData!!),
-            educationData = EducationData(applicant.educationData!!)
+    constructor(applicantDTO: ApplicantDTO) : this(
+            email = applicantDTO.email,
+            indexNumber = applicantDTO.indexNumber,
+            password = applicantDTO.password,
+            name = Name(applicantDTO.name),
+            phone = applicantDTO.phone,
+            citizenship = applicantDTO.citizenship,
+            photo = applicantDTO.photo,
+            photoPermission = applicantDTO.photoPermission,
+            casPasswordOverride = applicantDTO.casPasswordOverride,
+            modificationDate = applicantDTO.modificationDate,
+            basicData = BasicData(applicantDTO.basicData),
+            contactData = ContactData(applicantDTO.contactData!!),
+            additionalData = AdditionalData(applicantDTO.additionalData!!),
+            foreignerData = ForeignerData(applicantDTO.foreignerData!!),
+            educationData = EducationData(applicantDTO.educationData!!)
     )
 }

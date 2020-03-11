@@ -1,10 +1,9 @@
-package pl.ue.poznan.matriculation.irk.domain.applicants
+package pl.ue.poznan.matriculation.irk.dto.applicants
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import pl.ue.poznan.matriculation.irk.dto.applicants.*
 import java.util.*
 
-data class Applicant(
+data class ApplicantDTO(
         val id: Long,
 
         val email: String,
@@ -14,7 +13,7 @@ data class Applicant(
 
         val password: String,
 
-        val nameDTO: NameDTO,
+        val name: NameDTO,
 
         val phone: String?,
 
@@ -32,17 +31,17 @@ data class Applicant(
         val modificationDate: Date,
 
         @JsonProperty("basic_data")
-        val basicDataDTO: BasicDataDTO,
+        val basicData: BasicDataDTO,
 
         @JsonProperty("contact_data")
-        val contactDataDTO: ContactDataDTO?,
+        val contactData: ContactDataDTO?,
 
         @JsonProperty("additional_data")
-        val additionalDataDTO: AdditionalDataDTO?,
+        val additionalData: AdditionalDataDTO?,
 
         @JsonProperty("foreigner_data")
-        val foreignerDataDTO: ForeignerDataDTO?,
+        val foreignerData: ForeignerDataDTO?,
 
         @JsonProperty("education_data")
-        val educationDataDTO: EducationDataDTO?
+        val educationData: EducationDataDTO?
 )

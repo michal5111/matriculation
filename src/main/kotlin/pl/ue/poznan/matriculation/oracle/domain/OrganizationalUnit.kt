@@ -71,8 +71,8 @@ data class OrganizationalUnit(
         @Column(name = "CZY_WYSWIETLAC", length = 1, nullable = false)
         val display: String,
 
-        @Column(name = "CZY_AKTYWNA", length = 1, nullable = false)
-        val isActive: String,
+//        @Column(name = "CZY_AKTYWNA", length = 1, nullable = false)
+//        val isActive: String,
 
         @Column(name = "OPIS_NIE", length = 200, nullable = true)
         val germanDescription: String?,

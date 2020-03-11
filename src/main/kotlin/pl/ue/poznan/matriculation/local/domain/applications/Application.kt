@@ -1,7 +1,7 @@
 package pl.ue.poznan.matriculation.local.domain.applications
 
 
-import pl.ue.poznan.matriculation.irk.domain.applications.Application
+import pl.ue.poznan.matriculation.irk.dto.applications.ApplicationDTO
 import pl.ue.poznan.matriculation.local.domain.Turn
 import pl.ue.poznan.matriculation.local.domain.applicants.Applicant
 import javax.persistence.*
@@ -24,15 +24,15 @@ data class Application(
         @OneToOne(fetch = FetchType.LAZY)
         val user: Applicant?
 ) {
-        constructor(application: Application): this(
-                admitted = application.admitted,
-                comment = application.comment,
-                foreignerData = ForeignerData(application.foreignerData!!),
-                payment = application.payment,
-                position = application.position,
-                qualified = application.qualified,
-                score = application.score,
-                turn = Turn(application.turn!!),
-                user = Applicant(application.user!!)
-        )
+//        constructor(applicationDTO: ApplicationDTO): this(
+//                admitted = applicationDTO.admitted,
+//                comment = applicationDTO.comment,
+//                foreignerData = ForeignerData(applicationDTO.foreignerDataDTO!!),
+//                payment = applicationDTO.payment,
+//                position = applicationDTO.position,
+//                qualified = applicationDTO.qualified,
+//                score = applicationDTO.score,
+//                turn = Turn(applicationDTO.turn!!),
+//                user = Applicant(applicationDTO.user!!)
+//        )
 }

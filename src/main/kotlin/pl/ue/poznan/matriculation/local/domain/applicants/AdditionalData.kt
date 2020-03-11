@@ -1,7 +1,7 @@
 package pl.ue.poznan.matriculation.local.domain.applicants
 
 
-import pl.ue.poznan.matriculation.irk.domain.applicants.AdditionalData
+import pl.ue.poznan.matriculation.irk.dto.applicants.AdditionalDataDTO
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -24,17 +24,17 @@ data class AdditionalData(
         val mothersName: String?,
         val wku: String?
 ) {
-        constructor(additionalData: AdditionalData): this(
-                cityOfBirth = additionalData.cityOfBirth,
-                countryOfBirth = additionalData.countryOfBirth,
-                documentCountry = additionalData.countryOfBirth,
-                documentExpDate = additionalData.documentExpDate,
-                documentNumber = additionalData.documentNumber,
-                documentType = additionalData.documentType,
-                fathersName = additionalData.fathersName,
-                militaryCategory = additionalData.militaryCategory,
-                militaryStatus = additionalData.militaryStatus,
-                mothersName = additionalData.mothersName,
-                wku = additionalData.wku
+        constructor(additionalDataDTO: AdditionalDataDTO): this(
+                cityOfBirth = additionalDataDTO.cityOfBirth,
+                countryOfBirth = additionalDataDTO.countryOfBirth,
+                documentCountry = additionalDataDTO.countryOfBirth,
+                documentExpDate = additionalDataDTO.documentExpDate,
+                documentNumber = additionalDataDTO.documentNumber,
+                documentType = additionalDataDTO.documentType,
+                fathersName = additionalDataDTO.fathersName,
+                militaryCategory = additionalDataDTO.militaryCategory,
+                militaryStatus = additionalDataDTO.militaryStatus,
+                mothersName = additionalDataDTO.mothersName,
+                wku = additionalDataDTO.wku
         )
 }

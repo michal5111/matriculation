@@ -1,10 +1,9 @@
-package pl.ue.poznan.matriculation.irk.domain.applicants
+package pl.ue.poznan.matriculation.irk.dto.applicants
 
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import pl.ue.poznan.matriculation.irk.dto.applicants.DocumentDTO
 
-data class EducationData(
+data class EducationDataDTO(
         val documentDTOS: List<DocumentDTO>,
         @JsonProperty("high_school_city")
         val highSchoolCity: String?,

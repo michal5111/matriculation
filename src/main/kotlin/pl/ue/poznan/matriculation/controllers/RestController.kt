@@ -1,10 +1,14 @@
 package pl.ue.poznan.matriculation.controllers
 
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
-import pl.ue.poznan.matriculation.irk.domain.Page
+import pl.ue.poznan.matriculation.irk.dto.applicants.ApplicantDTO
+import pl.ue.poznan.matriculation.irk.dto.applications.ApplicationDTO
+import pl.ue.poznan.matriculation.irk.dto.programmes.ProgrammeGroupsDTO
+import pl.ue.poznan.matriculation.irk.dto.registrations.RegistrationDTO
 import pl.ue.poznan.matriculation.local.domain.applicants.Applicant
 import pl.ue.poznan.matriculation.local.domain.applications.Application
 import pl.ue.poznan.matriculation.local.domain.programmes.ProgrammeGroups
@@ -38,7 +42,7 @@ class RestController(
     }
 
     @GetMapping("persons")
-    fun person(pageable: Pageable): org.springframework.data.domain.Page<Person> {
+    fun person(pageable: Pageable): Page<Person> {
         return personsRepository.findAll(pageable)
     }
 
@@ -48,7 +52,7 @@ class RestController(
     }
 
     @GetMapping("applicants/{id}")
-    fun getApplicantById(@PathVariable("id") id: Long): Applicant? {
+    fun getApplicantById(@PathVariable("id") id: Long): ApplicantDTO? {
         return irkService.getApplicantById(id)
     }
 
@@ -57,7 +61,7 @@ class RestController(
             @RequestParam(required = false) pesel: String?,
             @RequestParam(required = false) surname: String?,
             @RequestParam(required = false) email: String?
-    ): Page<Applicant>? {
+    ): Page<ApplicantDTO>? {
         if (pesel != null) return irkService.getApplicantsByPesel(pesel)
         if (surname != null) return irkService.getApplicantsBySurname(surname)
         if (email != null) return irkService.getApplicantsByEmail(email)
@@ -65,12 +69,12 @@ class RestController(
     }
 
     @GetMapping("registrations/{id}")
-    fun getRegistration(@PathVariable("id") id: String): Registration? {
+    fun getRegistration(@PathVariable("id") id: String): RegistrationDTO? {
         return irkService.getRegistration(id)
     }
 
     @GetMapping("applications/{id}")
-    fun getApplication(@PathVariable("id") id: Long): Application? {
+    fun getApplication(@PathVariable("id") id: Long): ApplicationDTO? {
         return irkService.getApplication(id)
     }
 
@@ -79,12 +83,12 @@ class RestController(
             @RequestParam(required = false) qualified: Boolean,
             @RequestParam(required = false) paid: Boolean,
             @RequestParam(required = false) pageNumber: Int?
-    ): Page<Application>? {
+    ): Page<ApplicationDTO>? {
         return irkService.getApplications(qualified, paid, pageNumber)
     }
 
     @GetMapping("programmesGroups/{id}")
-    fun getProgrammesGroups(@PathVariable("id") id: String): ProgrammeGroups? {
+    fun getProgrammesGroups(@PathVariable("id") id: String): ProgrammeGroupsDTO? {
         return irkService.getProgrammesGroups(id)
     }
 }

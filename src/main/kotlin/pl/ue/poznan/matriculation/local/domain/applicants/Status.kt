@@ -1,6 +1,6 @@
 package pl.ue.poznan.matriculation.local.domain.applicants
 
-import pl.ue.poznan.matriculation.irk.domain.applicants.Status
+import pl.ue.poznan.matriculation.irk.dto.applicants.StatusDTO
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -13,7 +13,7 @@ data class Status(
         var id: Long? = null,
         val status: String
 ) {
-    constructor(status: Status): this(
-            status = status.status
+    constructor(statusDTO: StatusDTO): this(
+            status = statusDTO.status
     )
 }

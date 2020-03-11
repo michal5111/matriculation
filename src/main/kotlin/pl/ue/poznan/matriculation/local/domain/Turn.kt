@@ -1,7 +1,7 @@
 package pl.ue.poznan.matriculation.local.domain
 
 
-import pl.ue.poznan.matriculation.irk.domain.Turn
+import pl.ue.poznan.matriculation.irk.dto.TurnDTO
 import java.util.*
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -18,10 +18,10 @@ data class Turn(
         val programme: String?,
         val registration: String?
 ) {
-        constructor(turn: Turn): this(
-                dateFrom = turn.dateFrom,
-                dateTo = turn.dateTo,
-                programme = turn.programme,
-                registration = turn.registration
+        constructor(turnDTO: TurnDTO): this(
+                dateFrom = turnDTO.dateFrom,
+                dateTo = turnDTO.dateTo,
+                programme = turnDTO.programme,
+                registration = turnDTO.registration
         )
 }
