@@ -13,7 +13,7 @@ export class ApplicantComponent implements OnInit {
   id: string;
   applicant: Applicant;
 
-  constructor(private applicantService: ApplicantService, private route: ActivatedRoute) { }
+  constructor(public applicantService: ApplicantService, private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.id = this.route.snapshot.params.id;

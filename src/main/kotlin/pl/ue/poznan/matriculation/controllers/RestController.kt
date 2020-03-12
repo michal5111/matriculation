@@ -1,6 +1,5 @@
 package pl.ue.poznan.matriculation.controllers
 
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
@@ -9,10 +8,6 @@ import pl.ue.poznan.matriculation.irk.dto.applicants.ApplicantDTO
 import pl.ue.poznan.matriculation.irk.dto.applications.ApplicationDTO
 import pl.ue.poznan.matriculation.irk.dto.programmes.ProgrammeGroupsDTO
 import pl.ue.poznan.matriculation.irk.dto.registrations.RegistrationDTO
-import pl.ue.poznan.matriculation.local.domain.applicants.Applicant
-import pl.ue.poznan.matriculation.local.domain.applications.Application
-import pl.ue.poznan.matriculation.local.domain.programmes.ProgrammeGroups
-import pl.ue.poznan.matriculation.local.domain.registrations.Registration
 import pl.ue.poznan.matriculation.irk.service.IrkService
 import pl.ue.poznan.matriculation.oracle.domain.Person
 import pl.ue.poznan.matriculation.oracle.repo.PersonsRepository
@@ -42,7 +37,7 @@ class RestController(
     }
 
     @GetMapping("persons")
-    fun person(pageable: Pageable): Page<Person> {
+    fun person(pageable: Pageable): org.springframework.data.domain.Page<Person> {
         return personsRepository.findAll(pageable)
     }
 
@@ -61,7 +56,7 @@ class RestController(
             @RequestParam(required = false) pesel: String?,
             @RequestParam(required = false) surname: String?,
             @RequestParam(required = false) email: String?
-    ): Page<ApplicantDTO>? {
+    ): pl.ue.poznan.matriculation.irk.domain.Page<ApplicantDTO>? {
         if (pesel != null) return irkService.getApplicantsByPesel(pesel)
         if (surname != null) return irkService.getApplicantsBySurname(surname)
         if (email != null) return irkService.getApplicantsByEmail(email)
@@ -80,11 +75,13 @@ class RestController(
 
     @GetMapping("applications")
     fun getApplications(
-            @RequestParam(required = false) qualified: Boolean,
-            @RequestParam(required = false) paid: Boolean,
-            @RequestParam(required = false) pageNumber: Int?
-    ): Page<ApplicationDTO>? {
-        return irkService.getApplications(qualified, paid, pageNumber)
+        @RequestParam(required = false) admitted: Boolean,
+        @RequestParam(required = false) paid: Boolean,
+        @RequestParam(required = false) programme: String?,
+        @RequestParam(required = false) registration: String?,
+        @RequestParam(required = false) pageNumber: Int?
+    ): pl.ue.poznan.matriculation.irk.domain.Page<ApplicationDTO>? {
+        return irkService.getApplications(admitted, paid, registration, programme, pageNumber)
     }
 
     @GetMapping("programmesGroups/{id}")

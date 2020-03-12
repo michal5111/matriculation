@@ -4,13 +4,13 @@ package pl.ue.poznan.matriculation.irk.dto.applicants
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class EducationDataDTO(
-        val documentDTOS: List<DocumentDTO>,
-        @JsonProperty("high_school_city")
+    val documents: List<DocumentDTO>?,
+    @JsonProperty("high_school_city")
         val highSchoolCity: String?,
-        @JsonProperty("high_school_name")
+    @JsonProperty("high_school_name")
         val highSchoolName: String?,
-        @JsonProperty("high_school_type")
+    @JsonProperty("high_school_type")
         val highSchoolType: String?,
-        @JsonProperty("high_school_usos_code")
+    @JsonProperty("high_school_usos_code")
         val highSchoolUsosCode: String?
 )

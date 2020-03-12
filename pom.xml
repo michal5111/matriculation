@@ -109,8 +109,8 @@
 				<artifactId>frontend-maven-plugin</artifactId>
 				<version>1.7.6</version>
 				<configuration>
-					<nodeVersion>v11.15.0</nodeVersion>
-					<npmVersion>6.3.0</npmVersion>
+					<nodeVersion>v13.9.0</nodeVersion>
+					<npmVersion>6.14.1</npmVersion>
 					<workingDirectory>src/main/webapp/</workingDirectory>
 				</configuration>
 				<executions>

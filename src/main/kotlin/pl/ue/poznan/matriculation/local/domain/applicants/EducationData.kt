@@ -18,10 +18,10 @@ data class EducationData(
         val highSchoolUsosCode: String?
 ) {
         constructor(educationDataDTO: EducationDataDTO): this(
-                documents = educationDataDTO.documentDTOS
-                        .stream()
-                        .map { document -> Document(document) }
-                        .collect(Collectors.toList()),
+                documents = educationDataDTO.documents
+                    ?.stream()
+                    ?.map { document -> Document(document) }
+                    ?.collect(Collectors.toList())!!,
                 highSchoolCity = educationDataDTO.highSchoolCity,
                 highSchoolName = educationDataDTO.highSchoolName,
                 highSchoolType = educationDataDTO.highSchoolType,

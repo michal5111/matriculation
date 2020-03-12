@@ -1,11 +1,11 @@
 package pl.ue.poznan.matriculation.irk.service
 
 import org.springframework.core.ParameterizedTypeReference
-import org.springframework.data.domain.Page
 import org.springframework.http.*
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.exchange
+import pl.ue.poznan.matriculation.irk.domain.Page
 import pl.ue.poznan.matriculation.irk.dto.applicants.ApplicantDTO
 import pl.ue.poznan.matriculation.irk.dto.applications.ApplicationDTO
 import pl.ue.poznan.matriculation.irk.dto.programmes.ProgrammeGroupsDTO
@@ -108,13 +108,19 @@ class IrkService {
         return response.body
     }
 
-    fun getApplications(qualified: Boolean, paid: Boolean, pageNumber: Int?): Page<ApplicationDTO>? {
+    fun getApplications(admitted: Boolean, paid: Boolean, programme: String?, registration: String?, pageNumber: Int?): Page<ApplicationDTO>? {
         var url = "${apiUrl}applications/?"
-        if (qualified) {
-            url = url.plus("qualified&")
+        if (admitted) {
+            url = url.plus("admitted&")
         }
         if (paid) {
             url = url.plus("paid&")
+        }
+        registration?.let {
+            url = url.plus("registration=$registration")
+        }
+        programme?.let {
+            url = url.plus("programme=$programme")
         }
         if (pageNumber != null) {
             url = url.plus("page=$pageNumber&")
