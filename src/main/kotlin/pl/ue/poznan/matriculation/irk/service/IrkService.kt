@@ -18,7 +18,7 @@ import pl.ue.poznan.matriculation.local.domain.registrations.Registration
 
 @Service
 class IrkService {
-    private val apiKey = "50b962525772029436cf6643f0e2f569e75f967f"
+    private val apiKey = "598050a3c1978e84cb7dc0f43d4e2a091ff76319"
     private val apiUrl = "https://usos-irk.ue.poznan.pl/api/"
     private val restTemplate: RestTemplate = RestTemplate()
     private class pageOfApplicants: ParameterizedTypeReference<Page<ApplicantDTO>>()
