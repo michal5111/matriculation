@@ -14,10 +14,10 @@ class ApplicationMapper(
 
     private val modelMapper: ModelMapper = ModelMapper()
 
-    fun ApplicationDtoToApplicationMapper(applicationDTO: ApplicationDTO): Application {
+    fun applicationDtoToApplicationMapper(applicationDTO: ApplicationDTO): Application {
         val application = modelMapper.map(applicationDTO, Application::class.java)
         val applicantDTO = irkService.getApplicantById(applicationDTO.user)
-        val applicant = applicantDTO?.let { applicantMapper.ApplicantDtoToApplicantMapper(it) }
+        val applicant = applicantDTO?.let { applicantMapper.applicantDtoToApplicantMapper(it) }
         application.user = applicant
         return application
     }

@@ -11,7 +11,7 @@ class ApplicantMapper {
 
     private val modelMapper: ModelMapper = ModelMapper()
 
-    fun ApplicantDtoToApplicantMapper(applicantDTO: ApplicantDTO): Applicant? {
+    fun applicantDtoToApplicantMapper(applicantDTO: ApplicantDTO): Applicant? {
         return modelMapper.map(applicantDTO, Applicant::class.java)
     }
 }

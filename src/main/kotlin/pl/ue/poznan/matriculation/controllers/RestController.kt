@@ -81,7 +81,7 @@ class RestController(
         @RequestParam(required = false) registration: String?,
         @RequestParam(required = false) pageNumber: Int?
     ): pl.ue.poznan.matriculation.irk.domain.Page<ApplicationDTO>? {
-        return irkService.getApplications(admitted, paid, registration, programme, pageNumber)
+        return irkService.getApplications(admitted, paid, programme,registration,  pageNumber)
     }
 
     @GetMapping("programmesGroups/{id}")

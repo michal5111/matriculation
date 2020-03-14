@@ -5,6 +5,7 @@ import org.springframework.http.*
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.exchange
+import org.springframework.web.util.UriComponentsBuilder
 import pl.ue.poznan.matriculation.irk.domain.Page
 import pl.ue.poznan.matriculation.irk.dto.applicants.ApplicantDTO
 import pl.ue.poznan.matriculation.irk.dto.applications.ApplicationDTO
@@ -108,29 +109,34 @@ class IrkService {
         return response.body
     }
 
-    fun getApplications(admitted: Boolean, paid: Boolean, programme: String?, registration: String?, pageNumber: Int?): Page<ApplicationDTO>? {
-        var url = "${apiUrl}applications/?"
+    fun getApplications(
+            admitted: Boolean,
+            paid: Boolean,
+            programme: String?,
+            registration: String?,
+            pageNumber: Int?): Page<ApplicationDTO>? {
+        val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("${apiUrl}applications/")
         if (admitted) {
-            url = url.plus("admitted&")
+            uriComponentBuilder.queryParam("admitted",admitted)
         }
         if (paid) {
-            url = url.plus("paid&")
+            uriComponentBuilder.queryParam("paid", paid)
         }
         registration?.let {
-            url = url.plus("registration=$registration")
+            uriComponentBuilder.queryParam("registration", registration)
         }
         programme?.let {
-            url = url.plus("programme=$programme")
+            uriComponentBuilder.queryParam("programme",programme)
         }
         if (pageNumber != null) {
-            url = url.plus("page=$pageNumber&")
+            uriComponentBuilder.queryParam("page",pageNumber)
         }
         val httpHeaders = HttpHeaders()
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set("Authorization","Token $apiKey")
         val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         val response: ResponseEntity<Page<ApplicationDTO>> = restTemplate.exchange(
-                url,
+                uriComponentBuilder.toUriString(),
                 HttpMethod.GET,
                 httpEntity,
                 pageOfApplications()
