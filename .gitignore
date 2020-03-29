@@ -30,3 +30,5 @@ build/
 ### VS Code ###
 .vscode/
 /.directory
+/src/main/webapp/node/node_modules/npm/
+/.mvn/wrapper/
