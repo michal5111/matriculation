@@ -1,66 +1,119 @@
 package pl.ue.poznan.matriculation.local.domain.applicants
 
-import pl.ue.poznan.matriculation.irk.dto.applicants.ApplicantDTO
+import com.fasterxml.jackson.annotation.JsonIgnore
+import org.hibernate.annotations.LazyCollection
+import org.hibernate.annotations.LazyCollectionOption
+import pl.ue.poznan.matriculation.local.domain.applications.Application
 import java.util.*
 import javax.persistence.*
 
 @Entity
 data class Applicant(
+
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
-        var id: Long? = null,
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        val id: Long? = null,
 
-        val email: String,
+        @Column(unique = true)
+        val irkId: Long,
 
-        val indexNumber: String?,
+        @Column(unique = true)
+        var email: String,
 
-        val password: String,
+        var indexNumber: String?,
 
-        @OneToOne
+        var password: String,
+
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
         val name: Name,
 
-        val phone: String?,
+        var phone: String?,
 
-        val citizenship: String?,
+        var citizenship: String?,
 
-        val photo: String?,
+        var photo: String?,
 
-        val photoPermission: String?,
+//        @JsonIgnore
+//        @Basic(fetch = FetchType.LAZY)
+//        @Lob
+//        @Column(length = 4096)
+//        val photoByteArray: ByteArray?,
 
-        val casPasswordOverride: String?,
+        var photoPermission: String?,
 
-        val modificationDate: Date,
+        var casPasswordOverride: String?,
 
-        @OneToOne
-        val basicData: BasicData,
+        var modificationDate: Date,
 
-        @OneToOne
-        val contactData: ContactData?,
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+        var basicData: BasicData,
 
-        @OneToOne
-        val additionalData: AdditionalData?,
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+        var contactData: ContactData,
 
-        @OneToOne
-        val foreignerData: ForeignerData?,
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+        val additionalData: AdditionalData,
 
-        @OneToOne
-        val educationData: EducationData?
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+        val applicantForeignerData: ApplicantForeignerData?,
+
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+        val educationData: EducationData,
+
+        var usosId: Long? = null,
+
+        @JsonIgnore
+        @LazyCollection(LazyCollectionOption.FALSE)
+        @OneToMany(mappedBy = "applicant")
+        var application: MutableList<Application> = mutableListOf()
 ) {
-    constructor(applicantDTO: ApplicantDTO) : this(
-            email = applicantDTO.email,
-            indexNumber = applicantDTO.indexNumber,
-            password = applicantDTO.password,
-            name = Name(applicantDTO.name),
-            phone = applicantDTO.phone,
-            citizenship = applicantDTO.citizenship,
-            photo = applicantDTO.photo,
-            photoPermission = applicantDTO.photoPermission,
-            casPasswordOverride = applicantDTO.casPasswordOverride,
-            modificationDate = applicantDTO.modificationDate,
-            basicData = BasicData(applicantDTO.basicData),
-            contactData = ContactData(applicantDTO.contactData!!),
-            additionalData = AdditionalData(applicantDTO.additionalData!!),
-            foreignerData = ForeignerData(applicantDTO.foreignerData!!),
-            educationData = EducationData(applicantDTO.educationData!!)
-    )
+        override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as Applicant
+
+                if (id != other.id) return false
+                if (irkId != other.irkId) return false
+                if (email != other.email) return false
+                if (indexNumber != other.indexNumber) return false
+                if (password != other.password) return false
+                if (name != other.name) return false
+                if (phone != other.phone) return false
+                if (citizenship != other.citizenship) return false
+                if (photo != other.photo) return false
+                if (photoPermission != other.photoPermission) return false
+                if (casPasswordOverride != other.casPasswordOverride) return false
+                if (modificationDate != other.modificationDate) return false
+                if (basicData != other.basicData) return false
+                if (contactData != other.contactData) return false
+                if (additionalData != other.additionalData) return false
+                if (applicantForeignerData != other.applicantForeignerData) return false
+                if (educationData != other.educationData) return false
+                if (usosId != other.usosId) return false
+
+                return true
+        }
+
+        override fun hashCode(): Int {
+                var result = id?.hashCode() ?: 0
+                result = 31 * result + irkId.hashCode()
+                result = 31 * result + email.hashCode()
+                result = 31 * result + (indexNumber?.hashCode() ?: 0)
+                result = 31 * result + password.hashCode()
+                result = 31 * result + name.hashCode()
+                result = 31 * result + (phone?.hashCode() ?: 0)
+                result = 31 * result + (citizenship?.hashCode() ?: 0)
+                result = 31 * result + (photo?.hashCode() ?: 0)
+                result = 31 * result + (photoPermission?.hashCode() ?: 0)
+                result = 31 * result + (casPasswordOverride?.hashCode() ?: 0)
+                result = 31 * result + modificationDate.hashCode()
+                result = 31 * result + basicData.hashCode()
+                result = 31 * result + contactData.hashCode()
+                result = 31 * result + additionalData.hashCode()
+                result = 31 * result + (applicantForeignerData?.hashCode() ?: 0)
+                result = 31 * result + educationData.hashCode()
+                result = 31 * result + (usosId?.hashCode() ?: 0)
+                return result
+        }
 }

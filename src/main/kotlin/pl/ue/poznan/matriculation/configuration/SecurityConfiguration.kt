@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
+import org.springframework.http.HttpMethod
 import org.springframework.security.cas.ServiceProperties
 import org.springframework.security.cas.authentication.CasAssertionAuthenticationToken
 import org.springframework.security.cas.authentication.CasAuthenticationProvider
@@ -13,6 +14,7 @@ import org.springframework.security.cas.web.CasAuthenticationEntryPoint
 import org.springframework.security.cas.web.CasAuthenticationFilter
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService
@@ -21,6 +23,9 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy
 import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import org.springframework.web.filter.CorsFilter
 import pl.ue.poznan.matriculation.security.CustomUserDetailsService
 import java.util.*
 
@@ -118,27 +123,21 @@ class SecurityConfiguration: WebSecurityConfigurerAdapter() {
         auth.authenticationProvider(casAuthenticationProvider())
     }
 
-//    @Throws(Exception::class)
-//    override fun configure(web: WebSecurity) {
-//        web.ignoring().antMatchers("/fonts/**").antMatchers("/images/**").antMatchers("/scripts/**").antMatchers("/styles/**")
-//                .antMatchers("/views/**").antMatchers("/i18n/**").antMatchers("/webjars/**")
-//    }
-
-//    @Bean
-//    fun corsFilter(): CorsFilter {
-//        val source = UrlBasedCorsConfigurationSource()
-//        val config = CorsConfiguration()
-//        config.allowCredentials = true
-//        config.addAllowedOrigin("*")
-//        config.addAllowedHeader("*")
-//        config.addAllowedMethod("OPTIONS")
-//        config.addAllowedMethod("GET")
-//        config.addAllowedMethod("POST")
-//        config.addAllowedMethod("PUT")
-//        config.addAllowedMethod("DELETE")
-//        source.registerCorsConfiguration("/**", config)
-//        return CorsFilter(source)
-//    }
+    @Bean
+    fun corsFilter(): CorsFilter {
+        val source = UrlBasedCorsConfigurationSource()
+        val config = CorsConfiguration()
+        config.allowCredentials = true
+        config.addAllowedOrigin("*")
+        config.addAllowedHeader("*")
+        config.addAllowedMethod("OPTIONS")
+        config.addAllowedMethod("GET")
+        config.addAllowedMethod("POST")
+        config.addAllowedMethod("PUT")
+        config.addAllowedMethod("DELETE")
+        source.registerCorsConfiguration("/**", config)
+        return CorsFilter(source)
+    }
 
     override fun configure(http: HttpSecurity) {
         http
@@ -146,13 +145,24 @@ class SecurityConfiguration: WebSecurityConfigurerAdapter() {
                     .authenticationEntryPoint(casAuthenticationEntryPoint())
                 .and()
                     .addFilter(casAuthenticationFilter())
-                    //.addFilterBefore(corsFilter(), CorsFilter::class.java)
+                    .addFilterBefore(corsFilter(), CorsFilter::class.java)
                     .addFilterBefore(singleSignOutFilter(), CasAuthenticationFilter::class.java)
                     .addFilterBefore(requestCasGlobalLogoutFilter(), LogoutFilter::class.java)
-                    .authorizeRequests().antMatchers("/s/*").authenticated()
-                .antMatchers("/login").authenticated()
-                .antMatchers("/*").permitAll()
+                .authorizeRequests()
+                    .antMatchers("/login").authenticated()
+                    .antMatchers("/*").permitAll()
         http.csrf().disable()
         http.headers().frameOptions().disable()
+    }
+
+    override fun configure(web: WebSecurity) {
+        web.ignoring()
+                .antMatchers(HttpMethod.OPTIONS, "/**")
+                .antMatchers("/app/**/*.{js,html}")
+                .antMatchers("/i18n/**")
+                .antMatchers("/content/**")
+                .antMatchers("/h2-console/**")
+                .antMatchers("/swagger-ui/index.html")
+                .antMatchers("/test/**")
     }
 }

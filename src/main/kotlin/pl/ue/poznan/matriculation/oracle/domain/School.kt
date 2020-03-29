@@ -2,7 +2,6 @@ package pl.ue.poznan.matriculation.oracle.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.URL
-import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
@@ -15,7 +14,7 @@ data class School(
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_SZK_SEQ")
         @SequenceGenerator(sequenceName = "DZ_SZK_SEQ", allocationSize = 1, name = "DZ_SZK_SEQ")
         @Column(name = "ID")
-        val id: Long,
+        val id: Long? = null,
 
         @NotBlank
         @Column(name = "NAZWA", length = 200, nullable = false)
@@ -43,17 +42,17 @@ data class School(
         @Column(name = "NAME", length = 200, nullable = true)
         val nameEng: String?,
 
-        @Column(name = "MOD_DATA", nullable = false)
-        val modificationDate: Date,
-
-        @Column(name = "MOD_ID", length = 30, nullable = false)
-        val modificationUser: String,
-
-        @Column(name = "UTW_DATA", nullable = false)
-        val creationDate: Date,
-
-        @Column(name = "UTW_ID", length = 30, nullable = false)
-        val creationUser: String,
+//        @Column(name = "MOD_DATA", nullable = false)
+//        val modificationDate: Date,
+//
+//        @Column(name = "MOD_ID", length = 30, nullable = false)
+//        val modificationUser: String,
+//
+//        @Column(name = "UTW_DATA", nullable = false)
+//        val creationDate: Date,
+//
+//        @Column(name = "UTW_ID", length = 30, nullable = false)
+//        val creationUser: String,
 
         @Column(name = "KOD_POLON", length = 20, nullable = true)
         val polonCode: String?,
@@ -113,6 +112,10 @@ data class School(
         val emailNominations: String?,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "middleSchool", fetch = FetchType.EAGER)
-        val Persons: Set<Person>
+        @OneToMany(mappedBy = "middleSchool", fetch = FetchType.LAZY)
+        val persons: Set<Person>,
+
+        @JsonIgnore
+        @OneToMany(mappedBy = "school", fetch = FetchType.LAZY)
+        val entitlementDocuments: Set<EntitlementDocument>
         )

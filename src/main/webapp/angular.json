@@ -127,5 +127,8 @@
       }
     }
   },
-  "defaultProject": "angularmatriculation"
+  "defaultProject": "angularmatriculation",
+  "cli": {
+    "analytics": "8e960832-c5c2-48be-ab39-008eb6548c46"
+  }
 }

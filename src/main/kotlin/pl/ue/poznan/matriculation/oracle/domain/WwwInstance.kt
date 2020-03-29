@@ -2,7 +2,6 @@ package pl.ue.poznan.matriculation.oracle.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.validator.constraints.URL
-import java.util.*
 import javax.persistence.*
 
 //@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
@@ -28,17 +27,17 @@ data class WwwInstance(
         @Column(name = "INST_WWW_ID", nullable = false)
         val wwwInstanceId: Int,
 
-        @Column(name = "MOD_DATA", nullable = false)
-        val modificationDate: Date,
-
-        @Column(name = "MOD_ID", length = 30, nullable = false)
-        val modificationUser: String,
-
-        @Column(name = "UTW_DATA", nullable = false)
-        val creationDate: Date,
-
-        @Column(name = "UTW_ID", length = 30, nullable = false)
-        val creationUser: String,
+//        @Column(name = "MOD_DATA", nullable = false)
+//        val modificationDate: Date,
+//
+//        @Column(name = "MOD_ID", length = 30, nullable = false)
+//        val modificationUser: String,
+//
+//        @Column(name = "UTW_DATA", nullable = false)
+//        val creationDate: Date,
+//
+//        @Column(name = "UTW_ID", length = 30, nullable = false)
+//        val creationUser: String,
 
         @JsonIgnore
         @OneToMany(mappedBy = "wwwInstance", fetch = FetchType.LAZY)

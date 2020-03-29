@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
-import pl.ue.poznan.matriculation.oracle.repo.PersonsRepository
+import pl.ue.poznan.matriculation.oracle.repo.PersonRepository
 import java.net.URI
 
 
@@ -14,7 +14,7 @@ import java.net.URI
 
 @Controller
 class IndexController(
-        private val personsRepository: PersonsRepository
+        private val personRepository: PersonRepository
 ) {
 
 //    @GetMapping("/")

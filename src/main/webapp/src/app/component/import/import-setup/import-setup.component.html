@@ -1,0 +1,67 @@
+<div>
+  <form [formGroup]="importCreationFormGroup" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+      <mat-label>Rekrutacja</mat-label>
+      <mat-select formControlName="registration">
+        <mat-option
+          *ngFor="let registration of $availableRegistrationsObservable | async"
+          [value]="registration"
+          (onSelectionChange)="onRegistrationSelectionChange($event, registration)">{{registration}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Program</mat-label>
+      <mat-select formControlName="registrationProgramme">
+        <mat-option
+          *ngFor="let registrationProgramme of registrationProgrammes"
+          [value]="registrationProgramme"
+        (onSelectionChange)="onRegistrationProgrammeChange($event, registrationProgramme)">{{registrationProgramme}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Etap</mat-label>
+      <mat-select formControlName="stage">
+        <mat-option
+          *ngFor="let stage of stages"
+          [value]="stage">{{stage}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Cykl dydaktyczny</mat-label>
+      <input type="text" matInput formControlName="didacticCycle" [matAutocomplete]="auto" [(ngModel)]="didacticCycleInputValue" (keypress)="onDidacticCycleInputChange()">
+      <button mat-button *ngIf="didacticCycleInputValue" matSuffix mat-icon-button aria-label="Clear" (click)="didacticCycleInputValue=''">
+        <mat-icon>close</mat-icon>
+      </button>
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option *ngFor="let didacticCycle of didacticCycles" [value]="didacticCycle">
+          {{didacticCycle}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Pula indeksów</mat-label>
+      <mat-select formControlName="indexPool">
+        <mat-option
+          *ngFor="let indexPool of $indexPoolsObservable | async"
+          [value]="indexPool">{{indexPool}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Data rozpoczęcia studiów</mat-label>
+      <input matInput [matDatepicker]="startDatePicker" formControlName="startDate">
+      <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+      <mat-datepicker #startDatePicker></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Data przyjęcia na program</mat-label>
+      <input matInput [matDatepicker]="dateOfAddmisionPicker" formControlName="dateOfAddmision">
+      <mat-datepicker-toggle matSuffix [for]="dateOfAddmisionPicker"></mat-datepicker-toggle>
+      <mat-datepicker #dateOfAddmisionPicker></mat-datepicker>
+    </mat-form-field>
+    <button mat-button type="submit" [disabled]="!importCreationFormGroup.valid">Utwórz</button>
+  </form>
+</div>

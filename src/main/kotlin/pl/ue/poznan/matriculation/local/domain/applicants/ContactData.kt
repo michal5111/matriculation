@@ -1,56 +1,105 @@
 package pl.ue.poznan.matriculation.local.domain.applicants
 
-
-import pl.ue.poznan.matriculation.irk.dto.applicants.ContactDataDTO
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import com.fasterxml.jackson.annotation.JsonIgnore
+import java.io.Serializable
+import javax.persistence.*
 
 @Entity
 data class ContactData(
+
+        @JsonIgnore
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
-        var id: Long = -1,
-        val modificationDate: String?,
-        val officialCity: String?,
-        val officialCityIsCity: Boolean,
-        val officialCountry: String?,
-        val officialFlatNumber: String?,
-        val officialPostCode: String?,
-        val officialStreet: String?,
-        val officialStreetNumber: String,
-        val phoneNumber: String?,
-        val phoneNumber2: String?,
-        val phoneNumber2Type: String?,
-        val phoneNumberType: String?,
-        val realCity: String?,
-        val realCityIsCity: Boolean,
-        val realCountry: String?,
-        val realFlatNumber: String?,
-        val realPostCode: String?,
-        val realStreet: String?,
-        val realStreetNumber: String?
-) {
-        constructor(contactDataDTO: ContactDataDTO): this(
-                modificationDate = contactDataDTO.modificationDate,
-                officialCity = contactDataDTO.officialCity,
-                officialCityIsCity = contactDataDTO.officialCityIsCity,
-                officialCountry = contactDataDTO.officialCountry,
-                officialFlatNumber = contactDataDTO.officialFlatNumber,
-                officialPostCode = contactDataDTO.officialPostCode,
-                officialStreet = contactDataDTO.officialStreet,
-                officialStreetNumber = contactDataDTO.officialStreetNumber,
-                phoneNumber = contactDataDTO.phoneNumber,
-                phoneNumber2 = contactDataDTO.phoneNumber2,
-                phoneNumber2Type = contactDataDTO.phoneNumber2Type,
-                phoneNumberType = contactDataDTO.phoneNumber2Type,
-                realCity = contactDataDTO.realCity,
-                realCountry = contactDataDTO.realCountry,
-                realCityIsCity = contactDataDTO.realCityIsCity,
-                realFlatNumber = contactDataDTO.realFlatNumber,
-                realPostCode = contactDataDTO.realPostCode,
-                realStreet = contactDataDTO.realStreet,
-                realStreetNumber = contactDataDTO.realStreetNumber
-        )
+        @OneToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "applicant_id", referencedColumnName = "id")
+        var applicant: Applicant? = null,
+
+        var modificationDate: String?,
+
+        var officialCity: String?,
+
+        var officialCityIsCity: Boolean,
+
+        var officialCountry: String?,
+
+        var officialFlatNumber: String?,
+
+        var officialPostCode: String?,
+
+        var officialStreet: String?,
+
+        var officialStreetNumber: String,
+
+        var phoneNumber: String?,
+
+        var phoneNumber2: String?,
+
+        var phoneNumber2Type: String?,
+
+        var phoneNumberType: String?,
+
+        var realCity: String?,
+
+        var realCityIsCity: Boolean,
+
+        var realCountry: String?,
+
+        var realFlatNumber: String?,
+
+        var realPostCode: String?,
+
+        var realStreet: String?,
+
+        var realStreetNumber: String?
+): Serializable {
+        override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as ContactData
+
+                if (modificationDate != other.modificationDate) return false
+                if (officialCity != other.officialCity) return false
+                if (officialCityIsCity != other.officialCityIsCity) return false
+                if (officialCountry != other.officialCountry) return false
+                if (officialFlatNumber != other.officialFlatNumber) return false
+                if (officialPostCode != other.officialPostCode) return false
+                if (officialStreet != other.officialStreet) return false
+                if (officialStreetNumber != other.officialStreetNumber) return false
+                if (phoneNumber != other.phoneNumber) return false
+                if (phoneNumber2 != other.phoneNumber2) return false
+                if (phoneNumber2Type != other.phoneNumber2Type) return false
+                if (phoneNumberType != other.phoneNumberType) return false
+                if (realCity != other.realCity) return false
+                if (realCityIsCity != other.realCityIsCity) return false
+                if (realCountry != other.realCountry) return false
+                if (realFlatNumber != other.realFlatNumber) return false
+                if (realPostCode != other.realPostCode) return false
+                if (realStreet != other.realStreet) return false
+                if (realStreetNumber != other.realStreetNumber) return false
+
+                return true
+        }
+
+        override fun hashCode(): Int {
+                var result = modificationDate?.hashCode() ?: 0
+                result = 31 * result + (officialCity?.hashCode() ?: 0)
+                result = 31 * result + officialCityIsCity.hashCode()
+                result = 31 * result + (officialCountry?.hashCode() ?: 0)
+                result = 31 * result + (officialFlatNumber?.hashCode() ?: 0)
+                result = 31 * result + (officialPostCode?.hashCode() ?: 0)
+                result = 31 * result + (officialStreet?.hashCode() ?: 0)
+                result = 31 * result + officialStreetNumber.hashCode()
+                result = 31 * result + (phoneNumber?.hashCode() ?: 0)
+                result = 31 * result + (phoneNumber2?.hashCode() ?: 0)
+                result = 31 * result + (phoneNumber2Type?.hashCode() ?: 0)
+                result = 31 * result + (phoneNumberType?.hashCode() ?: 0)
+                result = 31 * result + (realCity?.hashCode() ?: 0)
+                result = 31 * result + realCityIsCity.hashCode()
+                result = 31 * result + (realCountry?.hashCode() ?: 0)
+                result = 31 * result + (realFlatNumber?.hashCode() ?: 0)
+                result = 31 * result + (realPostCode?.hashCode() ?: 0)
+                result = 31 * result + (realStreet?.hashCode() ?: 0)
+                result = 31 * result + (realStreetNumber?.hashCode() ?: 0)
+                return result
+        }
 }

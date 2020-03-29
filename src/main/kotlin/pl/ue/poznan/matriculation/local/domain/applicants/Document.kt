@@ -1,42 +1,86 @@
 package pl.ue.poznan.matriculation.local.domain.applicants
 
 
-import pl.ue.poznan.matriculation.irk.dto.applicants.DocumentDTO
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import com.fasterxml.jackson.annotation.JsonIgnore
+import java.io.Serializable
+import java.util.*
+import javax.persistence.*
 
 @Entity
 data class Document(
+
+        @JsonIgnore
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long? = null,
-        val certificateType: String?,
-        val certificateTypeCode: String?,
-        val certificateUsosCode: String?,
-        val comment: String?,
-        val documentNumber: String?,
-        val documentYear: Int?,
-        val issueCity: String?,
-        val issueCountry: String?,
-        val issueDate: String?,
-        val issueInstitution: String?,
-        val issueInstitutionUsosCode: String?,
-        val modificationDate: String?
-) {
-        constructor(documentDTO:DocumentDTO): this(
-                certificateType = documentDTO.certificateType,
-                certificateTypeCode = documentDTO.certificateTypeCode,
-                certificateUsosCode = documentDTO.certificateUsosCode,
-                comment = documentDTO.comment,
-                documentNumber = documentDTO.documentNumber,
-                documentYear = documentDTO.documentYear,
-                issueCity = documentDTO.issueCity,
-                issueCountry = documentDTO.issueCountry,
-                issueDate = documentDTO.issueDate,
-                issueInstitution = documentDTO.issueInstitution,
-                issueInstitutionUsosCode = documentDTO.issueInstitutionUsosCode,
-                modificationDate = documentDTO.modificationDate
-        )
+
+        @JsonIgnore
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "education_data_id", referencedColumnName = "applicant_id", nullable = false)
+        var educationData: EducationData? = null,
+
+        val certificateType: String,
+
+        val certificateTypeCode: String,
+
+        val certificateUsosCode: Char,
+
+        var comment: String?,
+
+        var documentNumber: String?,
+
+        var documentYear: Int?,
+
+        var issueCity: String?,
+
+        var issueCountry: String?,
+
+        var issueDate: Date?,
+
+        var issueInstitution: String?,
+
+        var issueInstitutionUsosCode: String?,
+
+        var modificationDate: String?
+
+) : Serializable {
+        override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as Document
+
+                if (id != other.id) return false
+                if (certificateType != other.certificateType) return false
+                if (certificateTypeCode != other.certificateTypeCode) return false
+                if (certificateUsosCode != other.certificateUsosCode) return false
+                if (comment != other.comment) return false
+                if (documentNumber != other.documentNumber) return false
+                if (documentYear != other.documentYear) return false
+                if (issueCity != other.issueCity) return false
+                if (issueCountry != other.issueCountry) return false
+                if (issueDate != other.issueDate) return false
+                if (issueInstitution != other.issueInstitution) return false
+                if (issueInstitutionUsosCode != other.issueInstitutionUsosCode) return false
+                if (modificationDate != other.modificationDate) return false
+
+                return true
+        }
+
+        override fun hashCode(): Int {
+                var result = id?.hashCode() ?: 0
+                result = 31 * result + certificateType.hashCode()
+                result = 31 * result + certificateTypeCode.hashCode()
+                result = 31 * result + certificateUsosCode.hashCode()
+                result = 31 * result + (comment?.hashCode() ?: 0)
+                result = 31 * result + (documentNumber?.hashCode() ?: 0)
+                result = 31 * result + (documentYear ?: 0)
+                result = 31 * result + (issueCity?.hashCode() ?: 0)
+                result = 31 * result + (issueCountry?.hashCode() ?: 0)
+                result = 31 * result + (issueDate?.hashCode() ?: 0)
+                result = 31 * result + (issueInstitution?.hashCode() ?: 0)
+                result = 31 * result + (issueInstitutionUsosCode?.hashCode() ?: 0)
+                result = 31 * result + (modificationDate?.hashCode() ?: 0)
+                return result
+        }
 }

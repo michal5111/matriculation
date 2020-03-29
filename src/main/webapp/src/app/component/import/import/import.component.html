@@ -1,0 +1,75 @@
+<div>
+  <div>
+    <p>Utwórz import</p>
+    <app-import-setup (importCreatedEvent)="onImportCreated($event)"></app-import-setup>
+  </div>
+  <div>
+    <p>Utworzone importy</p>
+    <div *ngIf="page">
+      <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)">
+
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+          <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="programmeCode">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Program </th>
+          <td mat-cell *matCellDef="let element"> {{element.programmeCode}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="stageCode">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Etap </th>
+          <td mat-cell *matCellDef="let element"> {{element.stageCode}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="registration">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Rekrutacja </th>
+          <td mat-cell *matCellDef="let element"> {{element.registration}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="indexPool">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Pula indeksów </th>
+          <td mat-cell *matCellDef="let element"> {{element.indexPoolCode}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="startDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Data rozpoczęcia programu </th>
+          <td mat-cell *matCellDef="let element"> {{element.startDate | date:'dd.MM.yyyy'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dateOfAddmision">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Data przyjęcia na program </th>
+          <td mat-cell *matCellDef="let element"> {{element.dateOfAddmision | date:'dd.MM.yyyy'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="didacticCycleCode">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Kod cyklu dydaktycznego </th>
+          <td mat-cell *matCellDef="let element"> {{element.didacticCycleCode}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="deleteImport">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Usuń </th>
+          <td mat-cell *matCellDef="let element"><button mat-button (click)="onDeleteImportClick(element.id)">Usuń</button></td>
+        </ng-container>
+
+        <ng-container matColumnDef="selectImport">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Wybierz </th>
+          <td mat-cell *matCellDef="let element"><button mat-button routerLink="/import/{{element.id}}">Wybierz</button></td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[5, 10, 20, 50, 100]"
+                     [length]="page.totalElements"
+                     [pageSize]="page.size"
+                     showFirstLastButtons
+                     (page)="switchPage($event)">
+      </mat-paginator>
+
+    </div>
+  </div>
+</div>

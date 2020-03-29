@@ -153,5 +153,33 @@ data class OrganizationalUnit(
 
         @JsonIgnore
         @OneToMany(mappedBy = "socialBenefitsSource", fetch = FetchType.LAZY)
-        val socialBenefitsSourcePersons: Set<Person>
-        )
+        val socialBenefitsSourcePersons: Set<Person>,
+
+        @JsonIgnore
+        @OneToMany(mappedBy = "organizationalUnit")
+        val phoneNumbers: List<PhoneNumber>,
+
+        @JsonIgnore
+        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
+        val conductedFieldOfStudy: MutableList<ConductedFieldOfStudy>,
+
+        @JsonIgnore
+        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
+        val fieldOfStudyPermissions: MutableList<FieldOfStudyPermission>,
+
+        @JsonIgnore
+        @OneToMany(mappedBy = "organizationalUnitPrimary", fetch = FetchType.LAZY)
+        val programmesPrimary: MutableList<Programme>,
+
+        @JsonIgnore
+        @OneToMany(mappedBy = "organizationalUnitLeading", fetch = FetchType.LAZY)
+        val programmesLeading: MutableList<Programme>,
+
+        @JsonIgnore
+        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
+        val personProgrammes: MutableList<PersonProgramme>,
+
+        @JsonIgnore
+        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
+        val folders: MutableList<Folder>
+)

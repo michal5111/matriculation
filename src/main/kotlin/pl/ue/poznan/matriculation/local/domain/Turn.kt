@@ -1,27 +1,28 @@
 package pl.ue.poznan.matriculation.local.domain
 
 
-import pl.ue.poznan.matriculation.irk.dto.TurnDTO
+import java.io.Serializable
 import java.util.*
+import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
 import javax.persistence.Id
 
 @Entity
 data class Turn(
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
-        var id: Long? = null,
+        @Column(name = "date_from")
         val dateFrom: Date?,
+
+        @Id
+        @Column(name = "date_to")
         val dateTo: Date?,
+
+        @Id
         val programme: String?,
+
+        @Id
         val registration: String?
-) {
-        constructor(turnDTO: TurnDTO): this(
-                dateFrom = turnDTO.dateFrom,
-                dateTo = turnDTO.dateTo,
-                programme = turnDTO.programme,
-                registration = turnDTO.registration
-        )
-}
+
+//        @OneToOne(mappedBy = "turn", fetch = FetchType.LAZY)
+//        var application: Application? = null
+) : Serializable

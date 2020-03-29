@@ -1,7 +1,6 @@
 package pl.ue.poznan.matriculation.oracle.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.NotBlank
 
@@ -29,17 +28,17 @@ data class Citizenship(
         @Column(name = "KRAJ_ANG", length = 100, nullable = true)
         val countryEng: String?,
 
-        @Column(name = "MOD_DATA", nullable = false)
-        val modificationDate: Date,
-
-        @Column(name = "MOD_ID", length = 30, nullable = false)
-        val modificationUser: String,
-
-        @Column(name = "UTW_DATA", nullable = false)
-        val creationDate: Date,
-
-        @Column(name = "UTW_ID", length = 30, nullable = false)
-        val creationUser: String,
+//        @Column(name = "MOD_DATA", nullable = false)
+//        val modificationDate: Date,
+//
+//        @Column(name = "MOD_ID", length = 30, nullable = false)
+//        val modificationUser: String,
+//
+//        @Column(name = "UTW_DATA", nullable = false)
+//        val creationDate: Date,
+//
+//        @Column(name = "UTW_ID", length = 30, nullable = false)
+//        val creationUser: String,
 
         @Column(name = "CZY_UE", length = 1, nullable = false)
         val isEU: String,
@@ -68,5 +67,9 @@ data class Citizenship(
 
         @JsonIgnore
         @OneToMany(mappedBy = "identityDocumentIssuerCountry", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-        val identityDocumentIssuerCountryPersons: Set<Person>
+        val identityDocumentIssuerCountryPersons: Set<Person>,
+
+        @JsonIgnore
+        @OneToMany(mappedBy = "countryCode", fetch = FetchType.LAZY)
+        var address: List<Address>
 )

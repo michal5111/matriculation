@@ -34,14 +34,14 @@ data class ApplicantDTO(
         val basicData: BasicDataDTO,
 
         @JsonProperty("contact_data")
-        val contactData: ContactDataDTO?,
+        val contactData: ContactDataDTO,
 
         @JsonProperty("additional_data")
-        val additionalData: AdditionalDataDTO?,
+        val additionalData: AdditionalDataDTO,
 
         @JsonProperty("foreigner_data")
         val foreignerData: ForeignerDataDTO?,
 
         @JsonProperty("education_data")
-        val educationData: EducationDataDTO?
+        val educationData: EducationDataDTO
 )

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
+
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
@@ -43,7 +44,7 @@ class OracleDbConfig {
                 .username(oracleDbUsername)
                 .password(oracleDbPassword)
                 .driverClassName(oracleDbDriverClassName)
-                .build();
+                .build()
     }
 
     @Bean(name = ["oracleEntityManagerFactory"])
@@ -62,4 +63,10 @@ class OracleDbConfig {
             JpaTransactionManager {
         return JpaTransactionManager(oracleEntityManagerFactory)
     }
+
+//    @Bean(name = ["chainedTransactionManager"])
+//    fun transactionManager(@Qualifier("oracleDataSource") ds1: PlatformTransactionManager?,
+//                           @Qualifier("secondaryDs") ds2: PlatformTransactionManager?): ChainedTransactionManager? {
+//        return ChainedTransactionManager(ds1, ds2)
+//    }
 }

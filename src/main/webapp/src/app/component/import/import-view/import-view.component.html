@@ -1,0 +1,59 @@
+<div>
+  <button mat-button routerLink="/import">Wróć</button>
+  <button mat-button (click)="startImport()">Importuj osoby</button>
+  <button mat-button (click)="savePersons()">Zapisz osoby</button>
+  <div *ngIf="page">
+    <table mat-table [dataSource]="dataSource" matSort>
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Id</th>
+        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="irkId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> IrkId</th>
+        <td mat-cell *matCellDef="let element"> {{element.irkId}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="nameGiven">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Imię</th>
+        <td mat-cell *matCellDef="let element"> {{element.applicant.name.given}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="nameMiddle">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nazwisko</th>
+        <td mat-cell *matCellDef="let element"> {{element.applicant.name.middle}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="nameFamily">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nazwisko</th>
+        <td mat-cell *matCellDef="let element"> {{element.applicant.name.family}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Email</th>
+        <td mat-cell *matCellDef="let element"> {{element.applicant.email}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="applicationImportStatus">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Status importu</th>
+        <td mat-cell *matCellDef="let element"> {{element.applicationImportStatus}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="importError">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Błąd przy importowaniu</th>
+        <td mat-cell *matCellDef="let element"> {{element.importError}} </td>
+      </ng-container>
+
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[5, 10, 20, 50, 100]"
+                   showFirstLastButtons
+                   [length]="page.totalElements"
+                   [pageSize]="page.size"
+                   (page)="switchPage($event)">
+    </mat-paginator>
+  </div>
+</div>

@@ -12,14 +12,17 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.transaction.annotation.EnableTransactionManagement
+import java.util.*
 import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
+
 
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
         entityManagerFactoryRef = "entityManagerFactory",
-        basePackages = ["pl.ue.poznan.matriculation.local.repo"]
+        basePackages = ["pl.ue.poznan.matriculation.local.repo"],
+        transactionManagerRef = "transactionManager"
 )
 class LocalDbConfig {
 
@@ -53,10 +56,13 @@ class LocalDbConfig {
             builder: EntityManagerFactoryBuilder,
             @Qualifier("dataSource") dataSource: DataSource
     ): LocalContainerEntityManagerFactoryBean? {
+        val properties: MutableMap<String, Any> = HashMap()
+        properties["hibernate.hbm2ddl.auto"] = "create"
         return builder
                 .dataSource(dataSource)
                 .packages("pl.ue.poznan.matriculation.local.domain")
                 .persistenceUnit("local")
+                .properties(properties)
                 .build()
     }
 

@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { ApplicantSearchComponent } from './irk/applicant-search/applicant-search.component'
-import { ApplicantComponent } from './irk/applicant/applicant.component';
-import { ApplicationsComponent } from './irk/applications/applications.component';
-import {HomeComponent} from "./home/home.component";
-import {PersonComponent} from "./oracle/person/person.component";
-import {PersonsComponent} from "./oracle/persons/persons.component";
+import { ApplicantSearchComponent } from './component/applicant-search/applicant-search.component'
+import { ApplicantComponent } from './component/applicant/applicant.component';
+import { ApplicationsComponent } from './component/applications/applications.component';
+import {HomeComponent} from "./component/home/home.component";
+import {PersonComponent} from "./component/oracle/person/person.component";
+import {PersonsComponent} from "./component/oracle/persons/persons.component";
+import {ImportComponent} from "./component/import/import/import.component";
+import {ImportViewComponent} from "./component/import/import-view/import-view.component";
 
 const routes: Routes = [
   {path: 'applicantsearch', component: ApplicantSearchComponent },
@@ -13,6 +15,8 @@ const routes: Routes = [
   {path: 'applications', component: ApplicationsComponent},
   {path: 'person/:id', component: PersonComponent},
   {path: 'persons', component: PersonsComponent},
+  {path: 'import', component: ImportComponent},
+  {path: 'import/:id', component: ImportViewComponent},
   {path: '', component: HomeComponent }
 ];
 

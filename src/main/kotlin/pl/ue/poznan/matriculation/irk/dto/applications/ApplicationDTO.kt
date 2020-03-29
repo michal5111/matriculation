@@ -8,12 +8,12 @@ data class ApplicationDTO(
         val admitted: String?,
         val comment: String?,
         @JsonProperty("foreigner_data")
-    val foreignerDataDTO: ForeignerDataDTO?,
+    val foreignerData: ForeignerDataDTO?,
         val id: Long,
         val payment: String?,
         val position: String?,
         val qualified: String?,
         val score: String?,
-        val turn: TurnDTO?,
+        val turn: TurnDTO,
         val user: Long
 )
