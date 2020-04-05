@@ -83,4 +83,8 @@ data class Document(
                 result = 31 * result + (modificationDate?.hashCode() ?: 0)
                 return result
         }
+
+        override fun toString(): String {
+                return "Document(id=$id, certificateType='$certificateType', certificateTypeCode='$certificateTypeCode', certificateUsosCode=$certificateUsosCode, comment=$comment, documentNumber=$documentNumber, documentYear=$documentYear, issueCity=$issueCity, issueCountry=$issueCountry, issueDate=$issueDate, issueInstitution=$issueInstitution, issueInstitutionUsosCode=$issueInstitutionUsosCode, modificationDate=$modificationDate)"
+        }
 }

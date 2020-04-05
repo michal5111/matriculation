@@ -1,5 +1,7 @@
 package pl.ue.poznan.matriculation.local.service
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -13,6 +15,8 @@ import pl.ue.poznan.matriculation.local.repo.DocumentRepository
 class ApplicantService(
         private val documentRepository: DocumentRepository
 ) {
+
+    val logger: Logger = LoggerFactory.getLogger(ApplicationService::class.java)
 
     fun checkApplicant(applicant: Applicant) {
         applicant.educationData.documents.forEach {
@@ -105,38 +109,27 @@ class ApplicantService(
             }
             applicantDTO.educationData.let {
                 applicant.educationData.apply {
-                    it.documents.forEach {
-                        val document = documentRepository.findByEducationDataAndCertificateTypeCode(educationData, it.certificateTypeCode)
-                        if (document != null) {
-                            document.apply {
-                                comment = it.comment
-                                documentNumber = it.documentNumber
-                                documentYear = it.documentYear
-                                issueCity = it.issueCity
-                                issueCountry = it.issueCountry
-                                issueDate = it.issueDate
-                                issueInstitution = it.issueInstitution
-                                issueInstitutionUsosCode = it.issueInstitutionUsosCode
-                                modificationDate = it.modificationDate
-                            }
-                        } else {
-                            educationData.documents.add(
-                                    Document(
-                                            certificateType = it.certificateType,
-                                            certificateTypeCode = it.certificateTypeCode,
-                                            certificateUsosCode = it.certificateUsosCode,
-                                            comment = it.comment,
-                                            documentNumber = it.documentNumber,
-                                            documentYear = it.documentYear,
-                                            issueCity = it.issueCity,
-                                            issueCountry = it.issueCountry,
-                                            issueDate = it.issueDate,
-                                            issueInstitution = it.issueInstitution,
-                                            issueInstitutionUsosCode = it.issueInstitutionUsosCode,
-                                            modificationDate = it.modificationDate
-                                    )
-                            )
-                        }
+                    documentRepository.deleteAllByEducationData(this)
+                    it.documents = listOf()
+                    it.documents.forEach { documentDto ->
+                        educationData.documents.add(
+                                Document(
+                                        educationData = this,
+                                        certificateType = documentDto.certificateType,
+                                        certificateTypeCode = documentDto.certificateTypeCode,
+                                        certificateUsosCode = documentDto.certificateUsosCode,
+                                        comment = documentDto.comment,
+                                        documentNumber = documentDto.documentNumber,
+                                        documentYear = documentDto.documentYear,
+                                        issueCity = documentDto.issueCity,
+                                        issueCountry = documentDto.issueCountry,
+                                        issueDate = documentDto.issueDate,
+                                        issueInstitution = documentDto.issueInstitution,
+                                        issueInstitutionUsosCode = documentDto.issueInstitutionUsosCode,
+                                        modificationDate = documentDto.modificationDate
+                                )
+                        )
+
                     }
                     highSchoolCity = it.highSchoolCity
                     highSchoolName = it.highSchoolName

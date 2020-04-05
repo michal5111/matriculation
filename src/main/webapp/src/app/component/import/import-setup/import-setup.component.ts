@@ -2,10 +2,10 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {Import} from "../../../model/import/import";
 import {ImportService} from "../../../service/import-service/import.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {tap} from "rxjs/operators";
-import {MatSelectChange} from "@angular/material/select";
 import {MatOptionSelectionChange} from "@angular/material/core";
 import {Observable} from "rxjs";
+import {HttpErrorResponse} from "@angular/common/http";
+import {tap} from "rxjs/operators";
 
 @Component({
   selector: 'app-import-setup',
@@ -22,16 +22,18 @@ export class ImportSetupComponent implements OnInit {
   didacticCycles: [string];
   importCreationFormGroup: FormGroup;
   didacticCycleInputValue: String = '';
+  debounceTime = 400;
 
-  constructor(private importService: ImportService, private formBuilder: FormBuilder) { }
+  constructor(private importService: ImportService, private formBuilder: FormBuilder) {
+  }
 
-  @Output() importCreatedEvent = new EventEmitter<string>();
+  @Output() onImportCreatedEventEmitter = new EventEmitter<Import>();
 
   ngOnInit(): void {
     this.importCreationFormGroup = this.formBuilder.group({
       registration: ['', Validators.required],
       registrationProgramme: ['', Validators.required],
-      indexPool: ['', Validators.required],
+      indexPoolCode: ['', Validators.required],
       stage: ['', Validators.required],
       didacticCycle: ['', Validators.required],
       startDate: ['', Validators.required],
@@ -49,19 +51,21 @@ export class ImportSetupComponent implements OnInit {
   onRegistrationSelectionChange(event: MatOptionSelectionChange, registration: String) {
     this.importService.getAvailableRegistrationProgrammes(registration).pipe(
       tap(results => this.registrationProgrammes = results)
-    ).subscribe()
+    ).subscribe(() => this.importCreationFormGroup.value.registrationProgramme = '')
   }
 
   onRegistrationProgrammeChange(event: MatOptionSelectionChange, programmeCode: String) {
     this.importService.getAvailableStages(programmeCode).pipe(
       tap(results => this.stages = results)
-    ).subscribe()
+    ).subscribe( () => this.importCreationFormGroup.value.stage = '' )
   }
 
   onDidacticCycleInputChange() {
-    this.importService.findDidacticCycleCodes(this.didacticCycleInputValue).pipe(
-      tap(results => this.didacticCycles = results)
-    ).subscribe()
+    if (this.didacticCycleInputValue == '') {
+      return
+    }
+    this.importService.findDidacticCycleCodes(this.didacticCycleInputValue)
+      .subscribe(results => this.didacticCycles = results)
   }
 
   onSubmit() {
@@ -70,9 +74,23 @@ export class ImportSetupComponent implements OnInit {
     this.import.didacticCycleCode = this.importCreationFormGroup.value.didacticCycle;
     this.import.dateOfAddmision = this.importCreationFormGroup.value.dateOfAddmision;
     this.import.startDate = this.importCreationFormGroup.value.startDate;
-    this.import.indexPoolCode = this.importCreationFormGroup.value.indexPool;
+    this.import.indexPoolCode = this.importCreationFormGroup.value.indexPoolCode;
     this.import.stageCode = this.importCreationFormGroup.value.stage;
-    this.importService.createImport(this.import).subscribe(importObject => this.import = importObject);
-    this.importCreatedEvent.next("importCreated")
+    this.importService.createImport(this.import).subscribe(
+      importObject => this.onImportCreated(importObject),
+      error => this.onError(error)
+    );
+  }
+
+  onError(error) {
+    if (error instanceof HttpErrorResponse) {
+      alert(`Błąd: ${error.error.message}`)
+    }
+  }
+
+  onImportCreated(importObject: Import) {
+    this.importCreationFormGroup.reset();
+    this.import = importObject;
+    this.onImportCreatedEventEmitter.next(this.import)
   }
 }

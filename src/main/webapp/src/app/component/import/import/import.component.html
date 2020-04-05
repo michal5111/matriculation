@@ -1,7 +1,7 @@
 <div>
   <div>
     <p>Utwórz import</p>
-    <app-import-setup (importCreatedEvent)="onImportCreated($event)"></app-import-setup>
+    <app-import-setup (onImportCreatedEventEmitter)="onImportCreated($event)"></app-import-setup>
   </div>
   <div>
     <p>Utworzone importy</p>
@@ -28,7 +28,7 @@
           <td mat-cell *matCellDef="let element"> {{element.registration}} </td>
         </ng-container>
 
-        <ng-container matColumnDef="indexPool">
+        <ng-container matColumnDef="indexPoolCode">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Pula indeksów </th>
           <td mat-cell *matCellDef="let element"> {{element.indexPoolCode}} </td>
         </ng-container>
@@ -50,12 +50,12 @@
 
         <ng-container matColumnDef="deleteImport">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Usuń </th>
-          <td mat-cell *matCellDef="let element"><button mat-button (click)="onDeleteImportClick(element.id)">Usuń</button></td>
+          <td mat-cell *matCellDef="let element"><button mat-button (click)="onDeleteImportClick(element.id)"><mat-icon>delete</mat-icon> Usuń</button></td>
         </ng-container>
 
         <ng-container matColumnDef="selectImport">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Wybierz </th>
-          <td mat-cell *matCellDef="let element"><button mat-button routerLink="/import/{{element.id}}">Wybierz</button></td>
+          <td mat-cell *matCellDef="let element"><button mat-button routerLink="/import/{{element.id}}"><mat-icon>arrow_right_alt</mat-icon> Wybierz</button></td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

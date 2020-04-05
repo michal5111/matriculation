@@ -37,4 +37,8 @@ data class Status(
                 result = 31 * result + status.hashCode()
                 return result
         }
+
+        override fun toString(): String {
+                return "Status(id=$id, status='$status')"
+        }
 }

@@ -55,4 +55,8 @@ data class ApplicantForeignerData(
                 result = 31 * result + (polishCardValidTo?.hashCode() ?: 0)
                 return result
         }
+
+        override fun toString(): String {
+                return "ApplicantForeignerData(baseOfStay=$baseOfStay, foreignerStatus=$foreignerStatus, polishCardIssueCountry=$polishCardIssueCountry, polishCardIssueDate=$polishCardIssueDate, polishCardNumber=$polishCardNumber, polishCardValidTo=$polishCardValidTo)"
+        }
 }

@@ -11,15 +11,11 @@ import {ApplicantSearchComponent} from "./component/applicant-search/applicant-s
 import {ApplicationsComponent} from "./component/applications/applications.component";
 import {ApplicantComponent} from "./component/applicant/applicant.component";
 import {HomeComponent} from './component/home/home.component';
-import {MatSortModule} from "@angular/material/sort";
 import {PersonComponent} from './component/oracle/person/person.component';
 import {PersonsComponent} from './component/oracle/persons/persons.component';
 import {ImportSetupComponent} from './component/import/import-setup/import-setup.component';
 import {ImportComponent} from './component/import/import/import.component';
-import {MatAutocompleteModule} from "@angular/material/autocomplete";
-import {MatIconModule} from "@angular/material/icon";
-import {MatDatepickerModule} from "@angular/material/datepicker";
-import { ImportViewComponent } from './component/import/import-view/import-view.component';
+import {ImportViewComponent} from './component/import/import-view/import-view.component';
 
 @NgModule({
   declarations: [
@@ -41,10 +37,6 @@ import { ImportViewComponent } from './component/import/import-view/import-view.
     MaterialModule,
     HttpClientModule,
     ReactiveFormsModule,
-    MatSortModule,
-    MatAutocompleteModule,
-    MatIconModule,
-    MatDatepickerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

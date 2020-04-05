@@ -12,27 +12,22 @@ import pl.ue.poznan.matriculation.irk.dto.applications.ApplicationDTO
 import pl.ue.poznan.matriculation.irk.dto.programmes.ProgrammeGroupsDTO
 import pl.ue.poznan.matriculation.irk.dto.registrations.RegistrationDTO
 import pl.ue.poznan.matriculation.irk.service.IrkService
-import pl.ue.poznan.matriculation.local.domain.applicants.Document
 import pl.ue.poznan.matriculation.local.domain.applications.Application
+import pl.ue.poznan.matriculation.local.domain.enum.ImportStatus
 import pl.ue.poznan.matriculation.local.domain.import.Import
 import pl.ue.poznan.matriculation.local.domain.import.ImportDto
 import pl.ue.poznan.matriculation.local.domain.import.ImportProgress
-import pl.ue.poznan.matriculation.local.repo.DocumentRepository
 import pl.ue.poznan.matriculation.local.service.ApplicationService
 import pl.ue.poznan.matriculation.local.service.AsyncService
 import pl.ue.poznan.matriculation.local.service.ImportService
-import pl.ue.poznan.matriculation.oracle.domain.Person
-import pl.ue.poznan.matriculation.oracle.repo.PersonRepository
 import pl.ue.poznan.matriculation.oracle.service.UsosService
 
 @RestController
 @RequestMapping("/api")
 class RestController(
-        private val personRepository: PersonRepository,
         private val irkService: IrkService,
         private val importService: ImportService,
         private val asyncService: AsyncService,
-        private val documentRepository: DocumentRepository,
         private val usosService: UsosService,
         private val applicationService: ApplicationService
 ) {
@@ -44,26 +39,20 @@ class RestController(
         } else principal
     }
 
-    @GetMapping("/test")
-    fun test(): Document? {
-        val educationData = importService.getImport(1).applications[0].applicant?.educationData
-        return documentRepository.findByEducationDataAndCertificateTypeCode(educationData!!, educationData.documents[0].certificateTypeCode)
-    }
-
-    @GetMapping("/person")
-    fun person(): Person {
-        return personRepository.getOne(SecurityContextHolder.getContext().authentication.name.toLong())
-    }
-
-    @GetMapping("/persons")
-    fun person(pageable: Pageable): org.springframework.data.domain.Page<Person> {
-        return personRepository.findAll(pageable)
-    }
-
-    @GetMapping("/persons/{id}")
-    fun person(@PathVariable("id") id: Long): Person {
-        return personRepository.getOne(id)
-    }
+//    @GetMapping("/person")
+//    fun person(): Person {
+//        return personRepository.getOne(SecurityContextHolder.getContext().authentication.name.toLong())
+//    }
+//
+//    @GetMapping("/persons")
+//    fun person(pageable: Pageable): org.springframework.data.domain.Page<Person> {
+//        return personRepository.findAll(pageable)
+//    }
+//
+//    @GetMapping("/persons/{id}")
+//    fun person(@PathVariable("id") id: Long): Person {
+//        return personRepository.getOne(id)
+//    }
 
     @GetMapping("/applicants/{id}")
     fun getApplicantById(@PathVariable("id") id: Long): ApplicantDTO? {
@@ -137,6 +126,7 @@ class RestController(
     @PutMapping("/import/{id}")
     fun importApplicants(@PathVariable("id") importId: Long): ResponseEntity<Void> {
         val import = importService.getImportForApplicantImport(importId)
+        importService.setImportStatus(ImportStatus.STARTED, importId)
         asyncService.importApplicantsAsync(import)
         return ResponseEntity.accepted().build()
     }
@@ -154,6 +144,8 @@ class RestController(
     @GetMapping("/import/save/{id}")
     fun savePersons(@PathVariable("id") importId: Long): ResponseEntity<Void> {
         val import = importService.getImportForPersonSave(importId)
+        importService.setImportStatus(ImportStatus.SAVING, importId)
+        importService.resetSaveErrors(importId)
         asyncService.savePersons(import)
         return ResponseEntity.accepted().build()
     }

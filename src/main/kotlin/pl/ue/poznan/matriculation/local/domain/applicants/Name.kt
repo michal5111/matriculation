@@ -39,4 +39,8 @@ data class Name(
                 result = 31 * result + (maiden?.hashCode() ?: 0)
                 return result
         }
+
+        override fun toString(): String {
+                return "Name(middle=$middle, family=$family, given=$given, maiden=$maiden)"
+        }
 }

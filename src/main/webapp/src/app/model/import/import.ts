@@ -4,19 +4,19 @@ export class Import {
 
   id: number;
 
-  programmeCode: String;
+  programmeCode: string;
 
-  stageCode: String;
+  stageCode: string;
 
-  registration: String;
+  registration: string;
 
-  indexPoolCode: String;
+  indexPoolCode: string;
 
   startDate: Date;
 
   dateOfAddmision: Date;
 
-  didacticCycleCode: String;
+  didacticCycleCode: string;
 
   importProgress: ImportProgress
 }

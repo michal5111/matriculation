@@ -4,6 +4,7 @@ import {Observable} from "rxjs";
 import {Page} from "../../model/oracle/page/page";
 import {Import} from "../../model/import/import";
 import {Application} from "../../model/irk/application";
+import {ImportProgress} from "../../model/import/import-progress";
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -28,27 +29,27 @@ export class ImportService {
     return this.http.get<Page<Import>>(`${this.apiUrl}?page=${page}&size=${size}`, httpOptions)
   }
 
-  getAvailableRegistrations() {
+  getAvailableRegistrations(): Observable<[string]> {
     return this.http.get<[string]>("api/registrations/codes", httpOptions)
   }
 
-  getAvailableRegistrationProgrammes(programmeCode: String) {
+  getAvailableRegistrationProgrammes(programmeCode: String): Observable<[string]> {
     return this.http.get<[string]>(`api/registrations/codes/${programmeCode}`)
   }
 
-  getAvailableIndexPools() {
+  getAvailableIndexPools(): Observable<[string]> {
     return this.http.get<[string]>("api/indexPool")
   }
 
-  getAvailableStages(programmeCode: String) {
+  getAvailableStages(programmeCode: String): Observable<[string]> {
     return this.http.get<[string]>(`api/programme/${programmeCode}/stages`)
   }
 
-  findDidacticCycleCodes(didacticCycleCode: String) {
+  findDidacticCycleCodes(didacticCycleCode: String): Observable<[string]> {
     return this.http.get<[string]>(`api/didacticCycle/${didacticCycleCode}`)
   }
 
-  createImport(importObject: Import) {
+  createImport(importObject: Import): Observable<Import> {
     return this.http.post<Import>(`api/import`, importObject, httpOptions)
   }
 
@@ -56,7 +57,7 @@ export class ImportService {
     return this.http.delete(`api/import/${importId}`, httpOptions)
   }
 
-  findAllApplicationsByImportId(importId: Number, page: number, size: number, sort?: string, sortDir?: string) {
+  findAllApplicationsByImportId(importId: Number, page: number, size: number, sort?: string, sortDir?: string): Observable<Page<Application>> {
     if (sort && sortDir) {
       return this.http.get<Page<Application>>(`api/import/${importId}/applications?page=${page}&size=${size}&sort=${sort},${sortDir}`, httpOptions)
     }
@@ -69,5 +70,9 @@ export class ImportService {
 
   savePersons(importId: Number) {
     return this.http.get(`api/import/save/${importId}`)
+  }
+
+  getImportProgress(importId: Number): Observable<ImportProgress> {
+    return this.http.get<ImportProgress>(`api/import/progress/${importId}`)
   }
 }

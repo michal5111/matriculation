@@ -44,8 +44,9 @@ class AsyncExceptionHandler: AsyncUncaughtExceptionHandler {
         println("Exception message - " + throwable.message)
         println("Cause " + throwable.cause?.message)
         println("Method name - " + method.name)
-//        for (param in objects) {
-//            println("Parameter value - $param")
-//        }
+        for (param in objects) {
+            println("Parameter value - $param")
+        }
+        throwable.printStackTrace()
     }
 }

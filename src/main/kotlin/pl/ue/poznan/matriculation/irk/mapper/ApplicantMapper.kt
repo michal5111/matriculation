@@ -3,9 +3,9 @@ package pl.ue.poznan.matriculation.irk.mapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import pl.ue.poznan.matriculation.irk.dto.applicants.ApplicantDTO
-import pl.ue.poznan.matriculation.local.service.ApplicantService
 import pl.ue.poznan.matriculation.irk.service.IrkService
 import pl.ue.poznan.matriculation.local.domain.applicants.*
+import pl.ue.poznan.matriculation.local.service.ApplicantService
 import pl.ue.poznan.matriculation.oracle.domain.*
 import pl.ue.poznan.matriculation.oracle.repo.*
 
@@ -238,7 +238,7 @@ class ApplicantMapper(
             entitlementDocuments.forEach {
                 it.person = this
             }
-            personPhoto?.let<PersonPhoto, Unit> {
+            personPhoto?.let {
                 it.person = this
                 personPreferences.add(
                         PersonPreference(this, "photo_visibility", applicant.photoPermission)

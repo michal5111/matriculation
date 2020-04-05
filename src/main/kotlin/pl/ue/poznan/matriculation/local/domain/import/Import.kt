@@ -32,15 +32,41 @@ data class Import(
         @OneToOne(mappedBy = "import", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
         var importProgress: ImportProgress? = null
 ) {
-        fun addApplication(application: Application) {
-                application.import = this
-                applications.add(application)
+
+
+        override fun toString(): String {
+                return "Import(id=$id, programmeCode='$programmeCode', stageCode='$stageCode', registration='$registration', indexPoolCode='$indexPoolCode', startDate=$startDate, dateOfAddmision=$dateOfAddmision, didacticCycleCode='$didacticCycleCode', applications=$applications, importProgress=$importProgress)"
         }
 
-        fun addAllApplications(applications: List<Application>) {
-                applications.forEach {
-                        it.import = this
-                        this.applications.add(it)
-                }
+        override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as Import
+
+                if (id != other.id) return false
+                if (programmeCode != other.programmeCode) return false
+                if (stageCode != other.stageCode) return false
+                if (registration != other.registration) return false
+                if (indexPoolCode != other.indexPoolCode) return false
+                if (startDate != other.startDate) return false
+                if (dateOfAddmision != other.dateOfAddmision) return false
+                if (didacticCycleCode != other.didacticCycleCode) return false
+                if (applications != other.applications) return false
+
+                return true
+        }
+
+        override fun hashCode(): Int {
+                var result = id?.hashCode() ?: 0
+                result = 31 * result + programmeCode.hashCode()
+                result = 31 * result + stageCode.hashCode()
+                result = 31 * result + registration.hashCode()
+                result = 31 * result + indexPoolCode.hashCode()
+                result = 31 * result + startDate.hashCode()
+                result = 31 * result + dateOfAddmision.hashCode()
+                result = 31 * result + didacticCycleCode.hashCode()
+                result = 31 * result + applications.hashCode()
+                return result
         }
 }

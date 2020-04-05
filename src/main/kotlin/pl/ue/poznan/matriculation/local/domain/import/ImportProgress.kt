@@ -2,6 +2,7 @@ package pl.ue.poznan.matriculation.local.domain.import
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import pl.ue.poznan.matriculation.local.domain.enum.ImportStatus
+import java.io.Serializable
 import javax.persistence.*
 
 @Entity
@@ -28,5 +29,12 @@ data class ImportProgress(
 
         @Lob
         var error: String? = null
-)
+): Serializable {
+        override fun toString(): String {
+                return "ImportProgress(id=$id, " +
+                        "importedApplications=$importedApplications, " +
+                        "saveErrors=$saveErrors, savedApplicants=$savedApplicants, " +
+                        "totalCount=$totalCount, importStatus=$importStatus, error=$error)"
+        }
+}
 

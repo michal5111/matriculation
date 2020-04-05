@@ -52,4 +52,8 @@ data class BasicData(
                 result = 31 * result + dataSource.hashCode()
                 return result
         }
+
+        override fun toString(): String {
+                return "BasicData(sex='$sex', pesel=$pesel, dateOfBirth=$dateOfBirth, cityOfBirth='$cityOfBirth', countryOfBirth='$countryOfBirth', dataSource='$dataSource')"
+        }
 }

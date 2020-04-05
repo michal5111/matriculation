@@ -73,4 +73,10 @@ data class AdditionalData(
                 result = 31 * result + (wku?.hashCode() ?: 0)
                 return result
         }
+
+        override fun toString(): String {
+                return "AdditionalData(cityOfBirth=$cityOfBirth, countryOfBirth=$countryOfBirth, documentCountry=$documentCountry, documentExpDate=$documentExpDate, documentNumber=$documentNumber, documentType=$documentType, fathersName=$fathersName, militaryCategory=$militaryCategory, militaryStatus=$militaryStatus, mothersName=$mothersName, wku=$wku)"
+        }
+
+
 }

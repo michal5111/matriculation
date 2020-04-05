@@ -14,11 +14,11 @@ data class ApplicationForeignerData(
         @JoinColumn(name = "application_id", referencedColumnName = "id")
         var application: Application? = null,
 
-        val baseOfStay: String?,
+        var baseOfStay: String?,
 
-        val basisOfAdmission: String?,
+        var basisOfAdmission: String?,
 
-        val sourceOfFinancing: String?
+        var sourceOfFinancing: String?
 ): Serializable {
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true
@@ -38,5 +38,9 @@ data class ApplicationForeignerData(
                 result = 31 * result + (basisOfAdmission?.hashCode() ?: 0)
                 result = 31 * result + (sourceOfFinancing?.hashCode() ?: 0)
                 return result
+        }
+
+        override fun toString(): String {
+                return "ApplicationForeignerData(baseOfStay=$baseOfStay, basisOfAdmission=$basisOfAdmission, sourceOfFinancing=$sourceOfFinancing)"
         }
 }

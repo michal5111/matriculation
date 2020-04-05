@@ -16,21 +16,21 @@ data class Application(
         @Column(unique = true)
         val irkId: Long,
 
-        val admitted: String?,
+        var admitted: String?,
 
         @Column(length = 500)
-        val comment: String?,
+        var comment: String?,
 
         @OneToOne(mappedBy = "application", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
         val applicationForeignerData: ApplicationForeignerData?,
 
-        val payment: String?,
+        var payment: String?,
 
-        val position: String?,
+        var position: String?,
 
-        val qualified: String?,
+        var qualified: String?,
 
-        val score: String?,
+        var score: String?,
 
         @Enumerated(EnumType.STRING)
         var applicationImportStatus: ApplicationImportStatus = ApplicationImportStatus.NOT_IMPORTED,
@@ -74,7 +74,6 @@ data class Application(
                 if (position != other.position) return false
                 if (qualified != other.qualified) return false
                 if (score != other.score) return false
-                if (turn != other.turn) return false
 
                 return true
         }
@@ -89,7 +88,10 @@ data class Application(
                 result = 31 * result + (position?.hashCode() ?: 0)
                 result = 31 * result + (qualified?.hashCode() ?: 0)
                 result = 31 * result + (score?.hashCode() ?: 0)
-                result = 31 * result + turn.hashCode()
                 return result
+        }
+
+        override fun toString(): String {
+                return "Application(id=$id, irkId=$irkId, admitted=$admitted, comment=$comment, applicationForeignerData=$applicationForeignerData, payment=$payment, position=$position, qualified=$qualified, score=$score, applicationImportStatus=$applicationImportStatus, importError=$importError, stackTrace=$stackTrace, turn=$turn, applicant=$applicant)"
         }
 }

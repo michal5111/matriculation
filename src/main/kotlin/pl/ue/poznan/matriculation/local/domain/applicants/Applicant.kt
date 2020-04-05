@@ -65,7 +65,7 @@ data class Applicant(
         @JsonIgnore
         @LazyCollection(LazyCollectionOption.FALSE)
         @OneToMany(mappedBy = "applicant")
-        var application: MutableList<Application> = mutableListOf()
+        var applications: MutableList<Application> = mutableListOf()
 ) {
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true
@@ -116,4 +116,10 @@ data class Applicant(
                 result = 31 * result + (usosId?.hashCode() ?: 0)
                 return result
         }
+
+        override fun toString(): String {
+                return "Applicant(id=$id, irkId=$irkId, email='$email', indexNumber=$indexNumber, password='$password', name=$name, phone=$phone, citizenship=$citizenship, photo=$photo, photoPermission=$photoPermission, casPasswordOverride=$casPasswordOverride, modificationDate=$modificationDate, basicData=$basicData, contactData=$contactData, additionalData=$additionalData, applicantForeignerData=$applicantForeignerData, educationData=$educationData, usosId=$usosId)"
+        }
+
+
 }

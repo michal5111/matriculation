@@ -1,17 +1,17 @@
 import {ImportStatus} from "./import-status.enum";
 
 export class ImportProgress {
-  id: Number;
+  id: number;
 
-  importedApplications: Number;
+  importedApplications: number;
 
-  saveErrors: Number;
+  saveErrors: number;
 
-  savedApplicants: Number;
+  savedApplicants: number;
 
-  totalCount: Number;
+  totalCount: number;
 
   importStatus: ImportStatus;
 
-  error: String;
+  error: string;
 }

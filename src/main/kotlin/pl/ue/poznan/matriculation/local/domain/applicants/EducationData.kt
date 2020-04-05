@@ -52,4 +52,8 @@ data class EducationData(
                 result = 31 * result + (highSchoolUsosCode?.hashCode() ?: 0)
                 return result
         }
+
+        override fun toString(): String {
+                return "EducationData(applicantId=$applicantId, documents=$documents, highSchoolCity=$highSchoolCity, highSchoolName=$highSchoolName, highSchoolType=$highSchoolType, highSchoolUsosCode=$highSchoolUsosCode)"
+        }
 }

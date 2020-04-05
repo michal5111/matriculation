@@ -3,7 +3,7 @@ import {Page} from "../../../model/oracle/page/page";
 import {Import} from "../../../model/import/import";
 import {MatTableDataSource} from "@angular/material/table";
 import {ImportService} from "../../../service/import-service/import.service";
-import {map, tap} from "rxjs/operators";
+import {flatMap, map, tap} from "rxjs/operators";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatSort, Sort} from "@angular/material/sort";
 
@@ -20,13 +20,13 @@ export class ImportComponent implements OnInit {
   sortDirString: string = 'desc';
   displayedColumns: string[] = [
     'id',
+    'registration',
     'programmeCode',
     'stageCode',
-    'registration',
-    'indexPool',
+    'didacticCycleCode',
+    'indexPoolCode',
     'startDate',
     'dateOfAddmision',
-    'didacticCycleCode',
     'deleteImport',
     'selectImport'
   ];
@@ -47,7 +47,7 @@ export class ImportComponent implements OnInit {
 
   ngOnInit(): void {
     this.dataSource.paginator = this.paginator;
-    this.getPage(0, 5, this.sortString, this.sortDirString).subscribe()
+    this.getPage(0, 15, this.sortString, this.sortDirString).subscribe()
   }
 
   switchPage(pageEvent: PageEvent) {
@@ -60,11 +60,13 @@ export class ImportComponent implements OnInit {
     this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe()
   }
 
-  onImportCreated(event) {
-    this.paginator.firstPage()
+  onImportCreated(event: Import) {
+    this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe()
   }
 
   onDeleteImportClick(importId: Number) {
-    this.importService.deleteImport(importId).subscribe()
+    this.importService.deleteImport(importId).pipe(
+     flatMap(() => this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString))
+    ).subscribe();
   }
 }

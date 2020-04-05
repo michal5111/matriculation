@@ -1,7 +1,35 @@
 <div>
-  <button mat-button routerLink="/import">Wróć</button>
-  <button mat-button (click)="startImport()">Importuj osoby</button>
-  <button mat-button (click)="savePersons()">Zapisz osoby</button>
+  <button mat-button routerLink="/import">
+    <mat-icon>arrow_back</mat-icon>
+    Wróć
+  </button>
+  <div>
+    <mat-card class="card-centered">
+        <mat-card-content *ngIf="importProgress">
+          <p>Status importu: {{importProgress.importStatus}}</p>
+          <p>Błąd importu: {{importProgress.error}}</p>
+          <p>Zaimportowane zgłoszenia: {{importProgress.importedApplications}}/{{importProgress.totalCount}}</p>
+          <mat-progress-bar mode="determinate"
+                            value="{{importProgress.importedApplications*100/importProgress.totalCount}}">
+          </mat-progress-bar>
+          <p>Zapisane zgłoszenia: {{importProgress.savedApplicants}}/{{importProgress.totalCount}}</p>
+          <mat-progress-bar mode="determinate"
+                            value="{{(importProgress.savedApplicants+importProgress.saveErrors)*100/importProgress.totalCount}}">
+          </mat-progress-bar>
+          <p>Błędy przy zapisywaniu: {{importProgress.saveErrors}}</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button (click)="startImport()">
+            <mat-icon>backup</mat-icon>
+            Importuj osoby
+          </button>
+          <button mat-button (click)="savePersons()">
+            <mat-icon>save</mat-icon>
+            Zapisz osoby
+          </button>
+        </mat-card-actions>
+    </mat-card>
+  </div>
   <div *ngIf="page">
     <table mat-table [dataSource]="dataSource" matSort>
 
@@ -21,7 +49,7 @@
       </ng-container>
 
       <ng-container matColumnDef="nameMiddle">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nazwisko</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Drugie imię</th>
         <td mat-cell *matCellDef="let element"> {{element.applicant.name.middle}} </td>
       </ng-container>
 
@@ -37,7 +65,22 @@
 
       <ng-container matColumnDef="applicationImportStatus">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Status importu</th>
-        <td mat-cell *matCellDef="let element"> {{element.applicationImportStatus}} </td>
+        <td mat-cell *matCellDef="let element">
+          <div [ngSwitch]="element.applicationImportStatus">
+            <div *ngSwitchCase="'NOT_IMPORTED'">
+              <mat-icon>hourglass_empty</mat-icon>
+              Oczekujące
+            </div>
+            <div *ngSwitchCase="'IMPORTED'">
+              <mat-icon>done</mat-icon>
+              Powodzenie
+            </div>
+            <div *ngSwitchCase="'ERROR'">
+              <mat-icon>error</mat-icon>
+              Błąd
+            </div>
+          </div>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="importError">
@@ -49,11 +92,12 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-paginator [pageSizeOptions]="[5, 10, 20, 50, 100]"
+    <mat-paginator [pageSizeOptions]="[10, 15, 20, 25, 50, 100]"
                    showFirstLastButtons
                    [length]="page.totalElements"
                    [pageSize]="page.size"
-                   (page)="switchPage($event)">
+                   (page)="switchPage($event)"
+                   (sort)="sortEvent($event)">
     </mat-paginator>
   </div>
 </div>

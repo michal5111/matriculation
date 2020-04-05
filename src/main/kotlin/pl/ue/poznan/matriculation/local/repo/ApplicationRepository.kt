@@ -13,4 +13,8 @@ interface ApplicationRepository: PagingAndSortingRepository<Application, Long> {
 
     @Query("SELECT a FROM Application a WHERE a.import.id = :importId")
     fun findAllByImportId(pageable: Pageable, @Param("importId") importId: Long): Page<Application>
+
+    fun existsByIrkId(irkId: Long): Boolean
+
+    fun getByIrkId(irkId: Long): Application
 }
