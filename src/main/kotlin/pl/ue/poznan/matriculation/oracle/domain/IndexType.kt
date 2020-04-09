@@ -29,6 +29,6 @@ data class IndexType(
         @Column(name = "CZY_AKTUALNY", length = 1, nullable = false)
         var isCurrent: Char = 'T',
 
-        @OneToMany(fetch = FetchType.LAZY, mappedBy = "indexType")
+        @OneToMany(fetch = FetchType.LAZY, mappedBy = "indexType" , cascade = [CascadeType.MERGE])
         var students: MutableList<Student>
 )

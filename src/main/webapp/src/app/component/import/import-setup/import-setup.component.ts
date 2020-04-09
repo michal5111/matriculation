@@ -6,6 +6,8 @@ import {MatOptionSelectionChange} from "@angular/material/core";
 import {Observable} from "rxjs";
 import {HttpErrorResponse} from "@angular/common/http";
 import {tap} from "rxjs/operators";
+import {IndexType} from "../../../model/oracle/index-type";
+import {Registration} from "../../../model/irk/registration";
 
 @Component({
   selector: 'app-import-setup',
@@ -15,9 +17,9 @@ import {tap} from "rxjs/operators";
 export class ImportSetupComponent implements OnInit {
 
   import: Import = new Import();
-  $availableRegistrationsObservable: Observable<[String]> = this.importService.getAvailableRegistrations();
+  $availableRegistrationsObservable: Observable<[Registration]> = this.importService.getAvailableRegistrations();
   registrationProgrammes: [string];
-  $indexPoolsObservable: Observable<[String]> = this.importService.getAvailableIndexPools();
+  $indexPoolsObservable: Observable<[IndexType]> = this.importService.getAvailableIndexPools();
   stages: [string];
   didacticCycles: [string];
   importCreationFormGroup: FormGroup;

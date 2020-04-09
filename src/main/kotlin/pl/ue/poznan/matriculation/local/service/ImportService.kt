@@ -78,7 +78,8 @@ class ImportService(
     }
 
     @Transactional(rollbackFor = [ImportException::class], propagation = Propagation.REQUIRES_NEW, transactionManager = "transactionManager")
-    fun importApplications(import: Import) {
+    fun importApplications(importId: Long) {
+        val import = getImport(importId)
         var currentPage = 1
         var hasNext: Boolean
         var set = true
@@ -102,9 +103,9 @@ class ImportService(
                 hasNext = page.next != null
                 currentPage++
             } while (hasNext)
+            importRepository.save(import)
             import.importProgress!!.importStatus = ImportStatus.IMPORTED
             importProgressRepository.save(import.importProgress!!)
-            importRepository.save(import)
         } catch (e: java.lang.Exception) {
             throw ImportException(import.id!!, e.message, e)
         }
@@ -114,6 +115,12 @@ class ImportService(
     fun resetSaveErrors(importId: Long) {
         val importProgress = getProgress(importId)
         importProgress.saveErrors = 0
+        importProgressRepository.save(importProgress)
+    }
+
+    fun resetImportedApplications(importId: Long) {
+        val importProgress = getProgress(importId)
+        importProgress.importedApplications = 0
         importProgressRepository.save(importProgress)
     }
 
@@ -133,7 +140,8 @@ class ImportService(
         importProgressRepository.save(importProgress)
     }
 
-    fun savePersons(import: Import) {
+    fun savePersons(importId: Long) {
+        val import = getImport(importId)
         import.applications.filter {
             it.applicationImportStatus == ApplicationImportStatus.NOT_IMPORTED
                     || it.applicationImportStatus == ApplicationImportStatus.ERROR
@@ -146,17 +154,28 @@ class ImportService(
                 it.applicationImportStatus = ApplicationImportStatus.IMPORTED
             } catch (e: JDBCException) {
                 it.applicationImportStatus = ApplicationImportStatus.ERROR
-                it.importError = "${e.javaClass.simpleName}: ${e.message} \n Error code: ${e.errorCode}" +
-                        "Sql exception: ${e.sqlException} \n" +
-                        "Sql: ${e.sql} \n" +
+                it.importError = "${e.javaClass.simpleName}: ${e.message} \n Error code: ${e.errorCode} " +
+                        "Sql exception: ${e.sqlException} \n " +
+                        "Sql: ${e.sql} \n " +
                         "Sql state: ${e.sqlState}"
                 it.stackTrace = e.stackTrace.joinToString("\n", "\nStackTrace: ")
                 import.importProgress!!.saveErrors++
             } catch (e: Exception) {
-                it.applicationImportStatus = ApplicationImportStatus.ERROR
-                it.importError = "${e.javaClass.simpleName}: ${e.message}"
-                it.stackTrace = e.stackTrace.joinToString("\n", "\nStackTrace: ")
-                import.importProgress!!.saveErrors++
+                if (e.cause is JDBCException) {
+                    val ex: JDBCException = e.cause as JDBCException
+                    it.applicationImportStatus = ApplicationImportStatus.ERROR
+                    it.importError = "${e.javaClass.simpleName}: ${e.message} \n Error code: ${ex.errorCode} " +
+                            "Sql exception: ${ex.sqlException} \n " +
+                            "Sql: ${ex.sql} \n " +
+                            "Sql state: ${ex.sqlState} "
+                    it.stackTrace = e.stackTrace.joinToString("\n", "\nStackTrace: ")
+                    import.importProgress!!.saveErrors++
+                } else {
+                    it.applicationImportStatus = ApplicationImportStatus.ERROR
+                    it.importError = "${e.javaClass.simpleName}: ${e.message}"
+                    it.stackTrace = e.stackTrace.joinToString("\n", "\nStackTrace: ")
+                    import.importProgress!!.saveErrors++
+                }
             }
             importProgressRepository.save(import.importProgress!!)
             applicantRepository.save(it.applicant!!)

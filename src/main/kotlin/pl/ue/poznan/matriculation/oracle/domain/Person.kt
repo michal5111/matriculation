@@ -66,7 +66,7 @@ class Person(
 
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
         @JsonIdentityReference(alwaysAsId = true)
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "WKU_KOD", referencedColumnName = "KOD", nullable = true)
         var wku: Wku? = null,
 
@@ -88,19 +88,19 @@ class Person(
 
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
         @JsonIdentityReference(alwaysAsId = true)
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "NAR_KOD", referencedColumnName = "KOD")
         var nationality: Citizenship?,
 
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
         @JsonIdentityReference(alwaysAsId = true)
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "OB_KOD", referencedColumnName = "KOD")
         var citizenship: Citizenship?,
 
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
         @JsonIdentityReference(alwaysAsId = true)
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "JED_ORG_KOD", referencedColumnName = "KOD")
         var organizationalUnit: OrganizationalUnit,
 
@@ -128,20 +128,20 @@ class Person(
         val titleSuffix: Title? = null,
 
         @Column(name = "CZY_POLONIA", length = 1, nullable = true)
-        val isPolish: Char = 'N',
+        val isPolish: Char? = 'N',
 
         @Column(name = "ZAMIEJSCOWA", length = 1, nullable = true)
         val nonresident: String? = null,
 
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
         @JsonIdentityReference(alwaysAsId = true)
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "GDZIE_SOCJALNE", referencedColumnName = "KOD", nullable = true)
         val socialBenefitsSource: OrganizationalUnit? = null,
 
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
         @JsonIdentityReference(alwaysAsId = true)
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "US_ID", referencedColumnName = "ID", nullable = true)
         val taxOffice: TaxOffice? = null,
 
@@ -156,7 +156,7 @@ class Person(
 
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
         @JsonIdentityReference(alwaysAsId = true)
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "SZK_ID", referencedColumnName = "ID", nullable = true)
         var middleSchool: School? = null,
 
@@ -175,7 +175,7 @@ class Person(
 
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
         @JsonIdentityReference(alwaysAsId = true)
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "KRAJ_URODZENIA", referencedColumnName = "KOD", nullable = true)
         var birthCountry: Citizenship? = null,
 
@@ -213,7 +213,7 @@ class Person(
 
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
         @JsonIdentityReference(alwaysAsId = true)
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "KRAJ_DOK_KOD", referencedColumnName = "KOD", nullable = true)
         val identityDocumentIssuerCountry: Citizenship? = null,
 

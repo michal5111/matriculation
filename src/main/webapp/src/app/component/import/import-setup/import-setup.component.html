@@ -5,8 +5,8 @@
       <mat-select formControlName="registration" required="true" [typeaheadDebounceInterval]="debounceTime">
         <mat-option
           *ngFor="let registration of $availableRegistrationsObservable | async"
-          [value]="registration"
-          (onSelectionChange)="onRegistrationSelectionChange($event, registration)">{{registration}}
+          [value]="registration.code"
+          (onSelectionChange)="onRegistrationSelectionChange($event, registration.code)">{{registration.code}} {{registration.name}}
         </mat-option>
       </mat-select>
     </mat-form-field>
@@ -47,7 +47,7 @@
         <mat-select formControlName="indexPoolCode" required="true">
           <mat-option
             *ngFor="let indexPool of $indexPoolsObservable | async"
-            [value]="indexPool">{{indexPool}}
+            [value]="indexPool.code">{{indexPool.description}}
           </mat-option>
         </mat-select>
       </mat-form-field>

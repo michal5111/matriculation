@@ -8,12 +8,12 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import pl.ue.poznan.matriculation.irk.mapper.ApplicantMapper
 import pl.ue.poznan.matriculation.irk.mapper.StudentMapper
-import pl.ue.poznan.matriculation.local.service.ApplicantService
 import pl.ue.poznan.matriculation.irk.service.IrkService
 import pl.ue.poznan.matriculation.local.domain.applicants.Applicant
 import pl.ue.poznan.matriculation.local.domain.applications.Application
 import pl.ue.poznan.matriculation.local.domain.import.Import
 import pl.ue.poznan.matriculation.local.repo.ImportProgressRepository
+import pl.ue.poznan.matriculation.local.service.ApplicantService
 import pl.ue.poznan.matriculation.oracle.domain.*
 import pl.ue.poznan.matriculation.oracle.repo.*
 import java.util.*
@@ -230,7 +230,8 @@ class PersonService(
             startDate: Date,
             dateOfAddmision: Date,
             stageCode: String,
-            didacticCycleCode: String
+            didacticCycleCode: String,
+            irkApplication: IrkApplication
     ) {
         val student = studentMapper.createOrFindStudent(person, indexPoolCode)
         studentRepository.save(student)
@@ -241,8 +242,13 @@ class PersonService(
                 dateOfAddmision = dateOfAddmision,
                 didacticCycleCode = didacticCycleCode,
                 stageCode = stageCode,
-                student = student
+                student = student,
+                irkApplication = irkApplication
         )
+        personProgrammeRepository.getDefaultProgramme(person.id!!)?.let {
+            it.isDefault = 'N'
+            personProgrammeRepository.save(it)
+        }
         personProgrammeRepository.save(personProgramme)
     }
 
@@ -267,6 +273,11 @@ class PersonService(
         } else {
             person = _self.mapAndSavePerson(application.applicant!!)
         }
+        val irkApplication = IrkApplication(
+                applicationId = application.irkId,
+                confirmationStatus = 1,
+                irkInstance = application.irkInstance
+        )
         _self.immatriculate(
                 person = person!!,
                 dateOfAddmision = import.dateOfAddmision,
@@ -275,7 +286,8 @@ class PersonService(
                 programmeCode = import.programmeCode,
                 registration = import.registration,
                 stageCode = import.stageCode,
-                startDate = import.startDate
+                startDate = import.startDate,
+                irkApplication = irkApplication
         )
         import.importProgress!!.savedApplicants++
         importProgressRepository.save(import.importProgress!!)

@@ -148,38 +148,38 @@ data class OrganizationalUnit(
         val polonUid: String?,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         val persons: Set<Person>,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "socialBenefitsSource", fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "socialBenefitsSource", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         val socialBenefitsSourcePersons: Set<Person>,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "organizationalUnit")
+        @OneToMany(mappedBy = "organizationalUnit", cascade = [CascadeType.MERGE])
         val phoneNumbers: List<PhoneNumber>,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         val conductedFieldOfStudy: MutableList<ConductedFieldOfStudy>,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         val fieldOfStudyPermissions: MutableList<FieldOfStudyPermission>,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "organizationalUnitPrimary", fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "organizationalUnitPrimary", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         val programmesPrimary: MutableList<Programme>,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "organizationalUnitLeading", fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "organizationalUnitLeading", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         val programmesLeading: MutableList<Programme>,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         val personProgrammes: MutableList<PersonProgramme>,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         val folders: MutableList<Folder>
 )

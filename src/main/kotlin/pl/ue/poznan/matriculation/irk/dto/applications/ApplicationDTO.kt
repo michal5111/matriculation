@@ -15,5 +15,6 @@ data class ApplicationDTO(
         val qualified: String?,
         val score: String?,
         val turn: TurnDTO,
-        val user: Long
+        val user: Long,
+        var irkInstance: String? = null
 )

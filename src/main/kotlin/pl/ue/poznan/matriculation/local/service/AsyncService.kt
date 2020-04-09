@@ -11,12 +11,12 @@ class AsyncService(
 ) {
 
     @Async
-    fun importApplicantsAsync(import: Import) {
-        importService.importApplications(import)
+    fun importApplicantsAsync(importId: Long) {
+        importService.importApplications(importId)
     }
 
     @Async
-    fun savePersons(import: Import) {
-        importService.savePersons(import)
+    fun savePersons(importId: Long) {
+        importService.savePersons(importId)
     }
 }

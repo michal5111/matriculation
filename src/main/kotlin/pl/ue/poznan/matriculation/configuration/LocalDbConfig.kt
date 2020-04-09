@@ -57,7 +57,7 @@ class LocalDbConfig {
             @Qualifier("dataSource") dataSource: DataSource
     ): LocalContainerEntityManagerFactoryBean? {
         val properties: MutableMap<String, Any> = HashMap()
-        properties["hibernate.hbm2ddl.auto"] = "create"
+        properties["hibernate.hbm2ddl.auto"] = "update"
         return builder
                 .dataSource(dataSource)
                 .packages("pl.ue.poznan.matriculation.local.domain")

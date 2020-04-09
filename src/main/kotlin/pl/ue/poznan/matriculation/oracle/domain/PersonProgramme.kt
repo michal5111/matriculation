@@ -17,15 +17,15 @@ data class PersonProgramme(
         val id: Long? = null,
 
         @JsonIgnore
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "OS_ID",referencedColumnName = "ID", nullable = false)
         var person: Person,
 
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "PRG_KOD", referencedColumnName = "KOD", nullable = false)
         var programme: Programme,
 
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "ST_ID", referencedColumnName = "ID", nullable = false)
         var student: Student,
 
@@ -157,5 +157,8 @@ data class PersonProgramme(
         var groundsForUndertakingStudies: GroundsForUndertakingStudies? = null,
 
         @OneToMany(mappedBy = "personProgramme" ,fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-        val personStages: MutableList<PersonStage> = mutableListOf()
+        val personStages: MutableList<PersonStage> = mutableListOf(),
+
+        @OneToOne(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+        var irkApplication: IrkApplication? = null
 )

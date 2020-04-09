@@ -1,6 +1,7 @@
 package pl.ue.poznan.matriculation.irk.service
 
 import org.apache.commons.io.IOUtils
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.core.io.Resource
 import org.springframework.http.*
@@ -18,18 +19,30 @@ import pl.ue.poznan.matriculation.local.domain.applications.Application
 import pl.ue.poznan.matriculation.local.domain.programmes.ProgrammeGroups
 import pl.ue.poznan.matriculation.local.domain.registrations.Registration
 import java.io.InputStream
+import javax.annotation.PostConstruct
 
 
 @Service
 class IrkService {
-    private val apiKey = "598050a3c1978e84cb7dc0f43d4e2a091ff76319"
-    private val serviceUrl = "https://usos-irk.ue.poznan.pl"
-    private val apiUrl = "$serviceUrl/api/"
+
+    @Value("\${pl.ue.poznan.matriculation.irkInstance}")
+    private lateinit var serviceUrl: String
+
+    @Value("\${pl.ue.poznan.matriculation.irkInstanceKey}")
+    private lateinit var apiKey: String
+
+    private lateinit var apiUrl: String
+
     private val restTemplate: RestTemplate = RestTemplate()
 
     private class PageOfApplicants : ParameterizedTypeReference<Page<ApplicantDTO>>()
     private class PageOfApplications : ParameterizedTypeReference<Page<ApplicationDTO>>()
     private class PageOfRegistrations : ParameterizedTypeReference<Page<RegistrationDTO>>()
+
+    @PostConstruct
+    fun init() {
+        apiUrl = "$serviceUrl/api/"
+    }
 
     fun getApplicantById(id: Long): ApplicantDTO? {
         val httpHeaders = HttpHeaders()
@@ -101,12 +114,12 @@ class IrkService {
         return response.body
     }
 
-    fun getAvailableRegistrations(): List<String> {
+    fun getAvailableRegistrations(): MutableList<Map<String, String>> {
         val httpHeaders = HttpHeaders()
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set("Authorization", "Token $apiKey")
         val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
-        val availableRegistrations = mutableListOf<String>()
+        val availableRegistrations = mutableListOf<Map<String, String>>()
         var currentPage = 1
         var hasNext: Boolean
         do {
@@ -117,7 +130,11 @@ class IrkService {
                     PageOfRegistrations()
             ).body
             page?.results?.forEach {
-                availableRegistrations.add(it.code)
+                val registration: Map<String, String> = mutableMapOf(
+                        "code" to it.code,
+                        "name" to it.name.pl!!
+                )
+                availableRegistrations.add(registration)
             }
             hasNext = page?.next != null
             currentPage++
@@ -187,6 +204,9 @@ class IrkService {
                 httpEntity,
                 PageOfApplications()
         )
+        response.body?.results?.forEach {
+            it.irkInstance = serviceUrl
+        }
         return response.body!!
     }
 

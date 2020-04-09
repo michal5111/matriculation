@@ -27,10 +27,10 @@ data class Wku(
 //        val creationUser: String,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "wku", fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "wku", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         val persons: Set<Person>,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "wku", fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "wku", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         val addresses: List<Address>
         )

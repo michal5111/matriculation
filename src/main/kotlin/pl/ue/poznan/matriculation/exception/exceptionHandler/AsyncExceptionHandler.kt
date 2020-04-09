@@ -1,5 +1,7 @@
 package pl.ue.poznan.matriculation.exception.exceptionHandler
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler
 import org.springframework.beans.factory.annotation.Autowired
 import pl.ue.poznan.matriculation.exception.ImportException
@@ -12,6 +14,8 @@ class AsyncExceptionHandler: AsyncUncaughtExceptionHandler {
 
     @Autowired
     private lateinit var importService: ImportService
+
+    val logger: Logger = LoggerFactory.getLogger(AsyncExceptionHandler::class.java)
 
     override fun handleUncaughtException(throwable: Throwable, method: Method, vararg objects: Any?) {
         if (throwable is ImportException) {
@@ -41,11 +45,11 @@ class AsyncExceptionHandler: AsyncUncaughtExceptionHandler {
                             + throwable.cause?.stackTrace?.joinToString("\n", "\nStackTrace: ")
             )
         }
-        println("Exception message - " + throwable.message)
-        println("Cause " + throwable.cause?.message)
-        println("Method name - " + method.name)
+        logger.error("Exception message - " + throwable.message)
+        logger.error("Cause " + throwable.cause?.message)
+        logger.error("Method name - " + method.name)
         for (param in objects) {
-            println("Parameter value - $param")
+            logger.error("Parameter value - $param")
         }
         throwable.printStackTrace()
     }

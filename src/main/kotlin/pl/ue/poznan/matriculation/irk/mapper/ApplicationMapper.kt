@@ -30,7 +30,8 @@ class ApplicationMapper {
                         dateTo = applicationDTO.turn.dateTo,
                         programme = applicationDTO.turn.programme,
                         registration = applicationDTO.turn.registration
-                )
+                ),
+                irkInstance = applicationDTO.irkInstance!!
         ).apply {
             applicationForeignerData?.application = this
         }

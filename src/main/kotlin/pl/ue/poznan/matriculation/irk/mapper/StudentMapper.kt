@@ -74,7 +74,8 @@ class StudentMapper(
             dateOfAddmision: Date,
             stageCode: String,
             didacticCycleCode: String,
-            student: Student
+            student: Student,
+            irkApplication: IrkApplication
     ): PersonProgramme {
         val programme = programmeRepository.getOne(programmeCode)
         val didacticCycle = didacticCycleRepository.getOne(didacticCycleCode)
@@ -87,8 +88,9 @@ class StudentMapper(
                 dateToNextPass = didacticCycle.dateTo,
                 isDefault = if (getPreviousStudyEndDate(person,dateOfAddmision) <= dateOfAddmision) 'T' else 'N'
                 //entitlementDocument = person.entitlementDocuments.
-
         )
+        irkApplication.personProgramme = personProgramme
+        personProgramme.irkApplication = irkApplication
         personProgramme.personStages.add(
                 PersonStage(
                         didacticCycle = didacticCycle,

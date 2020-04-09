@@ -5,6 +5,8 @@ import {Page} from "../../model/oracle/page/page";
 import {Import} from "../../model/import/import";
 import {Application} from "../../model/irk/application";
 import {ImportProgress} from "../../model/import/import-progress";
+import {IndexType} from "../../model/oracle/index-type";
+import {Registration} from "../../model/irk/registration";
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -29,16 +31,16 @@ export class ImportService {
     return this.http.get<Page<Import>>(`${this.apiUrl}?page=${page}&size=${size}`, httpOptions)
   }
 
-  getAvailableRegistrations(): Observable<[string]> {
-    return this.http.get<[string]>("api/registrations/codes", httpOptions)
+  getAvailableRegistrations(): Observable<[Registration]> {
+    return this.http.get<[Registration]>("api/registrations/codes", httpOptions)
   }
 
   getAvailableRegistrationProgrammes(programmeCode: String): Observable<[string]> {
     return this.http.get<[string]>(`api/registrations/codes/${programmeCode}`)
   }
 
-  getAvailableIndexPools(): Observable<[string]> {
-    return this.http.get<[string]>("api/indexPool")
+  getAvailableIndexPools(): Observable<[IndexType]> {
+    return this.http.get<[IndexType]>("api/indexPool")
   }
 
   getAvailableStages(programmeCode: String): Observable<[string]> {

@@ -20,6 +20,7 @@ import pl.ue.poznan.matriculation.local.domain.import.ImportProgress
 import pl.ue.poznan.matriculation.local.service.ApplicationService
 import pl.ue.poznan.matriculation.local.service.AsyncService
 import pl.ue.poznan.matriculation.local.service.ImportService
+import pl.ue.poznan.matriculation.oracle.dto.IndexTypeDto
 import pl.ue.poznan.matriculation.oracle.service.UsosService
 
 @RestController
@@ -77,7 +78,7 @@ class RestController(
     }
 
     @GetMapping("/registrations/codes")
-    fun getRegistrationCodes(): List<String> {
+    fun getRegistrationCodes(): MutableList<Map<String, String>> {
         return irkService.getAvailableRegistrations()
     }
 
@@ -127,7 +128,8 @@ class RestController(
     fun importApplicants(@PathVariable("id") importId: Long): ResponseEntity<Void> {
         val import = importService.getImportForApplicantImport(importId)
         importService.setImportStatus(ImportStatus.STARTED, importId)
-        asyncService.importApplicantsAsync(import)
+        importService.resetImportedApplications(importId)
+        asyncService.importApplicantsAsync(importId)
         return ResponseEntity.accepted().build()
     }
 
@@ -146,7 +148,7 @@ class RestController(
         val import = importService.getImportForPersonSave(importId)
         importService.setImportStatus(ImportStatus.SAVING, importId)
         importService.resetSaveErrors(importId)
-        asyncService.savePersons(import)
+        asyncService.savePersons(importId)
         return ResponseEntity.accepted().build()
     }
 
@@ -166,7 +168,7 @@ class RestController(
     }
 
     @GetMapping("/indexPool")
-    fun getAvailableIndexPools(): List<String> {
+    fun getAvailableIndexPools(): List<IndexTypeDto> {
         return usosService.getAvailableIndexPoolsCodes()
     }
 

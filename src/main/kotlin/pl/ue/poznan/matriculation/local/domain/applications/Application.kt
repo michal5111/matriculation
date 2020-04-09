@@ -51,6 +51,8 @@ data class Application(
 //        )
         val turn: Turn,
 
+        val irkInstance: String,
+
         @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE])
         @JoinColumn(name = "applicant_id", referencedColumnName = "id")
         var applicant: pl.ue.poznan.matriculation.local.domain.applicants.Applicant? = null,

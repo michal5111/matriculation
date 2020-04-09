@@ -16,7 +16,7 @@ data class EducationData(
         @JoinColumn(name = "applicant_id", referencedColumnName = "id")
         var applicant: Applicant? = null,
 
-        @OneToMany(mappedBy = "educationData", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+        @OneToMany(mappedBy = "educationData", cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
         var documents: MutableList<Document>,
 
         var highSchoolCity: String?,
