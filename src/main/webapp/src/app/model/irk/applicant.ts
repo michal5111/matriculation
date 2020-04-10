@@ -70,4 +70,5 @@ export class Applicant {
         high_school_city: string;
         documents: [Document]
     }
+    usosId: number
 }

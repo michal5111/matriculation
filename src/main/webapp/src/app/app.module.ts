@@ -5,7 +5,7 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from "./module/material/material.module";
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {ReactiveFormsModule} from "@angular/forms";
 import {ApplicantSearchComponent} from "./component/applicant-search/applicant-search.component";
 import {ApplicationsComponent} from "./component/applications/applications.component";
@@ -16,6 +16,9 @@ import {PersonsComponent} from './component/oracle/persons/persons.component';
 import {ImportSetupComponent} from './component/import/import-setup/import-setup.component';
 import {ImportComponent} from './component/import/import/import.component';
 import {ImportViewComponent} from './component/import/import-view/import-view.component';
+import { UnauthorizedDialogComponent } from './component/dialog/unauthorized-dialog/unauthorized-dialog.component';
+import {AuthInterceptor} from "./interceptors/auth-interceptor";
+import { ForbiddenDialogComponent } from './component/dialog/forbidden-dialog/forbidden-dialog.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +31,9 @@ import {ImportViewComponent} from './component/import/import-view/import-view.co
     PersonsComponent,
     ImportSetupComponent,
     ImportComponent,
-    ImportViewComponent
+    ImportViewComponent,
+    UnauthorizedDialogComponent,
+    ForbiddenDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -38,7 +43,13 @@ import {ImportViewComponent} from './component/import/import-view/import-view.co
     HttpClientModule,
     ReactiveFormsModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

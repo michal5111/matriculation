@@ -10,7 +10,7 @@ import {ActivatedRoute} from "@angular/router";
 import {ImportProgress} from "../../../model/import/import-progress";
 import {Subscription, timer} from "rxjs";
 import {Import} from "../../../model/import/import";
-import {ImportStatus} from "../../../model/import/import-status.enum";
+import {UserService} from "../../../service/user-service/user.service";
 
 @Component({
   selector: 'app-import-view',
@@ -55,7 +55,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
 
-  constructor(private importService: ImportService, private route: ActivatedRoute) {
+  constructor(private importService: ImportService, private route: ActivatedRoute, public _userService: UserService) {
   }
 
   getPage(page: number, size: number, sort?: string, sortDir?: string) {

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { UserService } from "./service/user-service/user.service";
-import {User} from "./model/user/user";
-import {AppSettings} from "./app-settings";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-root',
@@ -10,18 +9,12 @@ import {AppSettings} from "./app-settings";
 })
 export class AppComponent {
   title = 'angularmatriculation';
-  user: User;
-  isAuthenticated = false;
-  appHome = AppSettings.APP_HOME;
 
-  constructor(private userService: UserService) {
+  constructor(public _userService: UserService, public _router: Router) {
     this.getUser()
   }
 
   getUser() {
-    this.userService.getUser().subscribe((user: User) => {
-      this.user = user;
-      this.isAuthenticated = !!user.casAssertion;
-    })
+    this._userService.getUser().subscribe()
   }
 }

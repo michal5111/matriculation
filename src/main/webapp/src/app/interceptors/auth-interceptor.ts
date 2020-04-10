@@ -8,12 +8,14 @@ import {
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {tap} from 'rxjs/operators';
-import {Router} from '@angular/router';
+import {MatDialog} from "@angular/material/dialog";
+import {UnauthorizedDialogComponent} from "../component/dialog/unauthorized-dialog/unauthorized-dialog.component";
+import {UserService} from "../service/user-service/user.service";
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-    constructor(private router: Router) {}
+    constructor(private dialog: MatDialog, private userService: UserService) {}
 
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -30,10 +32,20 @@ export class AuthInterceptor implements HttpInterceptor {
         return next.handle(request).pipe( tap(() => {},
           (err: any) => {
           if (err instanceof HttpErrorResponse) {
-            if (err.status !== 401) {
+            if (err.status !== 401 && err.status !== 403) {
              return;
             }
-            this.router.navigate(['login']);
+            if (err.status === 401) {
+              const dialogRef = this.dialog.open(UnauthorizedDialogComponent, {
+                width: '250px'
+              });
+              this.userService.isAuthenticated = false
+            }
+            if (err.status === 403) {
+              const dialogRef = this.dialog.open(UnauthorizedDialogComponent, {
+                width: '250px'
+              });
+            }
           }
         }));
       }

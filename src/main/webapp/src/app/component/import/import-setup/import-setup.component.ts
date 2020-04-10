@@ -8,6 +8,7 @@ import {HttpErrorResponse} from "@angular/common/http";
 import {tap} from "rxjs/operators";
 import {IndexType} from "../../../model/oracle/index-type";
 import {Registration} from "../../../model/irk/registration";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-import-setup',
@@ -26,7 +27,7 @@ export class ImportSetupComponent implements OnInit {
   didacticCycleInputValue: String = '';
   debounceTime = 400;
 
-  constructor(private importService: ImportService, private formBuilder: FormBuilder) {
+  constructor(private importService: ImportService, private formBuilder: FormBuilder, private snackBar: MatSnackBar) {
   }
 
   @Output() onImportCreatedEventEmitter = new EventEmitter<Import>();
@@ -91,6 +92,9 @@ export class ImportSetupComponent implements OnInit {
   }
 
   onImportCreated(importObject: Import) {
+    this.snackBar.open("Import utworzony", "Cofnij", {
+      duration: 3000
+    })
     this.importCreationFormGroup.reset();
     this.import = importObject;
     this.onImportCreatedEventEmitter.next(this.import)

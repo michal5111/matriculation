@@ -1,7 +1,17 @@
-<div>
+<ng-template class="mat-typography" [ngIf]="_userService.isAuthenticated" ]>
   <div>
-    <p>Utwórz import</p>
-    <app-import-setup (onImportCreatedEventEmitter)="onImportCreated($event)"></app-import-setup>
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Utwórz import
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <app-import-setup (onImportCreatedEventEmitter)="onImportCreated($event)"></app-import-setup>
+        </ng-template>
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
   <div>
     <p>Utworzone importy</p>
@@ -72,4 +82,4 @@
 
     </div>
   </div>
-</div>
+</ng-template>

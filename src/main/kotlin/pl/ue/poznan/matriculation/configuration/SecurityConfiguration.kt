@@ -150,7 +150,6 @@ class SecurityConfiguration: WebSecurityConfigurerAdapter() {
                     .addFilterBefore(requestCasGlobalLogoutFilter(), LogoutFilter::class.java)
                 .authorizeRequests()
                     .antMatchers("/login").authenticated()
-                    //.antMatchers("/*").permitAll()
         http.csrf().disable()
         http.headers().frameOptions().disable()
     }

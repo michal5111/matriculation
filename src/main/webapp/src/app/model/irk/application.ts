@@ -22,4 +22,5 @@ export interface Application {
     source_of_financing: string,
     basis_of_admission: string
   }
+  irkInstance: string
 }

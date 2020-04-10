@@ -6,6 +6,8 @@ import {ImportService} from "../../../service/import-service/import.service";
 import {flatMap, map, tap} from "rxjs/operators";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatSort, Sort} from "@angular/material/sort";
+import {MatExpansionPanel} from "@angular/material/expansion";
+import {UserService} from "../../../service/user-service/user.service";
 
 @Component({
   selector: 'app-import',
@@ -33,8 +35,9 @@ export class ImportComponent implements OnInit {
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(MatExpansionPanel, {static: true}) importCreateExpansionPanel: MatExpansionPanel
 
-  constructor(private importService: ImportService) { }
+  constructor(private importService: ImportService, public _userService: UserService) { }
 
   getPage(page: number, size: number, sort?: string, sortDir?: string) {
     return this.importService.getImportsPage(page, size, sort, sortDir)
@@ -61,6 +64,7 @@ export class ImportComponent implements OnInit {
   }
 
   onImportCreated(event: Import) {
+    this.importCreateExpansionPanel.close()
     this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe()
   }
 
