@@ -1,4 +1,4 @@
-<ng-template class="mat-typography" [ngIf]="_userService.isAuthenticated" ]>
+<div class="mat-typography">
   <div>
     <mat-accordion>
       <mat-expansion-panel>
@@ -13,7 +13,7 @@
       </mat-expansion-panel>
     </mat-accordion>
   </div>
-  <div>
+  <ng-template [ngIf]="_userService.isAuthenticated">
     <p>Utworzone importy</p>
     <div *ngIf="page">
       <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)">
@@ -81,5 +81,5 @@
       </mat-paginator>
 
     </div>
-  </div>
-</ng-template>
+  </ng-template>
+</div>
