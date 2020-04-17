@@ -59,6 +59,10 @@ export class ImportService {
     return this.http.delete(`api/import/${importId}`, httpOptions)
   }
 
+  getImport(importId: Number) {
+    return this.http.get<Import>(`api/import/${importId}`, httpOptions)
+  }
+
   findAllApplicationsByImportId(importId: Number, page: number, size: number, sort?: string, sortDir?: string): Observable<Page<Application>> {
     if (sort && sortDir) {
       return this.http.get<Page<Application>>(`api/import/${importId}/applications?page=${page}&size=${size}&sort=${sort},${sortDir}`, httpOptions)

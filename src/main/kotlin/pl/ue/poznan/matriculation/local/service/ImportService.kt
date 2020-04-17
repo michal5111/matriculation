@@ -12,6 +12,7 @@ import pl.ue.poznan.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.ue.poznan.matriculation.local.domain.enum.ImportStatus
 import pl.ue.poznan.matriculation.local.domain.import.Import
 import pl.ue.poznan.matriculation.local.domain.import.ImportProgress
+import pl.ue.poznan.matriculation.local.domain.import.ImportProgressDto
 import pl.ue.poznan.matriculation.local.repo.ApplicantRepository
 import pl.ue.poznan.matriculation.local.repo.ApplicationRepository
 import pl.ue.poznan.matriculation.local.repo.ImportProgressRepository
@@ -93,6 +94,9 @@ class ImportService(
                         pageNumber = currentPage
                 )
                 if (set) {
+                    if (page.count == 0) {
+                        throw ImportException(import.id!!, "Liczba kandydatów wynosi 0!")
+                    }
                     import.importProgress!!.totalCount = page.count
                     importProgressRepository.save(import.importProgress!!)
                     set = false
@@ -134,6 +138,11 @@ class ImportService(
                 ?: throw ImportNotFoundException("Nie znaleziono importu.")
     }
 
+    fun getProgressRest(importId: Long): ImportProgressDto {
+        return importProgressRepository.getProgress(importId)
+                ?: throw ImportNotFoundException("Nie znaleziono importu.")
+    }
+
     fun setError(importId: Long, errorMessage: String) {
         val importProgress = importProgressRepository.getOne(importId)
         importProgress.error = errorMessage
@@ -147,8 +156,12 @@ class ImportService(
                     || it.applicationImportStatus == ApplicationImportStatus.ERROR
         }.forEach {
             try {
-                val personId = personService.processPerson(import, it)
-                it.applicant!!.usosId = personId
+                val personIdAndAssignedNumber = personService.processPerson(import, it)
+                import.importProgress!!.savedApplicants++
+                personIdAndAssignedNumber.let { pair ->
+                    it.applicant!!.usosId = pair.first
+                    it.applicant!!.assignedIndexNumber = pair.second
+                }
                 it.importError = null
                 it.stackTrace = null
                 it.applicationImportStatus = ApplicationImportStatus.IMPORTED

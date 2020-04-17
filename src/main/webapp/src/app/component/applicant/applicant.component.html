@@ -15,42 +15,42 @@
       <p>Numer telefonu: {{applicant.phone}}</p>
       <p>Obywatelstwo: {{applicant.citizenship}}</p>
       <p>Data ostatniej modyfikacji: {{applicant.modification_date}}</p>
-      <mat-expansion-panel [disabled]="!applicant.basic_data">
+      <mat-expansion-panel [disabled]="!applicant.basicData">
         <mat-expansion-panel-header>
           <mat-panel-title>Dane podstawowe</mat-panel-title>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
           <mat-list>
-            <mat-list-item> Płeć: {{applicant.basic_data.sex}}</mat-list-item>
-            <mat-list-item> PESEL: {{applicant.basic_data.pesel}}</mat-list-item>
-            <mat-list-item> Data urodzenia: {{applicant.basic_data.date_of_birth}}</mat-list-item>
-            <mat-list-item> Miasto urodzenia: {{applicant.basic_data.city_of_birth}}</mat-list-item>
-            <mat-list-item> Kraj urodzenia: {{applicant.basic_data.country_of_birth}}</mat-list-item>
-            <mat-list-item> Źródło danych: {{applicant.basic_data.data_source}}</mat-list-item>
+            <mat-list-item> Płeć: {{applicant.basicData.sex}}</mat-list-item>
+            <mat-list-item> PESEL: {{applicant.basicData.pesel}}</mat-list-item>
+            <mat-list-item> Data urodzenia: {{applicant.basicData.dateOfBirth}}</mat-list-item>
+            <mat-list-item> Miasto urodzenia: {{applicant.basicData.cityOfBirth}}</mat-list-item>
+            <mat-list-item> Kraj urodzenia: {{applicant.basicData.countryOfBirth}}</mat-list-item>
+            <mat-list-item> Źródło danych: {{applicant.basicData.dataSource}}</mat-list-item>
           </mat-list>
         </ng-template>
       </mat-expansion-panel>
-      <mat-expansion-panel [disabled]="!applicant.contact_data">
+      <mat-expansion-panel [disabled]="!applicant.contactData">
         <mat-expansion-panel-header>
           <mat-panel-title>Dane kontaktowe</mat-panel-title>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
           <mat-list>
-            <mat-list-item>Numer telefonu: {{applicant.contact_data.phone_number}}</mat-list-item>
-            <mat-list-item>Typ numeru telefonu: {{applicant.contact_data.phone_number_type}}</mat-list-item>
-            <mat-list-item>Drugi numer telefonu: {{applicant.contact_data.phone_number2}}</mat-list-item>
-            <mat-list-item>Typ drugiego numeru telefonu: {{applicant.contact_data.phone_number2_type}}</mat-list-item>
-            <mat-list-item>Nazwa ulicy zameldowania: {{applicant.contact_data.official_street}}</mat-list-item>
-            <mat-list-item>Numer ulicy zameldowania: {{applicant.contact_data.official_street_number}}</mat-list-item>
-            <mat-list-item>Numer mieszkania zameldowania: {{applicant.contact_data.official_flat_number}}</mat-list-item>
-            <mat-list-item>Kod pocztowy zameldowania: {{applicant.contact_data.official_post_code}}</mat-list-item>
-            <mat-list-item>Nazwa miejsca zameldowania: {{applicant.contact_data.official_city}}</mat-list-item>
+            <mat-list-item>Numer telefonu: {{applicant.contactData.phoneNumber}}</mat-list-item>
+            <mat-list-item>Typ numeru telefonu: {{applicant.contactData.phoneNumberType}}</mat-list-item>
+            <mat-list-item>Drugi numer telefonu: {{applicant.contactData.phoneNumber2}}</mat-list-item>
+            <mat-list-item>Typ drugiego numeru telefonu: {{applicant.contactData.phoneNumber2Type}}</mat-list-item>
+            <mat-list-item>Nazwa ulicy zameldowania: {{applicant.contactData.officialStreet}}</mat-list-item>
+            <mat-list-item>Numer ulicy zameldowania: {{applicant.contactData.officialStreetNumber}}</mat-list-item>
+            <mat-list-item>Numer mieszkania zameldowania: {{applicant.contactData.officialFlatNumber}}</mat-list-item>
+            <mat-list-item>Kod pocztowy zameldowania: {{applicant.contactData.officialPostCode}}</mat-list-item>
+            <mat-list-item>Nazwa miejsca zameldowania: {{applicant.contactData.officialCity}}</mat-list-item>
             <mat-list-item>
               Czy miasto:
-              <div *ngIf="applicant.contact_data.official_city_is_city">
+              <div *ngIf="applicant.contactData.officialCityIsCity">
                 Tak
               </div>
-              <div *ngIf="!applicant.contact_data.official_city_is_city">
+              <div *ngIf="!applicant.contactData.officialCityIsCity">
                 Nie
               </div>
             </mat-list-item>

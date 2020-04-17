@@ -34,7 +34,6 @@ data class EducationData(
                 other as EducationData
 
                 if (applicantId != other.applicantId) return false
-                if (documents != other.documents) return false
                 if (highSchoolCity != other.highSchoolCity) return false
                 if (highSchoolName != other.highSchoolName) return false
                 if (highSchoolType != other.highSchoolType) return false
@@ -45,7 +44,6 @@ data class EducationData(
 
         override fun hashCode(): Int {
                 var result = applicantId?.hashCode() ?: 0
-                result = 31 * result + documents.hashCode()
                 result = 31 * result + (highSchoolCity?.hashCode() ?: 0)
                 result = 31 * result + (highSchoolName?.hashCode() ?: 0)
                 result = 31 * result + (highSchoolType?.hashCode() ?: 0)
@@ -54,6 +52,8 @@ data class EducationData(
         }
 
         override fun toString(): String {
-                return "EducationData(applicantId=$applicantId, documents=$documents, highSchoolCity=$highSchoolCity, highSchoolName=$highSchoolName, highSchoolType=$highSchoolType, highSchoolUsosCode=$highSchoolUsosCode)"
+                return "EducationData(applicantId=$applicantId, highSchoolCity=$highSchoolCity, highSchoolName=$highSchoolName, highSchoolType=$highSchoolType, highSchoolUsosCode=$highSchoolUsosCode)"
         }
+
+
 }

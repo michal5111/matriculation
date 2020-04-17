@@ -62,6 +62,8 @@ data class Applicant(
 
         var usosId: Long? = null,
 
+        var assignedIndexNumber: String? = null,
+
         @JsonIgnore
         @LazyCollection(LazyCollectionOption.FALSE)
         @OneToMany(mappedBy = "applicant")
@@ -85,11 +87,6 @@ data class Applicant(
                 if (photoPermission != other.photoPermission) return false
                 if (casPasswordOverride != other.casPasswordOverride) return false
                 if (modificationDate != other.modificationDate) return false
-                if (basicData != other.basicData) return false
-                if (contactData != other.contactData) return false
-                if (additionalData != other.additionalData) return false
-                if (applicantForeignerData != other.applicantForeignerData) return false
-                if (educationData != other.educationData) return false
                 if (usosId != other.usosId) return false
 
                 return true
@@ -108,17 +105,12 @@ data class Applicant(
                 result = 31 * result + (photoPermission?.hashCode() ?: 0)
                 result = 31 * result + (casPasswordOverride?.hashCode() ?: 0)
                 result = 31 * result + modificationDate.hashCode()
-                result = 31 * result + basicData.hashCode()
-                result = 31 * result + contactData.hashCode()
-                result = 31 * result + additionalData.hashCode()
-                result = 31 * result + (applicantForeignerData?.hashCode() ?: 0)
-                result = 31 * result + educationData.hashCode()
                 result = 31 * result + (usosId?.hashCode() ?: 0)
                 return result
         }
 
         override fun toString(): String {
-                return "Applicant(id=$id, irkId=$irkId, email='$email', indexNumber=$indexNumber, password='$password', name=$name, phone=$phone, citizenship=$citizenship, photo=$photo, photoPermission=$photoPermission, casPasswordOverride=$casPasswordOverride, modificationDate=$modificationDate, basicData=$basicData, contactData=$contactData, additionalData=$additionalData, applicantForeignerData=$applicantForeignerData, educationData=$educationData, usosId=$usosId)"
+                return "Applicant(id=$id, irkId=$irkId, email='$email', indexNumber=$indexNumber, password='$password', name=$name, phone=$phone, citizenship=$citizenship, photo=$photo, photoPermission=$photoPermission, casPasswordOverride=$casPasswordOverride, modificationDate=$modificationDate, usosId=$usosId)"
         }
 
 

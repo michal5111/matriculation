@@ -12,11 +12,11 @@ import pl.ue.poznan.matriculation.irk.service.IrkService
 import pl.ue.poznan.matriculation.local.domain.applicants.Applicant
 import pl.ue.poznan.matriculation.local.domain.applications.Application
 import pl.ue.poznan.matriculation.local.domain.import.Import
-import pl.ue.poznan.matriculation.local.repo.ImportProgressRepository
 import pl.ue.poznan.matriculation.local.service.ApplicantService
 import pl.ue.poznan.matriculation.oracle.domain.*
 import pl.ue.poznan.matriculation.oracle.repo.*
 import java.util.*
+import javax.annotation.PostConstruct
 
 @Service
 class PersonService(
@@ -36,26 +36,32 @@ class PersonService(
         private val irkService: IrkService,
         private val entitlementDocumentRepository: EntitlementDocumentRepository,
         private val applicantService: ApplicantService,
-        private val importProgressRepository: ImportProgressRepository
+        private val addressService: AddressService
 ) {
 
     @Autowired
     private lateinit var _self: PersonService
+    private lateinit var permanentAddressType: AddressType
+    private lateinit var correspondenceAddressType: AddressType
+    private lateinit var defaultStudentOrganizationalUnit: OrganizationalUnit
 
     @Value("\${pl.ue.poznan.matriculation.defaultStudentOrganizationalUnit}")
     lateinit var defaultStudentOrganizationalUnitString: String
 
-    @Transactional(rollbackFor = [java.lang.Exception::class], propagation = Propagation.REQUIRED, transactionManager = "oracleTransactionManager")
-    fun mapAndSavePerson(applicant: Applicant): Person {
-        val person = applicantMapper.applicantToPersonMapper(applicant)
-        return personRepository.save(person)
+    fun mapPerson(applicant: Applicant): Person {
+        return applicantMapper.applicantToPersonMapper(applicant)
+    }
+
+    @PostConstruct
+    fun init() {
+        permanentAddressType = addressTypeRepository.getOne("STA")
+        correspondenceAddressType = addressTypeRepository.getOne("KOR")
+        defaultStudentOrganizationalUnit = organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitString)
     }
 
     @Transactional(rollbackFor = [java.lang.Exception::class], propagation = Propagation.REQUIRED, transactionManager = "oracleTransactionManager")
-    fun updateAndSavePerson(applicant: Applicant, personId: Long) {
+    fun updatePerson(applicant: Applicant, person: Person) {
         applicantService.checkApplicant(applicant)
-        val defaultStudentOrganizationalUnit: OrganizationalUnit = organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitString)
-        val person = personRepository.getOne(personId)
         person.apply {
             email = applicant.email
             name = applicant.name.given!!
@@ -89,55 +95,48 @@ class PersonService(
     }
 
     private fun updateAddresses(person: Person, applicant: Applicant) {
-        val permanentAddressType: AddressType = addressTypeRepository.getOne("STA")
-        val correspondenceAddressType: AddressType = addressTypeRepository.getOne("KOR")
         val permanentAddress = addressRepository.findByPersonAndAddressType(person, permanentAddressType)
         if (permanentAddress != null) {
-            permanentAddress.apply {
-                city = applicant.contactData.officialCity
-                street = applicant.contactData.officialStreet
-                houseNumber = applicant.contactData.officialStreetNumber
-                apartmentNumber = applicant.contactData.officialFlatNumber
-                zipCode = applicant.contactData.officialPostCode
-                cityIsCity = if (applicant.contactData.officialCityIsCity) 'T' else 'N'
-                countryCode = applicant.contactData.officialCountry?.let {
-                    citizenshipRepository.getOne(it)
-                }
-            }
+            addressService.updateAddress(
+                    address = permanentAddress,
+                    city = applicant.contactData.officialCity,
+                    street = applicant.contactData.officialStreet,
+                    houseNumber = applicant.contactData.officialStreetNumber,
+                    apartmentNumber = applicant.contactData.officialFlatNumber,
+                    zipCode = applicant.contactData.officialPostCode,
+                    cityIsCity = applicant.contactData.officialCityIsCity,
+                    countryCode = applicant.contactData.officialCountry
+            )
         } else {
             person.addresses.add(
-                    Address(
-                            person = person,
+                    addressService.createAddress(
                             addressType = permanentAddressType,
+                            person = person,
                             city = applicant.contactData.officialCity,
                             street = applicant.contactData.officialStreet,
                             houseNumber = applicant.contactData.officialStreetNumber,
                             apartmentNumber = applicant.contactData.officialFlatNumber,
                             zipCode = applicant.contactData.officialPostCode,
-                            cityIsCity = if (applicant.contactData.officialCityIsCity) 'T' else 'N',
-                            countryCode = applicant.contactData.officialCountry?.let {
-                                citizenshipRepository.getOne(it)
-                            }
+                            cityIsCity = applicant.contactData.officialCityIsCity,
+                            countryCode = applicant.contactData.officialCountry
                     )
             )
         }
         val correspondenceAddress = addressRepository.findByPersonAndAddressType(person, correspondenceAddressType)
         if (correspondenceAddress != null) {
-            correspondenceAddress.apply {
-                addressType = correspondenceAddressType
-                city = applicant.contactData.realCity
-                street = applicant.contactData.realStreet
-                houseNumber = applicant.contactData.realStreetNumber
-                apartmentNumber = applicant.contactData.realFlatNumber
-                zipCode = applicant.contactData.realPostCode
-                cityIsCity = if (applicant.contactData.realCityIsCity) 'T' else 'N'
-                countryCode = applicant.contactData.realCountry?.let {
-                    citizenshipRepository.getOne(it)
-                }
-            }
+            addressService.updateAddress(
+                    address = correspondenceAddress,
+                    city = applicant.contactData.realCity,
+                    street = applicant.contactData.realStreet,
+                    houseNumber = applicant.contactData.realStreetNumber,
+                    apartmentNumber = applicant.contactData.realFlatNumber,
+                    zipCode = applicant.contactData.realPostCode,
+                    cityIsCity = applicant.contactData.realCityIsCity,
+                    countryCode = applicant.contactData.realCountry
+            )
         } else {
             person.addresses.add(
-                    Address(
+                    addressService.createAddress(
                             person = person,
                             addressType = correspondenceAddressType,
                             city = applicant.contactData.realCity,
@@ -145,10 +144,8 @@ class PersonService(
                             houseNumber = applicant.contactData.realStreetNumber,
                             apartmentNumber = applicant.contactData.realFlatNumber,
                             zipCode = applicant.contactData.realPostCode,
-                            cityIsCity = if (applicant.contactData.realCityIsCity) 'T' else 'N',
-                            countryCode = applicant.contactData.realCountry?.let {
-                                citizenshipRepository.getOne(it)
-                            }
+                            cityIsCity = applicant.contactData.realCityIsCity,
+                            countryCode = applicant.contactData.realCountry
                     )
             )
         }
@@ -172,6 +169,9 @@ class PersonService(
         }
         applicant.contactData.phoneNumber2?.run {
             val secondaryPhoneNumber = phoneNumberRepository.findByPersonAndNumber(person, this)
+            if (this == applicant.contactData.phoneNumber) {
+                return
+            }
             secondaryPhoneNumber?.apply {
                 number = applicant.contactData.phoneNumber2!!
                 comments = "Alternatywny numer telefonu"
@@ -232,7 +232,7 @@ class PersonService(
             stageCode: String,
             didacticCycleCode: String,
             irkApplication: IrkApplication
-    ) {
+    ): String {
         val student = studentMapper.createOrFindStudent(person, indexPoolCode)
         studentRepository.save(student)
         val personProgramme = studentMapper.createPersonProgramme(
@@ -250,10 +250,11 @@ class PersonService(
             personProgrammeRepository.save(it)
         }
         personProgrammeRepository.save(personProgramme)
+        return student.indexNumber
     }
 
     @Transactional(rollbackFor = [java.lang.Exception::class], propagation = Propagation.REQUIRED, transactionManager = "oracleTransactionManager")
-    fun processPerson(import: Import, application: Application): Long? {
+    fun processPerson(import: Import, application: Application): Pair<Long?, String> {
         var person: Person? = null
         application.applicant!!.usosId?.let { usosId ->
             person = personRepository.findByIdOrNull(usosId)
@@ -269,16 +270,17 @@ class PersonService(
             }
         }
         if (person != null) {
-           _self.updateAndSavePerson(application.applicant!!, person!!.id!!)
+            _self.updatePerson(application.applicant!!, person!!)
         } else {
-            person = _self.mapAndSavePerson(application.applicant!!)
+            person = _self.mapPerson(application.applicant!!)
         }
+        personRepository.save(person!!)
         val irkApplication = IrkApplication(
                 applicationId = application.irkId,
                 confirmationStatus = 1,
                 irkInstance = application.irkInstance
         )
-        _self.immatriculate(
+        val assignedIndexNumber = _self.immatriculate(
                 person = person!!,
                 dateOfAddmision = import.dateOfAddmision,
                 didacticCycleCode = import.didacticCycleCode,
@@ -289,8 +291,6 @@ class PersonService(
                 startDate = import.startDate,
                 irkApplication = irkApplication
         )
-        import.importProgress!!.savedApplicants++
-        importProgressRepository.save(import.importProgress!!)
-        return person!!.id
+        return Pair(person!!.id, assignedIndexNumber)
     }
 }

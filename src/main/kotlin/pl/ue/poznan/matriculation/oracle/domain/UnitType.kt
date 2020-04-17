@@ -27,6 +27,6 @@ data class UnitType(
 //        val creationUser: String,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "unitType", cascade = [CascadeType.ALL])
+        @OneToMany(mappedBy = "unitType")
         val organizationalUnits: Set<OrganizationalUnit>
 )

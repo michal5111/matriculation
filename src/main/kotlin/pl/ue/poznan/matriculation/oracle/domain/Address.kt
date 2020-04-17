@@ -19,11 +19,11 @@ data class Address(
         @JsonIgnore
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
         @JsonIdentityReference(alwaysAsId = true)
-        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+        @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "OS_ID", referencedColumnName = "ID", nullable = true)
         var person: Person? = null,
 
-        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+        @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "WKU_KOD", referencedColumnName = "KOD", nullable = true)
         var wku: Wku? = null,
 
@@ -44,7 +44,7 @@ data class Address(
         @Column(name = "KOD_POCZ", length = 5, nullable = true)
         var zipCode: String? = null,
 
-        @ManyToOne(fetch = FetchType.EAGER, cascade = [CascadeType.MERGE])
+        @ManyToOne(fetch = FetchType.EAGER)
         @JoinColumn(name = "PW_KOD", referencedColumnName = "KOD", nullable = true)
         var county: County? = null,
 
@@ -66,34 +66,34 @@ data class Address(
         @Column(name = "NR_LOKALU", length = 80, nullable = true)
         var apartmentNumber: String? = null,
 
-        @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+        @OneToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "AKADEMIKI_ID", referencedColumnName = "ID", nullable = true)
         var dormitory: Dormitory? = null,
 
-        @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+        @OneToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "BUD_KOD", referencedColumnName = "KOD", nullable = true)
         var building: Building? = null,
 
-        @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+        @OneToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "US_ID", referencedColumnName = "ID", nullable = true)
         var taxOffice: TaxOffice? = null,
 
-        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+        @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "GM_KOD", referencedColumnName = "KOD", nullable = true)
         var commune: Commune? = null,
 
-        @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+        @OneToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "SZK_ID", referencedColumnName = "ID", nullable = true)
         var school: School? = null,
 
         @Column(name = "KOD_ZAGR", length = 20, nullable = true)
         var foreignZipCode: String? = null,
 
-        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+        @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "OB_KOD", referencedColumnName = "KOD", nullable = true)
         var countryCode: Citizenship? = null,
 
-        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+        @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "DOST_ID", referencedColumnName = "ID", nullable = true)
         var warehouseSuppliers: WarehouseSuppliers? = null,
 

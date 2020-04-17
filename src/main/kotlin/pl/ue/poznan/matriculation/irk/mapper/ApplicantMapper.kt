@@ -8,6 +8,7 @@ import pl.ue.poznan.matriculation.local.domain.applicants.*
 import pl.ue.poznan.matriculation.local.service.ApplicantService
 import pl.ue.poznan.matriculation.oracle.domain.*
 import pl.ue.poznan.matriculation.oracle.repo.*
+import pl.ue.poznan.matriculation.oracle.service.AddressService
 
 @Component
 class ApplicantMapper(
@@ -18,7 +19,8 @@ class ApplicantMapper(
         private val phoneNumberTypeRepository: PhoneNumberTypeRepository,
         private val wkuRepository: WkuRepository,
         private val irkService: IrkService,
-        private val applicantService: ApplicantService
+        private val applicantService: ApplicantService,
+        private val addressService: AddressService
 ) {
 
     @Value("\${pl.ue.poznan.matriculation.defaultStudentOrganizationalUnit}")
@@ -119,6 +121,8 @@ class ApplicantMapper(
                                         issueInstitutionUsosCode = documentDTO.issueInstitutionUsosCode,
                                         modificationDate = documentDTO.modificationDate
                                 )
+                            }.filter { document ->
+                                document.issueDate != null && !document.documentNumber.isNullOrBlank()
                             }.toMutableList(),
                             highSchoolCity = it.highSchoolCity,
                             highSchoolName = it.highSchoolName,
@@ -164,29 +168,25 @@ class ApplicantMapper(
                     schoolRepository.getOne(it)
                 },
                 addresses = listOf(
-                        Address(
+                        addressService.createAddress(
                                 addressType = permanentAddressType,
                                 city = applicant.contactData.officialCity,
                                 street = applicant.contactData.officialStreet,
                                 houseNumber = applicant.contactData.officialStreetNumber,
                                 apartmentNumber = applicant.contactData.officialFlatNumber,
                                 zipCode = applicant.contactData.officialPostCode,
-                                cityIsCity = if (applicant.contactData.officialCityIsCity) 'T' else 'N',
-                                countryCode = applicant.contactData.officialCountry?.let {
-                                    citizenshipRepository.getOne(it)
-                                }
+                                cityIsCity = applicant.contactData.officialCityIsCity,
+                                countryCode = applicant.contactData.officialCountry
                         ),
-                        Address(
+                        addressService.createAddress(
                                 addressType = correspondenceAddressType,
                                 city = applicant.contactData.realCity,
                                 street = applicant.contactData.realStreet,
                                 houseNumber = applicant.contactData.realStreetNumber,
                                 apartmentNumber = applicant.contactData.realFlatNumber,
                                 zipCode = applicant.contactData.realPostCode,
-                                cityIsCity = if (applicant.contactData.realCityIsCity) 'T' else 'N',
-                                countryCode = applicant.contactData.realCountry?.let {
-                                    citizenshipRepository.getOne(it)
-                                }
+                                cityIsCity = applicant.contactData.realCityIsCity,
+                                countryCode = applicant.contactData.realCountry
                         )
                 ).filter {
                     !(it.city.isNullOrBlank() or
@@ -244,28 +244,33 @@ class ApplicantMapper(
                         PersonPreference(this, "photo_visibility", applicant.photoPermission)
                 )
             }
+            addresses.forEach {
+                it.person = this
+            }
         }
     }
 
     private fun getPhoneNumberList(contactData: ContactData): MutableList<PhoneNumber> {
         val phoneNumbers: MutableList<PhoneNumber> = mutableListOf()
-        contactData.phoneNumberType?.let {
+        contactData.phoneNumberType?.run {
             phoneNumbers.add(
                     PhoneNumber(
-                            phoneNumberType = phoneNumberTypeRepository.getOne(it),
+                            phoneNumberType = phoneNumberTypeRepository.getOne(this),
                             number = contactData.phoneNumber!!,
                             comments = "Podstawowy numer telefonu"
                     )
             )
         }
-        contactData.phoneNumber2Type?.let {
-            phoneNumbers.add(
-                    PhoneNumber(
-                            phoneNumberType = phoneNumberTypeRepository.getOne(it),
-                            number = contactData.phoneNumber2!!,
-                            comments = "Alternatywny numer telefonu"
-                    )
-            )
+        contactData.phoneNumber2Type?.run {
+            if (contactData.phoneNumber2 != contactData.phoneNumber) {
+                phoneNumbers.add(
+                        PhoneNumber(
+                                phoneNumberType = phoneNumberTypeRepository.getOne(this),
+                                number = contactData.phoneNumber2!!,
+                                comments = "Alternatywny numer telefonu"
+                        )
+                )
+            }
         }
         if (phoneNumbers.size > 1 && phoneNumbers[0].number == phoneNumbers[1].number) {
             return mutableListOf()

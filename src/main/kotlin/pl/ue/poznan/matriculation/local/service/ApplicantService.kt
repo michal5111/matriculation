@@ -19,11 +19,11 @@ class ApplicantService(
     val logger: Logger = LoggerFactory.getLogger(ApplicationService::class.java)
 
     fun checkApplicant(applicant: Applicant) {
-        applicant.educationData.documents.forEach {
-            if (it.issueDate == null || it.documentNumber == null) {
-                throw ApplicantCheckException("Brak daty lub numeru dokumentu uprawniającego do podjęcia studiów")
-            }
-        }
+//        applicant.educationData.documents.forEach {
+//            if (it.issueDate == null || it.documentNumber == null) {
+//                throw ApplicantCheckException("Brak daty lub numeru dokumentu uprawniającego do podjęcia studiów")
+//            }
+//        }
         if (applicant.basicData.pesel == null && applicant.additionalData.documentNumber == null) {
             throw ApplicantCheckException("Brak peselu lub dokumentu tożsamości")
         }

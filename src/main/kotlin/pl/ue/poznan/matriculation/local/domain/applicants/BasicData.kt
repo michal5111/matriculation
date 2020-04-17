@@ -47,8 +47,8 @@ data class BasicData(
                 var result = sex.hashCode()
                 result = 31 * result + (pesel?.hashCode() ?: 0)
                 result = 31 * result + (dateOfBirth?.hashCode() ?: 0)
-                result = 31 * result + (cityOfBirth.hashCode())
-                result = 31 * result + (countryOfBirth.hashCode())
+                result = 31 * result + cityOfBirth.hashCode()
+                result = 31 * result + countryOfBirth.hashCode()
                 result = 31 * result + dataSource.hashCode()
                 return result
         }
@@ -56,4 +56,6 @@ data class BasicData(
         override fun toString(): String {
                 return "BasicData(sex='$sex', pesel=$pesel, dateOfBirth=$dateOfBirth, cityOfBirth='$cityOfBirth', countryOfBirth='$countryOfBirth', dataSource='$dataSource')"
         }
+
+
 }

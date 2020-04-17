@@ -53,11 +53,11 @@ data class Application(
 
         val irkInstance: String,
 
-        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE])
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "applicant_id", referencedColumnName = "id")
         var applicant: pl.ue.poznan.matriculation.local.domain.applicants.Applicant? = null,
 
-        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE])
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "import_id", referencedColumnName = "id")
         var import: Import? = null
 ): Serializable {
@@ -71,11 +71,13 @@ data class Application(
                 if (irkId != other.irkId) return false
                 if (admitted != other.admitted) return false
                 if (comment != other.comment) return false
-                if (applicationForeignerData != other.applicationForeignerData) return false
                 if (payment != other.payment) return false
                 if (position != other.position) return false
                 if (qualified != other.qualified) return false
                 if (score != other.score) return false
+                if (importError != other.importError) return false
+                if (stackTrace != other.stackTrace) return false
+                if (irkInstance != other.irkInstance) return false
 
                 return true
         }
@@ -85,15 +87,19 @@ data class Application(
                 result = 31 * result + irkId.hashCode()
                 result = 31 * result + (admitted?.hashCode() ?: 0)
                 result = 31 * result + (comment?.hashCode() ?: 0)
-                result = 31 * result + (applicationForeignerData?.hashCode() ?: 0)
                 result = 31 * result + (payment?.hashCode() ?: 0)
                 result = 31 * result + (position?.hashCode() ?: 0)
                 result = 31 * result + (qualified?.hashCode() ?: 0)
                 result = 31 * result + (score?.hashCode() ?: 0)
+                result = 31 * result + (importError?.hashCode() ?: 0)
+                result = 31 * result + (stackTrace?.hashCode() ?: 0)
+                result = 31 * result + irkInstance.hashCode()
                 return result
         }
 
         override fun toString(): String {
-                return "Application(id=$id, irkId=$irkId, admitted=$admitted, comment=$comment, applicationForeignerData=$applicationForeignerData, payment=$payment, position=$position, qualified=$qualified, score=$score, applicationImportStatus=$applicationImportStatus, importError=$importError, stackTrace=$stackTrace, turn=$turn, applicant=$applicant)"
+                return "Application(id=$id, irkId=$irkId, admitted=$admitted, comment=$comment, payment=$payment, position=$position, qualified=$qualified, score=$score, importError=$importError, stackTrace=$stackTrace, irkInstance='$irkInstance')"
         }
+
+
 }

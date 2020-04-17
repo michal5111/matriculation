@@ -126,7 +126,7 @@ class RestController(
 
     @PutMapping("/import/{id}")
     fun importApplicants(@PathVariable("id") importId: Long): ResponseEntity<Void> {
-        val import = importService.getImportForApplicantImport(importId)
+        importService.getImportForApplicantImport(importId)
         importService.setImportStatus(ImportStatus.STARTED, importId)
         importService.resetImportedApplications(importId)
         asyncService.importApplicantsAsync(importId)
@@ -145,7 +145,7 @@ class RestController(
 
     @GetMapping("/import/save/{id}")
     fun savePersons(@PathVariable("id") importId: Long): ResponseEntity<Void> {
-        val import = importService.getImportForPersonSave(importId)
+        importService.getImportForPersonSave(importId)
         importService.setImportStatus(ImportStatus.SAVING, importId)
         importService.resetSaveErrors(importId)
         asyncService.savePersons(importId)
@@ -180,5 +180,14 @@ class RestController(
     @GetMapping("/didacticCycle/{code}")
     fun findDidacticCycleByCode(@PathVariable("code")didacticCycleCode: String): List<String> {
         return usosService.findDidacticCycleCodes(didacticCycleCode,10)
+    }
+
+    @PutMapping("/person/{id}/indexNumber")
+    fun updateIndexNumberByUsosIdAndIndexType(
+            @PathVariable("id") personId: Long,
+            @RequestParam("indexType") indexTypeCode: String,
+            @RequestParam("indexNumber") indexNumber: String
+    ) {
+        usosService.updateIndexNumberByUsosIdAndIndexType(personId, indexTypeCode, indexNumber)
     }
 }

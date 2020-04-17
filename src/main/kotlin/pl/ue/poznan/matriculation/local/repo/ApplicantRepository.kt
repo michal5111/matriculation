@@ -9,4 +9,6 @@ interface ApplicantRepository: JpaRepository<Applicant, Long> {
     fun existsByIrkId(irkId: Long): Boolean
 
     fun findByIrkId(irkId: Long): Applicant?
+
+    fun findByUsosId(usosId: Long): Applicant?
 }

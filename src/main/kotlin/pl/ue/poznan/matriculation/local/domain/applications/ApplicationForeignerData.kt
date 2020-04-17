@@ -43,4 +43,6 @@ data class ApplicationForeignerData(
         override fun toString(): String {
                 return "ApplicationForeignerData(baseOfStay=$baseOfStay, basisOfAdmission=$basisOfAdmission, sourceOfFinancing=$sourceOfFinancing)"
         }
+
+
 }

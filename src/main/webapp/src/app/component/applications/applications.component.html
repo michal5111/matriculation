@@ -20,9 +20,9 @@
   </form>
   <mat-card *ngFor="let application of page.results">
     <mat-card-title>
-      <div *ngIf="(application.applicant$ | async) as applicant">
-        <a mat-button [routerLink]="['/applicant/',applicant.id]">{{applicant.name.given}} {{applicant.name.middle}} {{applicant.name.maiden}} {{applicant.name.family}}</a>
-      </div>
+<!--      <div *ngIf="(application.applicant$ | async) as applicant">-->
+<!--        <a mat-button [routerLink]="['/applicant/',applicant.id]">{{applicant.name.given}} {{applicant.name.middle}} {{applicant.name.maiden}} {{applicant.name.family}}</a>-->
+<!--      </div>-->
     </mat-card-title>
     <mat-card-subtitle>
       <div *ngIf="application.payment=='paid'; else notPaid">
@@ -40,8 +40,8 @@
     <mat-card-content>
       <p>Program: {{application.turn.programme}}</p>
       <p>Rejestracja: {{application.turn.registration}}</p>
-      <p>Data od: {{application.turn.date_from}}</p>
-      <p>Data do: {{application.turn.date_to}}</p>
+      <p>Data od: {{application.turn.dateFrom}}</p>
+      <p>Data do: {{application.turn.dateTo}}</p>
     </mat-card-content>
   </mat-card>
 </div>

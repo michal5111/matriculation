@@ -15,7 +15,7 @@ const httpOptions = {
 })
 export class PersonService {
 
-  private apiUrl = 'api/persons';
+  private apiUrl = 'api/person';
 
   constructor(private http: HttpClient) { }
 
@@ -28,5 +28,9 @@ export class PersonService {
       return this.http.get<Page<Person>>(`${this.apiUrl}?page=${page}&size=${size}&sort=${sort},${sortDir}`, httpOptions)
     }
     return this.http.get<Page<Person>>(`${this.apiUrl}?page=${page}&size=${size}`, httpOptions)
+  }
+
+  updateIndexNumberByUsosIdAndIndexType(personId: number, indexTypeCode: string, indexNumber: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${personId}/indexNumber?indexType=${indexTypeCode}&indexNumber=${indexNumber}`, null, httpOptions)
   }
 }

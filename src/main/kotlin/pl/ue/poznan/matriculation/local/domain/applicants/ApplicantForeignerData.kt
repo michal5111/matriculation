@@ -37,7 +37,6 @@ data class ApplicantForeignerData(
                 other as ApplicantForeignerData
 
                 if (baseOfStay != other.baseOfStay) return false
-                if (foreignerStatus != other.foreignerStatus) return false
                 if (polishCardIssueCountry != other.polishCardIssueCountry) return false
                 if (polishCardIssueDate != other.polishCardIssueDate) return false
                 if (polishCardNumber != other.polishCardNumber) return false
@@ -48,7 +47,6 @@ data class ApplicantForeignerData(
 
         override fun hashCode(): Int {
                 var result = baseOfStay?.hashCode() ?: 0
-                result = 31 * result + (foreignerStatus?.hashCode() ?: 0)
                 result = 31 * result + (polishCardIssueCountry?.hashCode() ?: 0)
                 result = 31 * result + (polishCardIssueDate?.hashCode() ?: 0)
                 result = 31 * result + (polishCardNumber?.hashCode() ?: 0)
@@ -57,6 +55,8 @@ data class ApplicantForeignerData(
         }
 
         override fun toString(): String {
-                return "ApplicantForeignerData(baseOfStay=$baseOfStay, foreignerStatus=$foreignerStatus, polishCardIssueCountry=$polishCardIssueCountry, polishCardIssueDate=$polishCardIssueDate, polishCardNumber=$polishCardNumber, polishCardValidTo=$polishCardValidTo)"
+                return "ApplicantForeignerData(baseOfStay=$baseOfStay, polishCardIssueCountry=$polishCardIssueCountry, polishCardIssueDate=$polishCardIssueDate, polishCardNumber=$polishCardNumber, polishCardValidTo=$polishCardValidTo)"
         }
+
+
 }

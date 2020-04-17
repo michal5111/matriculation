@@ -26,18 +26,12 @@ data class Import(
         val didacticCycleCode: String,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "import", fetch = FetchType.EAGER, cascade = [CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE])
+        @OneToMany(mappedBy = "import", fetch = FetchType.EAGER, cascade = [CascadeType.MERGE])
         val applications: MutableList<Application> = mutableListOf(),
 
-        @OneToOne(mappedBy = "import", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+        @OneToOne(mappedBy = "import", fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
         var importProgress: ImportProgress? = null
 ) {
-
-
-        override fun toString(): String {
-                return "Import(id=$id, programmeCode='$programmeCode', stageCode='$stageCode', registration='$registration', indexPoolCode='$indexPoolCode', startDate=$startDate, dateOfAddmision=$dateOfAddmision, didacticCycleCode='$didacticCycleCode', applications=$applications, importProgress=$importProgress)"
-        }
-
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (javaClass != other?.javaClass) return false
@@ -52,7 +46,6 @@ data class Import(
                 if (startDate != other.startDate) return false
                 if (dateOfAddmision != other.dateOfAddmision) return false
                 if (didacticCycleCode != other.didacticCycleCode) return false
-                if (applications != other.applications) return false
 
                 return true
         }
@@ -66,7 +59,12 @@ data class Import(
                 result = 31 * result + startDate.hashCode()
                 result = 31 * result + dateOfAddmision.hashCode()
                 result = 31 * result + didacticCycleCode.hashCode()
-                result = 31 * result + applications.hashCode()
                 return result
         }
+
+        override fun toString(): String {
+                return "Import(id=$id, programmeCode='$programmeCode', stageCode='$stageCode', registration='$registration', indexPoolCode='$indexPoolCode', startDate=$startDate, dateOfAddmision=$dateOfAddmision, didacticCycleCode='$didacticCycleCode')"
+        }
+
+
 }

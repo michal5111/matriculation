@@ -33,9 +33,13 @@ data class County(
 
         @JsonIgnore
         @OneToMany(mappedBy = "county",fetch = FetchType.LAZY)
-        var addresses: List<Address>,
+        var addresses: MutableList<Address>,
 
         @JsonIgnore
         @OneToMany(mappedBy = "county", fetch = FetchType.LAZY)
-        var communes: List<Commune>
+        var communes: List<Commune>,
+
+        @JsonIgnore
+        @OneToMany(mappedBy = "county", fetch = FetchType.LAZY)
+        var postalCodes: MutableList<PostalCode>
 )

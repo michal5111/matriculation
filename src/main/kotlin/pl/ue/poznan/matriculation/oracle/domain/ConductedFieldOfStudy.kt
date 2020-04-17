@@ -20,7 +20,7 @@ class ConductedFieldOfStudy(
 
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
         @JsonIdentityReference(alwaysAsId = true)
-        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+        @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "JED_ORG_KOD", referencedColumnName = "KOD", nullable = false)
         val organizationalUnit: OrganizationalUnit,
 
@@ -63,6 +63,6 @@ class ConductedFieldOfStudy(
         var EctsPoints: Double?,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "conductedFieldOfStudy", cascade = [CascadeType.MERGE])
+        @OneToMany(mappedBy = "conductedFieldOfStudy")
         var programmes: MutableList<Programme>
 )

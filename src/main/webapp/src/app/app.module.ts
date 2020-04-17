@@ -1,5 +1,5 @@
 import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
+import {LOCALE_ID, NgModule} from '@angular/core';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
@@ -19,6 +19,11 @@ import {ImportViewComponent} from './component/import/import-view/import-view.co
 import { UnauthorizedDialogComponent } from './component/dialog/unauthorized-dialog/unauthorized-dialog.component';
 import {AuthInterceptor} from "./interceptors/auth-interceptor";
 import { ForbiddenDialogComponent } from './component/dialog/forbidden-dialog/forbidden-dialog.component';
+import { registerLocaleData } from '@angular/common';
+import localePl from '@angular/common/locales/pl';
+import {MatPaginatorIntl} from "@angular/material/paginator";
+import {MatPaginatorIntlPl} from "./customProviders/mat-paginator-intl-pl";
+import { UpdateIndexNumberDialogComponent } from './component/dialog/update-index-number-dialog/update-index-number-dialog.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +38,8 @@ import { ForbiddenDialogComponent } from './component/dialog/forbidden-dialog/fo
     ImportComponent,
     ImportViewComponent,
     UnauthorizedDialogComponent,
-    ForbiddenDialogComponent
+    ForbiddenDialogComponent,
+    UpdateIndexNumberDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -48,9 +54,14 @@ import { ForbiddenDialogComponent } from './component/dialog/forbidden-dialog/fo
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
-    }
+    },
+    {provide: LOCALE_ID, useValue: 'pl-PL' },
+    {provide: MatPaginatorIntl, useClass: MatPaginatorIntlPl}
   ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
+  constructor() {
+    registerLocaleData(localePl, 'pl-PL');
+  }
 }

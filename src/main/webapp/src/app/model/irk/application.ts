@@ -4,7 +4,7 @@ import {Applicant} from "./applicant";
 export interface Application {
   id: number,
   user: number,
-  applicant$: Observable<Applicant>,
+  applicant: Applicant,
   payment: string,
   score: string,
   position: string,
@@ -14,13 +14,13 @@ export interface Application {
   turn: {
     programme: string,
     registration: string,
-    date_from: Date,
-    date_to: Date
+    dateFrom: Date,
+    dateTo: Date
   },
-  foreigner_data: {
-    base_of_stay: string,
-    source_of_financing: string,
-    basis_of_admission: string
+  foreignerData: {
+    baseOfStay: string,
+    sourceOfFinancing: string,
+    basisOfAdmission: string
   }
   irkInstance: string
 }

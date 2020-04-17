@@ -1,11 +1,11 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 import {Import} from "../../../model/import/import";
 import {ImportService} from "../../../service/import-service/import.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {MatOptionSelectionChange} from "@angular/material/core";
-import {Observable} from "rxjs";
+import {Observable, Subscription} from "rxjs";
 import {HttpErrorResponse} from "@angular/common/http";
-import {tap} from "rxjs/operators";
+import {filter, flatMap, tap} from "rxjs/operators";
 import {IndexType} from "../../../model/oracle/index-type";
 import {Registration} from "../../../model/irk/registration";
 import {MatSnackBar} from "@angular/material/snack-bar";
@@ -15,7 +15,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
   templateUrl: './import-setup.component.html',
   styleUrls: ['./import-setup.component.sass']
 })
-export class ImportSetupComponent implements OnInit {
+export class ImportSetupComponent implements OnInit, OnDestroy {
 
   import: Import = new Import();
   $availableRegistrationsObservable: Observable<[Registration]> = this.importService.getAvailableRegistrations();
@@ -24,7 +24,7 @@ export class ImportSetupComponent implements OnInit {
   stages: [string];
   didacticCycles: [string];
   importCreationFormGroup: FormGroup;
-  didacticCycleInputValue: String = '';
+  didacticCycleInputValueChangeSubscription: Subscription
   debounceTime = 400;
 
   constructor(private importService: ImportService, private formBuilder: FormBuilder, private snackBar: MatSnackBar) {
@@ -42,7 +42,7 @@ export class ImportSetupComponent implements OnInit {
       startDate: ['', Validators.required],
       dateOfAddmision: ['', Validators.required]
     });
-
+    this.onDidacticCycleInputChanges()
     // this.importService.getAvailableRegistrations().pipe(
     //   tap(results => this.registrations = results)
     // ).subscribe();
@@ -63,12 +63,14 @@ export class ImportSetupComponent implements OnInit {
     ).subscribe( () => this.importCreationFormGroup.value.stage = '' )
   }
 
-  onDidacticCycleInputChange() {
-    if (this.didacticCycleInputValue == '') {
-      return
-    }
-    this.importService.findDidacticCycleCodes(this.didacticCycleInputValue)
-      .subscribe(results => this.didacticCycles = results)
+  onDidacticCycleInputChanges() {
+    this.didacticCycleInputValueChangeSubscription = this.importCreationFormGroup.get('didacticCycle').valueChanges.pipe(
+      tap(value => console.log(value)),
+      filter(value => value !== undefined || value !== '' || value !== null || value.length < 2),
+      tap(value => console.log(value)),
+      flatMap(value => this.importService.findDidacticCycleCodes(value)),
+      tap(didacticCycles => this.didacticCycles = didacticCycles)
+    ).subscribe()
   }
 
   onSubmit() {
@@ -98,5 +100,9 @@ export class ImportSetupComponent implements OnInit {
     this.importCreationFormGroup.reset();
     this.import = importObject;
     this.onImportCreatedEventEmitter.next(this.import)
+  }
+
+  ngOnDestroy(): void {
+    this.didacticCycleInputValueChangeSubscription.unsubscribe()
   }
 }

@@ -14,7 +14,7 @@ data class Commune(
         @Column(name = "NAZWA", length = 100, nullable = false)
         var name: String,
 
-        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+        @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "PW_KOD", referencedColumnName = "KOD", nullable = false)
         var county: County,
 
@@ -31,5 +31,8 @@ data class Commune(
 //        val modificationDate: Date? = null,
 
         @OneToMany(mappedBy = "commune", fetch = FetchType.LAZY)
-        var address: List<Address>
+        var address: MutableList<Address>,
+
+        @OneToMany(mappedBy = "commune", fetch = FetchType.LAZY)
+        var postalCodes: MutableList<PostalCode>
 )

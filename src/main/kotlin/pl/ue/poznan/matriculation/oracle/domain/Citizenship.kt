@@ -50,23 +50,23 @@ data class Citizenship(
         val polonCountry: String?,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "nationality", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "nationality", fetch = FetchType.LAZY)
         val personsNationality: Set<Person>,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "citizenship", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "citizenship", fetch = FetchType.LAZY)
         val personsCitizenship: Set<Person>,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "birthCountry", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "birthCountry", fetch = FetchType.LAZY)
         val personsBirthCountry: Set<Person>,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "citizenship", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "citizenship", fetch = FetchType.LAZY)
         val nutsRegions: Set<NUTSRegion>,
 
         @JsonIgnore
-        @OneToMany(mappedBy = "identityDocumentIssuerCountry", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "identityDocumentIssuerCountry", fetch = FetchType.LAZY)
         val identityDocumentIssuerCountryPersons: Set<Person>,
 
         @JsonIgnore

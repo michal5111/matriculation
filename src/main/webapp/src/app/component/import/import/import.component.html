@@ -1,4 +1,4 @@
-<div class="mat-typography">
+<div  class="setup-wrapper">
   <div>
     <mat-accordion>
       <mat-expansion-panel>
@@ -14,7 +14,7 @@
     </mat-accordion>
   </div>
   <ng-template [ngIf]="_userService.isAuthenticated">
-    <p>Utworzone importy</p>
+    <h3 class="mat-h3">Utworzone importy</h3>
     <div *ngIf="page">
       <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)">
 

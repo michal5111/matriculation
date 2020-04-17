@@ -17,4 +17,7 @@ interface ApplicationRepository: PagingAndSortingRepository<Application, Long> {
     fun existsByIrkId(irkId: Long): Boolean
 
     fun getByIrkId(irkId: Long): Application
+
+    @Query("select an from Application an where an.import.id = :id and (an.applicationImportStatus = 'NOT_IMPORTED' or an.applicationImportStatus = 'ERROR')")
+    fun getAllByImportIdAndApplicationImportStatus(pageable: Pageable, @Param("id") importId: Long): Page<Application>
 }

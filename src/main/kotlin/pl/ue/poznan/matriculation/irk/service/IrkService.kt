@@ -147,7 +147,6 @@ class IrkService {
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set("Authorization", "Token $apiKey")
         val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
-        val availableProgrammes = mutableListOf<String>()
         val response: ResponseEntity<RegistrationDTO> = restTemplate.exchange(
                 "${apiUrl}registrations/$registrationCode",
                 HttpMethod.GET,

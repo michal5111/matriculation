@@ -106,4 +106,6 @@ data class ContactData(
         override fun toString(): String {
                 return "ContactData(modificationDate=$modificationDate, officialCity=$officialCity, officialCityIsCity=$officialCityIsCity, officialCountry=$officialCountry, officialFlatNumber=$officialFlatNumber, officialPostCode=$officialPostCode, officialStreet=$officialStreet, officialStreetNumber='$officialStreetNumber', phoneNumber=$phoneNumber, phoneNumber2=$phoneNumber2, phoneNumber2Type=$phoneNumber2Type, phoneNumberType=$phoneNumberType, realCity=$realCity, realCityIsCity=$realCityIsCity, realCountry=$realCountry, realFlatNumber=$realFlatNumber, realPostCode=$realPostCode, realStreet=$realStreet, realStreetNumber=$realStreetNumber)"
         }
+
+
 }

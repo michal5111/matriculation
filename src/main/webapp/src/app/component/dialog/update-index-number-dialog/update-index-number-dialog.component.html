@@ -1,0 +1,11 @@
+<div class="mat-typography">
+  <p>Obecny numer indeksu: {{data.indexNumber}}</p>
+  <form [formGroup]="updateIndexNumberFormGroup" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+      <mat-label>Nowy numer indeksu</mat-label>
+      <input matInput formControlName="indexNumber" required="true">
+      <mat-error *ngIf="sqlError">{{sqlError}}</mat-error>
+    </mat-form-field>
+    <button mat-button type="submit">Zmień</button>
+  </form>
+</div>
