@@ -38,6 +38,9 @@ class LocalDbConfig {
     @Value("\${spring.datasource.driverClassName}")
     private lateinit var localDbDriverClassName: String
 
+    @Value("\${spring.datasource.database-platform}")
+    private lateinit var localDbHibernateDialect: String
+
     @Primary
     @Bean(name = ["dataSource"])
     @ConfigurationProperties(prefix = "spring.datasource")
@@ -57,7 +60,8 @@ class LocalDbConfig {
             @Qualifier("dataSource") dataSource: DataSource
     ): LocalContainerEntityManagerFactoryBean? {
         val properties: MutableMap<String, Any> = HashMap()
-        properties["hibernate.hbm2ddl.auto"] = "create"
+        properties["hibernate.hbm2ddl.auto"] = "update"
+        properties["hibernate.dialect"] = localDbHibernateDialect
         return builder
                 .dataSource(dataSource)
                 .packages("pl.ue.poznan.matriculation.local.domain")

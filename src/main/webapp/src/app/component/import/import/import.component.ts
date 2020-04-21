@@ -68,7 +68,7 @@ export class ImportComponent implements OnInit {
     this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe()
   }
 
-  onDeleteImportClick(importId: Number) {
+  onDeleteImportClick(importId: number) {
     this.importService.deleteImport(importId).pipe(
      flatMap(() => this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString))
     ).subscribe();

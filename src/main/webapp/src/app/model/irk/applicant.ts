@@ -62,14 +62,21 @@ export class Applicant {
         mothersName: string;
         fathersName: string;
     };
-    foreignerData: string;
+    foreignerData: {
+      foreigner_status: [string];
+      polish_card_issue_date: Date;
+      polish_card_valid_to: Date;
+      polish_card_number: string;
+      polish_card_issue_country: string;
+      base_of_stay: string;
+    };
     educationData: {
         highSchoolType: string;
         highSchoolName: string;
         highSchoolUsosCode: string;
         highSchoolCity: string;
         documents: [Document];
-    }
+    };
     usosId: number;
     assignedIndexNumber: number;
 }

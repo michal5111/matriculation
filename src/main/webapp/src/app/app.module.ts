@@ -16,14 +16,14 @@ import {PersonsComponent} from './component/oracle/persons/persons.component';
 import {ImportSetupComponent} from './component/import/import-setup/import-setup.component';
 import {ImportComponent} from './component/import/import/import.component';
 import {ImportViewComponent} from './component/import/import-view/import-view.component';
-import { UnauthorizedDialogComponent } from './component/dialog/unauthorized-dialog/unauthorized-dialog.component';
+import {UnauthorizedDialogComponent} from './component/dialog/unauthorized-dialog/unauthorized-dialog.component';
 import {AuthInterceptor} from "./interceptors/auth-interceptor";
-import { ForbiddenDialogComponent } from './component/dialog/forbidden-dialog/forbidden-dialog.component';
-import { registerLocaleData } from '@angular/common';
+import {ForbiddenDialogComponent} from './component/dialog/forbidden-dialog/forbidden-dialog.component';
+import {APP_BASE_HREF, PlatformLocation, registerLocaleData} from '@angular/common';
 import localePl from '@angular/common/locales/pl';
 import {MatPaginatorIntl} from "@angular/material/paginator";
 import {MatPaginatorIntlPl} from "./customProviders/mat-paginator-intl-pl";
-import { UpdateIndexNumberDialogComponent } from './component/dialog/update-index-number-dialog/update-index-number-dialog.component';
+import {UpdateIndexNumberDialogComponent} from './component/dialog/update-index-number-dialog/update-index-number-dialog.component';
 
 @NgModule({
   declarations: [
@@ -55,8 +55,13 @@ import { UpdateIndexNumberDialogComponent } from './component/dialog/update-inde
       useClass: AuthInterceptor,
       multi: true
     },
-    {provide: LOCALE_ID, useValue: 'pl-PL' },
-    {provide: MatPaginatorIntl, useClass: MatPaginatorIntlPl}
+    {provide: LOCALE_ID, useValue: 'pl-PL'},
+    {provide: MatPaginatorIntl, useClass: MatPaginatorIntlPl},
+    {
+      provide: APP_BASE_HREF,
+      useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(),
+      deps: [PlatformLocation]
+    }
   ],
   bootstrap: [AppComponent]
 })

@@ -177,8 +177,8 @@ class RestController(
         return usosService.getStageByProgrammeCode(code)
     }
 
-    @GetMapping("/didacticCycle/{code}")
-    fun findDidacticCycleByCode(@PathVariable("code")didacticCycleCode: String): List<String> {
+    @GetMapping("/didacticCycle")
+    fun findDidacticCycleByCode(@RequestParam("code")didacticCycleCode: String): List<String> {
         return usosService.findDidacticCycleCodes(didacticCycleCode,10)
     }
 

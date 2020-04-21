@@ -24,7 +24,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   stages: [string];
   didacticCycles: [string];
   importCreationFormGroup: FormGroup;
-  didacticCycleInputValueChangeSubscription: Subscription
+  changesSubscription: Subscription
   debounceTime = 400;
 
   constructor(private importService: ImportService, private formBuilder: FormBuilder, private snackBar: MatSnackBar) {
@@ -51,23 +51,21 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     // ).subscribe();
   }
 
-  onRegistrationSelectionChange(event: MatOptionSelectionChange, registration: String) {
+  onRegistrationSelectionChange(event: MatOptionSelectionChange, registration: string) {
     this.importService.getAvailableRegistrationProgrammes(registration).pipe(
       tap(results => this.registrationProgrammes = results)
     ).subscribe(() => this.importCreationFormGroup.value.registrationProgramme = '')
   }
 
-  onRegistrationProgrammeChange(event: MatOptionSelectionChange, programmeCode: String) {
+  onRegistrationProgrammeChange(event: MatOptionSelectionChange, programmeCode: string) {
     this.importService.getAvailableStages(programmeCode).pipe(
       tap(results => this.stages = results)
     ).subscribe( () => this.importCreationFormGroup.value.stage = '' )
   }
 
   onDidacticCycleInputChanges() {
-    this.didacticCycleInputValueChangeSubscription = this.importCreationFormGroup.get('didacticCycle').valueChanges.pipe(
-      tap(value => console.log(value)),
-      filter(value => value !== undefined || value !== '' || value !== null || value.length < 2),
-      tap(value => console.log(value)),
+    this.changesSubscription = this.importCreationFormGroup.get('didacticCycle').valueChanges.pipe(
+      filter(value => value !== undefined && value !== '' && value !== null && value.length >= 2),
       flatMap(value => this.importService.findDidacticCycleCodes(value)),
       tap(didacticCycles => this.didacticCycles = didacticCycles)
     ).subscribe()
@@ -94,15 +92,17 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   }
 
   onImportCreated(importObject: Import) {
-    this.snackBar.open("Import utworzony", "Cofnij", {
+    let snackBarRef = this.snackBar.open("Import utworzony", "OK", {
       duration: 3000
     })
+    snackBarRef.onAction().subscribe(() => snackBarRef.dismiss())
     this.importCreationFormGroup.reset();
     this.import = importObject;
     this.onImportCreatedEventEmitter.next(this.import)
   }
 
   ngOnDestroy(): void {
-    this.didacticCycleInputValueChangeSubscription.unsubscribe()
+    this.snackBar.ngOnDestroy()
+    this.changesSubscription.unsubscribe()
   }
 }

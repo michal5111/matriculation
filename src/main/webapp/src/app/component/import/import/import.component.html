@@ -59,13 +59,21 @@
         </ng-container>
 
         <ng-container matColumnDef="deleteImport">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Usuń </th>
-          <td mat-cell *matCellDef="let element"><button mat-button (click)="onDeleteImportClick(element.id)"><mat-icon>delete</mat-icon> Usuń</button></td>
+          <th mat-header-cell *matHeaderCellDef> Usuń </th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-mini-fab color="warn" (click)="onDeleteImportClick(element.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="selectImport">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Wybierz </th>
-          <td mat-cell *matCellDef="let element"><button mat-button routerLink="/import/{{element.id}}"><mat-icon>arrow_right_alt</mat-icon> Wybierz</button></td>
+          <th mat-header-cell *matHeaderCellDef> Wybierz </th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-stroked-button routerLink="/import/{{element.id}}">
+              <mat-icon>arrow_right_alt</mat-icon> Wybierz
+            </button>
+          </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

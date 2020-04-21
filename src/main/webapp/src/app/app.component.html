@@ -7,10 +7,10 @@
     <span class="fill-remaining-space"></span>
     <ng-template [ngIf]="_userService.isAuthenticated" [ngIfElse]="loggedOut">
       <span>{{_userService.user.casAssertion.principal.attributes.givenname}} {{_userService.user.casAssertion.principal.attributes.lastname}}</span>
-      <a mat-button href="/logout">Wyloguj</a>
+      <a mat-button href="{{baseHref}}logout">Wyloguj</a>
     </ng-template>
     <ng-template #loggedOut>
-      <a mat-button href="/login?service={{_router.url}}">Zaloguj</a>
+      <a mat-button href="{{baseHref}}login?service={{baseHref+location.path().slice(1,location.path().length)}}">Zaloguj</a>
     </ng-template>
   </mat-toolbar>
   <div class="padding">

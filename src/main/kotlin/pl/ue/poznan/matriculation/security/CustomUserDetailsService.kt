@@ -9,11 +9,10 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import java.util.*
 
-internal class CustomUserDetailsService
-/**
- * @param admins
- */
-(private val admins: Set<String>?) : AuthenticationUserDetailsService<CasAssertionAuthenticationToken> {
+internal class CustomUserDetailsService(
+        private val admins: Set<String>?,
+        private val users: Set<String>?
+) : AuthenticationUserDetailsService<CasAssertionAuthenticationToken> {
 
     private val log = LoggerFactory.getLogger(CustomUserDetailsService::class.java)
 
@@ -27,14 +26,10 @@ internal class CustomUserDetailsService
 
         if (admins != null && admins.contains(lowercaseLogin)) {
             grantedAuthorities.add(SimpleGrantedAuthority(ADMIN))
+        } else if (users != null && users.contains(lowercaseLogin)) {
+            grantedAuthorities.add(SimpleGrantedAuthority(USER))
         } else {
-            grantedAuthorities.add(object : GrantedAuthority {
-                private val serialVersionUID = 1L
-
-                override fun getAuthority(): String {
-                    return USER
-                }
-            })
+            grantedAuthorities.add(SimpleGrantedAuthority(ANONYMOUS))
         }
 
         return CasUserDetails(lowercaseLogin, grantedAuthorities, token.assertion)

@@ -22,7 +22,7 @@ import {UpdateIndexNumberDialogComponent} from "../../dialog/update-index-number
 })
 export class ImportViewComponent implements OnInit, OnDestroy {
 
-  importId: Number;
+  importId: number;
   import: Import;
   importProgress: ImportProgress;
   progressSubscription: Subscription;
@@ -33,11 +33,10 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = [
     'id',
     'irkId',
-    'usosID',
+    'usosId',
     'names',
     'birthDateAndPlace',
     'pesel',
-    'parentsNames',
     'secondarySchoolDocumentNumber',
     'secondarySchoolDocumentIssueInstitution',
     'secondarySchoolDocumentIssueDate',
@@ -48,6 +47,17 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     'applicationImportStatus',
     'importError'
   ];
+  sortingMap: Map<string, string> = new Map<string, string>([
+    ['id','id'],
+    ['irkId','irkId'],
+    ['usosId','applicant.usosId'],
+    ['names','applicant.name.family'],
+    ['birthDateAndPlace','applicant.basicData.dateOfBirth'],
+    ['pesel','applicant.basicData.pesel'],
+    ['indexNumber','applicant.assignedIndexNumber'],
+    ['applicationImportStatus','applicationImportStatus'],
+    ['importError','importError']
+  ])
   $importProgressObservable = timer(0, 1000).pipe(
     flatMap(() => this.importService.getImportProgress(this.importId)),
     tap(result => this.importProgress = result),
@@ -81,7 +91,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       )
   }
 
-  getImport(importId: Number) {
+  getImport(importId: number) {
     return this.importService.getImport(importId).pipe(
       tap(importObject => this.import = importObject)
     )
@@ -89,6 +99,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort
     this.importId = this.route.snapshot.params.id;
     if (!this.importId) {
       return
@@ -104,7 +115,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   sortEvent(sortEvent: Sort) {
-    this.sortString = sortEvent.active;
+    this.sortString = this.sortingMap.get(sortEvent.active);
     this.sortDirString = sortEvent.direction;
     this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe();
   }

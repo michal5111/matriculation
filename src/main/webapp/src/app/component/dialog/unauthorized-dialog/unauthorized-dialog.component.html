@@ -1,4 +1,4 @@
 <div class="mat-typography">
   <p>Sesja wygasła. Zaloguj się.</p>
-  <a mat-button href="/login?service={{_router.url}}">Zaloguj</a>
+  <a mat-button href="{{baseHref}}login?service={{baseHref+location.path().slice(1,location.path().length)}}">Zaloguj</a>
 </div>

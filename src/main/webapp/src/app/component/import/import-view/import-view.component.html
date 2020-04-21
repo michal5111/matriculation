@@ -3,7 +3,7 @@
     <mat-icon>arrow_back</mat-icon>
     Wróć
   </button>
-  <div *ngIf="import">
+  <header *ngIf="import" class="card-wrapper">
     <mat-card class="card-centered">
       <mat-card-title>
         <p>Import rekrutacji {{import.registration}}</p>
@@ -16,34 +16,27 @@
       </mat-card-subtitle>
       <mat-card-content *ngIf="importProgress">
         <div [ngSwitch]="importProgress.importStatus">
-          <div *ngSwitchCase="'PENDING'">
-            <p>Status importu:
+          <span>Status importu: </span>
+          <span *ngSwitchCase="'PENDING'">
               <mat-icon>hourglass_empty</mat-icon>
               Oczekujący
-            </p>
-          </div>
-          <div *ngSwitchCase="'STARTED'">
-            <p>Status importu:
+          </span>
+          <span *ngSwitchCase="'STARTED'">
               <mat-icon>cloud_download</mat-icon>
               Importowanie...
-            </p>
-          </div>
-          <div *ngSwitchCase="'IMPORTED'">
-            <p>Status importu:
+          </span>
+          <span *ngSwitchCase="'IMPORTED'">
               <mat-icon>cloud_done</mat-icon>
               Zaimportowane
-            </p>
-          </div>
-          <div *ngSwitchCase="'SAVING'">
-            <p>Status importu:
+          </span>
+          <span *ngSwitchCase="'SAVING'">
               <mat-icon>cloud_upload</mat-icon>
               Zapisywanie w usosie...
-            </p>
-          </div>
-          <div *ngSwitchCase="'COMPLETE'">
+          </span>
+          <span *ngSwitchCase="'COMPLETE'">
             <mat-icon>done</mat-icon>
             Zakończono
-          </div>
+          </span>
         </div>
         <p>Błąd importu: {{importProgress.error}}</p>
         <p>Zaimportowane zgłoszenia: {{importProgress.importedApplications}}/{{importProgress.totalCount}}</p>
@@ -67,9 +60,9 @@
         </button>
       </mat-card-actions>
     </mat-card>
-  </div>
-  <div *ngIf="page">
-    <table mat-table [dataSource]="dataSource" matSort>
+  </header>
+  <div *ngIf="page" class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)" matSortActive="id" matSortDirection="asc" matSortDisableClear>
 
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
@@ -83,10 +76,10 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="usosID">
+      <ng-container matColumnDef="usosId">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>usosId</th>
         <td mat-cell *matCellDef="let element"><a mat-button
-                                                  href="{{'http://michal5111.ddns.net:8080/usosadm/studenci/programyOsob.jsf?osobaId='+element.applicant.usosId}}" target="_blank">{{element.applicant.usosId}}</a>
+                                                  href="{{'http://usosadm.ue.poznan:8080/usosadm/studenci/programyOsob.jsf?osobaId='+element.applicant.usosId}}" target="_blank">{{element.applicant.usosId}}</a>
         </td>
       </ng-container>
 
@@ -107,14 +100,8 @@
         <td mat-cell *matCellDef="let element">{{element.applicant.basicData.pesel}}</td>
       </ng-container>
 
-      <ng-container matColumnDef="parentsNames">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Imię ojca Imię matki</th>
-        <td mat-cell
-            *matCellDef="let element">{{element.applicant.additionalData.fathersName}} {{element.applicant.basicData.mothersName}}</td>
-      </ng-container>
-
       <ng-container matColumnDef="secondarySchoolDocumentNumber">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nr świad. dojrz.</th>
+        <th mat-header-cell *matHeaderCellDef>Nr świad. dojrz.</th>
         <td mat-cell *matCellDef="let element">
           <div *ngIf="getSecondarySchoolDocument(element)">
             {{getSecondarySchoolDocument(element).documentNumber}}
@@ -123,7 +110,7 @@
       </ng-container>
 
       <ng-container matColumnDef="secondarySchoolDocumentIssueInstitution">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Wystawiający</th>
+        <th mat-header-cell *matHeaderCellDef>Wystawiający</th>
         <td mat-cell *matCellDef="let element">
           <div *ngIf="getSecondarySchoolDocument(element)">
             {{getSecondarySchoolDocument(element).issueInstitution}}
@@ -132,7 +119,7 @@
       </ng-container>
 
       <ng-container matColumnDef="secondarySchoolDocumentIssueDate">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Data wyd.</th>
+        <th mat-header-cell *matHeaderCellDef>Data wyd.</th>
         <td mat-cell *matCellDef="let element">
           <div *ngIf="getSecondarySchoolDocument(element)">
             {{getSecondarySchoolDocument(element).issueDate | date:'dd.MM.yyyy'}}
@@ -141,7 +128,7 @@
       </ng-container>
 
       <ng-container matColumnDef="diplomaSchoolDocumentNumber">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Dyplom</th>
+        <th mat-header-cell *matHeaderCellDef>Dyplom</th>
         <td mat-cell *matCellDef="let element">
           <div *ngIf="getDiplomaDocument(element)">
             {{getDiplomaDocument(element).documentNumber}}
@@ -150,7 +137,7 @@
       </ng-container>
 
       <ng-container matColumnDef="diplomaSchoolDocumentIssueDateAndPlace">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Data wyd. Miejsce</th>
+        <th mat-header-cell *matHeaderCellDef>Data wyd. Miejsce</th>
         <td mat-cell *matCellDef="let element">
           <div *ngIf="getDiplomaDocument(element)">
             {{getDiplomaDocument(element).issueDate | date:'dd.MM.yyyy'}} {{getDiplomaDocument(element).issueCity}}
@@ -159,7 +146,7 @@
       </ng-container>
 
       <ng-container matColumnDef="diplomaSchoolDocumentIssueInstitution">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Wystawiający</th>
+        <th mat-header-cell *matHeaderCellDef>Wystawiający</th>
         <td mat-cell *matCellDef="let element">
           <div *ngIf="getDiplomaDocument(element)">
             {{getDiplomaDocument(element).issueInstitution}}
@@ -201,7 +188,6 @@
         <td mat-cell *matCellDef="let element"> {{element.importError}} </td>
       </ng-container>
 
-
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
@@ -209,8 +195,7 @@
                    showFirstLastButtons
                    [length]="page.totalElements"
                    [pageSize]="page.size"
-                   (page)="switchPage($event)"
-                   (sort)="sortEvent($event)">
+                   (page)="switchPage($event)">
     </mat-paginator>
   </div>
 </ng-template>

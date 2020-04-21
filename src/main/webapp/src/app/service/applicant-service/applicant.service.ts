@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Page } from '../../model/irk/page'
 import { Applicant } from '../../model/irk/applicant';
+import {APP_BASE_HREF} from "@angular/common";
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -14,9 +15,9 @@ const httpOptions = {
 })
 export class ApplicantService {
 
-  private apiUrl = '/api/applicants';
+  private apiUrl = `${this.baseHref}api/applicants`;
 
-  constructor(private http: HttpClient) { }
+  constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) { }
 
   getApplicantsList() {
     return this.http.get<Page<Applicant>>(this.apiUrl, httpOptions)

@@ -22,13 +22,13 @@ class AngularWebMvcConfigurer: WebMvcConfigurer {
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
         registry.addResourceHandler("/**/*")
-                .addResourceLocations("classpath:/resources/")
+                .addResourceLocations("classpath:/static/")
                 .resourceChain(true)
                 .addResolver(object : PathResourceResolver() {
                     override fun getResource(resourcePath: String, location: Resource): Resource {
                         val requestedResource = location.createRelative(resourcePath)
                         return if (requestedResource.exists() && requestedResource.isReadable) requestedResource
-                        else ClassPathResource("/resources/index.html")
+                        else ClassPathResource("static/index.html")
                     }
                 })
     }

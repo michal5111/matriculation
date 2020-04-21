@@ -1,6 +1,7 @@
 package pl.ue.poznan.matriculation.local.service
 
 import org.hibernate.JDBCException
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -36,6 +37,9 @@ class ImportService(
         private val applicationRepository: ApplicationRepository,
         private val didacticCycleRepository: DidacticCycleRepository
 ) {
+
+    @Value("\${pl.ue.poznan.matriculation.setAsAccepted}")
+    private var setAsAccepted: Boolean = false
 
     fun createImport(
             programmeCode: String,
@@ -165,6 +169,9 @@ class ImportService(
                 it.importError = null
                 it.stackTrace = null
                 it.applicationImportStatus = ApplicationImportStatus.IMPORTED
+                if (setAsAccepted) {
+                    irkService.completeImmatriculation(it.irkId)
+                }
             } catch (e: JDBCException) {
                 it.applicationImportStatus = ApplicationImportStatus.ERROR
                 it.importError = "${e.javaClass.simpleName}: ${e.message} \n Error code: ${e.errorCode} " +

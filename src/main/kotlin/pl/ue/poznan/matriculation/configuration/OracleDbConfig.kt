@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.transaction.annotation.EnableTransactionManagement
+import java.util.*
 import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
@@ -36,6 +37,9 @@ class OracleDbConfig {
     @Value("\${oracle.datasource.driverClassName}")
     private lateinit var oracleDbDriverClassName: String
 
+    @Value("\${oracle.datasource.database-platform}")
+    private lateinit var oracleDbHibernateDialect: String
+
     @Bean(name = ["oracleDataSource"])
     @ConfigurationProperties(prefix = "oracle.datasource")
     fun dataSource(): DataSource? {
@@ -51,10 +55,13 @@ class OracleDbConfig {
     fun oracleEntityManagerFactory(builder: EntityManagerFactoryBuilder,
                                    @Qualifier("oracleDataSource") dataSource: DataSource):
             LocalContainerEntityManagerFactoryBean {
+        val properties: MutableMap<String, Any> = HashMap()
+        properties["hibernate.dialect"] = oracleDbHibernateDialect
         return builder
                 .dataSource(dataSource)
                 .packages("pl.ue.poznan.matriculation.oracle.domain")
                 .persistenceUnit("oracle")
+                .properties(properties)
                 .build()
     }
 

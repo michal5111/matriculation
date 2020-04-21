@@ -27,7 +27,6 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
 import pl.ue.poznan.matriculation.security.CustomUserDetailsService
-import java.util.*
 
 @Configuration
 @EnableWebSecurity
@@ -45,14 +44,23 @@ class SecurityConfiguration: WebSecurityConfigurerAdapter() {
     private lateinit var CAS_SERVICE_URL: String
     @Value("\${app.service.home}")
     private lateinit var APP_SERVICE_HOME: String
-    @Value("\${app.admin.userName:admin}")
-    private lateinit var APP_ADMIN_USER_NAME: String
+    @Value("\${pl.ue.poznan.matriculation.admin.userName}")
+    private lateinit var APP_ADMIN_USER_NAMES: List<String>
+    @Value("\${pl.ue.poznan.matriculation.user.userName}")
+    private lateinit var APP_USER_USER_NAMES: List<String>
 
     @Bean
     fun adminList(): Set<String> {
         val admins = HashSet<String>()
-        admins.add(APP_ADMIN_USER_NAME)
+        admins.addAll(APP_ADMIN_USER_NAMES)
         return admins
+    }
+
+    @Bean
+    fun userList(): Set<String> {
+        val users = HashSet<String>()
+        users.addAll(APP_USER_USER_NAMES)
+        return users
     }
 
     @Bean
@@ -75,7 +83,7 @@ class SecurityConfiguration: WebSecurityConfigurerAdapter() {
 
     @Bean
     fun customUserDetailsService(): AuthenticationUserDetailsService<CasAssertionAuthenticationToken> {
-        return CustomUserDetailsService(adminList())
+        return CustomUserDetailsService(adminList(), userList())
     }
 
     @Bean

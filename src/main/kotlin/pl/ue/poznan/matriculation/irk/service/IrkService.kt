@@ -11,10 +11,12 @@ import org.springframework.web.client.exchange
 import org.springframework.web.util.UriComponentsBuilder
 import pl.ue.poznan.matriculation.irk.dto.Page
 import pl.ue.poznan.matriculation.irk.dto.applicants.ApplicantDTO
+import pl.ue.poznan.matriculation.irk.dto.applicants.MatriculationDataDTO
 import pl.ue.poznan.matriculation.irk.dto.applications.ApplicationDTO
 import pl.ue.poznan.matriculation.irk.dto.programmes.ProgrammeGroupsDTO
 import pl.ue.poznan.matriculation.irk.dto.registrations.RegistrationDTO
 import pl.ue.poznan.matriculation.local.domain.applicants.Applicant
+import pl.ue.poznan.matriculation.local.domain.applicants.Document
 import pl.ue.poznan.matriculation.local.domain.applications.Application
 import pl.ue.poznan.matriculation.local.domain.programmes.ProgrammeGroups
 import pl.ue.poznan.matriculation.local.domain.registrations.Registration
@@ -38,6 +40,7 @@ class IrkService {
     private class PageOfApplicants : ParameterizedTypeReference<Page<ApplicantDTO>>()
     private class PageOfApplications : ParameterizedTypeReference<Page<ApplicationDTO>>()
     private class PageOfRegistrations : ParameterizedTypeReference<Page<RegistrationDTO>>()
+    private class MapResult : ParameterizedTypeReference<Map<String, String>>()
 
     @PostConstruct
     fun init() {
@@ -196,7 +199,6 @@ class IrkService {
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set("Authorization", "Token $apiKey")
         val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
-        println(uriComponentBuilder.toUriString())
         val response: ResponseEntity<Page<ApplicationDTO>> = restTemplate.exchange(
                 uriComponentBuilder.toUriString(),
                 HttpMethod.GET,
@@ -255,5 +257,37 @@ class IrkService {
             throw IllegalStateException()
         }
         return IOUtils.toByteArray(responseInputStream)
+    }
+
+    fun completeImmatriculation(applicationId: Long): Map<String, String>? {
+        val httpHeaders = HttpHeaders()
+        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        httpHeaders.set("Authorization", "Token $apiKey")
+        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
+        val response: ResponseEntity<Map<String, String>> = restTemplate.exchange(
+                "${apiUrl}matriculation/${applicationId}/complete/",
+                HttpMethod.GET,
+                httpEntity,
+                MapResult::class
+        )
+        return response.body
+    }
+
+    fun getMatriculationData(applicationId: Long): MatriculationDataDTO? {
+        val httpHeaders = HttpHeaders()
+        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        httpHeaders.set("Authorization", "Token $apiKey")
+        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
+        val response: ResponseEntity<MatriculationDataDTO> = restTemplate.exchange(
+                "${apiUrl}matriculation/${applicationId}/data/",
+                HttpMethod.GET,
+                httpEntity,
+                MatriculationDataDTO::class
+        )
+        return response.body
+    }
+
+    fun getPrimaryCertificate(applicationId: Long): Document? {
+        return getMatriculationData(applicationId)?.applicationDTO?.certificate
     }
 }

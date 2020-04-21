@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import { UserService } from "./service/user-service/user.service";
+import {APP_BASE_HREF, Location} from "@angular/common";
 import {Router} from "@angular/router";
 
 @Component({
@@ -10,7 +11,7 @@ import {Router} from "@angular/router";
 export class AppComponent {
   title = 'angularmatriculation';
 
-  constructor(public _userService: UserService, public _router: Router) {
+  constructor(public _userService: UserService, @Inject(APP_BASE_HREF) public baseHref: string, public location: Location) {
     this.getUser()
   }
 
