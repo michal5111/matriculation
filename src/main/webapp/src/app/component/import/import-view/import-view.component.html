@@ -41,11 +41,11 @@
         <p>Błąd importu: {{importProgress.error}}</p>
         <p>Zaimportowane zgłoszenia: {{importProgress.importedApplications}}/{{importProgress.totalCount}}</p>
         <mat-progress-bar mode="determinate"
-                          value="{{importProgress.importedApplications*100/importProgress.totalCount}}">
+                          value="{{getImportProgressPercentage()}}">
         </mat-progress-bar>
         <p>Zapisane zgłoszenia: {{importProgress.savedApplicants}}/{{importProgress.totalCount}}</p>
         <mat-progress-bar mode="determinate"
-                          value="{{(importProgress.savedApplicants+importProgress.saveErrors)*100/importProgress.totalCount}}">
+                          value="{{getSaveProgressPercentage()}}">
         </mat-progress-bar>
         <p>Błędy przy zapisywaniu: {{importProgress.saveErrors}}</p>
       </mat-card-content>
@@ -61,47 +61,55 @@
       </mat-card-actions>
     </mat-card>
   </header>
-  <div *ngIf="page" class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)" matSortActive="id" matSortDirection="asc" matSortDisableClear>
+  <div *ngIf="page" class="mat-elevation-z2">
+    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)" matSortActive="id"
+           matSortDirection="asc" matSortDisableClear>
+
+      <ng-container matColumnDef="lp">
+        <th mat-header-cell *matHeaderCellDef>L.p.</th>
+        <td mat-cell *matCellDef="let element">  {{getElementNumber(element)}}  </td>
+      </ng-container>
 
       <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
-        <td mat-cell *matCellDef="let element">{{element.id}}</td>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Id</th>
+        <td mat-cell *matCellDef="let element">  {{element.id}}  </td>
       </ng-container>
 
       <ng-container matColumnDef="irkId">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>IrkId</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> IrkId</th>
         <td mat-cell *matCellDef="let element"><a mat-button
-                                                  href="{{element.irkInstance+'/pl/admin/application/'+element.irkId+'/edit/'}}" target="_blank">{{element.irkId}}</a>
+                                                  href="{{element.irkInstance+'/pl/admin/application/'+element.irkId+'/edit/'}}"
+                                                  target="_blank">{{element.irkId}}</a>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="usosId">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>usosId</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> usosId</th>
         <td mat-cell *matCellDef="let element"><a mat-button
-                                                  href="{{'http://usosadm.ue.poznan:8080/usosadm/studenci/programyOsob.jsf?osobaId='+element.applicant.usosId}}" target="_blank">{{element.applicant.usosId}}</a>
+                                                  href="{{'http://usosadm.ue.poznan:8080/usosadm/studenci/programyOsob.jsf?osobaId='+element.applicant.usosId}}"
+                                                  target="_blank">{{element.applicant.usosId}}</a>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="names">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nazwisko i imię/imiona</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nazwisko i imię/imiona</th>
         <td mat-cell
             *matCellDef="let element">{{element.applicant.name.family}} {{element.applicant.name.given}} {{element.applicant.name.middle}}</td>
       </ng-container>
 
       <ng-container matColumnDef="birthDateAndPlace">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Data urodzenia Miejsce urodzenia</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Data urodzenia Miejsce urodzenia</th>
         <td mat-cell
             *matCellDef="let element">{{element.applicant.basicData.dateOfBirth | date:'dd.MM.yyyy'}} {{element.applicant.basicData.cityOfBirth}}</td>
       </ng-container>
 
       <ng-container matColumnDef="pesel">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Pesel</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Pesel</th>
         <td mat-cell *matCellDef="let element">{{element.applicant.basicData.pesel}}</td>
       </ng-container>
 
       <ng-container matColumnDef="secondarySchoolDocumentNumber">
-        <th mat-header-cell *matHeaderCellDef>Nr świad. dojrz.</th>
+        <th mat-header-cell *matHeaderCellDef> Nr świad. dojrz.</th>
         <td mat-cell *matCellDef="let element">
           <div *ngIf="getSecondarySchoolDocument(element)">
             {{getSecondarySchoolDocument(element).documentNumber}}
@@ -110,7 +118,7 @@
       </ng-container>
 
       <ng-container matColumnDef="secondarySchoolDocumentIssueInstitution">
-        <th mat-header-cell *matHeaderCellDef>Wystawiający</th>
+        <th mat-header-cell *matHeaderCellDef> Wystawiający</th>
         <td mat-cell *matCellDef="let element">
           <div *ngIf="getSecondarySchoolDocument(element)">
             {{getSecondarySchoolDocument(element).issueInstitution}}
@@ -119,7 +127,7 @@
       </ng-container>
 
       <ng-container matColumnDef="secondarySchoolDocumentIssueDate">
-        <th mat-header-cell *matHeaderCellDef>Data wyd.</th>
+        <th mat-header-cell *matHeaderCellDef> Data wyd.</th>
         <td mat-cell *matCellDef="let element">
           <div *ngIf="getSecondarySchoolDocument(element)">
             {{getSecondarySchoolDocument(element).issueDate | date:'dd.MM.yyyy'}}
@@ -128,7 +136,7 @@
       </ng-container>
 
       <ng-container matColumnDef="diplomaSchoolDocumentNumber">
-        <th mat-header-cell *matHeaderCellDef>Dyplom</th>
+        <th mat-header-cell *matHeaderCellDef> Dyplom</th>
         <td mat-cell *matCellDef="let element">
           <div *ngIf="getDiplomaDocument(element)">
             {{getDiplomaDocument(element).documentNumber}}
@@ -137,7 +145,7 @@
       </ng-container>
 
       <ng-container matColumnDef="diplomaSchoolDocumentIssueDateAndPlace">
-        <th mat-header-cell *matHeaderCellDef>Data wyd. Miejsce</th>
+        <th mat-header-cell *matHeaderCellDef> Data wyd. Miejsce</th>
         <td mat-cell *matCellDef="let element">
           <div *ngIf="getDiplomaDocument(element)">
             {{getDiplomaDocument(element).issueDate | date:'dd.MM.yyyy'}} {{getDiplomaDocument(element).issueCity}}
@@ -146,7 +154,7 @@
       </ng-container>
 
       <ng-container matColumnDef="diplomaSchoolDocumentIssueInstitution">
-        <th mat-header-cell *matHeaderCellDef>Wystawiający</th>
+        <th mat-header-cell *matHeaderCellDef> Wystawiający</th>
         <td mat-cell *matCellDef="let element">
           <div *ngIf="getDiplomaDocument(element)">
             {{getDiplomaDocument(element).issueInstitution}}
@@ -155,7 +163,7 @@
       </ng-container>
 
       <ng-container matColumnDef="indexNumber">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nr albumu</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nr albumu</th>
         <td mat-cell *matCellDef="let element">
           <div *ngIf="element.applicant.assignedIndexNumber">
             <button mat-button (click)="updateIndexNumber(element)">{{element.applicant.assignedIndexNumber}}</button>

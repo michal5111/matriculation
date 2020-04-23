@@ -26,11 +26,14 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   import: Import;
   importProgress: ImportProgress;
   progressSubscription: Subscription;
+  pageSize: number = 15;
+  pageNumber: number = 0;
   page: Page<Application>;
   dataSource = new MatTableDataSource<Application>();
   sortString: string = 'id';
   sortDirString: string = 'asc';
   displayedColumns: string[] = [
+    'lp',
     'id',
     'irkId',
     'usosId',
@@ -61,8 +64,8 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   $importProgressObservable = timer(0, 1000).pipe(
     flatMap(() => this.importService.getImportProgress(this.importId)),
     tap(result => this.importProgress = result),
-    flatMap(() => this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString)),
-    tap(result => {
+    flatMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString)),
+    tap(() => {
       if (this.importProgress.importStatus == "IMPORTED"
         || this.importProgress.importStatus == "COMPLETE"
         || this.importProgress.importStatus == "PENDING") {
@@ -105,19 +108,21 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       return
     }
     this.getImport(this.importId).subscribe()
-    this.getPage(0, 15, this.sortString, this.sortDirString).subscribe(() => {
+    this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe(() => {
       this.progressSubscription = this.$importProgressObservable.subscribe()
     });
   }
 
   switchPage(pageEvent: PageEvent) {
+    this.pageSize = pageEvent.pageSize
+    this.pageNumber = pageEvent.pageIndex
     this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe();
   }
 
   sortEvent(sortEvent: Sort) {
     this.sortString = this.sortingMap.get(sortEvent.active);
     this.sortDirString = sortEvent.direction;
-    this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe();
+    this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe();
   }
 
   startImport() {
@@ -163,6 +168,18 @@ export class ImportViewComponent implements OnInit, OnDestroy {
         application.applicant.assignedIndexNumber = result
       }
     })
+  }
+
+  getElementNumber(application: Application): number {
+    return this.page.content.indexOf(application) + this.pageSize * this.page.number + 1
+  }
+
+  getImportProgressPercentage(): number {
+    return this.importProgress.importedApplications * 100 / this.importProgress.totalCount
+  }
+
+  getSaveProgressPercentage(): number {
+    return (this.importProgress.savedApplicants + this.importProgress.saveErrors) * 100 / this.importProgress.totalCount
   }
 
   ngOnDestroy(): void {

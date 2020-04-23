@@ -266,7 +266,7 @@ class IrkService {
         val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         val response: ResponseEntity<Map<String, String>> = restTemplate.exchange(
                 "${apiUrl}matriculation/${applicationId}/complete/",
-                HttpMethod.GET,
+                HttpMethod.POST,
                 httpEntity,
                 MapResult::class
         )

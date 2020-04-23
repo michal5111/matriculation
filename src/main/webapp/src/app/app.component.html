@@ -1,19 +1,23 @@
 <mat-drawer-container fullscreen>
-  <mat-toolbar color="primary" class="mat-elevation-z5">
-    <button mat-button routerLink="/">Immatrykulator 5000</button>
-    <ng-template [ngIf]="_userService.isAuthenticated">
-      <button mat-button routerLink="/import">Importy</button>
-    </ng-template>
-    <span class="fill-remaining-space"></span>
-    <ng-template [ngIf]="_userService.isAuthenticated" [ngIfElse]="loggedOut">
-      <span>{{_userService.user.casAssertion.principal.attributes.givenname}} {{_userService.user.casAssertion.principal.attributes.lastname}}</span>
-      <a mat-button href="{{baseHref}}logout">Wyloguj</a>
-    </ng-template>
-    <ng-template #loggedOut>
-      <a mat-button href="{{baseHref}}login?service={{baseHref+location.path().slice(1,location.path().length)}}">Zaloguj</a>
-    </ng-template>
-  </mat-toolbar>
-  <div class="padding">
+  <div class="wrapper">
+    <mat-toolbar color="primary" class="mat-elevation-z5">
+      <button mat-button routerLink="/"><img src="./assets/logo_uep_bial.svg" height="50" alt="Logo"/>Immatrykulator
+        5000
+      </button>
+      <ng-template [ngIf]="_userService.isAuthenticated">
+        <button mat-button routerLink="/import">Importy</button>
+      </ng-template>
+      <span class="fill-remaining-space"></span>
+      <ng-template [ngIf]="_userService.isAuthenticated" [ngIfElse]="loggedOut">
+        <span>{{_userService.user.casAssertion.principal.attributes.givenname}} {{_userService.user.casAssertion.principal.attributes.lastname}}</span>
+        <a mat-button href="{{baseHref}}logout">Wyloguj</a>
+      </ng-template>
+      <ng-template #loggedOut>
+        <a mat-button href="{{baseHref}}login?service={{baseHref+location.path().slice(1,location.path().length)}}">Zaloguj</a>
+      </ng-template>
+    </mat-toolbar>
     <router-outlet></router-outlet>
+    <div class="push"></div>
   </div>
+  <app-footer class="footer"></app-footer>
 </mat-drawer-container>

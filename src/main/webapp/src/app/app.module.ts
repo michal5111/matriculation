@@ -24,6 +24,7 @@ import localePl from '@angular/common/locales/pl';
 import {MatPaginatorIntl} from "@angular/material/paginator";
 import {MatPaginatorIntlPl} from "./customProviders/mat-paginator-intl-pl";
 import {UpdateIndexNumberDialogComponent} from './component/dialog/update-index-number-dialog/update-index-number-dialog.component';
+import {FooterComponent} from './component/footer/footer.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import {UpdateIndexNumberDialogComponent} from './component/dialog/update-index-
     ImportViewComponent,
     UnauthorizedDialogComponent,
     ForbiddenDialogComponent,
-    UpdateIndexNumberDialogComponent
+    UpdateIndexNumberDialogComponent,
+    FooterComponent
   ],
   imports: [
     BrowserModule,
