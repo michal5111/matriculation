@@ -25,6 +25,7 @@ import {MatPaginatorIntl} from "@angular/material/paginator";
 import {MatPaginatorIntlPl} from "./customProviders/mat-paginator-intl-pl";
 import {UpdateIndexNumberDialogComponent} from './component/dialog/update-index-number-dialog/update-index-number-dialog.component';
 import {FooterComponent} from './component/footer/footer.component';
+import {ConfirmationDialogComponent} from './component/dialog/confirmation-dialog/confirmation-dialog.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import {FooterComponent} from './component/footer/footer.component';
     UnauthorizedDialogComponent,
     ForbiddenDialogComponent,
     UpdateIndexNumberDialogComponent,
-    FooterComponent
+    FooterComponent,
+    ConfirmationDialogComponent
   ],
   imports: [
     BrowserModule,

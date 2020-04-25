@@ -188,8 +188,10 @@ class PersonService(
     }
 
     private fun updateEntitlementDocument(person: Person, applicant: Applicant) {
-        applicant.educationData.documents.forEach {
-            if (!entitlementDocumentRepository.existsByPersonAndType(person, it.certificateUsosCode)) {
+        applicant.educationData.documents.filter {
+            it.certificateUsosCode != null
+        }.forEach {
+            if (!entitlementDocumentRepository.existsByPersonAndType(person, it.certificateUsosCode!!)) {
                 person.entitlementDocuments.add(
                         EntitlementDocument(
                                 person = person,

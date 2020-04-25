@@ -1,4 +1,8 @@
-<div class="mat-typography">
-  <p>Sesja wygasła. Zaloguj się.</p>
-  <a mat-button href="{{baseHref}}login?service={{baseHref+location.path().slice(1,location.path().length)}}">Zaloguj</a>
-</div>
+<h2 mat-dialog-title>Sesja wygasła.</h2>
+<mat-dialog-content class="mat-typography">
+  Zaloguj się.
+</mat-dialog-content>
+<mat-dialog-actions>
+  <a mat-button
+     href="{{baseHref}}login?service={{baseHref+location.path().slice(1,location.path().length)}}">Zaloguj</a>
+</mat-dialog-actions>

@@ -208,12 +208,15 @@ class ApplicantMapper(
                 wku = applicant.additionalData.wku?.let {
                     wkuRepository.getOne(it)
                 },
-                entitlementDocuments = applicant.educationData.documents.map {
+                entitlementDocuments = applicant.educationData.documents.filter { document ->
+                    //document.certificateTypeCode in listOf("D","L","M","I","N","B","Z","U","K","E","R","G")
+                    document.certificateUsosCode != null
+                }.map {
                     EntitlementDocument(
                             issueDate = it.issueDate!!,
                             description = it.certificateType,
                             number = it.documentNumber!!,
-                            type = it.certificateUsosCode,
+                            type = it.certificateUsosCode!!,
                             school = it.issueInstitutionUsosCode?.let { schoolId ->
                                 schoolId.toLongOrNull()?.let { schoolIdLong ->
                                     schoolRepository.getOne(schoolIdLong)

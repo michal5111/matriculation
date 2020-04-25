@@ -138,12 +138,12 @@ class RestController(
         return importService.getImport(importId)
     }
 
-    @GetMapping("/import/progress/{id}")
+    @GetMapping("/import/{id}/progress")
     fun getProgress(@PathVariable("id") importId: Long): ImportProgress {
         return importService.getProgress(importId)
     }
 
-    @GetMapping("/import/save/{id}")
+    @GetMapping("/import/{id}/save")
     fun savePersons(@PathVariable("id") importId: Long): ResponseEntity<Void> {
         importService.getImportForPersonSave(importId)
         importService.setImportStatus(ImportStatus.SAVING, importId)
@@ -189,5 +189,14 @@ class RestController(
             @RequestParam("indexNumber") indexNumber: String
     ) {
         usosService.updateIndexNumberByUsosIdAndIndexType(personId, indexTypeCode, indexNumber)
+    }
+
+    @PutMapping("/import/{id}/archive")
+    fun archiveImport(@PathVariable("id") importId: Long) {
+        val import = importService.getImport(importId)
+        if (import.importProgress?.importStatus == ImportStatus.COMPLETE)
+            return importService.setImportStatus(ImportStatus.ARCHIVED, importId)
+        else
+            throw IllegalStateException("Zły stan importu!")
     }
 }

@@ -76,10 +76,14 @@ export class ImportService {
   }
 
   savePersons(importId: number) {
-    return this.http.get(`${this.apiUrl}/import/save/${importId}`)
+    return this.http.get(`${this.apiUrl}/import/${importId}/save`)
   }
 
   getImportProgress(importId: number): Observable<ImportProgress> {
-    return this.http.get<ImportProgress>(`${this.apiUrl}/import/progress/${importId}`)
+    return this.http.get<ImportProgress>(`${this.apiUrl}/import/${importId}/progress`)
+  }
+
+  archiveImport(importId: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/import/${importId}/archive`, null, httpOptions)
   }
 }

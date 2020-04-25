@@ -6,20 +6,20 @@ import java.util.*
 
 data class DocumentDTO(
         @JsonProperty("certificate_type")
-    val certificateType: String,
+        val certificateType: String,
         @JsonProperty("certificate_type_code")
-    val certificateTypeCode: String,
+        val certificateTypeCode: String,
         @JsonProperty("certificate_usos_code")
-    val certificateUsosCode: Char,
+        val certificateUsosCode: Char?,
         val comment: String?,
         @JsonProperty("document_number")
-    val documentNumber: String?,
+        val documentNumber: String?,
         @JsonProperty("document_year")
-    val documentYear: Int?,
+        val documentYear: Int?,
         @JsonProperty("issue_city")
-    val issueCity: String?,
+        val issueCity: String?,
         @JsonProperty("issue_country")
-    val issueCountry: String?,
+        val issueCountry: String?,
         @JsonProperty("issue_date")
     val issueDate: Date?,
         @JsonProperty("issue_institution")

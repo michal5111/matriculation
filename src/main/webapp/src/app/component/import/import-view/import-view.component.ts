@@ -2,18 +2,20 @@ import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from "@angular/material/table";
 import {ImportService} from "../../../service/import-service/import.service";
 import {Page} from "../../../model/oracle/page/page";
-import {flatMap, map, tap} from "rxjs/operators";
+import {filter, flatMap, map, tap} from "rxjs/operators";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatSort, Sort} from "@angular/material/sort";
 import {Application} from "../../../model/irk/application";
 import {ActivatedRoute} from "@angular/router";
 import {ImportProgress} from "../../../model/import/import-progress";
-import {Subscription, timer} from "rxjs";
+import {Observable, Subscription, timer} from "rxjs";
 import {Import} from "../../../model/import/import";
 import {UserService} from "../../../service/user-service/user.service";
 import {Document} from "../../../model/irk/document";
 import {MatDialog} from "@angular/material/dialog";
 import {UpdateIndexNumberDialogComponent} from "../../dialog/update-index-number-dialog/update-index-number-dialog.component";
+import {ConfirmationDialogComponent} from "../../dialog/confirmation-dialog/confirmation-dialog.component";
+import {ConfirmationDialogData} from "../../../model/dialog/confirmation-dialog-data";
 
 @Component({
   selector: 'app-import-view',
@@ -68,7 +70,8 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     tap(() => {
       if (this.importProgress.importStatus == "IMPORTED"
         || this.importProgress.importStatus == "COMPLETE"
-        || this.importProgress.importStatus == "PENDING") {
+        || this.importProgress.importStatus == "PENDING"
+        || this.importProgress.importStatus == "ARCHIVED") {
         this.progressSubscription.unsubscribe()
       }
     })
@@ -94,7 +97,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       )
   }
 
-  getImport(importId: number) {
+  getImport(importId: number): Observable<Import> {
     return this.importService.getImport(importId).pipe(
       tap(importObject => this.import = importObject)
     )
@@ -180,6 +183,18 @@ export class ImportViewComponent implements OnInit, OnDestroy {
 
   getSaveProgressPercentage(): number {
     return (this.importProgress.savedApplicants + this.importProgress.saveErrors) * 100 / this.importProgress.totalCount
+  }
+
+  onArchiveClick() {
+    const data = new ConfirmationDialogData("Archiwizuj import", "Czy na pewno chcesz zarchiwizować import? Procesu nie można odwrócić!")
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: data
+    })
+    dialogRef.afterClosed().pipe(
+      filter(result => result === true),
+      flatMap((result) => this.importService.archiveImport(this.importId)),
+      flatMap(() => this.getImport(this.importId))
+    ).subscribe()
   }
 
   ngOnDestroy(): void {

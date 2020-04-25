@@ -156,16 +156,16 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>target/classes/static/</directory>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
+            <!--            <plugin>-->
+            <!--                <artifactId>maven-clean-plugin</artifactId>-->
+            <!--                <configuration>-->
+            <!--                    <filesets>-->
+            <!--                        <fileset>-->
+            <!--                            <directory>target/classes/static/</directory>-->
+            <!--                        </fileset>-->
+            <!--                    </filesets>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>

@@ -23,7 +23,7 @@ data class Document(
 
         val certificateTypeCode: String,
 
-        val certificateUsosCode: Char,
+        val certificateUsosCode: Char?,
 
         var comment: String?,
 

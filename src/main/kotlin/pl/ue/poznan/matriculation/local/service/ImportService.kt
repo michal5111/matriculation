@@ -216,6 +216,9 @@ class ImportService(
                 import.importProgress!!.importStatus == ImportStatus.SAVING) {
             throw ImportException(importId, "Import już się rozpoczął.")
         }
+        if (import.importProgress!!.importStatus == ImportStatus.ARCHIVED) {
+            throw ImportException(importId, "Import został zarchiwizowany.")
+        }
         return import
     }
 
@@ -224,6 +227,9 @@ class ImportService(
                 ?: throw ImportNotFoundException("Nie znaleziono importu.")
         if (import.importProgress!!.importStatus != ImportStatus.IMPORTED && import.importProgress!!.importStatus != ImportStatus.COMPLETE) {
             throw ImportStartException(importId, "Zły stan importu.")
+        }
+        if (import.importProgress!!.importStatus == ImportStatus.ARCHIVED) {
+            throw ImportException(importId, "Import został zarchiwizowany.")
         }
         return import
     }
