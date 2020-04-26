@@ -26,6 +26,7 @@ import {MatPaginatorIntlPl} from "./customProviders/mat-paginator-intl-pl";
 import {UpdateIndexNumberDialogComponent} from './component/dialog/update-index-number-dialog/update-index-number-dialog.component';
 import {FooterComponent} from './component/footer/footer.component';
 import {ConfirmationDialogComponent} from './component/dialog/confirmation-dialog/confirmation-dialog.component';
+import {ErrorDialogComponent} from './component/dialog/error-dialog/error-dialog.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import {ConfirmationDialogComponent} from './component/dialog/confirmation-dialo
     ForbiddenDialogComponent,
     UpdateIndexNumberDialogComponent,
     FooterComponent,
-    ConfirmationDialogComponent
+    ConfirmationDialogComponent,
+    ErrorDialogComponent
   ],
   imports: [
     BrowserModule,

@@ -9,6 +9,9 @@ import {filter, flatMap, tap} from "rxjs/operators";
 import {IndexType} from "../../../model/oracle/index-type";
 import {Registration} from "../../../model/irk/registration";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatDialog} from "@angular/material/dialog";
+import {ErrorDialogComponent} from "../../dialog/error-dialog/error-dialog.component";
+import {ErrorDialogData} from "../../../model/dialog/error-dialog-data";
 
 @Component({
   selector: 'app-import-setup',
@@ -27,7 +30,12 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   changesSubscription: Subscription
   debounceTime = 400;
 
-  constructor(private importService: ImportService, private formBuilder: FormBuilder, private snackBar: MatSnackBar) {
+  constructor(
+    private importService: ImportService,
+    private formBuilder: FormBuilder,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
+  ) {
   }
 
   @Output() onImportCreatedEventEmitter = new EventEmitter<Import>();
@@ -43,32 +51,36 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
       dateOfAddmision: ['', Validators.required]
     });
     this.onDidacticCycleInputChanges()
-    // this.importService.getAvailableRegistrations().pipe(
-    //   tap(results => this.registrations = results)
-    // ).subscribe();
-    // this.importService.getAvailableIndexPools().pipe(
-    //   tap(results => this.indexPools = results)
-    // ).subscribe();
   }
 
-  onRegistrationSelectionChange(event: MatOptionSelectionChange, registration: string) {
+  onRegistrationSelectionChange(event: MatOptionSelectionChange, registration: string): void {
     this.importService.getAvailableRegistrationProgrammes(registration).pipe(
       tap(results => this.registrationProgrammes = results)
-    ).subscribe(() => this.importCreationFormGroup.value.registrationProgramme = '')
+    ).subscribe(
+      () => this.importCreationFormGroup.value.registrationProgramme = '',
+      error => this.onError("Błąd przy pobieraniu programów", error)
+    )
   }
 
-  onRegistrationProgrammeChange(event: MatOptionSelectionChange, programmeCode: string) {
+  onRegistrationProgrammeChange(event: MatOptionSelectionChange, programmeCode: string): void {
     this.importService.getAvailableStages(programmeCode).pipe(
       tap(results => this.stages = results)
-    ).subscribe( () => this.importCreationFormGroup.value.stage = '' )
+    ).subscribe(
+      () => this.importCreationFormGroup.value.stage = '',
+      error => this.onError("Błąd przy pobieraniu etapów", error)
+    )
   }
 
-  onDidacticCycleInputChanges() {
+  onDidacticCycleInputChanges(): void {
     this.changesSubscription = this.importCreationFormGroup.get('didacticCycle').valueChanges.pipe(
       filter(value => value !== undefined && value !== '' && value !== null && value.length >= 2),
       flatMap(value => this.importService.findDidacticCycleCodes(value)),
       tap(didacticCycles => this.didacticCycles = didacticCycles)
-    ).subscribe()
+    ).subscribe(
+      () => {
+      },
+      error => this.onError("Błąd przy pobieraniu cykli dydaktycznych", error)
+    )
   }
 
   onSubmit() {
@@ -81,17 +93,20 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.import.stageCode = this.importCreationFormGroup.value.stage;
     this.importService.createImport(this.import).subscribe(
       importObject => this.onImportCreated(importObject),
-      error => this.onError(error)
+      error => this.onError("Błąd przy tworzeniu importu", error)
     );
   }
 
-  onError(error) {
-    if (error instanceof HttpErrorResponse) {
-      alert(`Błąd: ${error.error.message}`)
+  onError(title: string, error): void {
+    if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
+      return
     }
+    this.dialog.open(ErrorDialogComponent, {
+      data: new ErrorDialogData(title, error)
+    })
   }
 
-  onImportCreated(importObject: Import) {
+  onImportCreated(importObject: Import): void {
     let snackBarRef = this.snackBar.open("Import utworzony", "OK", {
       duration: 3000
     })

@@ -16,6 +16,9 @@ import {MatDialog} from "@angular/material/dialog";
 import {UpdateIndexNumberDialogComponent} from "../../dialog/update-index-number-dialog/update-index-number-dialog.component";
 import {ConfirmationDialogComponent} from "../../dialog/confirmation-dialog/confirmation-dialog.component";
 import {ConfirmationDialogData} from "../../../model/dialog/confirmation-dialog-data";
+import {ErrorDialogComponent} from "../../dialog/error-dialog/error-dialog.component";
+import {ErrorDialogData} from "../../../model/dialog/error-dialog-data";
+import {HttpErrorResponse} from "@angular/common/http";
 
 @Component({
   selector: 'app-import-view',
@@ -112,34 +115,51 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     }
     this.getImport(this.importId).subscribe()
     this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe(() => {
-      this.progressSubscription = this.$importProgressObservable.subscribe()
-    });
+        this.progressSubscription = this.$importProgressObservable.subscribe()
+      },
+      error => this.onError("Błąd przy archiwizowaniu", error));
   }
 
   switchPage(pageEvent: PageEvent): void {
     this.pageSize = pageEvent.pageSize
     this.pageNumber = pageEvent.pageIndex
-    this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe();
+    this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe(
+      () => {
+      },
+      error => this.onError("Błąd przy pobieraniu strony", error)
+    );
   }
 
   sortEvent(sortEvent: Sort): void {
     this.sortString = this.sortingMap.get(sortEvent.active);
     this.sortDirString = sortEvent.direction;
-    this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe();
+    this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe(
+      () => {
+      },
+      error => this.onError("Błąd przy pobieraniu strony", error)
+    );
   }
 
   startImport(): void {
     this.progressSubscription.unsubscribe();
     this.progressSubscription = this.importService.startImport(this.importId).pipe(
       flatMap(() => this.$importProgressObservable)
-    ).subscribe();
+    ).subscribe(
+      () => {
+      },
+      error => this.onError("Błąd przy uruchomieniu importu", error)
+    );
   }
 
   savePersons(): void {
     this.progressSubscription.unsubscribe();
     this.progressSubscription = this.importService.savePersons(this.importId).pipe(
       flatMap(() => this.$importProgressObservable)
-    ).subscribe();
+    ).subscribe(
+      () => {
+      },
+      error => this.onError("Błąd przy rozpoczęciu zapisywania", error)
+    );
   }
 
   getSecondarySchoolDocument(application: Application): Document {
@@ -194,7 +214,11 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       filter(result => result === true),
       flatMap((result) => this.importService.archiveImport(this.importId)),
       flatMap(() => this.getImport(this.importId))
-    ).subscribe()
+    ).subscribe(
+      () => {
+      },
+      error => this.onError("Błąd przy archiwizowaniu", error)
+    )
   }
 
   getApplicationIrkUrl(application: Application): string {
@@ -207,5 +231,14 @@ export class ImportViewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.progressSubscription.unsubscribe()
+  }
+
+  onError(title: string, error): void {
+    if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
+      return
+    }
+    this.dialog.open(ErrorDialogComponent, {
+      data: new ErrorDialogData(title, error)
+    })
   }
 }
