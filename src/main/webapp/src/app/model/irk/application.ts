@@ -1,8 +1,8 @@
-import {Observable} from "rxjs";
 import {Applicant} from "./applicant";
 
 export interface Application {
   id: number,
+  irkId: number,
   user: number,
   applicant: Applicant,
   payment: string,

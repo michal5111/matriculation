@@ -62,7 +62,7 @@
           <mat-icon>save</mat-icon>
           Zapisz osoby
         </button>
-        <button mat-button (click)="onArchiveClick()" [disabled]="import.importProgress.importStatus === 'ARCHIVED'">
+        <button mat-button (click)="onArchiveClick()" [disabled]="import.importProgress.importStatus !== 'COMPLETE'">
           <mat-icon>archived</mat-icon>
           Archiwizuj
         </button>
@@ -86,7 +86,7 @@
       <ng-container matColumnDef="irkId">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> IrkId</th>
         <td mat-cell *matCellDef="let element"><a mat-button
-                                                  href="{{element.irkInstance+'/pl/admin/application/'+element.irkId+'/edit/'}}"
+                                                  href="{{getApplicationIrkUrl(element)}}"
                                                   target="_blank">{{element.irkId}}</a>
         </td>
       </ng-container>
@@ -94,7 +94,7 @@
       <ng-container matColumnDef="usosId">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> usosId</th>
         <td mat-cell *matCellDef="let element"><a mat-button
-                                                  href="{{'http://usosadm.ue.poznan:8080/usosadm/studenci/programyOsob.jsf?osobaId='+element.applicant.usosId}}"
+                                                  href="{{getPersonUsosUrl(element)}}"
                                                   target="_blank">{{element.applicant.usosId}}</a>
         </td>
       </ng-container>

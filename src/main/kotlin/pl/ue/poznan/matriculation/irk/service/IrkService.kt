@@ -127,7 +127,7 @@ class IrkService {
         var hasNext: Boolean
         do {
             val page = restTemplate.exchange(
-                    "${apiUrl}registrations/?page=$currentPage",
+                    "${apiUrl}registrations/?page=$currentPage&status=published",
                     HttpMethod.GET,
                     httpEntity,
                     PageOfRegistrations()

@@ -156,16 +156,25 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <!--            <plugin>-->
-            <!--                <artifactId>maven-clean-plugin</artifactId>-->
-            <!--                <configuration>-->
-            <!--                    <filesets>-->
-            <!--                        <fileset>-->
-            <!--                            <directory>target/classes/static/</directory>-->
-            <!--                        </fileset>-->
-            <!--                    </filesets>-->
-            <!--                </configuration>-->
-            <!--            </plugin>-->
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>auto-clean</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>target/classes/static/</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -231,7 +240,7 @@
                                     <goal>npm</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>run-script prod -- --base-href=/${artifactId}/</arguments>
+                                    <arguments>run-script prod -- --base-href=/${project.artifactId}/</arguments>
                                 </configuration>
                                 <phase>generate-resources</phase>
                             </execution>

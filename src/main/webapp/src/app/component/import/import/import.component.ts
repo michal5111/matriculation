@@ -29,6 +29,7 @@ export class ImportComponent implements OnInit {
     'indexPoolCode',
     'startDate',
     'dateOfAddmision',
+    'status',
     'deleteImport',
     'selectImport'
   ];

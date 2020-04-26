@@ -116,26 +116,26 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     });
   }
 
-  switchPage(pageEvent: PageEvent) {
+  switchPage(pageEvent: PageEvent): void {
     this.pageSize = pageEvent.pageSize
     this.pageNumber = pageEvent.pageIndex
     this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe();
   }
 
-  sortEvent(sortEvent: Sort) {
+  sortEvent(sortEvent: Sort): void {
     this.sortString = this.sortingMap.get(sortEvent.active);
     this.sortDirString = sortEvent.direction;
     this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe();
   }
 
-  startImport() {
+  startImport(): void {
     this.progressSubscription.unsubscribe();
     this.progressSubscription = this.importService.startImport(this.importId).pipe(
       flatMap(() => this.$importProgressObservable)
     ).subscribe();
   }
 
-  savePersons() {
+  savePersons(): void {
     this.progressSubscription.unsubscribe();
     this.progressSubscription = this.importService.savePersons(this.importId).pipe(
       flatMap(() => this.$importProgressObservable)
@@ -156,7 +156,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       )
   }
 
-  updateIndexNumber(application: Application) {
+  updateIndexNumber(application: Application): void {
     const dialogRef = this.dialog.open(UpdateIndexNumberDialogComponent, {
       width: '300px',
       height: '250px',
@@ -185,7 +185,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     return (this.importProgress.savedApplicants + this.importProgress.saveErrors) * 100 / this.importProgress.totalCount
   }
 
-  onArchiveClick() {
+  onArchiveClick(): void {
     const data = new ConfirmationDialogData("Archiwizuj import", "Czy na pewno chcesz zarchiwizować import? Procesu nie można odwrócić!")
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: data
@@ -195,6 +195,14 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       flatMap((result) => this.importService.archiveImport(this.importId)),
       flatMap(() => this.getImport(this.importId))
     ).subscribe()
+  }
+
+  getApplicationIrkUrl(application: Application): string {
+    return application.irkInstance + '/pl/admin/application/' + application.irkId + '/edit/'
+  }
+
+  getPersonUsosUrl(application: Application): string {
+    return 'http://usosadm.ue.poznan:8080/usosadm/studenci/programyOsob.jsf?osobaId=' + application.applicant.usosId
   }
 
   ngOnDestroy(): void {
