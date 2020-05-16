@@ -21,6 +21,8 @@ import {HttpErrorResponse} from "@angular/common/http";
 export class ImportComponent implements OnInit {
 
   page: Page<Import>;
+  totalElements = 0;
+  size = 0;
   dataSource = new MatTableDataSource<Import>();
   sortString: string = 'id';
   sortDirString: string = 'desc';
@@ -44,7 +46,7 @@ export class ImportComponent implements OnInit {
 
   constructor(
     private importService: ImportService,
-    public _userService: UserService,
+    public userService: UserService,
     private dialog: MatDialog
   ) {
   }
@@ -52,7 +54,11 @@ export class ImportComponent implements OnInit {
   getPage(page: number, size: number, sort?: string, sortDir?: string) {
     return this.importService.getImportsPage(page, size, sort, sortDir)
       .pipe(
-        tap(page => this.page = page),
+        tap(page => {
+          this.page = page
+          this.totalElements = page.totalElements
+          this.size = page.size
+        }),
         map(page => page.content),
         tap(results => this.dataSource.data = results)
       )

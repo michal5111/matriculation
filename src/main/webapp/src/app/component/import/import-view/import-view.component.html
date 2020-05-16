@@ -58,7 +58,8 @@
           <mat-icon>backup</mat-icon>
           Importuj osoby
         </button>
-        <button mat-button (click)="savePersons()" [disabled]="import.importProgress.importStatus === 'ARCHIVED'">
+        <button mat-button (click)="savePersons()"
+                [disabled]="import.importProgress.importStatus === 'ARCHIVED' || totalElements < 1">
           <mat-icon>save</mat-icon>
           Zapisz osoby
         </button>
@@ -69,7 +70,7 @@
       </mat-card-actions>
     </mat-card>
   </header>
-  <div *ngIf="page" class="mat-elevation-z2">
+  <div class="mat-elevation-z2">
     <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)" matSortActive="id"
            matSortDirection="asc" matSortDisableClear>
 
@@ -210,8 +211,8 @@
     </table>
     <mat-paginator [pageSizeOptions]="[10, 15, 20, 25, 50, 100]"
                    showFirstLastButtons
-                   [length]="page.totalElements"
-                   [pageSize]="page.size"
+                   [length]="totalElements"
+                   [pageSize]="pageSize"
                    (page)="switchPage($event)">
     </mat-paginator>
   </div>

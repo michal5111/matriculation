@@ -13,9 +13,9 @@
       </mat-expansion-panel>
     </mat-accordion>
   </div>
-  <ng-template [ngIf]="_userService.isAuthenticated">
+  <ng-template [ngIf]="userService.isAuthenticated">
     <h3 class="mat-h3">Utworzone importy</h3>
-    <div *ngIf="page" class="mat-elevation-z2">
+    <div class="mat-elevation-z2">
       <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)">
 
         <ng-container matColumnDef="id">
@@ -115,8 +115,8 @@
       </table>
 
       <mat-paginator [pageSizeOptions]="[5, 10, 20, 50, 100]"
-                     [length]="page.totalElements"
-                     [pageSize]="page.size"
+                     [length]="totalElements"
+                     [pageSize]="size"
                      showFirstLastButtons
                      (page)="switchPage($event)">
       </mat-paginator>

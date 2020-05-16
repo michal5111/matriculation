@@ -33,6 +33,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   progressSubscription: Subscription;
   pageSize: number = 15;
   pageNumber: number = 0;
+  totalElements = 0;
   page: Page<Application>;
   dataSource = new MatTableDataSource<Application>();
   sortString: string = 'id';
@@ -94,7 +95,10 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   getPage(page: number, size: number, sort?: string, sortDir?: string) {
     return this.importService.findAllApplicationsByImportId(this.importId, page, size, sort, sortDir)
       .pipe(
-        tap(page => this.page = page),
+        tap(page => {
+          this.page = page
+          this.totalElements = page.totalElements
+        }),
         map(page => page.content),
         tap(results => this.dataSource.data = results)
       )

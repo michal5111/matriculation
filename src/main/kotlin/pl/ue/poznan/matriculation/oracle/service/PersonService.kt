@@ -255,7 +255,7 @@ class PersonService(
         return student.indexNumber
     }
 
-    @Transactional(rollbackFor = [java.lang.Exception::class], propagation = Propagation.REQUIRED, transactionManager = "oracleTransactionManager")
+    @Transactional(rollbackFor = [java.lang.Exception::class], propagation = Propagation.REQUIRES_NEW, transactionManager = "oracleTransactionManager")
     fun processPerson(import: Import, application: Application): Pair<Long?, String> {
         var person: Person? = null
         application.applicant!!.usosId?.let { usosId ->
