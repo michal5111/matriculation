@@ -9,7 +9,7 @@ import javax.persistence.*
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_JEDNOSTKI_ORGANIZACYJNE")
-data class OrganizationalUnit(
+class OrganizationalUnit(
         @Id
         @Column(name = "KOD", length = 20, nullable = false)
         val code: String,

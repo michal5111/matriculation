@@ -1,4 +1,4 @@
-import {Attributes} from "./attributes";
+import {Attributes} from './attributes';
 
 export interface Principal {
   name: string;

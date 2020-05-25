@@ -1,15 +1,15 @@
-import { Document } from './document'
-import { Observable } from 'rxjs';
+import {Document} from './document';
+import {Observable} from 'rxjs';
 
 export class Applicant {
-    id: number;
-    email: string;
-    indexNumber: string;
-    password: string;
-    name: {
-        middle: string;
-        maiden: string;
-        family: string;
+  id: number;
+  email: string;
+  indexNumber: string;
+  password: string;
+  name: {
+    middle: string;
+    maiden: string;
+    family: string;
         given: string;
     };
     phone: string;

@@ -56,9 +56,7 @@ class RestController(
 //    }
 
     @GetMapping("/applicants/{id}")
-    fun getApplicantById(@PathVariable("id") id: Long): ApplicantDTO? {
-        return irkService.getApplicantById(id)
-    }
+    fun getApplicantById(@PathVariable("id") id: Long): ApplicantDTO? = irkService.getApplicantById(id)
 
     @GetMapping("/applicants/")
     fun getApplicantByParam(
@@ -73,24 +71,18 @@ class RestController(
     }
 
     @GetMapping("/registrations/{id}")
-    fun getRegistration(@PathVariable("id") id: String): RegistrationDTO? {
-        return irkService.getRegistration(id)
-    }
+    fun getRegistration(@PathVariable("id") id: String): RegistrationDTO? = irkService.getRegistration(id)
+
 
     @GetMapping("/registrations/codes")
-    fun getRegistrationCodes(): MutableList<Map<String, String>> {
-        return irkService.getAvailableRegistrations()
-    }
+    fun getRegistrationCodes(): MutableList<Map<String, String>> = irkService.getAvailableRegistrations()
 
     @GetMapping("/registrations/codes/{id}")
-    fun getRegistrationCodes(@PathVariable("id") id: String): List<String?> {
-        return irkService.getAvailableRegistrationProgrammes(id)
-    }
+    fun getRegistrationCodes(@PathVariable("id") id: String): List<String?> = irkService.getAvailableRegistrationProgrammes(id)
+
 
     @GetMapping("/applications/{id}")
-    fun getApplication(@PathVariable("id") id: Long): ApplicationDTO? {
-        return irkService.getApplication(id)
-    }
+    fun getApplication(@PathVariable("id") id: Long): ApplicationDTO? = irkService.getApplication(id)
 
     @GetMapping("/applications")
     fun getApplications(
@@ -99,30 +91,24 @@ class RestController(
             @RequestParam(required = false) programme: String?,
             @RequestParam(required = false) registration: String?,
             @RequestParam(required = false) pageNumber: Int?
-    ): Page<ApplicationDTO>? {
-        return irkService.getApplications(admitted, paid, programme, registration, pageNumber)
-    }
+    ): Page<ApplicationDTO>? = irkService.getApplications(admitted, paid, programme, registration, pageNumber)
 
     @GetMapping("/programmesGroups/{id}")
-    fun getProgrammesGroups(@PathVariable("id") id: String): ProgrammeGroupsDTO? {
-        return irkService.getProgrammesGroups(id)
-    }
+    fun getProgrammesGroups(@PathVariable("id") id: String): ProgrammeGroupsDTO? = irkService.getProgrammesGroups(id)
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/import")
     fun createImport(
             @RequestBody importDto: ImportDto
-    ): Import {
-        return importService.create(
-                programmeCode = importDto.programmeCode,
-                registration = importDto.registration,
-                indexPoolCode = importDto.indexPoolCode,
-                startDate = importDto.startDate,
-                dateOfAddmision = importDto.dateOfAddmision,
-                stageCode = importDto.stageCode,
-                didacticCycleCode = importDto.didacticCycleCode
-        )
-    }
+    ): Import = importService.create(
+            programmeCode = importDto.programmeCode,
+            registration = importDto.registration,
+            indexPoolCode = importDto.indexPoolCode,
+            startDate = importDto.startDate,
+            dateOfAddmision = importDto.dateOfAddmision,
+            stageCode = importDto.stageCode,
+            didacticCycleCode = importDto.didacticCycleCode
+    )
 
     @PutMapping("/import/{id}")
     fun importApplicants(@PathVariable("id") importId: Long): ResponseEntity<Void> {
@@ -134,14 +120,12 @@ class RestController(
     }
 
     @GetMapping("/import/{id}")
-    fun getImport(@PathVariable("id") importId: Long): Import {
-        return importService.get(importId)
-    }
+    fun getImport(@PathVariable("id") importId: Long): Import = importService.get(importId)
+
 
     @GetMapping("/import/{id}/progress")
-    fun getProgress(@PathVariable("id") importId: Long): ImportProgress {
-        return importService.getProgress(importId)
-    }
+    fun getProgress(@PathVariable("id") importId: Long): ImportProgress = importService.getProgress(importId)
+
 
     @GetMapping("/import/{id}/save")
     fun savePersons(@PathVariable("id") importId: Long): ResponseEntity<Void> {
@@ -153,43 +137,35 @@ class RestController(
     }
 
     @GetMapping("/import")
-    fun getImportsPage(pageable: Pageable): org.springframework.data.domain.Page<Import> {
-        return importService.getAll(pageable)
-    }
+    fun getImportsPage(pageable: Pageable): org.springframework.data.domain.Page<Import> = importService.getAll(pageable)
+
 
     @DeleteMapping("/import/{id}")
-    fun deleteImport(@PathVariable("id") importId: Long) {
-        return importService.delete(importId)
-    }
+    fun deleteImport(@PathVariable("id") importId: Long) = importService.delete(importId)
+
 
     @GetMapping("/import/{id}/applications")
-    fun findAllApplicationsByImportId(pageable: Pageable, @PathVariable("id") importId: Long): org.springframework.data.domain.Page<Application> {
-        return applicationService.findAllApplicationsByImportId(pageable, importId)
-    }
+    fun findAllApplicationsByImportId(pageable: Pageable, @PathVariable("id") importId: Long): org.springframework.data.domain.Page<Application> = applicationService.findAllApplicationsByImportId(pageable, importId)
+
 
     @GetMapping("/indexPool")
-    fun getAvailableIndexPools(): List<IndexTypeDto> {
-        return usosService.getAvailableIndexPoolsCodes()
-    }
+    fun getAvailableIndexPools(): List<IndexTypeDto> = usosService.getAvailableIndexPoolsCodes()
+
 
     @GetMapping("/programme/{code}/stages")
-    fun getAvailableIndexPools(@PathVariable("code") code: String): List<String> {
-        return usosService.getStageByProgrammeCode(code)
-    }
+    fun getAvailableIndexPools(@PathVariable("code") code: String): List<String> = usosService.getStageByProgrammeCode(code)
+
 
     @GetMapping("/didacticCycle")
-    fun findDidacticCycleByCode(@RequestParam("code")didacticCycleCode: String): List<String> {
-        return usosService.findDidacticCycleCodes(didacticCycleCode,10)
-    }
+    fun findDidacticCycleByCode(@RequestParam("code") didacticCycleCode: String): List<String> = usosService.findDidacticCycleCodes(didacticCycleCode, 10)
+
 
     @PutMapping("/person/{id}/indexNumber")
     fun updateIndexNumberByUsosIdAndIndexType(
             @PathVariable("id") personId: Long,
             @RequestParam("indexType") indexTypeCode: String,
             @RequestParam("indexNumber") indexNumber: String
-    ) {
-        usosService.updateIndexNumberByUsosIdAndIndexType(personId, indexTypeCode, indexNumber)
-    }
+    ) = usosService.updateIndexNumberByUsosIdAndIndexType(personId, indexTypeCode, indexNumber)
 
     @PutMapping("/import/{id}/archive")
     fun archiveImport(@PathVariable("id") importId: Long) {

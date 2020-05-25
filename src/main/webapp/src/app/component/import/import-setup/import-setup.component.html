@@ -2,7 +2,7 @@
   <form [formGroup]="importCreationFormGroup" (ngSubmit)="onSubmit()">
     <mat-form-field class="form-field wide-field">
       <mat-label>Rekrutacja</mat-label>
-      <mat-select formControlName="registration" required="true" [typeaheadDebounceInterval]="debounceTime">
+      <mat-select formControlName="registration" required="true">
         <mat-option
           *ngFor="let registration of $availableRegistrationsObservable | async"
           [value]="registration.code"
@@ -12,7 +12,7 @@
     </mat-form-field>
     <mat-form-field class="form-field wide-field">
       <mat-label>Program</mat-label>
-      <mat-select formControlName="registrationProgramme" required="true" [typeaheadDebounceInterval]="debounceTime">
+      <mat-select formControlName="registrationProgramme" required="true">
         <mat-option
           *ngFor="let registrationProgramme of registrationProgrammes"
           [value]="registrationProgramme"

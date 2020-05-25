@@ -1,4 +1,4 @@
-<ng-template [ngIf]="_userService.isAuthenticated">
+<ng-template [ngIf]="userService.isAuthenticated">
   <button mat-button routerLink="/import">
     <mat-icon>arrow_back</mat-icon>
     Wróć
@@ -14,6 +14,8 @@
         <p>Data rozpoczęcia programu: {{import.startDate | date: 'dd.MM.yyyy'}}</p>
         <p>Data przyjęcia na program: {{import.dateOfAddmision | date: 'dd.MM.yyyy'}}</p>
       </mat-card-subtitle>
+    </mat-card>
+    <mat-card class="card-centered">
       <mat-card-content *ngIf="importProgress">
         <div [ngSwitch]="importProgress.importStatus">
           <span>Status importu: </span>

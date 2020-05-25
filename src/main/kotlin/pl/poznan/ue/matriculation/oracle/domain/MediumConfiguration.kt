@@ -4,7 +4,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_KONFIG_SREDNICH")
-data class MediumConfiguration(
+class MediumConfiguration(
         @Id
         @Column(name = "KOD", length = 20, nullable = false)
         val code: String,

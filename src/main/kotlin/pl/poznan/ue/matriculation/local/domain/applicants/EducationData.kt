@@ -8,7 +8,7 @@ import javax.persistence.*
 @Entity
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-data class EducationData(
+class EducationData(
 
         @Id
         var applicantId: Long? = null,

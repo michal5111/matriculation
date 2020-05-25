@@ -7,7 +7,7 @@ import javax.persistence.*
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_ETAPY")
-data class Stage(
+class Stage(
 
         @Id
         @Column(name = "KOD", length = 20, nullable = false)

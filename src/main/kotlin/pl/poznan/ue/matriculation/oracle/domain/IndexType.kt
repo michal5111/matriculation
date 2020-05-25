@@ -7,7 +7,7 @@ import javax.persistence.*
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_TYPY_INDEKSOW")
-data class IndexType(
+class IndexType(
         @Id
         @Column(name = "KOD", length = 20, nullable = false)
         val code: String,

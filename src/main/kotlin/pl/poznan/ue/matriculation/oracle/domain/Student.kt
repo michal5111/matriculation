@@ -8,7 +8,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_STUDENCI")
-data class Student(
+class Student(
 
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_ST_SEQ")

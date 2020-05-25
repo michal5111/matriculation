@@ -61,7 +61,7 @@ class PersonService(
 
     @Transactional(rollbackFor = [java.lang.Exception::class, RuntimeException::class], propagation = Propagation.MANDATORY, transactionManager = "oracleTransactionManager")
     fun updatePerson(applicant: Applicant, person: Person) {
-        applicantService.checkApplicant(applicant)
+        applicantService.check(applicant)
         person.apply {
             email = applicant.email
             name = applicant.name.given!!

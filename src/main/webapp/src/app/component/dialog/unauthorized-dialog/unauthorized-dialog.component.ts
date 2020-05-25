@@ -1,7 +1,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {Router} from "@angular/router";
-import {MatDialogRef} from "@angular/material/dialog";
-import {APP_BASE_HREF, Location} from "@angular/common";
+import {Router} from '@angular/router';
+import {MatDialogRef} from '@angular/material/dialog';
+import {APP_BASE_HREF, Location} from '@angular/common';
 
 @Component({
   selector: 'app-unauthorized-dialog',

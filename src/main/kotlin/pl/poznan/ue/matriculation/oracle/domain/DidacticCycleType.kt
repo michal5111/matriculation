@@ -4,7 +4,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_TYPY_CYKLI_DYDAKTYCZNYCH")
-data class DidacticCycleType(
+class DidacticCycleType(
         @Id
         @Column(name = "KOD", length = 20, nullable = false)
         val code: String,

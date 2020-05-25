@@ -8,7 +8,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_TECZKI")
-data class Folder(
+class Folder(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_TECZ_SEQ")
         @SequenceGenerator(sequenceName = "DZ_TECZ_SEQ", allocationSize = 1, name = "DZ_TECZ_SEQ")

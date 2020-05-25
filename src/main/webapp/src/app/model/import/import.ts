@@ -1,4 +1,4 @@
-import {ImportProgress} from "./import-progress";
+import {ImportProgress} from './import-progress';
 
 export class Import {
 
@@ -18,5 +18,5 @@ export class Import {
 
   didacticCycleCode: string;
 
-  importProgress: ImportProgress
+  importProgress: ImportProgress;
 }

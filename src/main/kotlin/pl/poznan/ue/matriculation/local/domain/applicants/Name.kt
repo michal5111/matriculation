@@ -8,7 +8,7 @@ import javax.persistence.*
 @Entity
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-data class Name(
+class Name(
 
         @JsonIgnore
         @Id

@@ -9,7 +9,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_DOKUMENTY_UPR")
-data class EntitlementDocument(
+class EntitlementDocument(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_DOK_UPR_SEQ")
         @SequenceGenerator(sequenceName = "DZ_DOK_UPR_SEQ", allocationSize = 1, name = "DZ_DOK_UPR_SEQ")

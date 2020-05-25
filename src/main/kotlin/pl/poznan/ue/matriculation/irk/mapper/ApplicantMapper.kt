@@ -147,7 +147,7 @@ class ApplicantMapper(
     }
 
     fun applicantToPersonMapper(applicant: Applicant): Person {
-        applicantService.checkApplicant(applicant)
+        applicantService.check(applicant)
         val defaultStudentOrganizationalUnit: OrganizationalUnit = organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitString)
         val permanentAddressType: AddressType = addressTypeRepository.getOne("STA")
         val correspondenceAddressType: AddressType = addressTypeRepository.getOne("KOR")

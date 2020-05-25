@@ -7,7 +7,7 @@ import javax.persistence.*
 @Entity
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-data class Status(
+class Status(
 
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

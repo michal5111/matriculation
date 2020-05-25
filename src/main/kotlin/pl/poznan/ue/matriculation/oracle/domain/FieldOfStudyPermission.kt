@@ -7,7 +7,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_UPRAWNIENIA_DO_KIERUNKOW")
-data class FieldOfStudyPermission(
+class FieldOfStudyPermission(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_UPR_KIER_SEQ")
         @SequenceGenerator(sequenceName = "DZ_UPR_KIER_SEQ", allocationSize = 1, name = "DZ_UPR_KIER_SEQ")

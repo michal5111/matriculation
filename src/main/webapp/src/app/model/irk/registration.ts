@@ -1,4 +1,4 @@
 export interface Registration {
-  code: string
-  name: string
+  code: string;
+  name: string;
 }

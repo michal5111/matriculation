@@ -8,7 +8,7 @@ import javax.persistence.Entity
 import javax.persistence.Id
 
 @Entity
-data class Turn(
+class Turn(
         @Id
         @Column(name = "date_from")
         val dateFrom: Date?,

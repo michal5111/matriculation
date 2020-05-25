@@ -7,7 +7,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_KIERUNKI_STUDIOW")
-data class FieldOfStudy(
+class FieldOfStudy(
 
         @Id
         @Column(name = "KOD", length = 20, nullable = false)

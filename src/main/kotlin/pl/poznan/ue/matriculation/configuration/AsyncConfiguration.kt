@@ -1,7 +1,6 @@
 package pl.poznan.ue.matriculation.configuration
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.AsyncConfigurer
@@ -13,17 +12,9 @@ import java.util.concurrent.Executor
 
 @Configuration
 @EnableAsync
-class AsyncConfiguration: AsyncConfigurer {
-
-    @Autowired
-    lateinit var asyncExceptionHandler: AsyncExceptionHandler
+class AsyncConfiguration() : AsyncConfigurer {
 
     override fun getAsyncUncaughtExceptionHandler(): AsyncUncaughtExceptionHandler? {
-        return asyncExceptionHandler
-    }
-
-    @Bean
-    fun asyncExceptionHandlerBean(): AsyncExceptionHandler {
         return AsyncExceptionHandler()
     }
 

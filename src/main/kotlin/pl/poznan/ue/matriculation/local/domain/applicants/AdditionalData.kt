@@ -10,7 +10,7 @@ import javax.persistence.*
 @Entity
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-data class AdditionalData(
+class AdditionalData(
 
         @JsonIgnore
         @Id

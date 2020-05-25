@@ -4,7 +4,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_PODSTAWY_PODJECIA_STUDIOW")
-data class GroundsForUndertakingStudies(
+class GroundsForUndertakingStudies(
         @Id
         @Column(name = "KOD", length = 20, nullable = false)
         val code: String,

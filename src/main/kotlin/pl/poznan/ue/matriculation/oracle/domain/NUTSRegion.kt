@@ -3,10 +3,9 @@ package pl.poznan.ue.matriculation.oracle.domain
 import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
-//@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
 @Entity
 @Table(name = "DZ_REGIONY_NUTS")
-data class NUTSRegion(
+class NUTSRegion(
         @Id
         @Column(name = "KOD", length = 10, nullable = false)
         val code: String,

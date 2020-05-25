@@ -6,7 +6,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_BUDYNKI")
-data class Building(
+class Building(
         @Id
         @Column(name = "KOD", length = 20, nullable = false)
         val code: String,

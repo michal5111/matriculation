@@ -1,4 +1,4 @@
-import {ImportStatus} from "./import-status.enum";
+import {ImportStatus} from './import-status.enum';
 
 export class ImportProgress {
   id: number;

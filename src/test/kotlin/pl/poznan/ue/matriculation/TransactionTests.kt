@@ -60,24 +60,4 @@ class TransactionTests {
         assert(import.id != null)
         //assert(import.applications.size > 0)
     }
-
-    @Test
-    fun importTest() {
-        val importFuture = asyncService.importApplicantsAsync(import.id!!)
-        while (true) {
-            if (importFuture.isDone) {
-                assert(importFuture.get() == 55)
-                break
-            }
-            Thread.sleep(1000);
-        }
-        val saveFuture = asyncService.savePersons(import.id!!)
-        while (true) {
-            if (saveFuture.isDone) {
-                assert(saveFuture.get() == 55)
-                break
-            }
-            Thread.sleep(1000);
-        }
-    }
 }

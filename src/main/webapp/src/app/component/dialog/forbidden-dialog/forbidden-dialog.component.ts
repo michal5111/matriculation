@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {MatDialogRef} from "@angular/material/dialog";
+import {Component, OnInit} from '@angular/core';
+import {MatDialogRef} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-forbidden-dialog',
@@ -8,12 +8,13 @@ import {MatDialogRef} from "@angular/material/dialog";
 })
 export class ForbiddenDialogComponent implements OnInit {
 
-  constructor(public dialogRef: MatDialogRef<ForbiddenDialogComponent>) { }
+  constructor(public dialogRef: MatDialogRef<ForbiddenDialogComponent>) {
+  }
 
   ngOnInit(): void {
   }
 
   onClick(event) {
-    this.dialogRef.close()
+    this.dialogRef.close();
   }
 }

@@ -3,10 +3,9 @@ package pl.poznan.ue.matriculation.oracle.domain
 import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
-//@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
 @Entity
 @Table(name = "DZ_URZEDY_SKARBOWE")
-data class TaxOffice(
+class TaxOffice(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_US_SEQ")
         @SequenceGenerator(sequenceName = "DZ_US_SEQ", allocationSize = 1, name = "DZ_US_SEQ")

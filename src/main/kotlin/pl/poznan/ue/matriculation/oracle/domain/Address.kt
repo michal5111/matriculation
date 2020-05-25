@@ -9,7 +9,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_ADRESY")
-data class Address(
+class Address(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_ADR_SEQ")
         @SequenceGenerator(sequenceName = "DZ_ADR_SEQ", allocationSize = 1, name = "DZ_ADR_SEQ")

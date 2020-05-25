@@ -6,7 +6,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_ZDJECIA_OSOB")
-data class PersonPhoto(
+class PersonPhoto(
 
         @Id
         var id: Long? = null,

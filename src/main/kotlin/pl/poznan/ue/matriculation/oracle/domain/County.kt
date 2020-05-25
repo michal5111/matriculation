@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_POWIATY")
-data class County(
+class County(
         @Id
         @Column(name = "KOD", length = 20, nullable = false)
         val code: String,

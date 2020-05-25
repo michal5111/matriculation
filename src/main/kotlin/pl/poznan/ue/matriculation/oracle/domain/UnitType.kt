@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_TYPY_JEDNOSTEK")
-data class UnitType(
+class UnitType(
         @Id
         @Column(name = "KOD", length = 20, nullable = false)
         val code: String,

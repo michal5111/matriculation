@@ -11,7 +11,7 @@ import javax.persistence.*
 @Entity
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-data class Application(
+class Application(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long? = null,
@@ -56,11 +56,11 @@ data class Application(
 
         val irkInstance: String,
 
-        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+        @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "applicant_id", referencedColumnName = "id")
         var applicant: pl.poznan.ue.matriculation.local.domain.applicants.Applicant? = null,
 
-        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+        @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "import_id", referencedColumnName = "id")
         var import: Import? = null
 ): Serializable {

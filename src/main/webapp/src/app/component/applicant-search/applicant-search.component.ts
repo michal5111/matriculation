@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ApplicantService } from '../../service/applicant-service/applicant.service'
-import { Applicant } from '../../model/irk/applicant'
-import { map, tap, flatMap } from 'rxjs/operators';
-import {MatTableDataSource} from "@angular/material/table";
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {ApplicantService} from '../../service/applicant-service/applicant.service';
+import {Applicant} from '../../model/irk/applicant';
+import {flatMap, map, tap} from 'rxjs/operators';
+import {MatTableDataSource} from '@angular/material/table';
 
 @Component({
   selector: 'app-applicant-search',
@@ -29,7 +29,7 @@ export class ApplicantSearchComponent implements OnInit {
     });
     this.applicantFromGroup = this.formBuilder.group({
       applicant: ['', Validators.required]
-    })
+    });
   }
 
   inputDataOnSubmit() {
@@ -40,6 +40,6 @@ export class ApplicantSearchComponent implements OnInit {
       tap(results => this.dataSource.data = results),
       flatMap(applicants => applicants),
       map(applicant => applicant.image$ = this.applicantService.getPhoto(applicant.photo)),
-    ).subscribe()
+    ).subscribe();
   }
 }

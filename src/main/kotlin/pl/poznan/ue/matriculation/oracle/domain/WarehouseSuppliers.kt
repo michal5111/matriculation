@@ -4,7 +4,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_MAG_DOSTAWCY")
-data class WarehouseSuppliers(
+class WarehouseSuppliers(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_MAG_DOST_SEQ")
         @SequenceGenerator(sequenceName = "DZ_MAG_DOST_SEQ", allocationSize = 1, name = "DZ_MAG_DOST_SEQ")

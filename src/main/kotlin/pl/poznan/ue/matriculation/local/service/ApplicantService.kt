@@ -16,7 +16,7 @@ class ApplicantService(
 
     val logger: Logger = LoggerFactory.getLogger(ApplicationService::class.java)
 
-    fun checkApplicant(applicant: Applicant) {
+    fun check(applicant: Applicant) {
 //        applicant.educationData.documents.forEach {
 //            if (it.issueDate == null || it.documentNumber == null) {
 //                throw ApplicantCheckException("Brak daty lub numeru dokumentu uprawniającego do podjęcia studiów")
@@ -27,7 +27,7 @@ class ApplicantService(
         }
     }
 
-    fun updateApplicant(applicant: Applicant, applicantDTO: ApplicantDTO): Applicant {
+    fun update(applicant: Applicant, applicantDTO: ApplicantDTO): Applicant {
         applicant.apply {
             email = applicantDTO.email
             indexNumber = applicantDTO.indexNumber
@@ -106,7 +106,6 @@ class ApplicantService(
             }
             applicantDTO.educationData.let {
                 applicant.educationData.apply {
-                    documentRepository.deleteAllByEducationData(this)
                     it.documents = listOf()
                     it.documents.forEach { documentDto ->
                         educationData.documents.add(

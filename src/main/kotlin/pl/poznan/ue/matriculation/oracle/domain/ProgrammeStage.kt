@@ -4,7 +4,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_ETAPY_PROGRAMOW")
-data class ProgrammeStage(
+class ProgrammeStage(
 
         @EmbeddedId
         val programmeStageId: ProgrammeStageId,

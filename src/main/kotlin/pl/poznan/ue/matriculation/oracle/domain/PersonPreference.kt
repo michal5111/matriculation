@@ -6,7 +6,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_PREFERENCJE_OSOB")
-data class PersonPreference(
+class PersonPreference(
         @Id
         @JsonIgnore
         @ManyToOne(fetch = FetchType.LAZY)

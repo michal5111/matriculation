@@ -7,7 +7,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "DZ_TYPY_ADRESOW")
-data class AddressType(
+class AddressType(
         @Id
         @Column(name = "KOD", length = 20, nullable = false)
         val code: String,

@@ -4,16 +4,16 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_TYPY_TELEFONOW")
-data class PhoneNumberType(
-    @Id
-    @Column(name = "KOD", length = 20, nullable = false)
-    val code: String,
+class PhoneNumberType(
+        @Id
+        @Column(name = "KOD", length = 20, nullable = false)
+        val code: String,
 
-    @Column(name = "OPIS", length = 100, nullable = false)
-    var description: String,
+        @Column(name = "OPIS", length = 100, nullable = false)
+        var description: String,
 
-    @Column(name = "CZY_DOMYSLNY", length = 1, nullable = false)
-    var isDefault: Char,
+        @Column(name = "CZY_DOMYSLNY", length = 1, nullable = false)
+        var isDefault: Char,
 
 //    @Column(name = "UTW_ID", nullable = false)
 //    val creatorOracleUser: String? = null,

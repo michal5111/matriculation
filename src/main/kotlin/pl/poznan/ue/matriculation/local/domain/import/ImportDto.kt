@@ -1,6 +1,6 @@
 package pl.poznan.ue.matriculation.local.domain.import
 
-data class ImportDto(
+class ImportDto(
         val programmeCode: String,
         val registration: String,
         val indexPoolCode: String,

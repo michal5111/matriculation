@@ -1,4 +1,4 @@
-import {Principal} from "./principal";
+import {Principal} from './principal';
 
 export interface CasAssertion {
   validFromDate: Date;

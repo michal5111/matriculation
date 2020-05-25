@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_TYTULY")
-data class Title(
+class Title(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_TYT_SEQ")
         @SequenceGenerator(sequenceName = "DZ_TYT_SEQ", allocationSize = 1, name = "DZ_TYT_SEQ")

@@ -1,7 +1,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
-import {ErrorDialogData} from "../../../model/dialog/error-dialog-data";
-import {HttpErrorResponse} from "@angular/common/http";
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {ErrorDialogData} from '../../../model/dialog/error-dialog-data';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-error-dialog',
@@ -10,7 +10,7 @@ import {HttpErrorResponse} from "@angular/common/http";
 })
 export class ErrorDialogComponent implements OnInit {
 
-  message: string
+  message: string;
 
   constructor(
     public dialogRef: MatDialogRef<ErrorDialogComponent>,
@@ -20,7 +20,7 @@ export class ErrorDialogComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.data.error instanceof HttpErrorResponse) {
-      this.message = this.data.error.error.message
+      this.message = this.data.error.error.message;
     }
   }
 

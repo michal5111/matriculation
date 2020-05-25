@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_ZGLOSZENIA_REKRUTACYJNE")
-data class IrkApplication(
+class IrkApplication(
 
         @Id
         val id: Long? = null,

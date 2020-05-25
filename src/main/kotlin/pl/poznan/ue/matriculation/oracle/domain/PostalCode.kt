@@ -4,7 +4,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_KODY_POCZTOWE")
-data class PostalCode(
+class PostalCode(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_KOD_POCZ_SEQ")
         @SequenceGenerator(sequenceName = "DZ_KOD_POCZ_SEQ", allocationSize = 1, name = "DZ_KOD_POCZ_SEQ")

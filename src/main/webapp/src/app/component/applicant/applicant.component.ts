@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { Applicant } from '../../model/irk/applicant'
-import { ApplicantService } from '../../service/applicant-service/applicant.service';
-import { ActivatedRoute } from '@angular/router'
+import {Component, OnInit} from '@angular/core';
+import {Applicant} from '../../model/irk/applicant';
+import {ApplicantService} from '../../service/applicant-service/applicant.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-applicant',
@@ -18,11 +18,11 @@ export class ApplicantComponent implements OnInit {
   ngOnInit() {
     this.id = this.route.snapshot.params.id;
     if (!this.id) {
-      return
+      return;
     }
     this.applicantService.getApplicantById(this.id).subscribe(applicant => {
       this.applicant = applicant;
-    })
+    });
   }
 
 }

@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_TELEFONY")
-data class PhoneNumber(
+class PhoneNumber(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_TEL_SEQ")
         @SequenceGenerator(sequenceName = "DZ_TEL_SEQ", allocationSize = 1, name = "DZ_TEL_SEQ")

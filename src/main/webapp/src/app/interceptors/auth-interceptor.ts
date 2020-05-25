@@ -1,16 +1,10 @@
 import {Injectable} from '@angular/core';
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor,
-  HttpErrorResponse
-} from '@angular/common/http';
+import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {tap} from 'rxjs/operators';
-import {MatDialog} from "@angular/material/dialog";
-import {UnauthorizedDialogComponent} from "../component/dialog/unauthorized-dialog/unauthorized-dialog.component";
-import {UserService} from "../service/user-service/user.service";
+import {MatDialog} from '@angular/material/dialog';
+import {UnauthorizedDialogComponent} from '../component/dialog/unauthorized-dialog/unauthorized-dialog.component';
+import {UserService} from '../service/user-service/user.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -31,7 +25,7 @@ export class AuthInterceptor implements HttpInterceptor {
             const dialogRef = this.dialog.open(UnauthorizedDialogComponent, {
               width: '250px'
             });
-            this.userService.isAuthenticated = false
+            this.userService.isAuthenticated = false;
           }
           if (err.status === 403) {
             const dialogRef = this.dialog.open(UnauthorizedDialogComponent, {

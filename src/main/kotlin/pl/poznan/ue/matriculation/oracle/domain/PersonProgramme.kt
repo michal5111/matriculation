@@ -9,7 +9,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_PROGRAMY_OSOB")
-data class PersonProgramme(
+class PersonProgramme(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_PRGOS_SEQ")
         @SequenceGenerator(sequenceName = "DZ_PRGOS_SEQ", allocationSize = 1, name = "DZ_PRGOS_SEQ")
@@ -18,7 +18,7 @@ data class PersonProgramme(
 
         @JsonIgnore
         @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
-        @JoinColumn(name = "OS_ID",referencedColumnName = "ID", nullable = false)
+        @JoinColumn(name = "OS_ID", referencedColumnName = "ID", nullable = false)
         var person: Person,
 
         @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])

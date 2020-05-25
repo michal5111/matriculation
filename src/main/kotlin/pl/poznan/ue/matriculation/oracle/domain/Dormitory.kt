@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_AKADEMIKI")
-data class Dormitory(
+class Dormitory(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_AKADEMIKI_SEQ")
         @SequenceGenerator(sequenceName = "DZ_AKADEMIKI_SEQ", allocationSize = 1, name = "DZ_AKADEMIKI_SEQ")

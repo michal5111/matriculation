@@ -1,6 +1,5 @@
-import {Principal} from "./principal";
-import {CasAssertion} from "./casAssertion";
-import {Authority} from "./authority";
+import {CasAssertion} from './casAssertion';
+import {Authority} from './authority';
 
 export interface User {
   authorities: Authority[];

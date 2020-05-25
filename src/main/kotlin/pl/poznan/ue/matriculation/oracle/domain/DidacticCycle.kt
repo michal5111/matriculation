@@ -8,7 +8,7 @@ import javax.persistence.*
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_CYKLE_DYDAKTYCZNE")
-data class DidacticCycle(
+class DidacticCycle(
         @Id
         @Column(name = "KOD", length = 20, nullable = false)
         val code: String,

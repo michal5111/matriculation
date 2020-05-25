@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
-//@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
 @Entity
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_SZKOLY")
-data class School(
+class School(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_SZK_SEQ")
         @SequenceGenerator(sequenceName = "DZ_SZK_SEQ", allocationSize = 1, name = "DZ_SZK_SEQ")

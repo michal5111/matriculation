@@ -6,7 +6,7 @@ import java.io.Serializable
 import javax.persistence.*
 
 @Entity
-data class ImportProgress(
+class ImportProgress(
         @Id
         var id: Long? = null,
 

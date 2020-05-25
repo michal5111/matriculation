@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { ApplicationsService } from '../../service/application-service/applications.service';
-import { ApplicantService } from '../../service/applicant-service/applicant.service'
-import { Page } from '../../model/irk/page';
+import {Component, OnInit} from '@angular/core';
+import {ApplicationsService} from '../../service/application-service/applications.service';
+import {ApplicantService} from '../../service/applicant-service/applicant.service';
+import {Page} from '../../model/irk/page';
 import {FormBuilder, FormGroup} from '@angular/forms';
-import {MatTableDataSource} from "@angular/material/table";
-import {Application} from "../../model/irk/application";
+import {MatTableDataSource} from '@angular/material/table';
+import {Application} from '../../model/irk/application';
 
 @Component({
   selector: 'app-applications',
@@ -33,7 +33,7 @@ export class ApplicationsComponent implements OnInit {
       programmeInput: [''],
       registrationInput: ['']
     });
-    //this.getPage()
+    // this.getPage()
   }
 
   // getPage() {

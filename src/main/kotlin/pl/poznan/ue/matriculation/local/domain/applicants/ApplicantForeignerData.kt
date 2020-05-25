@@ -11,7 +11,7 @@ import javax.persistence.*
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "ApplicantForeignerData")
-data class ApplicantForeignerData(
+class ApplicantForeignerData(
 
         @JsonIgnore
         @Id

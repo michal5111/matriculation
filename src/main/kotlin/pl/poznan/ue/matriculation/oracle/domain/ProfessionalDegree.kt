@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_STOPNIE_ZAWODOWE")
-data class ProfessionalDegree(
+class ProfessionalDegree(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_STZA_SEQ")
         @SequenceGenerator(sequenceName = "DZ_STZA_SEQ", allocationSize = 1, name = "DZ_STZA_SEQ")
