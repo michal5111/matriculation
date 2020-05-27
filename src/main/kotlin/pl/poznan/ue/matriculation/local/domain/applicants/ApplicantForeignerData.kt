@@ -33,32 +33,26 @@ class ApplicantForeignerData(
 
         var polishCardValidTo: String?
 ): Serializable {
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
 
-                other as ApplicantForeignerData
+    override fun toString(): String {
+        return "ApplicantForeignerData(baseOfStay=$baseOfStay, polishCardIssueCountry=$polishCardIssueCountry, " +
+                "polishCardIssueDate=$polishCardIssueDate, polishCardNumber=$polishCardNumber, " +
+                "polishCardValidTo=$polishCardValidTo)"
+    }
 
-                if (baseOfStay != other.baseOfStay) return false
-                if (polishCardIssueCountry != other.polishCardIssueCountry) return false
-                if (polishCardIssueDate != other.polishCardIssueDate) return false
-                if (polishCardNumber != other.polishCardNumber) return false
-                if (polishCardValidTo != other.polishCardValidTo) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                return true
+        other as ApplicantForeignerData
+
+        if (applicant != other.applicant) return false
+
+        return true
         }
 
         override fun hashCode(): Int {
-                var result = baseOfStay?.hashCode() ?: 0
-                result = 31 * result + (polishCardIssueCountry?.hashCode() ?: 0)
-                result = 31 * result + (polishCardIssueDate?.hashCode() ?: 0)
-                result = 31 * result + (polishCardNumber?.hashCode() ?: 0)
-                result = 31 * result + (polishCardValidTo?.hashCode() ?: 0)
-                return result
-        }
-
-        override fun toString(): String {
-                return "ApplicantForeignerData(baseOfStay=$baseOfStay, polishCardIssueCountry=$polishCardIssueCountry, polishCardIssueDate=$polishCardIssueDate, polishCardNumber=$polishCardNumber, polishCardValidTo=$polishCardValidTo)"
+            return applicant?.hashCode() ?: 0
         }
 
 

@@ -23,28 +23,25 @@ class ApplicationForeignerData(
 
         var sourceOfFinancing: String?
 ): Serializable {
+
+        override fun toString(): String {
+                return "ApplicationForeignerData(baseOfStay=$baseOfStay, basisOfAdmission=$basisOfAdmission, " +
+                        "sourceOfFinancing=$sourceOfFinancing)"
+        }
+
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (javaClass != other?.javaClass) return false
 
                 other as ApplicationForeignerData
 
-                if (baseOfStay != other.baseOfStay) return false
-                if (basisOfAdmission != other.basisOfAdmission) return false
-                if (sourceOfFinancing != other.sourceOfFinancing) return false
+                if (application != other.application) return false
 
                 return true
         }
 
         override fun hashCode(): Int {
-                var result = baseOfStay?.hashCode() ?: 0
-                result = 31 * result + (basisOfAdmission?.hashCode() ?: 0)
-                result = 31 * result + (sourceOfFinancing?.hashCode() ?: 0)
-                return result
-        }
-
-        override fun toString(): String {
-                return "ApplicationForeignerData(baseOfStay=$baseOfStay, basisOfAdmission=$basisOfAdmission, sourceOfFinancing=$sourceOfFinancing)"
+                return application?.hashCode() ?: 0
         }
 
 

@@ -30,13 +30,4 @@ class AngularWebMvcConfigurer: WebMvcConfigurer {
                     }
                 })
     }
-
-//    override fun extendMessageConverters(converters: List<HttpMessageConverter<*>>) {
-//        for (converter in converters) {
-//            if (converter is org.springframework.http.converter.json.MappingJackson2HttpMessageConverter) {
-//                val mapper = converter.objectMapper
-//                mapper.registerModule(Hibernate5Module())
-//            }
-//        }
-//    }
 }

@@ -30,36 +30,24 @@ class ImportProgress(
         @Lob
         var error: String? = null
 ): Serializable {
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
 
-                other as ImportProgress
+    override fun toString(): String {
+        return "ImportProgress(id=$id, importedApplications=$importedApplications, saveErrors=$saveErrors, savedApplicants=$savedApplicants, totalCount=$totalCount, importStatus=$importStatus, error=$error)"
+    }
 
-                if (id != other.id) return false
-                if (importedApplications != other.importedApplications) return false
-                if (saveErrors != other.saveErrors) return false
-                if (savedApplicants != other.savedApplicants) return false
-                if (totalCount != other.totalCount) return false
-                if (importStatus != other.importStatus) return false
-                if (error != other.error) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                return true
+        other as ImportProgress
+
+        if (id != other.id) return false
+
+        return true
         }
 
         override fun hashCode(): Int {
-                var result = id?.hashCode() ?: 0
-                result = 31 * result + importedApplications
-                result = 31 * result + saveErrors
-                result = 31 * result + savedApplicants
-                result = 31 * result + (totalCount ?: 0)
-                result = 31 * result + importStatus.hashCode()
-                result = 31 * result + (error?.hashCode() ?: 0)
-                return result
-        }
-
-        override fun toString(): String {
-                return "ImportProgress(id=$id, importedApplications=$importedApplications, saveErrors=$saveErrors, savedApplicants=$savedApplicants, totalCount=$totalCount, importStatus=$importStatus, error=$error)"
+            return id?.hashCode() ?: 0
         }
 
 

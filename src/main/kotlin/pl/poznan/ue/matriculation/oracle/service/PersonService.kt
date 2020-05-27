@@ -11,7 +11,6 @@ import pl.poznan.ue.matriculation.irk.mapper.StudentMapper
 import pl.poznan.ue.matriculation.irk.service.IrkService
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applications.Application
-import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.service.ApplicantService
 import pl.poznan.ue.matriculation.oracle.domain.*
 import pl.poznan.ue.matriculation.oracle.repo.*
@@ -258,7 +257,16 @@ class PersonService(
     }
 
     @Transactional(rollbackFor = [java.lang.Exception::class, RuntimeException::class], propagation = Propagation.REQUIRED, transactionManager = "oracleTransactionManager")
-    fun processPerson(import: Import, application: Application): Pair<Long?, String> {
+    fun processPerson(
+            application: Application,
+            dateOfAddmision: Date,
+            didacticCycleCode: String,
+            indexPoolCode: String,
+            programmeCode: String,
+            registration: String,
+            stageCode: String,
+            startDate: Date
+    ): Pair<Person, String> {
         var person: Person? = null
         application.applicant!!.usosId?.let { usosId ->
             person = personRepository.findByIdOrNull(usosId)
@@ -286,15 +294,15 @@ class PersonService(
         )
         val assignedIndexNumber = _self.immatriculate(
                 person = person!!,
-                dateOfAddmision = import.dateOfAddmision,
-                didacticCycleCode = import.didacticCycleCode,
-                indexPoolCode = import.indexPoolCode,
-                programmeCode = import.programmeCode,
-                registration = import.registration,
-                stageCode = import.stageCode,
-                startDate = import.startDate,
+                dateOfAddmision = dateOfAddmision,
+                didacticCycleCode = didacticCycleCode,
+                indexPoolCode = indexPoolCode,
+                programmeCode = programmeCode,
+                registration = registration,
+                stageCode = stageCode,
+                startDate = startDate,
                 irkApplication = irkApplication
         )
-        return Pair(person!!.id, assignedIndexNumber)
+        return Pair(person!!, assignedIndexNumber)
     }
 }

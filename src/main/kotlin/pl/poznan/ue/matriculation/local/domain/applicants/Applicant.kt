@@ -72,25 +72,22 @@ class Applicant(
         @OneToMany(mappedBy = "applicant")
         var applications: MutableList<Application> = mutableListOf()
 ) {
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
 
-                other as Applicant
+    override fun toString(): String {
+        return "Applicant(id=$id, irkId=$irkId, email='$email', indexNumber=$indexNumber, " +
+                "password='$password', name=$name, phone=$phone, citizenship=$citizenship, " +
+                "photo=$photo, photoPermission=$photoPermission, casPasswordOverride=$casPasswordOverride, " +
+                "modificationDate=$modificationDate, usosId=$usosId)"
+    }
 
-                if (id != other.id) return false
-                if (irkId != other.irkId) return false
-                if (email != other.email) return false
-                if (indexNumber != other.indexNumber) return false
-                if (password != other.password) return false
-                if (name != other.name) return false
-                if (phone != other.phone) return false
-                if (citizenship != other.citizenship) return false
-                if (photo != other.photo) return false
-                if (photoPermission != other.photoPermission) return false
-                if (casPasswordOverride != other.casPasswordOverride) return false
-                if (modificationDate != other.modificationDate) return false
-                if (usosId != other.usosId) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Applicant
+
+        if (id != other.id) return false
+        if (irkId != other.irkId) return false
 
                 return true
         }
@@ -98,22 +95,7 @@ class Applicant(
         override fun hashCode(): Int {
                 var result = id?.hashCode() ?: 0
                 result = 31 * result + irkId.hashCode()
-                result = 31 * result + email.hashCode()
-                result = 31 * result + (indexNumber?.hashCode() ?: 0)
-                result = 31 * result + password.hashCode()
-                result = 31 * result + name.hashCode()
-                result = 31 * result + (phone?.hashCode() ?: 0)
-                result = 31 * result + (citizenship?.hashCode() ?: 0)
-                result = 31 * result + (photo?.hashCode() ?: 0)
-                result = 31 * result + (photoPermission?.hashCode() ?: 0)
-                result = 31 * result + (casPasswordOverride?.hashCode() ?: 0)
-                result = 31 * result + modificationDate.hashCode()
-                result = 31 * result + (usosId?.hashCode() ?: 0)
                 return result
-        }
-
-        override fun toString(): String {
-                return "Applicant(id=$id, irkId=$irkId, email='$email', indexNumber=$indexNumber, password='$password', name=$name, phone=$phone, citizenship=$citizenship, photo=$photo, photoPermission=$photoPermission, casPasswordOverride=$casPasswordOverride, modificationDate=$modificationDate, usosId=$usosId)"
         }
 
 

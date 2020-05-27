@@ -3,6 +3,7 @@ package pl.poznan.ue.matriculation.local.domain.applications
 
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import pl.poznan.ue.matriculation.local.domain.Turn
+import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import java.io.Serializable
@@ -56,14 +57,21 @@ class Application(
 
         val irkInstance: String,
 
-        @ManyToOne(fetch = FetchType.LAZY)
+        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
         @JoinColumn(name = "applicant_id", referencedColumnName = "id")
-        var applicant: pl.poznan.ue.matriculation.local.domain.applicants.Applicant? = null,
+        var applicant: Applicant? = null,
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "import_id", referencedColumnName = "id")
         var import: Import? = null
 ): Serializable {
+
+        override fun toString(): String {
+                return "Application(id=$id, irkId=$irkId, admitted=$admitted, comment=$comment, payment=$payment, " +
+                        "position=$position, qualified=$qualified, score=$score, importError=$importError, " +
+                        "stackTrace=$stackTrace, irkInstance='$irkInstance')"
+        }
+
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (javaClass != other?.javaClass) return false
@@ -72,15 +80,6 @@ class Application(
 
                 if (id != other.id) return false
                 if (irkId != other.irkId) return false
-                if (admitted != other.admitted) return false
-                if (comment != other.comment) return false
-                if (payment != other.payment) return false
-                if (position != other.position) return false
-                if (qualified != other.qualified) return false
-                if (score != other.score) return false
-                if (importError != other.importError) return false
-                if (stackTrace != other.stackTrace) return false
-                if (irkInstance != other.irkInstance) return false
 
                 return true
         }
@@ -88,20 +87,7 @@ class Application(
         override fun hashCode(): Int {
                 var result = id?.hashCode() ?: 0
                 result = 31 * result + irkId.hashCode()
-                result = 31 * result + (admitted?.hashCode() ?: 0)
-                result = 31 * result + (comment?.hashCode() ?: 0)
-                result = 31 * result + (payment?.hashCode() ?: 0)
-                result = 31 * result + (position?.hashCode() ?: 0)
-                result = 31 * result + (qualified?.hashCode() ?: 0)
-                result = 31 * result + (score?.hashCode() ?: 0)
-                result = 31 * result + (importError?.hashCode() ?: 0)
-                result = 31 * result + (stackTrace?.hashCode() ?: 0)
-                result = 31 * result + irkInstance.hashCode()
                 return result
-        }
-
-        override fun toString(): String {
-                return "Application(id=$id, irkId=$irkId, admitted=$admitted, comment=$comment, payment=$payment, position=$position, qualified=$qualified, score=$score, importError=$importError, stackTrace=$stackTrace, irkInstance='$irkInstance')"
         }
 
 

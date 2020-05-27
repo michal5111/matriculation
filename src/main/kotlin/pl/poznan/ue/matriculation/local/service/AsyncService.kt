@@ -1,20 +1,17 @@
 package pl.poznan.ue.matriculation.local.service
 
-import org.hibernate.JDBCException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import pl.poznan.ue.matriculation.exception.ImportException
 import pl.poznan.ue.matriculation.irk.service.IrkService
-import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
 import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
+import javax.persistence.EntityManager
+import javax.persistence.PersistenceContext
 
 @Service
 class AsyncService(
@@ -27,6 +24,9 @@ class AsyncService(
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(AsyncService::class.java)
+
+    @PersistenceContext
+    private lateinit var localEntityManager: EntityManager
 
     @Async
     fun importApplicantsAsync(importId: Long) {
@@ -55,7 +55,8 @@ class AsyncService(
                 }
                 logger.debug("Przetwarzam osoby...")
                 page.results.forEach {
-                    processService.processApplication(importId, it)
+                    val application = processService.processApplication(importId, it)
+                    localEntityManager.detach(application)
                 }
                 logger.debug("Przetworzyłem osoby...")
                 hasNext = page.next != null
@@ -71,20 +72,18 @@ class AsyncService(
 
     @Async
     fun savePersons(importId: Long) {
-        val pageRequest: Pageable = PageRequest.of(0, 20)
-        var applicationsPage: Page<Application> = applicationRepository.getAllByImportIdAndApplicationImportStatus(pageRequest, importId)
-        while (!applicationsPage.isEmpty) {
-            applicationsPage.content.forEach {
-                try {
-                    processService.processPerson(it, importId)
-                } catch (e: JDBCException) {
-                    processService.handleSaveJdbcException(e, it, importId)
-                } catch (e: Exception) {
-                    processService.handleSaveException(e, it, importId)
-                }
-            }
-            applicationsPage = applicationRepository.getAllByImportIdAndApplicationImportStatus(pageRequest, importId)
-        }
+        val import = importRepository.getOne(importId)
+        processService.processPersons(
+                importId = importId,
+                dateOfAddmision = import.dateOfAddmision,
+                didacticCycleCode = import.didacticCycleCode,
+                indexPoolCode = import.indexPoolCode,
+                programmeCode = import.programmeCode,
+                registration = import.registration,
+                stageCode = import.stageCode,
+                startDate = import.startDate
+        )
         processService.setSaveComplete(importId)
     }
+
 }

@@ -30,32 +30,26 @@ class EducationData(
 
         var highSchoolUsosCode: Long?
 ): Serializable {
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
 
-                other as EducationData
+    override fun toString(): String {
+        return "EducationData(applicantId=$applicantId, highSchoolCity=$highSchoolCity, " +
+                "highSchoolName=$highSchoolName, highSchoolType=$highSchoolType, " +
+                "highSchoolUsosCode=$highSchoolUsosCode)"
+    }
 
-                if (applicantId != other.applicantId) return false
-                if (highSchoolCity != other.highSchoolCity) return false
-                if (highSchoolName != other.highSchoolName) return false
-                if (highSchoolType != other.highSchoolType) return false
-                if (highSchoolUsosCode != other.highSchoolUsosCode) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                return true
+        other as EducationData
+
+        if (applicantId != other.applicantId) return false
+
+        return true
         }
 
         override fun hashCode(): Int {
-                var result = applicantId?.hashCode() ?: 0
-                result = 31 * result + (highSchoolCity?.hashCode() ?: 0)
-                result = 31 * result + (highSchoolName?.hashCode() ?: 0)
-                result = 31 * result + (highSchoolType?.hashCode() ?: 0)
-                result = 31 * result + (highSchoolUsosCode?.hashCode() ?: 0)
-                return result
-        }
-
-        override fun toString(): String {
-                return "EducationData(applicantId=$applicantId, highSchoolCity=$highSchoolCity, highSchoolName=$highSchoolName, highSchoolType=$highSchoolType, highSchoolUsosCode=$highSchoolUsosCode)"
+            return applicantId?.hashCode() ?: 0
         }
 
 

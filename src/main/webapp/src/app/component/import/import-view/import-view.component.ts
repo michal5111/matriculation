@@ -31,7 +31,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   import: Import;
   importProgress: ImportProgress;
   progressSubscription: Subscription;
-  pageSize = 15;
+  pageSize = 5;
   pageNumber = 0;
   totalElements = 0;
   page: Page<Application>;

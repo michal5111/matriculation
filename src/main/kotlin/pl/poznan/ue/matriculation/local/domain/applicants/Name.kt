@@ -21,30 +21,24 @@ class Name(
         var given: String?,
         var maiden: String?
 ): Serializable {
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
 
-                other as Name
+    override fun toString(): String {
+        return "Name(middle=$middle, family=$family, given=$given, maiden=$maiden)"
+    }
 
-                if (middle != other.middle) return false
-                if (family != other.family) return false
-                if (given != other.given) return false
-                if (maiden != other.maiden) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                return true
+        other as Name
+
+        if (applicant != other.applicant) return false
+
+        return true
         }
 
         override fun hashCode(): Int {
-                var result = middle?.hashCode() ?: 0
-                result = 31 * result + (family?.hashCode() ?: 0)
-                result = 31 * result + (given?.hashCode() ?: 0)
-                result = 31 * result + (maiden?.hashCode() ?: 0)
-                return result
-        }
-
-        override fun toString(): String {
-                return "Name(middle=$middle, family=$family, given=$given, maiden=$maiden)"
+            return applicant?.hashCode() ?: 0
         }
 
 

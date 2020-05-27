@@ -19,26 +19,24 @@ class Status(
 
         val status: String
 ): Serializable {
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
 
-                other as Status
+    override fun toString(): String {
+        return "Status(id=$id, status='$status')"
+    }
 
-                if (id != other.id) return false
-                if (status != other.status) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                return true
+        other as Status
+
+        if (id != other.id) return false
+
+        return true
         }
 
         override fun hashCode(): Int {
-                var result = id?.hashCode() ?: 0
-                result = 31 * result + status.hashCode()
-                return result
-        }
-
-        override fun toString(): String {
-                return "Status(id=$id, status='$status')"
+            return id?.hashCode() ?: 0
         }
 
 

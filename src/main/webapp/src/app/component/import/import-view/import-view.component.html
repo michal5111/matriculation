@@ -7,10 +7,12 @@
     <mat-card class="card-centered">
       <mat-card-title>
         <p>Import rekrutacji {{import.registration}}</p>
-        <p>Kod programu: {{import.programmeCode}}</p>
-        <p>Kod cyklu dydaktycznego: {{import.didacticCycleCode}}</p>
       </mat-card-title>
       <mat-card-subtitle>
+        <p>Kod programu: {{import.programmeCode}}</p>
+        <p>Kod etapu: {{import.stageCode}}</p>
+        <p>Kod cyklu dydaktycznego: {{import.didacticCycleCode}}</p>
+        <p>Kod puli indeksów: {{import.indexPoolCode}}</p>
         <p>Data rozpoczęcia programu: {{import.startDate | date: 'dd.MM.yyyy'}}</p>
         <p>Data przyjęcia na program: {{import.dateOfAddmision | date: 'dd.MM.yyyy'}}</p>
       </mat-card-subtitle>
@@ -211,7 +213,7 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-paginator [pageSizeOptions]="[10, 15, 20, 25, 50, 100]"
+    <mat-paginator [pageSizeOptions]="[5, 10, 15, 20, 25, 50, 100]"
                    showFirstLastButtons
                    [length]="totalElements"
                    [pageSize]="pageSize"
