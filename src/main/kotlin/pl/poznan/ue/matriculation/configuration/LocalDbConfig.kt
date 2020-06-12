@@ -60,7 +60,7 @@ class LocalDbConfig {
             @Qualifier("dataSource") dataSource: DataSource
     ): LocalContainerEntityManagerFactoryBean? {
         val properties: MutableMap<String, Any> = HashMap()
-        properties["hibernate.hbm2ddl.auto"] = "create"
+        properties["hibernate.hbm2ddl.auto"] = "update"
         properties["hibernate.dialect"] = localDbHibernateDialect
         return builder
                 .dataSource(dataSource)

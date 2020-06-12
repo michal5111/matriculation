@@ -1,15 +1,17 @@
 package pl.poznan.ue.matriculation.oracle.service
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import pl.poznan.ue.matriculation.irk.mapper.ApplicantMapper
-import pl.poznan.ue.matriculation.irk.mapper.StudentMapper
+import org.springframework.web.client.HttpStatusCodeException
+import pl.poznan.ue.matriculation.irk.dto.ErrorMessageDto
 import pl.poznan.ue.matriculation.irk.service.IrkService
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
+import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.service.ApplicantService
 import pl.poznan.ue.matriculation.oracle.domain.*
@@ -20,8 +22,7 @@ import javax.annotation.PostConstruct
 @Service
 class PersonService(
         private val personRepository: PersonRepository,
-        private val applicantMapper: ApplicantMapper,
-        private val studentMapper: StudentMapper,
+        private val studentService: StudentService,
         private val studentRepository: StudentRepository,
         private val personProgrammeRepository: PersonProgrammeRepository,
         private val organizationalUnitRepository: OrganizationalUnitRepository,
@@ -35,7 +36,8 @@ class PersonService(
         private val irkService: IrkService,
         private val entitlementDocumentRepository: EntitlementDocumentRepository,
         private val applicantService: ApplicantService,
-        private val addressService: AddressService
+        private val addressService: AddressService,
+        private val irkApplicationRepository: IrkApplicationRepository
 ) {
 
     @Autowired
@@ -47,8 +49,14 @@ class PersonService(
     @Value("\${pl.poznan.ue.matriculation.defaultStudentOrganizationalUnit}")
     lateinit var defaultStudentOrganizationalUnitString: String
 
-    fun mapPerson(applicant: Applicant): Person {
-        return applicantMapper.applicantToPersonMapper(applicant)
+    @Value("\${pl.poznan.ue.matriculation.universityEmailSuffix}")
+    lateinit var universityEmailSuffix: String
+
+    @Value("\${pl.poznan.ue.matriculation.setAsAccepted}")
+    private var setAsAccepted: Boolean = false
+
+    fun create(applicant: Applicant): Person {
+        return applicantService.createPersonFromApplicant(applicant)
     }
 
     @PostConstruct
@@ -59,10 +67,13 @@ class PersonService(
     }
 
     @Transactional(rollbackFor = [java.lang.Exception::class, RuntimeException::class], propagation = Propagation.MANDATORY, transactionManager = "oracleTransactionManager")
-    fun updatePerson(applicant: Applicant, person: Person) {
-        applicantService.check(applicant)
+    fun update(applicant: Applicant, person: Person) {
         person.apply {
-            email = applicant.email
+            if (applicant.email.endsWith(universityEmailSuffix)) {
+                email = applicant.email
+            } else {
+                privateEmail = applicant.email
+            }
             name = applicant.name.given!!
             middleName = applicant.name.middle
             surname = applicant.name.family!!
@@ -76,8 +87,8 @@ class PersonService(
             middleSchool = applicant.educationData.highSchoolUsosCode?.let {
                 schoolRepository.getOne(it)
             }
-            updateAddresses(this, applicant)
-            updatePhoneNumbers(this, applicant)
+            createOrUpdateAddresses(this, applicant)
+            createOrUpdatePhoneNumbers(this, applicant)
 
             //dok toż
 
@@ -86,71 +97,83 @@ class PersonService(
             wku = applicant.additionalData.wku?.let {
                 wkuRepository.getOne(it)
             }
-            updateEntitlementDocument(person, applicant)
+            createOrUpdateEntitlementDocument(person, applicant)
             militaryCategory = applicant.additionalData.militaryCategory
             militaryStatus = applicant.additionalData.militaryStatus
-            updatePersonPhoto(person, applicant)
+            createOrUpdatePersonPhoto(person, applicant)
         }
     }
 
-    private fun updateAddresses(person: Person, applicant: Applicant) {
-        val permanentAddress = addressRepository.findByPersonAndAddressType(person, permanentAddressType)
-        if (permanentAddress != null) {
+    private fun createOrUpdateAddresses(person: Person, applicant: Applicant) {
+        createOrUpdateAddress(
+                person = person,
+                addressType = permanentAddressType,
+                city = applicant.contactData.officialCity,
+                street = applicant.contactData.officialStreet,
+                houseNumber = applicant.contactData.officialStreetNumber,
+                apartmentNumber = applicant.contactData.officialFlatNumber,
+                zipCode = applicant.contactData.officialPostCode,
+                cityIsCity = applicant.contactData.officialCityIsCity,
+                countryCode = applicant.contactData.officialCountry
+        )
+
+        createOrUpdateAddress(
+                person = person,
+                addressType = correspondenceAddressType,
+                city = applicant.contactData.realCity,
+                street = applicant.contactData.realStreet,
+                houseNumber = applicant.contactData.realStreetNumber,
+                apartmentNumber = applicant.contactData.realFlatNumber,
+                zipCode = applicant.contactData.realPostCode,
+                cityIsCity = applicant.contactData.realCityIsCity,
+                countryCode = applicant.contactData.realCountry
+        )
+    }
+
+    private fun createOrUpdateAddress(
+            person: Person,
+            addressType: AddressType,
+            city: String?,
+            street: String?,
+            houseNumber: String?,
+            apartmentNumber: String?,
+            zipCode: String?,
+            cityIsCity: Boolean,
+            countryCode: String?
+    ) {
+        if (city.isNullOrBlank() || street.isNullOrBlank() || houseNumber.isNullOrBlank() || zipCode.isNullOrBlank()) {
+            return
+        }
+        val address = addressRepository.findByPersonAndAddressType(person, addressType)
+        if (address != null) {
             addressService.update(
-                    address = permanentAddress,
-                    city = applicant.contactData.officialCity,
-                    street = applicant.contactData.officialStreet,
-                    houseNumber = applicant.contactData.officialStreetNumber,
-                    apartmentNumber = applicant.contactData.officialFlatNumber,
-                    zipCode = applicant.contactData.officialPostCode,
-                    cityIsCity = applicant.contactData.officialCityIsCity,
-                    countryCode = applicant.contactData.officialCountry
+                    address = address,
+                    city = city,
+                    street = street,
+                    houseNumber = houseNumber,
+                    apartmentNumber = apartmentNumber,
+                    zipCode = zipCode,
+                    cityIsCity = cityIsCity,
+                    countryCode = countryCode
             )
         } else {
             person.addresses.add(
                     addressService.create(
-                            addressType = permanentAddressType,
                             person = person,
-                            city = applicant.contactData.officialCity,
-                            street = applicant.contactData.officialStreet,
-                            houseNumber = applicant.contactData.officialStreetNumber,
-                            apartmentNumber = applicant.contactData.officialFlatNumber,
-                            zipCode = applicant.contactData.officialPostCode,
-                            cityIsCity = applicant.contactData.officialCityIsCity,
-                            countryCode = applicant.contactData.officialCountry
-                    )
-            )
-        }
-        val correspondenceAddress = addressRepository.findByPersonAndAddressType(person, correspondenceAddressType)
-        if (correspondenceAddress != null) {
-            addressService.update(
-                    address = correspondenceAddress,
-                    city = applicant.contactData.realCity,
-                    street = applicant.contactData.realStreet,
-                    houseNumber = applicant.contactData.realStreetNumber,
-                    apartmentNumber = applicant.contactData.realFlatNumber,
-                    zipCode = applicant.contactData.realPostCode,
-                    cityIsCity = applicant.contactData.realCityIsCity,
-                    countryCode = applicant.contactData.realCountry
-            )
-        } else {
-            person.addresses.add(
-                    addressService.create(
-                            person = person,
-                            addressType = correspondenceAddressType,
-                            city = applicant.contactData.realCity,
-                            street = applicant.contactData.realStreet,
-                            houseNumber = applicant.contactData.realStreetNumber,
-                            apartmentNumber = applicant.contactData.realFlatNumber,
-                            zipCode = applicant.contactData.realPostCode,
-                            cityIsCity = applicant.contactData.realCityIsCity,
-                            countryCode = applicant.contactData.realCountry
+                            addressType = addressType,
+                            city = city,
+                            street = street,
+                            houseNumber = houseNumber,
+                            apartmentNumber = apartmentNumber,
+                            zipCode = zipCode,
+                            cityIsCity = cityIsCity,
+                            countryCode = countryCode
                     )
             )
         }
     }
 
-    private fun updatePhoneNumbers(person: Person, applicant: Applicant) {
+    private fun createOrUpdatePhoneNumbers(person: Person, applicant: Applicant) {
         applicant.contactData.phoneNumber?.run {
             val primaryPhoneNumber = phoneNumberRepository.findByPersonAndNumber(person, this)
             primaryPhoneNumber?.apply {
@@ -186,7 +209,7 @@ class PersonService(
         }
     }
 
-    private fun updateEntitlementDocument(person: Person, applicant: Applicant) {
+    private fun createOrUpdateEntitlementDocument(person: Person, applicant: Applicant) {
         applicant.educationData.documents.filter {
             it.certificateUsosCode != null
         }.forEach {
@@ -209,7 +232,7 @@ class PersonService(
         }
     }
 
-    private fun updatePersonPhoto(person: Person, applicant: Applicant) {
+    private fun createOrUpdatePersonPhoto(person: Person, applicant: Applicant) {
         applicant.photo?.let {
             if (person.personPhoto != null) {
                 person.personPhoto!!.photoBlob = irkService.getPhoto(it)
@@ -232,17 +255,18 @@ class PersonService(
             dateOfAddmision: Date,
             stageCode: String,
             didacticCycleCode: String,
-            irkApplication: IrkApplication
+            irkApplication: IrkApplication,
+            certificate: Document?
     ): String {
-        val student = studentMapper.createOrFindStudent(person, indexPoolCode)
+        val student = studentService.createOrFindStudent(person, indexPoolCode)
         studentRepository.save(student)
-        if (studentMapper.getPreviousStudyEndDate(person, dateOfAddmision) <= dateOfAddmision) {
+        if (studentService.getPreviousStudyEndDate(person, dateOfAddmision) <= dateOfAddmision) {
             personProgrammeRepository.getDefaultProgramme(person.id!!)?.let {
                 it.isDefault = 'N'
                 personProgrammeRepository.save(it)
             }
         }
-        val personProgramme = studentMapper.createPersonProgramme(
+        val personProgramme = studentService.createPersonProgramme(
                 person = person,
                 programmeCode = programmeCode,
                 startDate = startDate,
@@ -250,8 +274,10 @@ class PersonService(
                 didacticCycleCode = didacticCycleCode,
                 stageCode = stageCode,
                 student = student,
-                irkApplication = irkApplication
+                certificate = certificate
         )
+        irkApplication.personProgramme = personProgramme
+        personProgramme.irkApplication = irkApplication
         personProgrammeRepository.save(personProgramme)
         return student.indexNumber
     }
@@ -267,6 +293,7 @@ class PersonService(
             stageCode: String,
             startDate: Date
     ): Pair<Person, String> {
+        applicantService.check(application.applicant!!)
         var person: Person? = null
         application.applicant!!.usosId?.let { usosId ->
             person = personRepository.findByIdOrNull(usosId)
@@ -282,14 +309,14 @@ class PersonService(
             }
         }
         if (person != null) {
-            _self.updatePerson(application.applicant!!, person!!)
+            _self.update(application.applicant!!, person!!)
         } else {
-            person = _self.mapPerson(application.applicant!!)
+            person = _self.create(application.applicant!!)
         }
         personRepository.save(person!!)
         val irkApplication = IrkApplication(
                 applicationId = application.irkId,
-                confirmationStatus = 1,
+                confirmationStatus = 0,
                 irkInstance = application.irkInstance
         )
         val assignedIndexNumber = _self.immatriculate(
@@ -301,8 +328,19 @@ class PersonService(
                 registration = registration,
                 stageCode = stageCode,
                 startDate = startDate,
-                irkApplication = irkApplication
+                irkApplication = irkApplication,
+                certificate = application.certificate
         )
+        if (setAsAccepted) {
+            try {
+                irkService.completeImmatriculation(application.irkId)
+                irkApplication.confirmationStatus = 1
+            } catch (e: HttpStatusCodeException) {
+                val errorMessageDto = jacksonObjectMapper().readValue(e.responseBodyAsString, ErrorMessageDto::class.java)
+                irkApplication.confirmationStatus = errorMessageDto.error
+            }
+        }
+        irkApplicationRepository.save(irkApplication)
         return Pair(person!!, assignedIndexNumber)
     }
 }

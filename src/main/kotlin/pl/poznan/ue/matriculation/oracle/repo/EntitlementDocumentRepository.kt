@@ -9,4 +9,6 @@ import pl.poznan.ue.matriculation.oracle.domain.Person
 interface EntitlementDocumentRepository: JpaRepository<EntitlementDocument, Long> {
 
     fun existsByPersonAndType(person: Person, type: Char): Boolean
+
+    fun getByPersonAndTypeAndNumber(person: Person, type: Char, number: String): EntitlementDocument?
 }

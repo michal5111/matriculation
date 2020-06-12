@@ -5,27 +5,17 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import pl.poznan.ue.matriculation.exception.ApplicantCheckException
 import pl.poznan.ue.matriculation.irk.dto.applicants.ApplicantDTO
+import pl.poznan.ue.matriculation.irk.mapper.ApplicantMapper
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
-import pl.poznan.ue.matriculation.local.repo.DocumentRepository
+import pl.poznan.ue.matriculation.oracle.domain.Person
 
 @Service
 class ApplicantService(
-        private val documentRepository: DocumentRepository
+        private val applicantMapper: ApplicantMapper
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(ApplicationService::class.java)
-
-    fun check(applicant: Applicant) {
-//        applicant.educationData.documents.forEach {
-//            if (it.issueDate == null || it.documentNumber == null) {
-//                throw ApplicantCheckException("Brak daty lub numeru dokumentu uprawniającego do podjęcia studiów")
-//            }
-//        }
-        if (applicant.basicData.pesel == null && applicant.additionalData.documentNumber == null) {
-            throw ApplicantCheckException("Brak peselu lub dokumentu tożsamości")
-        }
-    }
 
     fun update(applicant: Applicant, applicantDTO: ApplicantDTO): Applicant {
         applicant.apply {
@@ -106,9 +96,9 @@ class ApplicantService(
             }
             applicantDTO.educationData.let {
                 applicant.educationData.apply {
-                    it.documents = listOf()
+                    this.documents.clear()
                     it.documents.forEach { documentDto ->
-                        educationData.documents.add(
+                        this.documents.add(
                                 Document(
                                         educationData = this,
                                         certificateType = documentDto.certificateType,
@@ -135,5 +125,24 @@ class ApplicantService(
             }
         }
         return applicant
+    }
+
+    fun create(applicantDTO: ApplicantDTO): Applicant {
+        return applicantMapper.applicantDtoToApplicantMapper(applicantDTO)
+    }
+
+    fun createPersonFromApplicant(applicant: Applicant): Person {
+        return applicantMapper.applicantToPersonMapper(applicant)
+    }
+
+    fun check(applicant: Applicant) {
+//        applicant.educationData.documents.forEach {
+//            if (it.issueDate == null || it.documentNumber == null) {
+//                throw ApplicantCheckException("Brak daty lub numeru dokumentu uprawniającego do podjęcia studiów")
+//            }
+//        }
+        if (applicant.basicData.pesel == null && applicant.additionalData.documentNumber == null) {
+            throw ApplicantCheckException("Brak peselu lub dokumentu tożsamości")
+        }
     }
 }

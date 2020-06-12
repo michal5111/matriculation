@@ -2,7 +2,6 @@ package pl.poznan.ue.matriculation.oracle.domain
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.JsonIdentityReference
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import java.util.*
 import javax.persistence.*
@@ -16,7 +15,6 @@ class PersonProgramme(
         @Column(name = "ID", length = 10)
         val id: Long? = null,
 
-        @JsonIgnore
         @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         @JoinColumn(name = "OS_ID", referencedColumnName = "ID", nullable = false)
         var person: Person,
@@ -159,7 +157,7 @@ class PersonProgramme(
         @OneToMany(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
         val personStages: MutableList<PersonStage> = mutableListOf(),
 
-        @OneToOne(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+        @OneToOne(mappedBy = "personProgramme", fetch = FetchType.LAZY)
         var irkApplication: IrkApplication? = null
 ) {
         override fun equals(other: Any?): Boolean {

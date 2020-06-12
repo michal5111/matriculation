@@ -63,9 +63,9 @@ class AddressService(
     }
 
     private fun Address.getPostalCodeInfo(): Address {
-        zipCode.let {
-            if (it != null && city != null) {
-                val postalCodes = postalCodeRepository.findByCodeAndPostLike(zipCode!!, "$city")
+        zipCode?.let {
+            if (city != null) {
+                val postalCodes = postalCodeRepository.findByCodeAndPostLike(zipCode!!, "$city%")
                 if (postalCodes.isEmpty()) {
                     return@let
                 }

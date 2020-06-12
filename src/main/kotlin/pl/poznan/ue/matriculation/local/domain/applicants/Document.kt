@@ -3,6 +3,7 @@ package pl.poznan.ue.matriculation.local.domain.applicants
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.CacheConcurrencyStrategy
+import pl.poznan.ue.matriculation.local.domain.applications.Application
 import java.io.Serializable
 import java.util.*
 import javax.persistence.*
@@ -12,7 +13,6 @@ import javax.persistence.*
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 class Document(
 
-        @JsonIgnore
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long? = null,
@@ -44,7 +44,11 @@ class Document(
 
         var issueInstitutionUsosCode: String?,
 
-        var modificationDate: String?
+        var modificationDate: String?,
+
+        @get:JsonIgnore
+        @OneToMany(mappedBy = "certificate", fetch = FetchType.LAZY)
+        var Applications: MutableList<Application> = mutableListOf()
 
 ) : Serializable {
 

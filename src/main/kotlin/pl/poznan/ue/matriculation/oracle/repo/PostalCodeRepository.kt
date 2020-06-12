@@ -7,6 +7,6 @@ import pl.poznan.ue.matriculation.oracle.domain.PostalCode
 
 interface PostalCodeRepository: JpaRepository<PostalCode, Long> {
 
-    @Query("select distinct pc from PostalCode pc where pc.code = :code and lower(pc.post) like lower(:post)")
+    @Query("select distinct pc from PostalCode pc where pc.code = :code and lower(pc.post) like lower(:post) order by length(pc.post) asc")
     fun findByCodeAndPostLike(@Param("code") postalCode: String, @Param("post") post: String): List<PostalCode>
 }

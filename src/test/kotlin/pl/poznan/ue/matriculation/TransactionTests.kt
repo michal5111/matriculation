@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.irk.service.IrkService
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
@@ -51,13 +52,9 @@ class TransactionTests {
     }
 
     @Test
-    //@Transactional
+    @Transactional
     fun import() {
-        processService.processApplication(import.id!!, irkService.getApplication(1)!!)
-        //asyncService.test(importId = import.id!!)
-        //executor.threadPoolExecutor.awaitTermination(1, TimeUnit.SECONDS)
-        import = importRepository.getOne(import.id!!)
-        assert(import.id != null)
-        //assert(import.applications.size > 0)
+        val application = processService.processApplication(import.id!!, irkService.getApplication(1)!!)
+        processService.processPerson(import.id!!, application, importRepository.getDtoById(importId = import.id!!))
     }
 }

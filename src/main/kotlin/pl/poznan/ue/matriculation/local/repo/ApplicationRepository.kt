@@ -1,5 +1,7 @@
 package pl.poznan.ue.matriculation.local.repo
 
+import org.hibernate.annotations.QueryHints.READ_ONLY
+import org.hibernate.jpa.QueryHints.HINT_CACHEABLE
 import org.hibernate.jpa.QueryHints.HINT_FETCH_SIZE
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -27,8 +29,12 @@ interface ApplicationRepository: PagingAndSortingRepository<Application, Long> {
     fun getByIrkId(irkId: Long): Application
 
     //@QueryHints(value = [QueryHint(name = HINT_FETCH_SIZE, value = "" + Integer.MIN_VALUE)]) //MySql
-    @QueryHints(value = [QueryHint(name = HINT_FETCH_SIZE, value = "20")])
-    @Query("select an from Application an where an.import.id = :id and (an.applicationImportStatus = 'NOT_IMPORTED' or an.applicationImportStatus = 'ERROR')")
+    @QueryHints(value = [
+        QueryHint(name = HINT_FETCH_SIZE, value = "20"),
+        QueryHint(name = HINT_CACHEABLE, value = "false"),
+        QueryHint(name = READ_ONLY, value = "true")
+    ])
+    @Query("select an from Application an where an.import.id = :id and (an.importStatus = 'NOT_IMPORTED' or an.importStatus = 'ERROR')")
     fun getAllByImportIdAndApplicationImportStatus(@Param("id") importId: Long): Stream<Application>
 
     @Transactional(rollbackFor = [Exception::class], propagation = Propagation.REQUIRED, transactionManager = "transactionManager")

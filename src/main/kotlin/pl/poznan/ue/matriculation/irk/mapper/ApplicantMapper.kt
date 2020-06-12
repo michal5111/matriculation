@@ -5,10 +5,10 @@ import org.springframework.stereotype.Component
 import pl.poznan.ue.matriculation.irk.dto.applicants.ApplicantDTO
 import pl.poznan.ue.matriculation.irk.service.IrkService
 import pl.poznan.ue.matriculation.local.domain.applicants.*
-import pl.poznan.ue.matriculation.local.service.ApplicantService
 import pl.poznan.ue.matriculation.oracle.domain.*
 import pl.poznan.ue.matriculation.oracle.repo.*
 import pl.poznan.ue.matriculation.oracle.service.AddressService
+import javax.annotation.PostConstruct
 
 @Component
 class ApplicantMapper(
@@ -19,12 +19,26 @@ class ApplicantMapper(
         private val phoneNumberTypeRepository: PhoneNumberTypeRepository,
         private val wkuRepository: WkuRepository,
         private val irkService: IrkService,
-        private val applicantService: ApplicantService,
-        private val addressService: AddressService
+        private val addressService: AddressService,
+        private val documentTypeRepository: DocumentTypeRepository
 ) {
+
+    lateinit var defaultStudentOrganizationalUnit: OrganizationalUnit
+    lateinit var permanentAddressType: AddressType
+    lateinit var correspondenceAddressType: AddressType
 
     @Value("\${pl.poznan.ue.matriculation.defaultStudentOrganizationalUnit}")
     lateinit var defaultStudentOrganizationalUnitString: String
+
+    @Value("\${pl.poznan.ue.matriculation.universityEmailSuffix}")
+    lateinit var universityEmailSuffix: String
+
+    @PostConstruct
+    fun init() {
+        defaultStudentOrganizationalUnit = organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitString)
+        permanentAddressType = addressTypeRepository.getOne("STA")
+        correspondenceAddressType = addressTypeRepository.getOne("KOR")
+    }
 
     fun applicantDtoToApplicantMapper(applicantDTO: ApplicantDTO): Applicant {
         return Applicant(
@@ -147,12 +161,13 @@ class ApplicantMapper(
     }
 
     fun applicantToPersonMapper(applicant: Applicant): Person {
-        applicantService.check(applicant)
-        val defaultStudentOrganizationalUnit: OrganizationalUnit = organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitString)
-        val permanentAddressType: AddressType = addressTypeRepository.getOne("STA")
-        val correspondenceAddressType: AddressType = addressTypeRepository.getOne("KOR")
         return Person(
-                email = applicant.email,
+                email = applicant.email.takeIf {
+                    it.endsWith(universityEmailSuffix)
+                },
+                privateEmail = applicant.email.takeIf {
+                    !it.endsWith(universityEmailSuffix)
+                },
                 name = applicant.name.given!!,
                 middleName = applicant.name.middle,
                 surname = applicant.name.family!!,
@@ -249,6 +264,22 @@ class ApplicantMapper(
             }
             addresses.forEach {
                 it.person = this
+            }
+            applicant.applicantForeignerData?.let {
+                if (it.baseOfStay != null && it.baseOfStay == "OKS") {
+                    ownedDocuments.add(
+                            OwnedDocument(
+                                    documentType = documentTypeRepository.getOne(it.baseOfStay!!),
+                                    person = this,
+                                    issueDate = it.polishCardIssueDate,
+                                    issueCountry = it.polishCardIssueCountry?.let { countryCode ->
+                                        citizenshipRepository.getOne(countryCode)
+                                    },
+                                    number = it.polishCardNumber,
+                                    expirationDate = it.polishCardValidTo
+                            )
+                    )
+                }
             }
         }
     }

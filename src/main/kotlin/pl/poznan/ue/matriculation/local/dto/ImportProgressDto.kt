@@ -1,4 +1,4 @@
-package pl.poznan.ue.matriculation.local.domain.import
+package pl.poznan.ue.matriculation.local.dto
 
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import java.io.Serializable

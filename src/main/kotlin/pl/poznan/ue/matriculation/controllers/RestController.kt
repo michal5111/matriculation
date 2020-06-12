@@ -15,8 +15,8 @@ import pl.poznan.ue.matriculation.irk.service.IrkService
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
-import pl.poznan.ue.matriculation.local.domain.import.ImportDto
 import pl.poznan.ue.matriculation.local.domain.import.ImportProgress
+import pl.poznan.ue.matriculation.local.dto.ImportDto
 import pl.poznan.ue.matriculation.local.service.ApplicationService
 import pl.poznan.ue.matriculation.local.service.AsyncService
 import pl.poznan.ue.matriculation.local.service.ImportService
@@ -145,7 +145,10 @@ class RestController(
 
 
     @GetMapping("/import/{id}/applications")
-    fun findAllApplicationsByImportId(pageable: Pageable, @PathVariable("id") importId: Long): org.springframework.data.domain.Page<Application> = applicationService.findAllApplicationsByImportId(pageable, importId)
+    fun findAllApplicationsByImportId(
+            pageable: Pageable,
+            @PathVariable("id") importId: Long)
+            : org.springframework.data.domain.Page<Application> = applicationService.findAllApplicationsByImportId(pageable, importId)
 
 
     @GetMapping("/indexPool")

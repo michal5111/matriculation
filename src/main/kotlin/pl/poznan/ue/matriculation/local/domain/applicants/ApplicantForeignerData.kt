@@ -5,6 +5,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy
 import org.hibernate.annotations.LazyCollection
 import org.hibernate.annotations.LazyCollectionOption
 import java.io.Serializable
+import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -27,11 +28,11 @@ class ApplicantForeignerData(
 
         var polishCardIssueCountry: String?,
 
-        var polishCardIssueDate: String?,
+        var polishCardIssueDate: Date?,
 
         var polishCardNumber: String?,
 
-        var polishCardValidTo: String?
+        var polishCardValidTo: Date?
 ): Serializable {
 
     override fun toString(): String {

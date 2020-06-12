@@ -1,11 +1,13 @@
-package pl.poznan.ue.matriculation.local.domain.import
+package pl.poznan.ue.matriculation.local.dto
 
-class ImportDto(
+import java.util.*
+
+class ImportDtoJpa(
         val programmeCode: String,
         val registration: String,
         val indexPoolCode: String,
-        val startDate: String,
-        val dateOfAddmision: String,
+        val startDate: Date,
+        val dateOfAddmision: Date,
         val stageCode: String,
         val didacticCycleCode: String
 )

@@ -46,7 +46,9 @@
             Zarchiwizowany
           </span>
         </div>
-        <p>Błąd importu: {{importProgress.error}}</p>
+        <p>Błąd importu:
+          <mark class="error-color">{{importProgress.error}}</mark>
+        </p>
         <p>Zaimportowane zgłoszenia: {{importProgress.importedApplications}}/{{importProgress.totalCount}}</p>
         <mat-progress-bar mode="determinate"
                           value="{{getImportProgressPercentage()}}">
@@ -188,7 +190,7 @@
       <ng-container matColumnDef="applicationImportStatus">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Status importu</th>
         <td mat-cell *matCellDef="let element">
-          <div [ngSwitch]="element.applicationImportStatus">
+          <div [ngSwitch]="element.importStatus">
             <div *ngSwitchCase="'NOT_IMPORTED'">
               <mat-icon>hourglass_empty</mat-icon>
               Oczekujące

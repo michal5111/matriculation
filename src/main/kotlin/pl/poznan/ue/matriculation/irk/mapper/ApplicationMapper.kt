@@ -2,7 +2,6 @@ package pl.poznan.ue.matriculation.irk.mapper
 
 import org.springframework.stereotype.Component
 import pl.poznan.ue.matriculation.irk.dto.applications.ApplicationDTO
-import pl.poznan.ue.matriculation.local.domain.Turn
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.applications.ApplicationForeignerData
 
@@ -25,12 +24,12 @@ class ApplicationMapper {
                 position = applicationDTO.payment,
                 qualified = applicationDTO.qualified,
                 score = applicationDTO.score,
-                turn = Turn(
-                        dateFrom = applicationDTO.turn.dateFrom,
-                        dateTo = applicationDTO.turn.dateTo,
-                        programme = applicationDTO.turn.programme,
-                        registration = applicationDTO.turn.registration
-                ),
+//                turn = Turn(
+//                        dateFrom = applicationDTO.turn.dateFrom,
+//                        dateTo = applicationDTO.turn.dateTo,
+//                        programme = applicationDTO.turn.programme,
+//                        registration = applicationDTO.turn.registration
+//                ),
                 irkInstance = applicationDTO.irkInstance!!
         ).apply {
             applicationForeignerData?.application = this

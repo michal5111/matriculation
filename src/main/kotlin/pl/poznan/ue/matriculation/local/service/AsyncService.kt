@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service
 import pl.poznan.ue.matriculation.exception.ImportException
 import pl.poznan.ue.matriculation.irk.service.IrkService
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
-import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
 import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import javax.persistence.EntityManager
@@ -19,8 +18,7 @@ class AsyncService(
         private val importProgressRepository: ImportProgressRepository,
         private val irkService: IrkService,
         private val processService: ProcessService,
-        private val importRepository: ImportRepository,
-        private val applicationRepository: ApplicationRepository
+        private val importRepository: ImportRepository
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(AsyncService::class.java)
@@ -47,7 +45,7 @@ class AsyncService(
                 logger.debug("Pobrałem osoby...")
                 if (set) {
                     if (page.count == 0) {
-                        throw ImportException(importId, "Liczba kandydatów wynosi 0!")
+                        throw IllegalStateException("Liczba kandydatów wynosi 0!")
                     }
                     import.importProgress!!.totalCount = page.count
                     importProgressRepository.save(import.importProgress!!)
@@ -72,18 +70,12 @@ class AsyncService(
 
     @Async
     fun savePersons(importId: Long) {
-        val import = importRepository.getOne(importId)
+        val importDto = importRepository.getDtoById(importId)
         processService.processPersons(
                 importId = importId,
-                dateOfAddmision = import.dateOfAddmision,
-                didacticCycleCode = import.didacticCycleCode,
-                indexPoolCode = import.indexPoolCode,
-                programmeCode = import.programmeCode,
-                registration = import.registration,
-                stageCode = import.stageCode,
-                startDate = import.startDate
+                importDto = importDto
         )
-        processService.setSaveComplete(importId)
+        importService.setImportStatus(ImportStatus.COMPLETE, importId)
     }
 
 }

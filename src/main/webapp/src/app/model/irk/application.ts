@@ -1,4 +1,6 @@
 import {Applicant} from './applicant';
+import {Document} from "./document";
+import {ImportStatus} from "../import/import-status.enum";
 
 export interface Application {
   id: number;
@@ -12,15 +14,19 @@ export interface Application {
   admitted: string;
   comment: string;
   turn: {
-    programme: string,
-    registration: string,
-    dateFrom: Date,
-    dateTo: Date
+    programme: string;
+    registration: string;
+    dateFrom: Date;
+    dateTo: Date;
   };
   foreignerData: {
-    baseOfStay: string,
-    sourceOfFinancing: string,
-    basisOfAdmission: string
+    baseOfStay: string;
+    sourceOfFinancing: string;
+    basisOfAdmission: string;
   };
+  certificate: Document;
+  importStatus: ImportStatus;
+  importError: string;
+  stackTrace: string;
   irkInstance: string;
 }

@@ -1,8 +1,6 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
 import org.hibernate.annotations.CacheConcurrencyStrategy
-import org.hibernate.annotations.LazyCollection
-import org.hibernate.annotations.LazyCollectionOption
 import java.util.*
 import javax.persistence.*
 
@@ -144,7 +142,7 @@ class Person(
         val libraryCardNumber: String? = null,
 
         @Column(name = "BK_EMAIL", length = 100, nullable = true)
-        val careersOfficeEmail: String? = null,
+        var privateEmail: String? = null,
 
         @Column(name = "BK_CZYMIGROWAC", length = 2, precision = 0, nullable = false)
         val careersOfficeMigrate: Int = 0,
@@ -201,37 +199,35 @@ class Person(
         @Column(name = "CZY_KLUB_ABS_REZYG", nullable = true)
         val graduateClubJoinResignDate: Date? = null,
 
-        @LazyCollection(LazyCollectionOption.FALSE)
-        @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true)
+        @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
         var addresses: MutableList<Address>,
 
-        @LazyCollection(LazyCollectionOption.FALSE)
-        @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true)
+        @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
         var phoneNumbers: MutableList<PhoneNumber>,
 
-        @LazyCollection(LazyCollectionOption.FALSE)
-        @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true)
+        @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
         var entitlementDocuments: MutableList<EntitlementDocument>,
 
-        @LazyCollection(LazyCollectionOption.FALSE)
-        @OneToOne(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true)
+        @OneToOne(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
         var personPhoto: PersonPhoto? = null,
 
-        @LazyCollection(LazyCollectionOption.FALSE)
-        @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true)
+        @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
         var personPreferences: MutableList<PersonPreference> = mutableListOf(),
 
-        @LazyCollection(LazyCollectionOption.FALSE)
-        @OneToMany(mappedBy = "person", orphanRemoval = true)
+        @OneToMany(mappedBy = "person", orphanRemoval = true, fetch = FetchType.LAZY)
         var student: MutableList<Student> = mutableListOf(),
 
-        @LazyCollection(LazyCollectionOption.FALSE)
-        @OneToMany(mappedBy = "person", orphanRemoval = true)
+        @OneToMany(mappedBy = "person", orphanRemoval = true, fetch = FetchType.LAZY)
         var personProgrammes: MutableList<PersonProgramme> = mutableListOf(),
 
-        @LazyCollection(LazyCollectionOption.FALSE)
-        @OneToMany(mappedBy = "person", orphanRemoval = true)
-        var folders: MutableList<Folder> = mutableListOf()
+        @OneToMany(mappedBy = "person", orphanRemoval = true, fetch = FetchType.LAZY)
+        var folders: MutableList<Folder> = mutableListOf(),
+
+        @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+        var documents: MutableList<PersonDocument> = mutableListOf(),
+
+        @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+        var ownedDocuments: MutableList<OwnedDocument> = mutableListOf()
 ) {
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true

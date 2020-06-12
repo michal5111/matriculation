@@ -3,7 +3,7 @@ package pl.poznan.ue.matriculation.irk.dto.applications
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import pl.poznan.ue.matriculation.irk.dto.TurnDTO
-import pl.poznan.ue.matriculation.local.domain.applicants.Document
+import pl.poznan.ue.matriculation.irk.dto.applicants.DocumentDTO
 
 data class ApplicationDTO(
         val admitted: String?,
@@ -18,5 +18,6 @@ data class ApplicationDTO(
         val turn: TurnDTO,
         val user: Long,
         var irkInstance: String? = null,
-        val certificate: Document?
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        var certificate: DocumentDTO? = null
 )

@@ -19,7 +19,10 @@ class Language(
         var Iso6391Code: String? = name,
 
         @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
-        var conductedFieldsOfStudy: MutableList<ConductedFieldOfStudy>
+        var conductedFieldsOfStudy: MutableList<ConductedFieldOfStudy>,
+
+        @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
+        var personDocuments: MutableList<PersonDocument>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

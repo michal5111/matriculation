@@ -11,16 +11,15 @@ import org.springframework.web.client.exchange
 import org.springframework.web.util.UriComponentsBuilder
 import pl.poznan.ue.matriculation.irk.dto.Page
 import pl.poznan.ue.matriculation.irk.dto.applicants.ApplicantDTO
+import pl.poznan.ue.matriculation.irk.dto.applicants.DocumentDTO
 import pl.poznan.ue.matriculation.irk.dto.applicants.MatriculationDataDTO
 import pl.poznan.ue.matriculation.irk.dto.applications.ApplicationDTO
 import pl.poznan.ue.matriculation.irk.dto.programmes.ProgrammeGroupsDTO
 import pl.poznan.ue.matriculation.irk.dto.registrations.RegistrationDTO
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
-import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.programmes.ProgrammeGroups
 import pl.poznan.ue.matriculation.local.domain.registrations.Registration
-import java.io.InputStream
 import javax.annotation.PostConstruct
 
 
@@ -251,27 +250,24 @@ class IrkService {
                 httpEntity,
                 Resource::class.java
         )
-        val responseInputStream: InputStream
-        try {
-            responseInputStream = responseEntity.body!!.inputStream
-        } catch (e: Exception) {
-            throw IllegalStateException()
+        var byteArray = ByteArray(0)
+        responseEntity.body!!.inputStream.use {
+            byteArray = IOUtils.toByteArray(it)
         }
-        return IOUtils.toByteArray(responseInputStream)
+        return byteArray
     }
 
-    fun completeImmatriculation(applicationId: Long): Map<String, String>? {
+    fun completeImmatriculation(applicationId: Long): ResponseEntity<Map<String, String>> {
         val httpHeaders = HttpHeaders()
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set("Authorization", "Token $apiKey")
         val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
-        val response: ResponseEntity<Map<String, String>> = restTemplate.exchange(
+        return restTemplate.exchange(
                 "${apiUrl}matriculation/${applicationId}/complete/",
                 HttpMethod.POST,
                 httpEntity,
                 MapResult::class
         )
-        return response.body
     }
 
     fun getMatriculationData(applicationId: Long): MatriculationDataDTO? {
@@ -288,7 +284,7 @@ class IrkService {
         return response.body
     }
 
-    fun getPrimaryCertificate(applicationId: Long): Document? {
-        return getMatriculationData(applicationId)?.applicationDTO?.certificate
+    fun getPrimaryCertificate(applicationId: Long): DocumentDTO? {
+        return getMatriculationData(applicationId)?.application?.certificate
     }
 }

@@ -27,12 +27,12 @@ class ImportProgress(
         @Enumerated(EnumType.STRING)
         var importStatus: ImportStatus = ImportStatus.PENDING,
 
-        @Lob
         var error: String? = null
 ): Serializable {
 
     override fun toString(): String {
-        return "ImportProgress(id=$id, importedApplications=$importedApplications, saveErrors=$saveErrors, savedApplicants=$savedApplicants, totalCount=$totalCount, importStatus=$importStatus, error=$error)"
+        return "ImportProgress(id=$id, importedApplications=$importedApplications, saveErrors=$saveErrors, " +
+                "savedApplicants=$savedApplicants, totalCount=$totalCount, importStatus=$importStatus, error=$error)"
     }
 
     override fun equals(other: Any?): Boolean {

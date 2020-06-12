@@ -4,25 +4,21 @@ import org.hibernate.JDBCException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionSynchronizationManager
 import pl.poznan.ue.matriculation.irk.dto.applications.ApplicationDTO
-import pl.poznan.ue.matriculation.irk.mapper.ApplicantMapper
-import pl.poznan.ue.matriculation.irk.mapper.ApplicationMapper
 import pl.poznan.ue.matriculation.irk.service.IrkService
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
-import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
+import pl.poznan.ue.matriculation.local.dto.ImportDtoJpa
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
 import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
 import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.service.PersonService
-import java.util.*
 import java.util.stream.Stream
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
@@ -32,9 +28,7 @@ class ProcessService(
         private val importRepository: ImportRepository,
         private val applicationRepository: ApplicationRepository,
         private val applicantRepository: ApplicantRepository,
-        private val applicationMapper: ApplicationMapper,
         private val irkService: IrkService,
-        private val applicantMapper: ApplicantMapper,
         private val applicantService: ApplicantService,
         private val personService: PersonService,
         private val applicationService: ApplicationService,
@@ -42,9 +36,6 @@ class ProcessService(
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(ProcessService::class.java)
-
-    @Value("\${pl.poznan.ue.matriculation.setAsAccepted}")
-    private var setAsAccepted: Boolean = false
 
     @Autowired
     private lateinit var self: ProcessService
@@ -68,17 +59,17 @@ class ProcessService(
             )
         } else {
             logger.debug("Nie istnieje dodaję...")
-            applicationMapper.applicationDtoToApplicationMapper(applicationDTO)
+            applicationService.create(applicationDTO)
         }
         logger.debug("Pobrałem import... Sprawdzam czy istnieje już aplikant o takim irkId")
         val applicant = irkService.getApplicantById(applicationDTO.user).let {
-            if (applicantRepository.existsByIrkId(it!!.id)) {
+            val applicant = applicantRepository.findByIrkId(it!!.id)
+            if (applicant != null) {
                 logger.debug("Istnieje aktualizuję...")
-                val applicant = applicantRepository.findByIrkId(it.id)
-                return@let applicantService.update(applicant!!, it)
+                return@let applicantService.update(applicant, it)
             } else {
                 logger.debug("Nie istnieje dodaję...")
-                return@let applicantMapper.applicantDtoToApplicantMapper(it)
+                return@let applicantService.create(it)
             }
         }
         logger.debug("zapisuję aplikanta")
@@ -88,6 +79,13 @@ class ProcessService(
             application.applicant = applicant
             applicant.applications.add(application)
         }
+        application.certificate = applicant.educationData.documents.find {
+            irkService.getPrimaryCertificate(application.irkId)?.let { primaryCertificate ->
+                return@let it.documentNumber == primaryCertificate.documentNumber &&
+                        it.certificateTypeCode == primaryCertificate.certificateTypeCode
+            } ?: false
+        }
+        //application.certificate?.Applications?.add(application)
         logger.debug("zapisuję aplikację")
         applicationRepository.save(application)
         if (!applicationRepository.existsByImportIdAndIrkId(importId, application.irkId)) {
@@ -101,27 +99,23 @@ class ProcessService(
 
     @Transactional(rollbackFor = [Exception::class, RuntimeException::class], propagation = Propagation.REQUIRES_NEW, transactionManager = "transactionManager")
     fun processPerson(
+            importId: Long,
             application: Application,
-            dateOfAddmision: Date,
-            didacticCycleCode: String,
-            indexPollCode: String,
-            programmeCode: String,
-            registration: String,
-            stageCode: String,
-            startDate: Date
+            importDto: ImportDtoJpa
     ): Person {
         if (!TransactionSynchronizationManager.isActualTransactionActive()) {
             throw IllegalStateException("Nie ma aktywnej transakcji")
         }
+        val importProgress = importProgressRepository.getOne(importId)
         val personAndAssignedNumber = personService.processPerson(
                 application = application,
-                dateOfAddmision = dateOfAddmision,
-                didacticCycleCode = didacticCycleCode,
-                indexPoolCode = indexPollCode,
-                programmeCode = programmeCode,
-                registration = registration,
-                stageCode = stageCode,
-                startDate = startDate
+                dateOfAddmision = importDto.dateOfAddmision,
+                didacticCycleCode = importDto.didacticCycleCode,
+                indexPoolCode = importDto.indexPoolCode,
+                programmeCode = importDto.programmeCode,
+                registration = importDto.registration,
+                stageCode = importDto.stageCode,
+                startDate = importDto.startDate
         )
         personAndAssignedNumber.let { pair ->
             application.applicant!!.usosId = pair.first.id
@@ -129,91 +123,53 @@ class ProcessService(
         }
         application.importError = null
         application.stackTrace = null
-        application.applicationImportStatus = ApplicationImportStatus.IMPORTED
-        if (setAsAccepted) {
-            irkService.completeImmatriculation(application.irkId)
-        }
+        application.importStatus = ApplicationImportStatus.IMPORTED
         applicantRepository.save(application.applicant!!)
         applicationRepository.save(application)
+        importProgress.savedApplicants++
         return personAndAssignedNumber.first
     }
 
     @Transactional(rollbackFor = [Exception::class, RuntimeException::class], propagation = Propagation.REQUIRES_NEW, transactionManager = "transactionManager")
-    fun setSaveComplete(importId: Long) {
+    fun handleSaveException(exception: Exception, application: Application, importId: Long) {
         val importProgress = importProgressRepository.getOne(importId)
-        importProgress.importStatus = ImportStatus.COMPLETE
-    }
-
-    @Transactional(rollbackFor = [Exception::class, RuntimeException::class], propagation = Propagation.REQUIRES_NEW, transactionManager = "transactionManager")
-    fun handleSaveJdbcException(e: JDBCException, application: Application, importId: Long) {
-        val import = importRepository.getOne(importId)
-        application.applicationImportStatus = ApplicationImportStatus.ERROR
-        application.importError = "${e.javaClass.simpleName}: ${e.message} \n Error code: ${e.errorCode} " +
-                "Sql exception: ${e.sqlException} \n " +
-                "Sql: ${e.sql} \n " +
-                "Sql state: ${e.sqlState}"
-        application.stackTrace = e.stackTrace.joinToString("\n", "\nStackTrace: ")
-        import.importProgress!!.saveErrors++
+        application.importError = ""
+        var e: Throwable? = exception
+        do {
+            if (e is JDBCException) {
+                application.importError += "${e.javaClass.simpleName}: ${e.message} \n Error code: ${e.errorCode} " +
+                        "Sql exception: ${e.sqlException} \n " +
+                        "Sql: ${e.sql} \n " +
+                        "Sql state: ${e.sqlState} "
+            } else {
+                application.importError += "${e?.javaClass?.simpleName}: ${e?.message} "
+            }
+            e = e?.cause
+        } while (e != null)
+        application.importStatus = ApplicationImportStatus.ERROR
+        application.stackTrace = exception.stackTrace.joinToString("\n", "\nStackTrace: ")
+        importProgress.saveErrors++
         applicantRepository.save(application.applicant!!)
         applicationRepository.save(application)
     }
 
-    @Transactional(rollbackFor = [Exception::class, RuntimeException::class], propagation = Propagation.REQUIRES_NEW, transactionManager = "transactionManager")
-    fun handleSaveException(e: Exception, application: Application, importId: Long) {
-        val import = importRepository.getOne(importId)
-        if (e.cause is JDBCException) {
-            val ex: JDBCException = e.cause as JDBCException
-            application.importError = "${e.javaClass.simpleName}: ${e.message} \n Error code: ${ex.errorCode} " +
-                    "Sql exception: ${ex.sqlException} \n " +
-                    "Sql: ${ex.sql} \n " +
-                    "Sql state: ${ex.sqlState} "
-        } else {
-            application.importError = "${e.javaClass.simpleName}: ${e.message}"
-        }
-        application.applicationImportStatus = ApplicationImportStatus.ERROR
-        application.stackTrace = e.stackTrace.joinToString("\n", "\nStackTrace: ")
-        import.importProgress!!.saveErrors++
-        applicantRepository.save(application.applicant!!)
-        applicationRepository.save(application)
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "transactionManager")
-    fun incrementProgress(importId: Long) {
-        val importProgress = importProgressRepository.getOne(importId)
-        importProgress.savedApplicants++
-    }
-
-    @Transactional(rollbackFor = [Exception::class, RuntimeException::class], propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     fun processPersons(
             importId: Long,
-            dateOfAddmision: Date,
-            didacticCycleCode: String,
-            indexPoolCode: String,
-            programmeCode: String,
-            registration: String,
-            stageCode: String,
-            startDate: Date
+            importDto: ImportDtoJpa
     ) {
         val applicationsPage: Stream<Application> = applicationRepository.getAllByImportIdAndApplicationImportStatus(importId)
         applicationsPage.use {
-            applicationsPage.forEach {
+            it.forEach { application ->
                 try {
                     val person = self.processPerson(
-                            application = it,
-                            dateOfAddmision = dateOfAddmision,
-                            didacticCycleCode = didacticCycleCode,
-                            indexPollCode = indexPoolCode,
-                            programmeCode = programmeCode,
-                            registration = registration,
-                            stageCode = stageCode,
-                            startDate = startDate
+                            importId = importId,
+                            application = application,
+                            importDto = importDto
                     )
-                    self.incrementProgress(importId)
                     oracleEntityManager.detach(person)
-                } catch (e: JDBCException) {
-                    self.handleSaveJdbcException(e, it, importId)
                 } catch (e: Exception) {
-                    self.handleSaveException(e, it, importId)
+                    self.handleSaveException(e, application, importId)
                 }
             }
         }

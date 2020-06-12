@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.local.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -22,6 +23,8 @@ class ImportService(
         private val importProgressRepository: ImportProgressRepository,
         private val didacticCycleRepository: DidacticCycleRepository
 ) {
+
+    private val logger = LoggerFactory.getLogger(ImportService::class.java)
 
     fun create(
             programmeCode: String,
@@ -59,9 +62,7 @@ class ImportService(
     }
 
     fun setImportStatus(importStatus: ImportStatus, importId: Long) {
-        val importProgress = getProgress(importId)
-        importProgress.importStatus = importStatus
-        importProgressRepository.save(importProgress)
+        importProgressRepository.setStatus(importStatus, importId)
     }
 
     fun resetSaveErrors(importId: Long) {
@@ -87,9 +88,7 @@ class ImportService(
     }
 
     fun setError(importId: Long, errorMessage: String) {
-        val importProgress = importProgressRepository.getOne(importId)
-        importProgress.error = errorMessage
-        importProgressRepository.save(importProgress)
+        importProgressRepository.setError(errorMessage, importId)
     }
 
     fun getAll(pageable: org.springframework.data.domain.Pageable): Page<Import> {
@@ -124,7 +123,9 @@ class ImportService(
     fun delete(importId: Long) {
         try {
             importRepository.deleteById(importId)
+            logger.info("Usuwam import $importId")
         } catch (e: Exception) {
+            logger.error("Błąd przy usuwaniu importu", e)
             throw ImportDeleteException("Nie Można usunąć importu: ${e.message}")
         }
     }

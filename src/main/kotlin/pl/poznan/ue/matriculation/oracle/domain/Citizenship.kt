@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
@@ -49,29 +48,26 @@ class Citizenship(
         @Column(name = "KRAJ_POLON", length = 100, nullable = false)
         val polonCountry: String?,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "nationality", fetch = FetchType.LAZY)
         val personsNationality: Set<Person>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "citizenship", fetch = FetchType.LAZY)
         val personsCitizenship: Set<Person>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "birthCountry", fetch = FetchType.LAZY)
         val personsBirthCountry: Set<Person>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "citizenship", fetch = FetchType.LAZY)
         val nutsRegions: Set<NUTSRegion>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "identityDocumentIssuerCountry", fetch = FetchType.LAZY)
         val identityDocumentIssuerCountryPersons: Set<Person>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "countryCode", fetch = FetchType.LAZY)
-        var address: List<Address>
+        var address: List<Address>,
+
+        @OneToMany(mappedBy = "issueCountry", fetch = FetchType.LAZY)
+        var ownedDocuments: MutableList<OwnedDocument> = mutableListOf()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

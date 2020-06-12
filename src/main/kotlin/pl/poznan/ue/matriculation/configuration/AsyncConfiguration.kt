@@ -12,10 +12,10 @@ import java.util.concurrent.Executor
 
 @Configuration
 @EnableAsync
-class AsyncConfiguration() : AsyncConfigurer {
+class AsyncConfiguration(private val asyncExceptionHandler: AsyncExceptionHandler) : AsyncConfigurer {
 
     override fun getAsyncUncaughtExceptionHandler(): AsyncUncaughtExceptionHandler? {
-        return AsyncExceptionHandler()
+        return asyncExceptionHandler
     }
 
     @Bean

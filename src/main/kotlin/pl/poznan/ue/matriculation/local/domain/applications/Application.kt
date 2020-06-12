@@ -1,9 +1,10 @@
 package pl.poznan.ue.matriculation.local.domain.applications
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.CacheConcurrencyStrategy
-import pl.poznan.ue.matriculation.local.domain.Turn
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
+import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import java.io.Serializable
@@ -36,8 +37,12 @@ class Application(
 
         var score: String?,
 
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "certificate_id", referencedColumnName = "id")
+        var certificate: Document? = null,
+
         @Enumerated(EnumType.STRING)
-        var applicationImportStatus: ApplicationImportStatus = ApplicationImportStatus.NOT_IMPORTED,
+        var importStatus: ApplicationImportStatus = ApplicationImportStatus.NOT_IMPORTED,
 
         @Column(length = 4096)
         var importError: String? = null,
@@ -45,22 +50,13 @@ class Application(
         @Lob
         var stackTrace: String? = null,
 
-        @Transient
-//        @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
-//        @JoinColumns(
-//                JoinColumn(name = "programme", referencedColumnName = "programme"),
-//                JoinColumn(name = "registration", referencedColumnName = "registration"),
-//                JoinColumn(name = "date_from", referencedColumnName = "date_from"),
-//                JoinColumn(name = "date_to", referencedColumnName = "date_to")
-//        )
-        val turn: Turn,
-
         val irkInstance: String,
 
         @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
         @JoinColumn(name = "applicant_id", referencedColumnName = "id")
         var applicant: Applicant? = null,
 
+        @JsonIgnore
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "import_id", referencedColumnName = "id")
         var import: Import? = null
