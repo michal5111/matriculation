@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 @Entity
@@ -25,11 +24,9 @@ class Wku(
 //        @Column(name = "UTW_ID", length = 30, nullable = false)
 //        val creationUser: String,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "wku", fetch = FetchType.LAZY)
         val persons: Set<Person>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "wku", fetch = FetchType.LAZY)
         val addresses: List<Address>
 ) {

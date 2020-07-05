@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 @Entity
@@ -29,15 +28,12 @@ class County(
 //        @Column(name = "MOD_DATA", nullable = false)
 //        val modificationDate: Date? = null,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "county", fetch = FetchType.LAZY)
         var addresses: MutableList<Address>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "county", fetch = FetchType.LAZY)
         var communes: List<Commune>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "county", fetch = FetchType.LAZY)
         var postalCodes: MutableList<PostalCode>
 ) {

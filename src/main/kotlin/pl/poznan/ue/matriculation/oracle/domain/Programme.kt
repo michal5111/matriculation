@@ -1,15 +1,11 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo
-import com.fasterxml.jackson.annotation.JsonIdentityReference
-import com.fasterxml.jackson.annotation.ObjectIdGenerators
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import java.util.*
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+//@Cacheable
+//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_PROGRAMY")
 class Programme(
 
@@ -118,8 +114,6 @@ class Programme(
         @Column(name = "ZAKRES_ANG", length = 500, nullable = true)
         var rangeEng: String? = null,
 
-        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
-        @JsonIdentityReference(alwaysAsId = true)
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "JED_ORG_KOD_PODST", referencedColumnName = "KOD", nullable = true)
         var organizationalUnitPrimary: OrganizationalUnit? = null,
@@ -137,8 +131,6 @@ class Programme(
         @Column(name = "KOD_POLON_REKRUTACJA", length = 20, nullable = true)
         var polonCodeRegistration: String? = null,
 
-        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
-        @JsonIdentityReference(alwaysAsId = true)
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "JED_ORG_KOD_PROW", referencedColumnName = "KOD", nullable = true)
         var organizationalUnitLeading: OrganizationalUnit? = null,

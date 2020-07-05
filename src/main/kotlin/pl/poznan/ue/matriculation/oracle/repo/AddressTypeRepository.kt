@@ -5,4 +5,4 @@ import org.springframework.stereotype.Repository
 import pl.poznan.ue.matriculation.oracle.domain.AddressType
 
 @Repository
-interface AddressTypeRepository: JpaRepository<AddressType, String>
+interface AddressTypeRepository : JpaRepository<AddressType, String>

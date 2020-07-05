@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 @Entity
@@ -25,7 +24,6 @@ class Voivodeship(
 //        @Column(name = "MOD_DATA", nullable = false)
 //        val modificationDate: Date? = null,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "voivodeship", fetch = FetchType.LAZY)
         var county: List<County>
 ) {

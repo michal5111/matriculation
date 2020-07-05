@@ -1,6 +1,5 @@
 import {Applicant} from './applicant';
 import {Document} from "./document";
-import {ImportStatus} from "../import/import-status.enum";
 
 export interface Application {
   id: number;
@@ -25,7 +24,7 @@ export interface Application {
     basisOfAdmission: string;
   };
   certificate: Document;
-  importStatus: ImportStatus;
+  importStatus: string;
   importError: string;
   stackTrace: string;
   irkInstance: string;

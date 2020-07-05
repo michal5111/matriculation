@@ -64,7 +64,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['birthDateAndPlace', 'applicant.basicData.dateOfBirth'],
     ['pesel', 'applicant.basicData.pesel'],
     ['indexNumber', 'applicant.assignedIndexNumber'],
-    ['applicationImportStatus', 'applicationImportStatus'],
+    ['applicationImportStatus', 'importStatus'],
     ['importError', 'importError']
   ]);
   $importProgressObservable = timer(0, 1000).pipe(
@@ -98,6 +98,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
         tap(applicationsPage => {
           this.page = applicationsPage;
           this.totalElements = applicationsPage.totalElements;
+          this.pageSize = applicationsPage.size;
         }),
         map(applicationsPage => applicationsPage.content),
         tap(content => this.dataSource.data = content)
@@ -125,8 +126,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   switchPage(pageEvent: PageEvent): void {
-    this.pageSize = pageEvent.pageSize;
-    this.pageNumber = pageEvent.pageIndex;
     this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe(
       () => {
       },
@@ -244,5 +243,13 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     this.dialog.open(ErrorDialogComponent, {
       data: new ErrorDialogData(title, error)
     });
+  }
+
+  showApplicationErrorDialog(application: Application): void {
+    if (application.importStatus === 'ERROR') {
+      this.dialog.open(ErrorDialogComponent, {
+        data: new ErrorDialogData('Błąd przy importowaniu', application.importError, application.stackTrace)
+      });
+    }
   }
 }

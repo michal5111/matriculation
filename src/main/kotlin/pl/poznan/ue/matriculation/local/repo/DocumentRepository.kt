@@ -8,7 +8,7 @@ import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applicants.EducationData
 
 @Repository
-interface DocumentRepository: JpaRepository<Document, Long> {
+interface DocumentRepository : JpaRepository<Document, Long> {
     fun findByEducationDataAndCertificateTypeCode(educationData: EducationData, certificateTypeCode: String): Document?
 
     @Transactional(rollbackFor = [Exception::class], propagation = Propagation.REQUIRED, transactionManager = "transactionManager")

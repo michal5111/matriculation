@@ -7,7 +7,7 @@ import pl.poznan.ue.matriculation.oracle.domain.AddressType
 import pl.poznan.ue.matriculation.oracle.domain.Person
 
 @Repository
-interface AddressRepository: JpaRepository<Address, String> {
+interface AddressRepository : JpaRepository<Address, String> {
 
     fun findByPersonAndAddressType(person: Person, addressType: AddressType): Address?
 }

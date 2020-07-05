@@ -6,8 +6,8 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 
 
 @SpringBootApplication
-class MatriculationApplication: SpringBootServletInitializer()
+class MatriculationApplication : SpringBootServletInitializer()
 
 fun main(args: Array<String>) {
-	runApplication<MatriculationApplication>(*args)
+    runApplication<MatriculationApplication>(*args)
 }

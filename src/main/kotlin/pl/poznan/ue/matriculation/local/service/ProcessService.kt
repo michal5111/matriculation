@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionSynchronizationManager
 import pl.poznan.ue.matriculation.irk.dto.applications.ApplicationDTO
 import pl.poznan.ue.matriculation.irk.service.IrkService
+import pl.poznan.ue.matriculation.kotlinExtensions.stackTraceToString
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.dto.ImportDtoJpa
@@ -19,6 +20,7 @@ import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.service.PersonService
+import java.lang.reflect.UndeclaredThrowableException
 import java.util.stream.Stream
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
@@ -61,9 +63,9 @@ class ProcessService(
             logger.debug("Nie istnieje dodaję...")
             applicationService.create(applicationDTO)
         }
-        logger.debug("Pobrałem import... Sprawdzam czy istnieje już aplikant o takim irkId")
-        val applicant = irkService.getApplicantById(applicationDTO.user).let {
-            val applicant = applicantRepository.findByIrkId(it!!.id)
+        logger.debug("Sprawdzam czy istnieje już aplikant o takim irkId")
+        val applicant = irkService.getApplicantById(applicationDTO.user)!!.let {
+            val applicant = applicantRepository.findByIrkId(it.id)
             if (applicant != null) {
                 logger.debug("Istnieje aktualizuję...")
                 return@let applicantService.update(applicant, it)
@@ -74,11 +76,14 @@ class ProcessService(
         }
         logger.debug("zapisuję aplikanta")
         applicantRepository.save(applicant)
+        application.applicant = applicant
         logger.debug("Zapisałem aplikanta")
+
         if (!applicant.applications.any { it.irkId == application.irkId }) {
             application.applicant = applicant
             applicant.applications.add(application)
         }
+
         application.certificate = applicant.educationData.documents.find {
             irkService.getPrimaryCertificate(application.irkId)?.let { primaryCertificate ->
                 return@let it.documentNumber == primaryCertificate.documentNumber &&
@@ -88,10 +93,14 @@ class ProcessService(
         //application.certificate?.Applications?.add(application)
         logger.debug("zapisuję aplikację")
         applicationRepository.save(application)
-        if (!applicationRepository.existsByImportIdAndIrkId(importId, application.irkId)) {
-            import.applications.add(application)
-            application.import = import
-        }
+
+//        if (!applicationRepository.existsByImportIdAndIrkId(importId, application.irkId)) {
+//            import.applications.add(application)
+//            application.import = import
+//        }
+
+        application.import = import
+
         logger.debug("zwiększam liczbę zaimportowanych")
         import.importProgress!!.importedApplications++
         return application
@@ -136,10 +145,12 @@ class ProcessService(
         application.importError = ""
         var e: Throwable? = exception
         do {
+            if (e is UndeclaredThrowableException) {
+                e = e.cause
+            }
             if (e is JDBCException) {
-                application.importError += "${e.javaClass.simpleName}: ${e.message} \n Error code: ${e.errorCode} " +
-                        "Sql exception: ${e.sqlException} \n " +
-                        "Sql: ${e.sql} \n " +
+                application.importError += "${e.javaClass.simpleName}: ${e.message} Error code: ${e.errorCode} " +
+                        "Sql: ${e.sql} " +
                         "Sql state: ${e.sqlState} "
             } else {
                 application.importError += "${e?.javaClass?.simpleName}: ${e?.message} "
@@ -147,7 +158,7 @@ class ProcessService(
             e = e?.cause
         } while (e != null)
         application.importStatus = ApplicationImportStatus.ERROR
-        application.stackTrace = exception.stackTrace.joinToString("\n", "\nStackTrace: ")
+        application.stackTrace = exception.stackTraceToString()
         importProgress.saveErrors++
         applicantRepository.save(application.applicant!!)
         applicationRepository.save(application)

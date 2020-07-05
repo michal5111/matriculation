@@ -1,14 +1,11 @@
 package pl.poznan.ue.matriculation.local.domain.import
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import java.util.*
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 class Import(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +29,7 @@ class Import(
         @OneToMany(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         val applications: MutableList<Application> = mutableListOf(),
 
-        @OneToOne(mappedBy = "import", fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+        @OneToOne(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
         var importProgress: ImportProgress? = null
 ) {
 
@@ -52,11 +49,11 @@ class Import(
         if (id != other.id) return false
 
         return true
-        }
+    }
 
-        override fun hashCode(): Int {
-            return id?.hashCode() ?: 0
-        }
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
 
 
 }

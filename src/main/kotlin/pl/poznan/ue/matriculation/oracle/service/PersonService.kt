@@ -17,7 +17,6 @@ import pl.poznan.ue.matriculation.local.service.ApplicantService
 import pl.poznan.ue.matriculation.oracle.domain.*
 import pl.poznan.ue.matriculation.oracle.repo.*
 import java.util.*
-import javax.annotation.PostConstruct
 
 @Service
 class PersonService(
@@ -37,14 +36,15 @@ class PersonService(
         private val entitlementDocumentRepository: EntitlementDocumentRepository,
         private val applicantService: ApplicantService,
         private val addressService: AddressService,
-        private val irkApplicationRepository: IrkApplicationRepository
+        private val irkApplicationRepository: IrkApplicationRepository,
+        private val personPreferenceRepository: PersonPreferenceRepository,
+        private val documentTypeRepository: DocumentTypeRepository,
+        private val ownedDocumentRepository: OwnedDocumentRepository,
+        private val personChangeHistoryRepository: PersonChangeHistoryRepository
 ) {
 
     @Autowired
     private lateinit var _self: PersonService
-    private lateinit var permanentAddressType: AddressType
-    private lateinit var correspondenceAddressType: AddressType
-    private lateinit var defaultStudentOrganizationalUnit: OrganizationalUnit
 
     @Value("\${pl.poznan.ue.matriculation.defaultStudentOrganizationalUnit}")
     lateinit var defaultStudentOrganizationalUnitString: String
@@ -55,42 +55,59 @@ class PersonService(
     @Value("\${pl.poznan.ue.matriculation.setAsAccepted}")
     private var setAsAccepted: Boolean = false
 
+    private var lastChangeDate: Date? = null
+
     fun create(applicant: Applicant): Person {
         return applicantService.createPersonFromApplicant(applicant)
     }
 
-    @PostConstruct
-    fun init() {
-        permanentAddressType = addressTypeRepository.getOne("STA")
-        correspondenceAddressType = addressTypeRepository.getOne("KOR")
-        defaultStudentOrganizationalUnit = organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitString)
-    }
-
     @Transactional(rollbackFor = [java.lang.Exception::class, RuntimeException::class], propagation = Propagation.MANDATORY, transactionManager = "oracleTransactionManager")
     fun update(applicant: Applicant, person: Person) {
+        val changeHistory = personChangeHistoryRepository.findByPersonAndChangeDate(person, Date())
+                ?: PersonChangeHistory(person = person)
         person.apply {
             if (applicant.email.endsWith(universityEmailSuffix)) {
                 email = applicant.email
             } else {
                 privateEmail = applicant.email
             }
-            name = applicant.name.given!!
-            middleName = applicant.name.middle
-            surname = applicant.name.family!!
-            citizenship = citizenshipRepository.getOne(applicant.citizenship!!)
+            if (name != applicant.name.given) {
+                changeHistory.name = name
+                name = applicant.name.given.capitalize()
+            }
+            if (middleName != applicant.name.middle) {
+                changeHistory.middleName = middleName
+                middleName = applicant.name.middle?.capitalize()
+            }
+            if (surname != applicant.name.family) {
+                changeHistory.surname = surname
+                surname = applicant.name.family.capitalize()
+            }
+            if (citizenship?.code != applicant.citizenship) {
+                changeHistory.citizenship = citizenship
+                citizenship = citizenshipRepository.getOne(applicant.citizenship!!)
+            }
             birthDate = applicant.basicData.dateOfBirth
             birthCity = applicant.basicData.cityOfBirth
             birthCountry = citizenshipRepository.getOne(applicant.basicData.countryOfBirth)
-            sex = applicant.basicData.sex
-            nationality = citizenshipRepository.getOne(applicant.basicData.countryOfBirth)
-            organizationalUnit = defaultStudentOrganizationalUnit
+            if (sex != applicant.basicData.sex) {
+                changeHistory.sex = sex
+                sex = applicant.basicData.sex
+            }
+//            if (nationality?.code != applicant.basicData.countryOfBirth) {
+//                personChangeHistory.add(PersonChangeHistory(
+//                        person = person,
+//                        nationality = nationality
+//                ))
+//                nationality = citizenshipRepository.getOne(applicant.basicData.countryOfBirth)
+//            }
+            organizationalUnit = organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitString)
             middleSchool = applicant.educationData.highSchoolUsosCode?.let {
                 schoolRepository.getOne(it)
             }
             createOrUpdateAddresses(this, applicant)
             createOrUpdatePhoneNumbers(this, applicant)
-
-            //dok toż
+            createOrUpdateIdentityDocument(this, applicant, changeHistory)
 
             mothersName = applicant.additionalData.mothersName
             fathersName = applicant.additionalData.fathersName
@@ -101,13 +118,50 @@ class PersonService(
             militaryCategory = applicant.additionalData.militaryCategory
             militaryStatus = applicant.additionalData.militaryStatus
             createOrUpdatePersonPhoto(person, applicant)
+            createOrUpdateOwnedDocuments(person, applicant)
+            if (
+                    changeHistory.name != null
+                    || changeHistory.middleName != null
+                    || changeHistory.surname != null
+                    || changeHistory.citizenship != null
+                    || changeHistory.idNumber != null
+                    || changeHistory.documentType != null
+                    || changeHistory.pesel != null
+                    || changeHistory.sex != null
+            ) {
+                person.personChangeHistory.add(changeHistory)
+            }
+        }
+    }
+
+    private fun createOrUpdateIdentityDocument(person: Person, applicant: Applicant, changeHistory: PersonChangeHistory) {
+        applicant.basicData.pesel?.let {
+            if (person.pesel != it) {
+                changeHistory.pesel = person.pesel
+                person.pesel = it
+            }
+        }
+        applicant.additionalData.documentNumber?.let {
+            if (person.documentType != applicant.additionalData.documentType) {
+                changeHistory.documentType = person.documentType
+                person.documentType = applicant.additionalData.documentType
+            }
+            if (person.idNumber != it) {
+                changeHistory.idNumber = person.idNumber
+                person.idNumber = it
+            }
+            person.documentType = applicant.additionalData.documentType
+            person.identityDocumentExpirationDate = applicant.additionalData.documentExpDate
+            person.identityDocumentIssuerCountry = applicant.additionalData.documentCountry?.let { documentCountry ->
+                citizenshipRepository.getOne(documentCountry)
+            }
         }
     }
 
     private fun createOrUpdateAddresses(person: Person, applicant: Applicant) {
         createOrUpdateAddress(
                 person = person,
-                addressType = permanentAddressType,
+                addressType = addressTypeRepository.getOne("STA"),
                 city = applicant.contactData.officialCity,
                 street = applicant.contactData.officialStreet,
                 houseNumber = applicant.contactData.officialStreetNumber,
@@ -119,7 +173,7 @@ class PersonService(
 
         createOrUpdateAddress(
                 person = person,
-                addressType = correspondenceAddressType,
+                addressType = addressTypeRepository.getOne("KOR"),
                 city = applicant.contactData.realCity,
                 street = applicant.contactData.realStreet,
                 houseNumber = applicant.contactData.realStreetNumber,
@@ -217,9 +271,9 @@ class PersonService(
                 person.entitlementDocuments.add(
                         EntitlementDocument(
                                 person = person,
-                                issueDate = it.issueDate!!,
+                                issueDate = it.issueDate,
                                 description = it.certificateType,
-                                number = it.documentNumber!!,
+                                number = it.documentNumber,
                                 type = it.certificateUsosCode,
                                 school = it.issueInstitutionUsosCode?.let { schoolId ->
                                     schoolId.toLongOrNull()?.let { schoolIdLong ->
@@ -242,6 +296,56 @@ class PersonService(
                         photoBlob = irkService.getPhoto(it)
                 )
             }
+            val personPreference = personPreferenceRepository.findByIdOrNull(PersonPreferenceId(
+                    person.id!!, "photo_visibility"
+            ))
+            if (personPreference != null) {
+                personPreference.value = applicant.photoPermission
+            } else {
+                person.personPreferences.add(
+                        PersonPreference(person, "photo_visibility", applicant.photoPermission)
+                )
+            }
+        }
+    }
+
+    private fun createOrUpdateOwnedDocuments(person: Person, applicant: Applicant) {
+        if (applicant.applicantForeignerData?.baseOfStay == null
+                || applicant.applicantForeignerData.baseOfStay != "OKP") {
+            return
+        }
+        val ownedDocument = ownedDocumentRepository.findByPersonAndAndDocumentType(
+                person,
+                documentTypeRepository.getOne(applicant.applicantForeignerData.baseOfStay!!)
+        )
+        if (ownedDocument != null) {
+            ownedDocument.apply {
+                documentType = documentTypeRepository.getOne(applicant.applicantForeignerData.baseOfStay!!)
+                issueDate = applicant.applicantForeignerData.polishCardIssueDate
+                issueCountry = applicant.applicantForeignerData.polishCardIssueCountry?.let { countryCode ->
+                    citizenshipRepository.getOne(countryCode)
+                }
+                number = applicant.applicantForeignerData.polishCardNumber
+                expirationDate = applicant.applicantForeignerData.polishCardValidTo
+            }
+        } else {
+            applicant.applicantForeignerData.let {
+                if (it.baseOfStay == null || it.baseOfStay != "OKP") {
+                    return@let
+                }
+                person.ownedDocuments.add(
+                        OwnedDocument(
+                                documentType = documentTypeRepository.getOne(it.baseOfStay!!),
+                                person = person,
+                                issueDate = it.polishCardIssueDate,
+                                issueCountry = it.polishCardIssueCountry?.let { countryCode ->
+                                    citizenshipRepository.getOne(countryCode)
+                                },
+                                number = it.polishCardNumber,
+                                expirationDate = it.polishCardValidTo
+                        )
+                )
+            }
         }
     }
 
@@ -256,7 +360,9 @@ class PersonService(
             stageCode: String,
             didacticCycleCode: String,
             irkApplication: IrkApplication,
-            certificate: Document?
+            certificate: Document?,
+            sourceOfFinancing: String?,
+            basisOfAdmission: String?
     ): String {
         val student = studentService.createOrFindStudent(person, indexPoolCode)
         studentRepository.save(student)
@@ -274,7 +380,9 @@ class PersonService(
                 didacticCycleCode = didacticCycleCode,
                 stageCode = stageCode,
                 student = student,
-                certificate = certificate
+                certificate = certificate,
+                sourceOfFinancing = sourceOfFinancing,
+                basisOfAdmission = basisOfAdmission
         )
         irkApplication.personProgramme = personProgramme
         personProgramme.irkApplication = irkApplication
@@ -329,7 +437,9 @@ class PersonService(
                 stageCode = stageCode,
                 startDate = startDate,
                 irkApplication = irkApplication,
-                certificate = application.certificate
+                certificate = application.certificate,
+                sourceOfFinancing = application.applicationForeignerData?.sourceOfFinancing,
+                basisOfAdmission = application.applicationForeignerData?.basisOfAdmission
         )
         if (setAsAccepted) {
             try {

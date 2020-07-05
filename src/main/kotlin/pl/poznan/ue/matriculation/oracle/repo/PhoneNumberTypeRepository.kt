@@ -5,4 +5,4 @@ import org.springframework.stereotype.Repository
 import pl.poznan.ue.matriculation.oracle.domain.PhoneNumberType
 
 @Repository
-interface PhoneNumberTypeRepository: JpaRepository<PhoneNumberType, String>
+interface PhoneNumberTypeRepository : JpaRepository<PhoneNumberType, String>

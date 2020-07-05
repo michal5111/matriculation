@@ -112,9 +112,7 @@ class RestController(
 
     @PutMapping("/import/{id}")
     fun importApplicants(@PathVariable("id") importId: Long): ResponseEntity<Void> {
-        importService.getForApplicantImport(importId)
-        importService.setImportStatus(ImportStatus.STARTED, importId)
-        importService.resetImportedApplications(importId)
+        importService.prepareForImporting(importId)
         asyncService.importApplicantsAsync(importId)
         return ResponseEntity.accepted().build()
     }
@@ -126,12 +124,9 @@ class RestController(
     @GetMapping("/import/{id}/progress")
     fun getProgress(@PathVariable("id") importId: Long): ImportProgress = importService.getProgress(importId)
 
-
     @GetMapping("/import/{id}/save")
     fun savePersons(@PathVariable("id") importId: Long): ResponseEntity<Void> {
-        importService.getForPersonSave(importId)
-        importService.setImportStatus(ImportStatus.SAVING, importId)
-        importService.resetSaveErrors(importId)
+        importService.prepareForSaving(importId)
         asyncService.savePersons(importId)
         return ResponseEntity.accepted().build()
     }

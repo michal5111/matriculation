@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 @Entity
@@ -30,11 +29,9 @@ class TaxOffice(
 //        @Column(name = "UTW_ID", length = 30, nullable = false)
 //        val creationUser: String,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "taxOffice", fetch = FetchType.LAZY)
         val persons: Set<Person>,
 
-        @JsonIgnore
         @OneToOne(mappedBy = "taxOffice", fetch = FetchType.LAZY)
         var address: Address
 

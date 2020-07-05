@@ -31,7 +31,7 @@ import pl.poznan.ue.matriculation.security.CustomUserDetailsService
 @Configuration
 @EnableWebSecurity
 @Order(2)
-class SecurityConfiguration: WebSecurityConfigurerAdapter() {
+class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Value("\${cas.service.login}")
     private lateinit var CAS_URL_LOGIN: String
 
@@ -120,9 +120,8 @@ class SecurityConfiguration: WebSecurityConfigurerAdapter() {
     }
 
     fun singleSignOutFilter(): SingleSignOutFilter {
-        val singleSignOutFilter = SingleSignOutFilter()
         //singleSignOutFilter.(CAS_URL_PREFIX)//setCasServerUrlPrefix(CAS_URL_PREFIX)
-        return singleSignOutFilter
+        return SingleSignOutFilter()
     }
 
     @Bean
@@ -157,14 +156,14 @@ class SecurityConfiguration: WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http
                 .exceptionHandling()
-                    .authenticationEntryPoint(casAuthenticationEntryPoint())
+                .authenticationEntryPoint(casAuthenticationEntryPoint())
                 .and()
-                    .addFilter(casAuthenticationFilter())
-                    .addFilterBefore(corsFilter(), CorsFilter::class.java)
-                    .addFilterBefore(singleSignOutFilter(), CasAuthenticationFilter::class.java)
-                    .addFilterBefore(requestCasGlobalLogoutFilter(), LogoutFilter::class.java)
+                .addFilter(casAuthenticationFilter())
+                .addFilterBefore(corsFilter(), CorsFilter::class.java)
+                .addFilterBefore(singleSignOutFilter(), CasAuthenticationFilter::class.java)
+                .addFilterBefore(requestCasGlobalLogoutFilter(), LogoutFilter::class.java)
                 .authorizeRequests()
-                    .antMatchers("/login").authenticated()
+                .antMatchers("/login").authenticated()
         http.csrf().disable()
         http.headers().frameOptions().disable()
     }

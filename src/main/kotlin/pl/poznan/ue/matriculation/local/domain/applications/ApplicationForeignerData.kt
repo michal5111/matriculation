@@ -1,13 +1,10 @@
 package pl.poznan.ue.matriculation.local.domain.applications
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import java.io.Serializable
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "ApplicationForeignerData")
 class ApplicationForeignerData(
 
@@ -22,27 +19,27 @@ class ApplicationForeignerData(
         var basisOfAdmission: String?,
 
         var sourceOfFinancing: String?
-): Serializable {
+) : Serializable {
 
-        override fun toString(): String {
-                return "ApplicationForeignerData(baseOfStay=$baseOfStay, basisOfAdmission=$basisOfAdmission, " +
-                        "sourceOfFinancing=$sourceOfFinancing)"
-        }
+    override fun toString(): String {
+        return "ApplicationForeignerData(baseOfStay=$baseOfStay, basisOfAdmission=$basisOfAdmission, " +
+                "sourceOfFinancing=$sourceOfFinancing)"
+    }
 
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                other as ApplicationForeignerData
+        other as ApplicationForeignerData
 
-                if (application != other.application) return false
+        if (application != other.application) return false
 
-                return true
-        }
+        return true
+    }
 
-        override fun hashCode(): Int {
-                return application?.hashCode() ?: 0
-        }
+    override fun hashCode(): Int {
+        return application?.hashCode() ?: 0
+    }
 
 
 }

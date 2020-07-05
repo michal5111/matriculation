@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 
 @Repository
-interface ApplicantRepository: JpaRepository<Applicant, Long> {
+interface ApplicantRepository : JpaRepository<Applicant, Long> {
 
     fun findByIrkId(irkId: Long): Applicant?
 

@@ -3,6 +3,10 @@
   {{data.title}}</h2>
 <mat-dialog-content>
   {{message}}
+  <div *ngIf="data.stacktrace">
+    <mat-divider class="divider-margin"></mat-divider>
+    {{data.stacktrace}}
+  </div>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button (click)="dialogRef.close()">Ok</button>

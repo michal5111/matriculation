@@ -65,16 +65,18 @@ class ImportService(
         importProgressRepository.setStatus(importStatus, importId)
     }
 
-    fun resetSaveErrors(importId: Long) {
-        val importProgress = getProgress(importId)
-        importProgress.saveErrors = 0
-        importProgressRepository.save(importProgress)
+    fun prepareForSaving(importId: Long) {
+        val import = getForPersonSave(importId)
+        import.importProgress!!.saveErrors = 0
+        import.importProgress!!.importStatus = ImportStatus.SAVING
+        importRepository.save(import)
     }
 
-    fun resetImportedApplications(importId: Long) {
-        val importProgress = getProgress(importId)
-        importProgress.importedApplications = 0
-        importProgressRepository.save(importProgress)
+    fun prepareForImporting(importId: Long) {
+        val import = getForApplicantImport(importId)
+        import.importProgress!!.importStatus = ImportStatus.STARTED
+        import.importProgress!!.importedApplications = 0
+        importRepository.save(import)
     }
 
     fun get(importId: Long): Import {
@@ -111,7 +113,13 @@ class ImportService(
     fun getForPersonSave(importId: Long): Import {
         val import: Import = importRepository.findByIdOrNull(importId)
                 ?: throw ImportNotFoundException("Nie znaleziono importu.")
-        if (import.importProgress!!.importStatus != ImportStatus.IMPORTED && import.importProgress!!.importStatus != ImportStatus.COMPLETE) {
+        if ((import.importProgress!!.importStatus != ImportStatus.IMPORTED
+                        && import.importProgress!!.importStatus != ImportStatus.COMPLETE)
+                || (import.importProgress?.totalCount != null
+                        && import.importProgress!!.totalCount!! < 1)
+                || (import.importProgress?.totalCount != null
+                        && import.importProgress!!.totalCount ==
+                        import.importProgress!!.savedApplicants)) {
             throw ImportStartException(importId, "Zły stan importu.")
         }
         if (import.importProgress!!.importStatus == ImportStatus.ARCHIVED) {
@@ -128,5 +136,9 @@ class ImportService(
             logger.error("Błąd przy usuwaniu importu", e)
             throw ImportDeleteException("Nie Można usunąć importu: ${e.message}")
         }
+    }
+
+    fun save(import: Import): Import {
+        return importRepository.save(import)
     }
 }

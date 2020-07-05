@@ -1,11 +1,10 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+//@Cacheable
+//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_OBYWATELSTWA")
 class Citizenship(
         @Id
@@ -67,7 +66,13 @@ class Citizenship(
         var address: List<Address>,
 
         @OneToMany(mappedBy = "issueCountry", fetch = FetchType.LAZY)
-        var ownedDocuments: MutableList<OwnedDocument> = mutableListOf()
+        var ownedDocuments: MutableList<OwnedDocument> = mutableListOf(),
+
+        @OneToMany(mappedBy = "nationality", fetch = FetchType.LAZY)
+        val personsChangeHistoryNationality: Set<PersonChangeHistory>,
+
+        @OneToMany(mappedBy = "citizenship", fetch = FetchType.LAZY)
+        val personsChangeHistoryCitizenship: Set<PersonChangeHistory>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -187,10 +187,10 @@ class IrkService {
             uriComponentBuilder.queryParam("paid", paid)
         }
         registration?.let {
-            uriComponentBuilder.queryParam("registration", registration)
+            uriComponentBuilder.queryParam("registration", "^${registration}$")
         }
         programme?.let {
-            uriComponentBuilder.queryParam("programme", programme)
+            uriComponentBuilder.queryParam("programme", "^${programme}$")
         }
         if (pageNumber != null) {
             uriComponentBuilder.queryParam("page", pageNumber)
@@ -200,7 +200,7 @@ class IrkService {
         httpHeaders.set("Authorization", "Token $apiKey")
         val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         val response: ResponseEntity<Page<ApplicationDTO>> = restTemplate.exchange(
-                uriComponentBuilder.toUriString(),
+                uriComponentBuilder.build().toUri(),
                 HttpMethod.GET,
                 httpEntity,
                 PageOfApplications()

@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 @Entity
@@ -30,7 +29,6 @@ class PhoneNumber(
         @JoinColumn(name = "JED_ORG_KOD", referencedColumnName = "KOD", nullable = true)
         var organizationalUnit: OrganizationalUnit? = null,
 
-        @JsonIgnore
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "OS_ID", referencedColumnName = "ID", nullable = true)
         var person: Person? = null,

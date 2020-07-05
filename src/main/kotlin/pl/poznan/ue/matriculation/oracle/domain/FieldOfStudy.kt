@@ -1,8 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo
-import com.fasterxml.jackson.annotation.JsonIdentityReference
-import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import javax.persistence.*
 
 @Entity
@@ -16,8 +13,6 @@ class FieldOfStudy(
         @Column(name = "OPIS", length = 200, nullable = false)
         val description: String,
 
-        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
-        @JsonIdentityReference(alwaysAsId = true)
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "NADRZEDNY_KOD", referencedColumnName = "KOD", nullable = false)
         var fieldOfStudy: FieldOfStudy? = null,

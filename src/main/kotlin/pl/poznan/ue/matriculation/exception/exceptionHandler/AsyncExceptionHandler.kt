@@ -13,7 +13,7 @@ import java.lang.reflect.Method
 import java.sql.SQLException
 
 @Component
-class AsyncExceptionHandler: AsyncUncaughtExceptionHandler {
+class AsyncExceptionHandler : AsyncUncaughtExceptionHandler {
 
     @Autowired
     private lateinit var importService: ImportService

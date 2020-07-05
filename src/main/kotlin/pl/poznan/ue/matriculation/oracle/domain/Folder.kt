@@ -1,9 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo
-import com.fasterxml.jackson.annotation.JsonIdentityReference
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import javax.persistence.*
 
 @Entity
@@ -15,7 +11,6 @@ class Folder(
         @Column(name = "ID", length = 10)
         val id: Long? = null,
 
-        @JsonIgnore
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "OS_ID", referencedColumnName = "ID", nullable = false)
         var person: Person,
@@ -47,8 +42,6 @@ class Folder(
         @Column(name = "STATUS", length = 1, nullable = false)
         var status: Char = 'N',
 
-        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
-        @JsonIdentityReference(alwaysAsId = true)
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "JED_ORG_KOD", referencedColumnName = "KOD", nullable = true)
         var organizationalUnit: OrganizationalUnit? = null,
@@ -56,7 +49,6 @@ class Folder(
         @Column(name = "LICZBA_TECZEK", length = 2, nullable = true)
         var foldersCount: Int? = null,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "folder", fetch = FetchType.LAZY)
         var personProgrammes: MutableList<PersonProgramme>
 ) {

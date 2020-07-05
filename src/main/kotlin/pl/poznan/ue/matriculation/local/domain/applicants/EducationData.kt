@@ -1,13 +1,10 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import java.io.Serializable
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 class EducationData(
 
         @Id
@@ -29,7 +26,7 @@ class EducationData(
         var highSchoolType: String?,
 
         var highSchoolUsosCode: Long?
-): Serializable {
+) : Serializable {
 
     override fun toString(): String {
         return "EducationData(applicantId=$applicantId, highSchoolCity=$highSchoolCity, " +
@@ -46,11 +43,11 @@ class EducationData(
         if (applicantId != other.applicantId) return false
 
         return true
-        }
+    }
 
-        override fun hashCode(): Int {
-            return applicantId?.hashCode() ?: 0
-        }
+    override fun hashCode(): Int {
+        return applicantId?.hashCode() ?: 0
+    }
 
 
 }

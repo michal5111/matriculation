@@ -8,7 +8,6 @@ import pl.poznan.ue.matriculation.local.domain.applicants.*
 import pl.poznan.ue.matriculation.oracle.domain.*
 import pl.poznan.ue.matriculation.oracle.repo.*
 import pl.poznan.ue.matriculation.oracle.service.AddressService
-import javax.annotation.PostConstruct
 
 @Component
 class ApplicantMapper(
@@ -23,22 +22,11 @@ class ApplicantMapper(
         private val documentTypeRepository: DocumentTypeRepository
 ) {
 
-    lateinit var defaultStudentOrganizationalUnit: OrganizationalUnit
-    lateinit var permanentAddressType: AddressType
-    lateinit var correspondenceAddressType: AddressType
-
     @Value("\${pl.poznan.ue.matriculation.defaultStudentOrganizationalUnit}")
     lateinit var defaultStudentOrganizationalUnitString: String
 
     @Value("\${pl.poznan.ue.matriculation.universityEmailSuffix}")
     lateinit var universityEmailSuffix: String
-
-    @PostConstruct
-    fun init() {
-        defaultStudentOrganizationalUnit = organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitString)
-        permanentAddressType = addressTypeRepository.getOne("STA")
-        correspondenceAddressType = addressTypeRepository.getOne("KOR")
-    }
 
     fun applicantDtoToApplicantMapper(applicantDTO: ApplicantDTO): Applicant {
         return Applicant(
@@ -47,10 +35,10 @@ class ApplicantMapper(
                 indexNumber = applicantDTO.indexNumber,
                 password = applicantDTO.password,
                 name = Name(
-                        middle = applicantDTO.name.middle,
-                        family = applicantDTO.name.family,
-                        maiden = applicantDTO.name.maiden,
-                        given = applicantDTO.name.given
+                        middle = applicantDTO.name.middle?.capitalize(),
+                        family = applicantDTO.name.family.capitalize(),
+                        maiden = applicantDTO.name.maiden?.capitalize(),
+                        given = applicantDTO.name.given.capitalize()
                 ),
                 phone = applicantDTO.phone,
                 citizenship = applicantDTO.citizenship,
@@ -111,7 +99,7 @@ class ApplicantMapper(
                                 Status(
                                         status = statusDto
                                 )
-                            },
+                            }.toMutableList(),
                             polishCardIssueCountry = it.polishCardIssueCountry,
                             polishCardIssueDate = it.polishCardIssueDate,
                             polishCardNumber = it.polishCardNumber,
@@ -120,23 +108,23 @@ class ApplicantMapper(
                 },
                 educationData = applicantDTO.educationData.let {
                     EducationData(
-                            documents = it.documents.map { documentDTO ->
+                            documents = it.documents.filter { document ->
+                                document.issueDate != null && !document.documentNumber.isNullOrBlank()
+                            }.map { documentDTO ->
                                 Document(
                                         certificateType = documentDTO.certificateType,
                                         certificateTypeCode = documentDTO.certificateTypeCode,
                                         certificateUsosCode = documentDTO.certificateUsosCode,
                                         comment = documentDTO.comment,
-                                        documentNumber = documentDTO.documentNumber,
+                                        documentNumber = documentDTO.documentNumber!!,
                                         documentYear = documentDTO.documentYear,
                                         issueCity = documentDTO.issueCity,
                                         issueCountry = documentDTO.issueCountry,
-                                        issueDate = documentDTO.issueDate,
+                                        issueDate = documentDTO.issueDate!!,
                                         issueInstitution = documentDTO.issueInstitution,
                                         issueInstitutionUsosCode = documentDTO.issueInstitutionUsosCode,
                                         modificationDate = documentDTO.modificationDate
                                 )
-                            }.filter { document ->
-                                document.issueDate != null && !document.documentNumber.isNullOrBlank()
                             }.toMutableList(),
                             highSchoolCity = it.highSchoolCity,
                             highSchoolName = it.highSchoolName,
@@ -168,23 +156,23 @@ class ApplicantMapper(
                 privateEmail = applicant.email.takeIf {
                     !it.endsWith(universityEmailSuffix)
                 },
-                name = applicant.name.given!!,
+                name = applicant.name.given,
                 middleName = applicant.name.middle,
-                surname = applicant.name.family!!,
+                surname = applicant.name.family,
                 citizenship = citizenshipRepository.getOne(applicant.citizenship!!),
                 birthDate = applicant.basicData.dateOfBirth,
                 birthCity = applicant.basicData.cityOfBirth,
                 birthCountry = citizenshipRepository.getOne(applicant.basicData.countryOfBirth),
                 pesel = applicant.basicData.pesel,
                 sex = applicant.basicData.sex,
-                nationality = citizenshipRepository.getOne(applicant.basicData.countryOfBirth),
-                organizationalUnit = defaultStudentOrganizationalUnit,
+                //nationality = citizenshipRepository.getOne(applicant.basicData.countryOfBirth),
+                organizationalUnit = organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitString),
                 middleSchool = applicant.educationData.highSchoolUsosCode?.let {
                     schoolRepository.getOne(it)
                 },
                 addresses = listOf(
                         addressService.create(
-                                addressType = permanentAddressType,
+                                addressType = addressTypeRepository.getOne("STA"),
                                 city = applicant.contactData.officialCity,
                                 street = applicant.contactData.officialStreet,
                                 houseNumber = applicant.contactData.officialStreetNumber,
@@ -194,7 +182,7 @@ class ApplicantMapper(
                                 countryCode = applicant.contactData.officialCountry
                         ),
                         addressService.create(
-                                addressType = correspondenceAddressType,
+                                addressType = addressTypeRepository.getOne("KOR"),
                                 city = applicant.contactData.realCity,
                                 street = applicant.contactData.realStreet,
                                 houseNumber = applicant.contactData.realStreetNumber,
@@ -228,9 +216,9 @@ class ApplicantMapper(
                     document.certificateUsosCode != null
                 }.map {
                     EntitlementDocument(
-                            issueDate = it.issueDate!!,
+                            issueDate = it.issueDate,
                             description = it.certificateType,
-                            number = it.documentNumber!!,
+                            number = it.documentNumber,
                             type = it.certificateUsosCode!!,
                             school = it.issueInstitutionUsosCode?.let { schoolId ->
                                 schoolId.toLongOrNull()?.let { schoolIdLong ->
@@ -259,27 +247,28 @@ class ApplicantMapper(
             personPhoto?.let {
                 it.person = this
                 personPreferences.add(
-                        PersonPreference(this, "photo_visibility", applicant.photoPermission)
+                        PersonPreference(person = this, attribute = "photo_visibility", value = applicant.photoPermission)
                 )
             }
             addresses.forEach {
                 it.person = this
             }
             applicant.applicantForeignerData?.let {
-                if (it.baseOfStay != null && it.baseOfStay == "OKS") {
-                    ownedDocuments.add(
-                            OwnedDocument(
-                                    documentType = documentTypeRepository.getOne(it.baseOfStay!!),
-                                    person = this,
-                                    issueDate = it.polishCardIssueDate,
-                                    issueCountry = it.polishCardIssueCountry?.let { countryCode ->
-                                        citizenshipRepository.getOne(countryCode)
-                                    },
-                                    number = it.polishCardNumber,
-                                    expirationDate = it.polishCardValidTo
-                            )
-                    )
+                if (it.baseOfStay == null || it.baseOfStay != "OKP") {
+                    return@let
                 }
+                ownedDocuments.add(
+                        OwnedDocument(
+                                documentType = documentTypeRepository.getOne(it.baseOfStay!!),
+                                person = this,
+                                issueDate = it.polishCardIssueDate,
+                                issueCountry = it.polishCardIssueCountry?.let { countryCode ->
+                                    citizenshipRepository.getOne(countryCode)
+                                },
+                                number = it.polishCardNumber,
+                                expirationDate = it.polishCardValidTo
+                        )
+                )
             }
         }
     }

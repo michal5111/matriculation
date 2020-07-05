@@ -1,8 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo
-import com.fasterxml.jackson.annotation.JsonIdentityReference
-import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import java.util.*
 import javax.persistence.*
 
@@ -39,8 +36,6 @@ class PersonProgramme(
         @Column(name = "UPRAWNIENIA_ZAWODOWE_ANG", length = 4000, nullable = true)
         var professionalPowersEng: String? = null,
 
-        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
-        @JsonIdentityReference(alwaysAsId = true)
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "JED_ORG_KOD", referencedColumnName = "KOD", nullable = true)
         var organizationalUnit: OrganizationalUnit? = null,
@@ -158,7 +153,13 @@ class PersonProgramme(
         val personStages: MutableList<PersonStage> = mutableListOf(),
 
         @OneToOne(mappedBy = "personProgramme", fetch = FetchType.LAZY)
-        var irkApplication: IrkApplication? = null
+        var irkApplication: IrkApplication? = null,
+
+        @OneToMany(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+        var personProgrammeSourceOfFinancing: MutableList<PersonProgrammeSourceOfFinancing> = mutableListOf(),
+
+        @OneToMany(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+        var personProgrammeBasisOfAdmission: MutableList<PersonProgrammeBasisOfAdmission> = mutableListOf()
 ) {
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true

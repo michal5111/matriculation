@@ -2,21 +2,21 @@
   <form [formGroup]="importCreationFormGroup" (ngSubmit)="onSubmit()">
     <mat-form-field class="form-field wide-field">
       <mat-label>Rekrutacja</mat-label>
-      <mat-select formControlName="registration" required="true">
+      <mat-select formControlName="registration" required="true"
+                  (selectionChange)="onRegistrationSelectionChange($event)">
         <mat-option
           *ngFor="let registration of $availableRegistrationsObservable | async"
-          [value]="registration.code"
-          (onSelectionChange)="onRegistrationSelectionChange($event, registration.code)">{{registration.code}} {{registration.name}}
+          [value]="registration.code">{{registration.code}} {{registration.name}}
         </mat-option>
       </mat-select>
     </mat-form-field>
     <mat-form-field class="form-field wide-field">
       <mat-label>Program</mat-label>
-      <mat-select formControlName="registrationProgramme" required="true">
+      <mat-select formControlName="registrationProgramme" required="true"
+                  (selectionChange)="onRegistrationProgrammeChange($event)">
         <mat-option
           *ngFor="let registrationProgramme of registrationProgrammes"
-          [value]="registrationProgramme"
-          (onSelectionChange)="onRegistrationProgrammeChange($event, registrationProgramme)">{{registrationProgramme}}
+          [value]="registrationProgramme">{{registrationProgramme}}
         </mat-option>
       </mat-select>
     </mat-form-field>

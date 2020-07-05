@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.oracle.domain.Person
 
 @Repository
-interface PersonRepository: JpaRepository<Person, Long> {
+interface PersonRepository : JpaRepository<Person, Long> {
 
     @Transactional(rollbackFor = [java.lang.Exception::class], propagation = Propagation.REQUIRED, transactionManager = "oracleTransactionManager")
     fun findOneByPesel(pesel: String): Person?

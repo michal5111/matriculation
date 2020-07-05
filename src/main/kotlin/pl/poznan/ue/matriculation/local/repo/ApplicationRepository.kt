@@ -17,20 +17,18 @@ import java.util.stream.Stream
 import javax.persistence.QueryHint
 
 @Repository
-interface ApplicationRepository: PagingAndSortingRepository<Application, Long> {
+interface ApplicationRepository : PagingAndSortingRepository<Application, Long> {
 
     @Query("SELECT a FROM Application a WHERE a.import.id = :importId")
     fun findAllByImportId(pageable: Pageable, @Param("importId") importId: Long): Page<Application>
 
     fun existsByIrkId(irkId: Long): Boolean
 
-    fun existsByImportIdAndIrkId(importId: Long, irkId: Long): Boolean
-
     fun getByIrkId(irkId: Long): Application
 
     //@QueryHints(value = [QueryHint(name = HINT_FETCH_SIZE, value = "" + Integer.MIN_VALUE)]) //MySql
     @QueryHints(value = [
-        QueryHint(name = HINT_FETCH_SIZE, value = "20"),
+        QueryHint(name = HINT_FETCH_SIZE, value = "50"),
         QueryHint(name = HINT_CACHEABLE, value = "false"),
         QueryHint(name = READ_ONLY, value = "true")
     ])

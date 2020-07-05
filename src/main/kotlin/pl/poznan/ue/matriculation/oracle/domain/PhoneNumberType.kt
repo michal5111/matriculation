@@ -27,8 +27,8 @@ class PhoneNumberType(
 //    @Column(name = "MOD_DATA", nullable = false)
 //    val modificationDate: Date? = null,
 
-    @OneToMany(mappedBy = "phoneNumberType")
-    var phoneNumbers: List<PhoneNumber>
+        @OneToMany(mappedBy = "phoneNumberType")
+        var phoneNumbers: List<PhoneNumber>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

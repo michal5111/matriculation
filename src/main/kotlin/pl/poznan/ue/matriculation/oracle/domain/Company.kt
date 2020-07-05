@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 @Entity
@@ -40,7 +39,7 @@ class Company(
         @Column(name = "FORMA_PRAWNA", length = 3, nullable = true)
         var legalForm: String? = null,
 
-        @Column(name = "NUMER_KRS",length = 10, nullable = true)
+        @Column(name = "NUMER_KRS", length = 10, nullable = true)
         var krsNumber: String? = null,
 
         @Column(name = "REGON", length = 14, nullable = true)
@@ -49,12 +48,10 @@ class Company(
         @Column(name = "ADRES_WWW", length = 200, nullable = true)
         var website: String? = null,
 
-        @JsonIgnore
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "FRM_KOD", referencedColumnName = "KOD", nullable = true)
         var company: Company? = null,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "company")
         var phoneNumbers: List<PhoneNumber>
 

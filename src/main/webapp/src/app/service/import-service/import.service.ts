@@ -64,7 +64,13 @@ export class ImportService {
     return this.http.get<Import>(`${this.apiUrl}/import/${importId}`, httpOptions);
   }
 
-  findAllApplicationsByImportId(importId: number, page: number, size: number, sort?: string, sortDir?: string): Observable<Page<Application>> {
+  findAllApplicationsByImportId(
+    importId: number,
+    page: number,
+    size: number,
+    sort?: string,
+    sortDir?: string
+  ): Observable<Page<Application>> {
     if (sort && sortDir) {
       return this.http.get<Page<Application>>(`${this.apiUrl}/import/${importId}/applications?page=${page}&size=${size}&sort=${sort},${sortDir}`, httpOptions);
     }

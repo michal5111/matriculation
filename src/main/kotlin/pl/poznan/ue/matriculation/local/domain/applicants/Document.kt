@@ -2,15 +2,12 @@ package pl.poznan.ue.matriculation.local.domain.applicants
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import java.io.Serializable
 import java.util.*
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 class Document(
 
         @Id
@@ -30,7 +27,7 @@ class Document(
 
         var comment: String?,
 
-        var documentNumber: String?,
+        var documentNumber: String,
 
         var documentYear: Int?,
 
@@ -38,7 +35,7 @@ class Document(
 
         var issueCountry: String?,
 
-        var issueDate: Date?,
+        var issueDate: Date,
 
         var issueInstitution: String?,
 
@@ -69,11 +66,11 @@ class Document(
         if (id != other.id) return false
 
         return true
-        }
+    }
 
-        override fun hashCode(): Int {
-            return id?.hashCode() ?: 0
-        }
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
 
 
 }

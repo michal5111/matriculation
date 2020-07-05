@@ -8,6 +8,7 @@ import pl.poznan.ue.matriculation.irk.dto.applicants.ApplicantDTO
 import pl.poznan.ue.matriculation.irk.mapper.ApplicantMapper
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
+import pl.poznan.ue.matriculation.local.domain.applicants.Status
 import pl.poznan.ue.matriculation.oracle.domain.Person
 
 @Service
@@ -83,11 +84,12 @@ class ApplicantService(
             applicantDTO.foreignerData?.let {
                 applicant.applicantForeignerData?.apply {
                     baseOfStay = it.baseOfStay
-//                    it.foreignerStatus.map { statusDto ->
-//                        Status(
-//                                status = statusDto.status
-//                        )
-//                    }
+                    foreignerStatus.clear()
+                    foreignerStatus.addAll(it.foreignerStatus.map { statusDto ->
+                        Status(
+                                status = statusDto
+                        )
+                    })
                     polishCardIssueCountry = it.polishCardIssueCountry
                     polishCardIssueDate = it.polishCardIssueDate
                     polishCardNumber = it.polishCardNumber
@@ -96,27 +98,26 @@ class ApplicantService(
             }
             applicantDTO.educationData.let {
                 applicant.educationData.apply {
-                    this.documents.clear()
-                    it.documents.forEach { documentDto ->
-                        this.documents.add(
-                                Document(
-                                        educationData = this,
-                                        certificateType = documentDto.certificateType,
-                                        certificateTypeCode = documentDto.certificateTypeCode,
-                                        certificateUsosCode = documentDto.certificateUsosCode,
-                                        comment = documentDto.comment,
-                                        documentNumber = documentDto.documentNumber,
-                                        documentYear = documentDto.documentYear,
-                                        issueCity = documentDto.issueCity,
-                                        issueCountry = documentDto.issueCountry,
-                                        issueDate = documentDto.issueDate,
-                                        issueInstitution = documentDto.issueInstitution,
-                                        issueInstitutionUsosCode = documentDto.issueInstitutionUsosCode,
-                                        modificationDate = documentDto.modificationDate
-                                )
+                    documents.clear()
+                    documents.addAll(it.documents.filter { document ->
+                        document.issueDate != null && !document.documentNumber.isNullOrBlank()
+                    }.map { documentDto ->
+                        Document(
+                                educationData = this,
+                                certificateType = documentDto.certificateType,
+                                certificateTypeCode = documentDto.certificateTypeCode,
+                                certificateUsosCode = documentDto.certificateUsosCode,
+                                comment = documentDto.comment,
+                                documentNumber = documentDto.documentNumber!!,
+                                documentYear = documentDto.documentYear,
+                                issueCity = documentDto.issueCity,
+                                issueCountry = documentDto.issueCountry,
+                                issueDate = documentDto.issueDate!!,
+                                issueInstitution = documentDto.issueInstitution,
+                                issueInstitutionUsosCode = documentDto.issueInstitutionUsosCode,
+                                modificationDate = documentDto.modificationDate
                         )
-
-                    }
+                    })
                     highSchoolCity = it.highSchoolCity
                     highSchoolName = it.highSchoolName
                     highSchoolType = it.highSchoolType
@@ -138,10 +139,11 @@ class ApplicantService(
     fun check(applicant: Applicant) {
 //        applicant.educationData.documents.forEach {
 //            if (it.issueDate == null || it.documentNumber == null) {
-//                throw ApplicantCheckException("Brak daty lub numeru dokumentu uprawniającego do podjęcia studiów")
+//                //throw ApplicantCheckException("Brak daty lub numeru dokumentu uprawniającego do podjęcia studiów")
+//                logger.warn("Brak daty lub numeru dokumentu uprawniającego do podjęcia studiów. Pomijam dodawnie Tego dokumentu. ApplicantId: ${it.educationData?.applicantId}")
 //            }
 //        }
-        if (applicant.basicData.pesel == null && applicant.additionalData.documentNumber == null) {
+        if (applicant.basicData.pesel.isNullOrBlank() && applicant.additionalData.documentNumber.isNullOrBlank()) {
             throw ApplicantCheckException("Brak peselu lub dokumentu tożsamości")
         }
     }

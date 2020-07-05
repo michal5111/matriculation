@@ -5,4 +5,4 @@ import org.springframework.stereotype.Repository
 import pl.poznan.ue.matriculation.oracle.domain.OrganizationalUnit
 
 @Repository
-interface OrganizationalUnitRepository: JpaRepository<OrganizationalUnit, String>
+interface OrganizationalUnitRepository : JpaRepository<OrganizationalUnit, String>

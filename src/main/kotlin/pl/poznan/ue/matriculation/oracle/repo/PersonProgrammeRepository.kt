@@ -11,7 +11,7 @@ import pl.poznan.ue.matriculation.oracle.domain.Student
 import java.util.*
 
 @Repository
-interface PersonProgrammeRepository: JpaRepository<PersonProgramme, Long> {
+interface PersonProgrammeRepository : JpaRepository<PersonProgramme, Long> {
 
     @Query("SELECT MAX(pp.plannedDateOfCompletion) FROM PersonProgramme pp WHERE pp.person = :person")
     fun getPreviousStudyEndDate(person: Person): Date?

@@ -26,7 +26,9 @@ class StudentService(
         private val programmeStageRepository: ProgrammeStageRepository,
         private val personProgrammeRepository: PersonProgrammeRepository,
         private val studentRepository: StudentRepository,
-        private val entitlementDocumentRepository: EntitlementDocumentRepository
+        private val entitlementDocumentRepository: EntitlementDocumentRepository,
+        private val sourceOfFinancingRepository: SourceOfFinancingRepository,
+        private val basisOfAdmissionRepository: BasisOfAdmissionRepository
 ) {
 
     @Autowired
@@ -77,7 +79,9 @@ class StudentService(
             stageCode: String,
             didacticCycleCode: String,
             student: Student,
-            certificate: Document?
+            certificate: Document?,
+            sourceOfFinancing: String?,
+            basisOfAdmission: String?
     ): PersonProgramme {
         val programme = programmeRepository.getOne(programmeCode)
         val didacticCycle = didacticCycleRepository.getOne(didacticCycleCode)
@@ -93,10 +97,28 @@ class StudentService(
                     entitlementDocumentRepository.getByPersonAndTypeAndNumber(
                             person,
                             it.certificateUsosCode!!,
-                            it.documentNumber!!
+                            it.documentNumber
                     )
                 }
         )
+        sourceOfFinancing?.let {
+            personProgramme.personProgrammeSourceOfFinancing.add(
+                    PersonProgrammeSourceOfFinancing(
+                            sourceOfFinancing = sourceOfFinancingRepository.getOne(it),
+                            dateFrom = dateOfAddmision,
+                            personProgramme = personProgramme
+                    )
+            )
+        }
+        basisOfAdmission?.let {
+            personProgramme.personProgrammeBasisOfAdmission.add(
+                    PersonProgrammeBasisOfAdmission(
+                            basisOfAdmission = basisOfAdmissionRepository.getOne(it),
+                            dateFrom = dateOfAddmision,
+                            personProgramme = personProgramme
+                    )
+            )
+        }
         personProgramme.personStages.add(
                 PersonStage(
                         didacticCycle = didacticCycle,

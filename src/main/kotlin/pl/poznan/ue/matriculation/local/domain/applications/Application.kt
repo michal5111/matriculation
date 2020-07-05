@@ -2,7 +2,6 @@ package pl.poznan.ue.matriculation.local.domain.applications
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
@@ -11,8 +10,6 @@ import java.io.Serializable
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 class Application(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,31 +57,31 @@ class Application(
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "import_id", referencedColumnName = "id")
         var import: Import? = null
-): Serializable {
+) : Serializable {
 
-        override fun toString(): String {
-                return "Application(id=$id, irkId=$irkId, admitted=$admitted, comment=$comment, payment=$payment, " +
-                        "position=$position, qualified=$qualified, score=$score, importError=$importError, " +
-                        "stackTrace=$stackTrace, irkInstance='$irkInstance')"
-        }
+    override fun toString(): String {
+        return "Application(id=$id, irkId=$irkId, admitted=$admitted, comment=$comment, payment=$payment, " +
+                "position=$position, qualified=$qualified, score=$score, importError=$importError, " +
+                "stackTrace=$stackTrace, irkInstance='$irkInstance')"
+    }
 
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                other as Application
+        other as Application
 
-                if (id != other.id) return false
-                if (irkId != other.irkId) return false
+        if (id != other.id) return false
+        if (irkId != other.irkId) return false
 
-                return true
-        }
+        return true
+    }
 
-        override fun hashCode(): Int {
-                var result = id?.hashCode() ?: 0
-                result = 31 * result + irkId.hashCode()
-                return result
-        }
+    override fun hashCode(): Int {
+        var result = id?.hashCode() ?: 0
+        result = 31 * result + irkId.hashCode()
+        return result
+    }
 
 
 }

@@ -1,13 +1,10 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import java.io.Serializable
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 class ContactData(
 
         @JsonIgnore
@@ -53,7 +50,7 @@ class ContactData(
         var realStreet: String?,
 
         var realStreetNumber: String?
-): Serializable {
+) : Serializable {
 
     override fun toString(): String {
         return "ContactData(modificationDate=$modificationDate, officialCity=$officialCity, " +
@@ -75,11 +72,11 @@ class ContactData(
         if (applicant != other.applicant) return false
 
         return true
-        }
+    }
 
-        override fun hashCode(): Int {
-            return applicant?.hashCode() ?: 0
-        }
+    override fun hashCode(): Int {
+        return applicant?.hashCode() ?: 0
+    }
 
 
 }

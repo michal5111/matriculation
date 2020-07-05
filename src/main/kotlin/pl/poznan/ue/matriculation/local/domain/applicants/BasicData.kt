@@ -1,14 +1,11 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import java.io.Serializable
 import java.util.*
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 class BasicData(
 
         @JsonIgnore
@@ -29,7 +26,7 @@ class BasicData(
         var countryOfBirth: String,
 
         var dataSource: String
-): Serializable {
+) : Serializable {
 
     override fun toString(): String {
         return "BasicData(sex='$sex', pesel=$pesel, dateOfBirth=$dateOfBirth, cityOfBirth='$cityOfBirth', " +
@@ -45,11 +42,11 @@ class BasicData(
         if (applicant != other.applicant) return false
 
         return true
-        }
+    }
 
-        override fun hashCode(): Int {
-            return applicant?.hashCode() ?: 0
-        }
+    override fun hashCode(): Int {
+        return applicant?.hashCode() ?: 0
+    }
 
 
 }

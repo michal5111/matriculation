@@ -8,7 +8,7 @@ import pl.poznan.ue.matriculation.oracle.domain.ProgrammeStage
 import pl.poznan.ue.matriculation.oracle.domain.ProgrammeStageId
 
 @Repository
-interface ProgrammeStageRepository: JpaRepository<ProgrammeStage, ProgrammeStageId> {
+interface ProgrammeStageRepository : JpaRepository<ProgrammeStage, ProgrammeStageId> {
 
     @Query("SELECT ps.programmeStageId.stageId FROM ProgrammeStage ps WHERE ps.programmeStageId.programmeId = :programmeCode")
     fun getAllStageCodesByProgrammeCode(@Param("programmeCode") programmeCode: String): List<String>

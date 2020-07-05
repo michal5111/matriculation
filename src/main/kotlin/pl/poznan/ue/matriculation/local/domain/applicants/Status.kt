@@ -1,12 +1,9 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import java.io.Serializable
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 class Status(
 
         @Id
@@ -18,7 +15,7 @@ class Status(
         var applicantForeignerData: ApplicantForeignerData? = null,
 
         val status: String
-): Serializable {
+) : Serializable {
 
     override fun toString(): String {
         return "Status(id=$id, status='$status')"
@@ -33,11 +30,11 @@ class Status(
         if (id != other.id) return false
 
         return true
-        }
+    }
 
-        override fun hashCode(): Int {
-            return id?.hashCode() ?: 0
-        }
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
 
 
 }

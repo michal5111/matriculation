@@ -5,4 +5,4 @@ import org.springframework.stereotype.Repository
 import pl.poznan.ue.matriculation.oracle.domain.Wku
 
 @Repository
-interface WkuRepository: JpaRepository<Wku, String>
+interface WkuRepository : JpaRepository<Wku, String>

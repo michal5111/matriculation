@@ -27,8 +27,9 @@ class ImportProgress(
         @Enumerated(EnumType.STRING)
         var importStatus: ImportStatus = ImportStatus.PENDING,
 
+        @Lob
         var error: String? = null
-): Serializable {
+) : Serializable {
 
     override fun toString(): String {
         return "ImportProgress(id=$id, importedApplications=$importedApplications, saveErrors=$saveErrors, " +
@@ -44,11 +45,11 @@ class ImportProgress(
         if (id != other.id) return false
 
         return true
-        }
+    }
 
-        override fun hashCode(): Int {
-            return id?.hashCode() ?: 0
-        }
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
 
 
 }

@@ -1,14 +1,14 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import java.io.Serializable
 import javax.persistence.*
 
 @Entity
+@IdClass(PersonPreferenceId::class)
 @Table(name = "DZ_PREFERENCJE_OSOB")
 class PersonPreference(
+
         @Id
-        @JsonIgnore
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "OS_ID", referencedColumnName = "ID", nullable = false, unique = false)
         var person: Person,

@@ -1,9 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo
-import com.fasterxml.jackson.annotation.JsonIdentityReference
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import javax.persistence.*
 
 @Entity
@@ -19,8 +15,6 @@ class Student(
         @Column(name = "INDEKS", length = 30, nullable = false)
         var indexNumber: String,
 
-        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "code")
-        @JsonIdentityReference(alwaysAsId = true)
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "JED_ORG_KOD", referencedColumnName = "KOD")
         val organizationalUnit: OrganizationalUnit,
@@ -29,9 +23,6 @@ class Student(
         @JoinColumn(name = "TYP_IND_KOD", referencedColumnName = "KOD")
         val indexType: IndexType,
 
-        @JsonIgnore
-        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
-        @JsonIdentityReference(alwaysAsId = true)
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "OS_ID", referencedColumnName = "ID", nullable = false)
         var person: Person,
@@ -39,21 +30,21 @@ class Student(
         @Column(name = "INDEKS_GLOWNY", length = 1, nullable = false)
         var mainIndex: Char,
 
-        @OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
+        @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
         val personProgrammes: MutableList<PersonProgramme> = mutableListOf()
 ) {
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                other as Student
+        other as Student
 
-                if (id != other.id) return false
+        if (id != other.id) return false
 
-                return true
-        }
+        return true
+    }
 
-        override fun hashCode(): Int {
-                return id?.hashCode() ?: 0
-        }
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
 }

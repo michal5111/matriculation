@@ -1,11 +1,10 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+//@Cacheable
+//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_ETAPY")
 class Stage(
 
@@ -22,18 +21,18 @@ class Stage(
         @OneToMany(mappedBy = "stage", fetch = FetchType.LAZY)
         val programmeStages: MutableList<ProgrammeStage>
 ) {
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                other as Stage
+        other as Stage
 
-                if (code != other.code) return false
+        if (code != other.code) return false
 
-                return true
-        }
+        return true
+    }
 
-        override fun hashCode(): Int {
-                return code.hashCode()
-        }
+    override fun hashCode(): Int {
+        return code.hashCode()
+    }
 }

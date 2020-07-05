@@ -7,7 +7,7 @@ import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.domain.Student
 
 @Repository
-interface StudentRepository: JpaRepository<Student, Long> {
+interface StudentRepository : JpaRepository<Student, Long> {
 
     fun findByPersonAndIndexType(person: Person, indexType: IndexType): Student?
 

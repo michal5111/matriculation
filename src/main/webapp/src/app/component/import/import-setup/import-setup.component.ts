@@ -2,7 +2,6 @@ import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core'
 import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {MatOptionSelectionChange} from '@angular/material/core';
 import {Observable, Subscription} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
 import {filter, flatMap, tap} from 'rxjs/operators';
@@ -12,6 +11,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatDialog} from '@angular/material/dialog';
 import {ErrorDialogComponent} from '../../dialog/error-dialog/error-dialog.component';
 import {ErrorDialogData} from '../../../model/dialog/error-dialog-data';
+import {MatSelectChange} from '@angular/material/select';
 
 @Component({
   selector: 'app-import-setup',
@@ -52,21 +52,23 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.onDidacticCycleInputChanges();
   }
 
-  onRegistrationSelectionChange(event: MatOptionSelectionChange, registration: string): void {
-    this.importService.getAvailableRegistrationProgrammes(registration).pipe(
+  onRegistrationSelectionChange(event: MatSelectChange): void {
+    this.importService.getAvailableRegistrationProgrammes(event.value).pipe(
       tap(results => this.registrationProgrammes = results)
     ).subscribe(
       () => {
+        this.importCreationFormGroup.patchValue({registrationProgramme: null, stage: null});
       },
       error => this.onError('Błąd przy pobieraniu programów', error)
     );
   }
 
-  onRegistrationProgrammeChange(event: MatOptionSelectionChange, programmeCode: string): void {
-    this.importService.getAvailableStages(programmeCode).pipe(
+  onRegistrationProgrammeChange(event: MatSelectChange): void {
+    this.importService.getAvailableStages(event.value).pipe(
       tap(results => this.stages = results)
     ).subscribe(
       () => {
+        this.importCreationFormGroup.patchValue({stage: null});
       },
       error => this.onError('Błąd przy pobieraniu etapów', error)
     );

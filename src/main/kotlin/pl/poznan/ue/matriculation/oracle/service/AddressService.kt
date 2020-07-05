@@ -31,12 +31,19 @@ class AddressService(
                 street = street,
                 houseNumber = houseNumber,
                 apartmentNumber = apartmentNumber,
-                zipCode = zipCode,
                 cityIsCity = if (cityIsCity) 'T' else 'N',
                 countryCode = countryCode?.let {
                     citizenshipRepository.getOne(it)
                 }
-        ).getPostalCodeInfo()
+        ).apply {
+            countryCode?.let {
+                if (it == "PL") {
+                    this.zipCode = zipCode
+                } else {
+                    this.foreignZipCode = zipCode
+                }
+            }
+        }.getPostalCodeInfo()
     }
 
     fun update(
@@ -54,10 +61,16 @@ class AddressService(
             this.street = street
             this.houseNumber = houseNumber
             this.apartmentNumber = apartmentNumber
-            this.zipCode = zipCode
             this.cityIsCity = if (cityIsCity) 'T' else 'N'
             this.countryCode = countryCode?.let {
                 citizenshipRepository.getOne(it)
+            }
+            countryCode?.let {
+                if (it == "PL") {
+                    this.zipCode = zipCode
+                } else {
+                    this.foreignZipCode = zipCode
+                }
             }
         }.getPostalCodeInfo()
     }

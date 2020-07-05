@@ -16,17 +16,17 @@ class ProgrammeStageId(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-                other as ProgrammeStageId
+        other as ProgrammeStageId
 
-                if (programmeId != other.programmeId) return false
-                if (stageId != other.stageId) return false
+        if (programmeId != other.programmeId) return false
+        if (stageId != other.stageId) return false
 
-                return true
-        }
+        return true
+    }
 
-        override fun hashCode(): Int {
-                var result = programmeId.hashCode()
-                result = 31 * result + stageId.hashCode()
-                return result
-        }
+    override fun hashCode(): Int {
+        var result = programmeId.hashCode()
+        result = 31 * result + stageId.hashCode()
+        return result
+    }
 }

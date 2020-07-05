@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam
 import java.net.URI
 
 
-
-
 @Controller
-class IndexController() {
+class IndexController {
 
     @GetMapping("/login")
     fun login(@RequestParam service: String): ResponseEntity<String> {

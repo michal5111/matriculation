@@ -1,12 +1,10 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+//@Cacheable
+//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_SZKOLY")
 class School(
         @Id
@@ -105,26 +103,24 @@ class School(
         @Column(name = "EMAIL_NOMINACJE", length = 1000, nullable = true)
         val emailNominations: String?,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "middleSchool", fetch = FetchType.LAZY)
         val persons: Set<Person>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "school", fetch = FetchType.LAZY)
         val entitlementDocuments: Set<EntitlementDocument>
 ) {
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                other as School
+        other as School
 
-                if (id != other.id) return false
+        if (id != other.id) return false
 
-                return true
-        }
+        return true
+    }
 
-        override fun hashCode(): Int {
-                return id?.hashCode() ?: 0
-        }
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
 }

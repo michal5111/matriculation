@@ -1,13 +1,11 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import java.util.*
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+//@Cacheable
+//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_JEDNOSTKI_ORGANIZACYJNE")
 class OrganizationalUnit(
         @Id
@@ -24,7 +22,6 @@ class OrganizationalUnit(
         @Column(name = "OPIS_ANG", length = 200, nullable = true)
         val descriptionEng: String?,
 
-        @JsonIgnore
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "JED_ORG_KOD", referencedColumnName = "KOD", nullable = true)
         val organizationalUnit: OrganizationalUnit?,
@@ -140,39 +137,30 @@ class OrganizationalUnit(
         @Column(name = "UID_POLON", length = 128, nullable = true)
         val polonUid: String?,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
         val persons: Set<Person>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "socialBenefitsSource", fetch = FetchType.LAZY)
         val socialBenefitsSourcePersons: Set<Person>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "organizationalUnit")
         val phoneNumbers: List<PhoneNumber>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
         val conductedFieldOfStudy: MutableList<ConductedFieldOfStudy>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
         val fieldOfStudyPermissions: MutableList<FieldOfStudyPermission>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "organizationalUnitPrimary", fetch = FetchType.LAZY)
         val programmesPrimary: MutableList<Programme>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "organizationalUnitLeading", fetch = FetchType.LAZY)
         val programmesLeading: MutableList<Programme>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
         val personProgrammes: MutableList<PersonProgramme>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
         val folders: MutableList<Folder>
 ) {

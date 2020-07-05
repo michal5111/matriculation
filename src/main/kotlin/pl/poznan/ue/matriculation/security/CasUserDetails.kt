@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import java.util.*
 
 class CasUserDetails
-(private val userid: String, private val authorities: Collection<GrantedAuthority>,
+(private val userId: String, private val authorities: Collection<GrantedAuthority>,
  val casAssertion: Assertion) : UserDetails {
 
     private val roles = ArrayList<String>()
@@ -26,7 +26,7 @@ class CasUserDetails
     }
 
     override fun getUsername(): String {
-        return userid
+        return userId
     }
 
     override fun isAccountNonExpired(): Boolean {

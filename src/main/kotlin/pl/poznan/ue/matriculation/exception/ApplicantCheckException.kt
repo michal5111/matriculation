@@ -1,3 +1,3 @@
 package pl.poznan.ue.matriculation.exception
 
-class ApplicantCheckException(exceptionString: String): Exception(exceptionString)
+class ApplicantCheckException(exceptionString: String) : Exception(exceptionString)

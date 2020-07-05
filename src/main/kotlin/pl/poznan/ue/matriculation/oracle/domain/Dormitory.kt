@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 @Entity
@@ -39,7 +38,6 @@ class Dormitory(
         @OneToOne(mappedBy = "dormitory", fetch = FetchType.LAZY)
         var address: Address,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "dormitory")
         var phoneNumbers: List<PhoneNumber>
 ) {

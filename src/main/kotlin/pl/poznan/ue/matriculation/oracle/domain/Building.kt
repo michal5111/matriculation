@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.*
 import javax.persistence.*
 
@@ -55,11 +54,9 @@ class Building(
         @Column(name = "DATA_DO", nullable = true)
         var dateTO: Date? = null,
 
-        @JsonIgnore
         @OneToOne(mappedBy = "building")
         var address: Address,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "building")
         var phoneNumbers: List<PhoneNumber>
 ) {

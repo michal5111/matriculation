@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 @Entity
@@ -36,11 +35,9 @@ class Title(
 //        @Column(name = "UTW_ID", length = 30, nullable = false)
 //        val creationUser: String,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "titlePrefix", fetch = FetchType.LAZY)
         val personsPrefixes: Set<Person>,
 
-        @JsonIgnore
         @OneToMany(mappedBy = "titleSuffix", fetch = FetchType.LAZY)
         val personsSuffixes: Set<Person>
 ) {

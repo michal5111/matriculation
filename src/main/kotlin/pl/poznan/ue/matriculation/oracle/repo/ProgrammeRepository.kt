@@ -5,4 +5,4 @@ import org.springframework.stereotype.Repository
 import pl.poznan.ue.matriculation.oracle.domain.Programme
 
 @Repository
-interface ProgrammeRepository: JpaRepository<Programme, String>
+interface ProgrammeRepository : JpaRepository<Programme, String>

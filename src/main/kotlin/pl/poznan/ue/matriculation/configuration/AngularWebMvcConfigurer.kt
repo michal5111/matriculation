@@ -8,15 +8,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.resource.PathResourceResolver
 
 
-
-
-
-
-
-
-
 @Configuration
-class AngularWebMvcConfigurer: WebMvcConfigurer {
+class AngularWebMvcConfigurer : WebMvcConfigurer {
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
         registry.addResourceHandler("/**/*")

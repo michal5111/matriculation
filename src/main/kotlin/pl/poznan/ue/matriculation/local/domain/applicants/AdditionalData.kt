@@ -2,14 +2,11 @@ package pl.poznan.ue.matriculation.local.domain.applicants
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import java.io.Serializable
 import java.util.*
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 class AdditionalData(
 
         @JsonIgnore
@@ -40,30 +37,30 @@ class AdditionalData(
         var mothersName: String?,
 
         var wku: String?
-): Serializable {
+) : Serializable {
 
-        override fun toString(): String {
-                return "AdditionalData(cityOfBirth=$cityOfBirth, countryOfBirth=$countryOfBirth, " +
-                        "documentCountry=$documentCountry, documentExpDate=$documentExpDate, " +
-                        "documentNumber=$documentNumber, documentType=$documentType, " +
-                        "fathersName=$fathersName, militaryCategory=$militaryCategory, " +
-                        "militaryStatus=$militaryStatus, mothersName=$mothersName, wku=$wku)"
-        }
+    override fun toString(): String {
+        return "AdditionalData(cityOfBirth=$cityOfBirth, countryOfBirth=$countryOfBirth, " +
+                "documentCountry=$documentCountry, documentExpDate=$documentExpDate, " +
+                "documentNumber=$documentNumber, documentType=$documentType, " +
+                "fathersName=$fathersName, militaryCategory=$militaryCategory, " +
+                "militaryStatus=$militaryStatus, mothersName=$mothersName, wku=$wku)"
+    }
 
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                other as AdditionalData
+        other as AdditionalData
 
-                if (applicant != other.applicant) return false
+        if (applicant != other.applicant) return false
 
-                return true
-        }
+        return true
+    }
 
-        override fun hashCode(): Int {
-                return applicant?.hashCode() ?: 0
-        }
+    override fun hashCode(): Int {
+        return applicant?.hashCode() ?: 0
+    }
 
 
 }

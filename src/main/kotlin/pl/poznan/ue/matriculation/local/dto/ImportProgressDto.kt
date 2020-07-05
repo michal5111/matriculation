@@ -18,12 +18,12 @@ data class ImportProgressDto(
         var importStatus: ImportStatus = ImportStatus.PENDING,
 
         var error: String? = null
-): Serializable {
-        override fun toString(): String {
-                return "ImportProgress(id=$id, " +
-                        "importedApplications=$importedApplications, " +
-                        "saveErrors=$saveErrors, savedApplicants=$savedApplicants, " +
-                        "totalCount=$totalCount, importStatus=$importStatus, error=$error)"
-        }
+) : Serializable {
+    override fun toString(): String {
+        return "ImportProgress(id=$id, " +
+                "importedApplications=$importedApplications, " +
+                "saveErrors=$saveErrors, savedApplicants=$savedApplicants, " +
+                "totalCount=$totalCount, importStatus=$importStatus, error=$error)"
+    }
 }
 

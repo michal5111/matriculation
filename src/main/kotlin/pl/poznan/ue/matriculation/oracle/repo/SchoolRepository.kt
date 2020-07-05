@@ -5,4 +5,4 @@ import org.springframework.stereotype.Repository
 import pl.poznan.ue.matriculation.oracle.domain.School
 
 @Repository
-interface SchoolRepository: JpaRepository<School, Long>
+interface SchoolRepository : JpaRepository<School, Long>

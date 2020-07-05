@@ -1,16 +1,11 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.hibernate.annotations.CacheConcurrencyStrategy
-import org.hibernate.annotations.LazyCollection
-import org.hibernate.annotations.LazyCollectionOption
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import java.util.*
 import javax.persistence.*
 
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 class Applicant(
 
         @Id
@@ -48,19 +43,19 @@ class Applicant(
 
         var modificationDate: Date,
 
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
         var basicData: BasicData,
 
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
         var contactData: ContactData,
 
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
         val additionalData: AdditionalData,
 
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
         val applicantForeignerData: ApplicantForeignerData?,
 
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
         val educationData: EducationData,
 
         var usosId: Long? = null,
@@ -68,7 +63,6 @@ class Applicant(
         var assignedIndexNumber: String? = null,
 
         @JsonIgnore
-        @LazyCollection(LazyCollectionOption.FALSE)
         @OneToMany(mappedBy = "applicant")
         var applications: MutableList<Application> = mutableListOf()
 ) {
@@ -89,14 +83,14 @@ class Applicant(
         if (id != other.id) return false
         if (irkId != other.irkId) return false
 
-                return true
-        }
+        return true
+    }
 
-        override fun hashCode(): Int {
-                var result = id?.hashCode() ?: 0
-                result = 31 * result + irkId.hashCode()
-                return result
-        }
+    override fun hashCode(): Int {
+        var result = id?.hashCode() ?: 0
+        result = 31 * result + irkId.hashCode()
+        return result
+    }
 
 
 }

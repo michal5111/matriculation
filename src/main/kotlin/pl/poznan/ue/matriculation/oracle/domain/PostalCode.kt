@@ -28,18 +28,18 @@ class PostalCode(
         @Column(name = "CZY_MIASTO", length = 1, nullable = true)
         var cityIsCity: Char?
 ) {
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                other as PostalCode
+        other as PostalCode
 
-                if (id != other.id) return false
+        if (id != other.id) return false
 
-                return true
-        }
+        return true
+    }
 
-        override fun hashCode(): Int {
-                return id?.hashCode() ?: 0
-        }
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
 }

@@ -38,18 +38,18 @@ class ProgrammeStage(
         @OneToMany(mappedBy = "programmeStage", fetch = FetchType.LAZY)
         var personStages: MutableList<PersonStage>
 ) {
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                other as ProgrammeStage
+        other as ProgrammeStage
 
-                if (programmeStageId != other.programmeStageId) return false
+        if (programmeStageId != other.programmeStageId) return false
 
-                return true
-        }
+        return true
+    }
 
-        override fun hashCode(): Int {
-                return programmeStageId.hashCode()
-        }
+    override fun hashCode(): Int {
+        return programmeStageId.hashCode()
+    }
 }

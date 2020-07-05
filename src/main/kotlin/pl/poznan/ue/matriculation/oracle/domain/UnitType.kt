@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 @Entity
@@ -25,8 +24,7 @@ class UnitType(
 //        @Column(name = "UTW_ID", length = 30, nullable = false)
 //        val creationUser: String,
 
-        @JsonIgnore
-        @OneToMany(mappedBy = "unitType")
+        @OneToMany(mappedBy = "unitType", fetch = FetchType.LAZY)
         val organizationalUnits: Set<OrganizationalUnit>
 ) {
     override fun equals(other: Any?): Boolean {

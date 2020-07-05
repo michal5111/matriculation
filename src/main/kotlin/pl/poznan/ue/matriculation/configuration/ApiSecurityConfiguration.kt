@@ -20,10 +20,11 @@ class ApiSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .antMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST, "/api/import").hasRole("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/api/import/*").hasRole("ADMIN")
+                .antMatchers("/actuator/**").permitAll()
                 .and()
                 .antMatcher("/api/**")
-                    .exceptionHandling()
-                    .authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                .exceptionHandling()
+                .authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 .and().csrf().disable()
     }
 }

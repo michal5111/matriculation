@@ -27,8 +27,9 @@ class AsyncService(
     private lateinit var localEntityManager: EntityManager
 
     @Async
+    @Throws(ImportException::class)
     fun importApplicantsAsync(importId: Long) {
-        var import = importRepository.getOne(importId)
+        val import = importRepository.getOne(importId)
         var currentPage = 1
         var hasNext: Boolean
         var set = true
@@ -60,9 +61,7 @@ class AsyncService(
                 hasNext = page.next != null
                 currentPage++
             } while (hasNext)
-            import = importService.get(importId)
-            import.importProgress!!.importStatus = ImportStatus.IMPORTED
-            importProgressRepository.save(import.importProgress!!)
+            importService.setImportStatus(ImportStatus.IMPORTED, importId)
         } catch (e: Exception) {
             throw ImportException(import.id!!, e.message, e)
         }
