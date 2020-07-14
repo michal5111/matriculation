@@ -10,6 +10,7 @@ import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applicants.Status
 import pl.poznan.ue.matriculation.oracle.domain.Person
+import java.util.*
 
 @Service
 class ApplicantService(
@@ -146,5 +147,83 @@ class ApplicantService(
         if (applicant.basicData.pesel.isNullOrBlank() && applicant.additionalData.documentNumber.isNullOrBlank()) {
             throw ApplicantCheckException("Brak peselu lub dokumentu tożsamości")
         }
+    }
+
+    fun clearPersonalData(applicant: Applicant): Applicant {
+        applicant.apply {
+            email = ""
+            indexNumber = ""
+            password = ""
+            name.apply {
+                middle = ""
+                family = ""
+                maiden = ""
+                given = ""
+            }
+            phone = ""
+            citizenship = ""
+            photo = ""
+            photoPermission = ""
+            casPasswordOverride = ""
+            modificationDate = Date()
+            basicData.apply {
+                cityOfBirth = ""
+                countryOfBirth = ""
+                dataSource = ""
+                dateOfBirth = Date()
+                pesel = ""
+                sex = ""
+            }
+            applicant.contactData.apply {
+                modificationDate = Date()
+                officialCity = ""
+                officialCityIsCity = false
+                officialCountry = ""
+                officialFlatNumber = ""
+                officialPostCode = ""
+                officialStreet = ""
+                officialStreetNumber = ""
+                phoneNumber = ""
+                phoneNumber2 = ""
+                phoneNumberType = ""
+                phoneNumber2Type = ""
+                realCity = ""
+                realCityIsCity = false
+                realCountry = ""
+                realFlatNumber = ""
+                realPostCode = ""
+                realStreet = ""
+                realStreetNumber = ""
+            }
+            applicant.additionalData.apply {
+                countryOfBirth = ""
+                cityOfBirth = ""
+                documentCountry = ""
+                documentExpDate = Date()
+                documentNumber = ""
+                documentType = ""
+                fathersName = ""
+                militaryCategory = ""
+                militaryStatus = ""
+                mothersName = ""
+                wku = ""
+            }
+            applicant.applicantForeignerData?.apply {
+                baseOfStay = ""
+                foreignerStatus.clear()
+                polishCardIssueCountry = ""
+                polishCardIssueDate = Date()
+                polishCardNumber = ""
+                polishCardValidTo = Date()
+            }
+            applicant.educationData.apply {
+                documents.clear()
+                highSchoolCity = ""
+                highSchoolName = ""
+                highSchoolType = ""
+                highSchoolUsosCode = -1L
+            }
+        }
+        return applicant
     }
 }

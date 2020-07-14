@@ -75,7 +75,8 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       if (this.importProgress.importStatus === 'IMPORTED'
         || this.importProgress.importStatus === 'COMPLETE'
         || this.importProgress.importStatus === 'PENDING'
-        || this.importProgress.importStatus === 'ARCHIVED') {
+        || this.importProgress.importStatus === 'ARCHIVED'
+        || this.importProgress.importStatus === 'COMPLETED_WITH_ERRORS') {
         this.progressSubscription.unsubscribe();
       }
     })
@@ -98,7 +99,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
         tap(applicationsPage => {
           this.page = applicationsPage;
           this.totalElements = applicationsPage.totalElements;
-          this.pageSize = applicationsPage.size;
         }),
         map(applicationsPage => applicationsPage.content),
         tap(content => this.dataSource.data = content)
@@ -126,6 +126,8 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   switchPage(pageEvent: PageEvent): void {
+    this.pageNumber = pageEvent.pageIndex;
+    this.pageSize = pageEvent.pageSize;
     this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe(
       () => {
       },
@@ -216,7 +218,8 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().pipe(
       filter(result => result === true),
       flatMap((result) => this.importService.archiveImport(this.importId)),
-      flatMap(() => this.getImport(this.importId))
+      flatMap(() => this.importService.getImportProgress(this.importId)),
+      flatMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString))
     ).subscribe(
       () => {
       },
@@ -240,6 +243,9 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
       return;
     }
+    if (this.dialog.openDialogs.length > 0) {
+      return;
+    }
     this.dialog.open(ErrorDialogComponent, {
       data: new ErrorDialogData(title, error)
     });
@@ -247,9 +253,20 @@ export class ImportViewComponent implements OnInit, OnDestroy {
 
   showApplicationErrorDialog(application: Application): void {
     if (application.importStatus === 'ERROR') {
+      if (this.dialog.openDialogs.length > 0) {
+        return;
+      }
       this.dialog.open(ErrorDialogComponent, {
         data: new ErrorDialogData('Błąd przy importowaniu', application.importError, application.stackTrace)
       });
+    }
+  }
+
+  getPeselOrIdNumber(application: Application) {
+    if (application.applicant.basicData.pesel != null) {
+      return application.applicant.basicData.pesel;
+    } else {
+      return application.applicant.additionalData.documentNumber;
     }
   }
 }

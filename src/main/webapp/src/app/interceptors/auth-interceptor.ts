@@ -17,6 +17,9 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(tap(() => {
       },
       (err: any) => {
+        if (this.dialog.openDialogs.length > 0) {
+          return;
+        }
         if (err instanceof HttpErrorResponse) {
           if (err.status !== 401 && err.status !== 403) {
             return;

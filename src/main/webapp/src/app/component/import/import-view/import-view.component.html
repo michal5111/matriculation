@@ -3,85 +3,93 @@
     <mat-icon>arrow_back</mat-icon>
     Wróć
   </button>
-  <header *ngIf="import" class="card-wrapper">
-    <mat-card class="card-centered">
-      <mat-card-title>
-        <p>Import rekrutacji {{import.registration}}</p>
-      </mat-card-title>
-      <mat-card-subtitle>
-        <p>Kod programu: {{import.programmeCode}}</p>
-        <p>Kod etapu: {{import.stageCode}}</p>
-        <p>Kod cyklu dydaktycznego: {{import.didacticCycleCode}}</p>
-        <p>Kod puli indeksów: {{import.indexPoolCode}}</p>
-        <p>Data rozpoczęcia programu: {{import.startDate | date: 'dd.MM.yyyy'}}</p>
-        <p>Data przyjęcia na program: {{import.dateOfAddmision | date: 'dd.MM.yyyy'}}</p>
-      </mat-card-subtitle>
-    </mat-card>
-    <mat-card class="card-centered">
-      <mat-card-content *ngIf="importProgress">
-        <div [ngSwitch]="importProgress.importStatus">
-          <span>Status importu: </span>
-          <span *ngSwitchCase="'PENDING'">
+  <ng-template [ngIf]="importProgress">
+
+
+    <header *ngIf="import" class="card-wrapper">
+      <mat-card class="card-centered">
+        <mat-card-title>
+          <p>Import rekrutacji {{import.registration}}</p>
+        </mat-card-title>
+        <mat-card-subtitle>
+          <p>Kod programu: {{import.programmeCode}}</p>
+          <p>Kod etapu: {{import.stageCode}}</p>
+          <p>Kod cyklu dydaktycznego: {{import.didacticCycleCode}}</p>
+          <p>Kod puli indeksów: {{import.indexPoolCode}}</p>
+          <p>Data rozpoczęcia programu: {{import.startDate | date: 'dd.MM.yyyy'}}</p>
+          <p>Data przyjęcia na program: {{import.dateOfAddmision | date: 'dd.MM.yyyy'}}</p>
+        </mat-card-subtitle>
+      </mat-card>
+      <mat-card class="card-centered">
+        <mat-card-content *ngIf="importProgress">
+          <div [ngSwitch]="importProgress.importStatus">
+            <span>Status importu: </span>
+            <span *ngSwitchCase="'PENDING'">
               <mat-icon>hourglass_empty</mat-icon>
               Oczekujący
           </span>
-          <span *ngSwitchCase="'STARTED'">
+            <span *ngSwitchCase="'STARTED'">
               <mat-icon>cloud_download</mat-icon>
               Importowanie...
           </span>
-          <span *ngSwitchCase="'IMPORTED'">
+            <span *ngSwitchCase="'IMPORTED'">
               <mat-icon>cloud_done</mat-icon>
               Zaimportowane
           </span>
-          <span *ngSwitchCase="'SAVING'">
+            <span *ngSwitchCase="'SAVING'">
               <mat-icon>cloud_upload</mat-icon>
               Zapisywanie w usosie...
           </span>
-          <span *ngSwitchCase="'COMPLETE'">
+            <span *ngSwitchCase="'COMPLETE'">
             <mat-icon>done</mat-icon>
             Zakończono
           </span>
-          <span *ngSwitchCase="'ARCHIVED'">
+            <span *ngSwitchCase="'ARCHIVED'">
             <mat-icon>archived</mat-icon>
             Zarchiwizowany
           </span>
-        </div>
-        <p>Błąd importu:
-          <mark class="error-color">{{importProgress.error}}</mark>
-        </p>
-        <p>Zaimportowane zgłoszenia: {{importProgress.importedApplications}}/{{importProgress.totalCount}}</p>
-        <mat-progress-bar mode="determinate"
-                          value="{{getImportProgressPercentage()}}">
-        </mat-progress-bar>
-        <p>Zapisane zgłoszenia: {{importProgress.savedApplicants}}/{{importProgress.totalCount}}</p>
-        <mat-progress-bar mode="determinate"
-                          value="{{getSaveProgressPercentage()}}">
-        </mat-progress-bar>
-        <p>Błędy przy zapisywaniu: {{importProgress.saveErrors}}</p>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-button (click)="startImport()" [disabled]="
+            <span *ngSwitchCase="'COMPLETED_WITH_ERRORS'">
+            <mat-icon>warning</mat-icon>
+            Zakończono z błędami
+          </span>
+          </div>
+          <p>Błąd importu:
+            <mark class="error-color">{{importProgress.error}}</mark>
+          </p>
+          <p>Zaimportowane zgłoszenia: {{importProgress.importedApplications}}/{{importProgress.totalCount}}</p>
+          <mat-progress-bar mode="determinate"
+                            value="{{getImportProgressPercentage()}}">
+          </mat-progress-bar>
+          <p>Zapisane zgłoszenia: {{importProgress.savedApplicants}}/{{importProgress.totalCount}}</p>
+          <mat-progress-bar mode="determinate"
+                            value="{{getSaveProgressPercentage()}}">
+          </mat-progress-bar>
+          <p>Błędy przy zapisywaniu: {{importProgress.saveErrors}}</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button (click)="startImport()" [disabled]="
                 importProgress.importStatus === 'ARCHIVED'
                 || importProgress.importStatus === 'SAVING'
                 || importProgress.importStatus === 'STARTED'
                 || importProgress.savedApplicants == importProgress.totalCount">
-          <mat-icon>backup</mat-icon>
-          Importuj osoby
-        </button>
-        <button mat-button (click)="savePersons()"
-                [disabled]="(importProgress.importStatus !== 'COMPLETE' && importProgress.importStatus !== 'IMPORTED')
+            <mat-icon>cloud_download</mat-icon>
+            Importuj osoby
+          </button>
+          <button mat-button (click)="savePersons()"
+                  [disabled]="(importProgress.importStatus !== 'COMPLETED_WITH_ERRORS' && importProgress.importStatus !== 'IMPORTED')
                 || totalElements < 1
                 || importProgress.savedApplicants == importProgress.totalCount">
-          <mat-icon>save</mat-icon>
-          Zapisz osoby
-        </button>
-        <button mat-button (click)="onArchiveClick()" [disabled]="importProgress.importStatus !== 'COMPLETE'">
-          <mat-icon>archived</mat-icon>
-          Archiwizuj
-        </button>
-      </mat-card-actions>
-    </mat-card>
-  </header>
+            <mat-icon>save</mat-icon>
+            Zapisz osoby
+          </button>
+          <button mat-button (click)="onArchiveClick()" [disabled]="importProgress.importStatus !== 'COMPLETE'">
+            <mat-icon>archived</mat-icon>
+            Archiwizuj
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </header>
+  </ng-template>
   <div class="mat-elevation-z2">
     <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)" matSortActive="id"
            matSortDirection="asc" matSortDisableClear>
@@ -97,7 +105,7 @@
       </ng-container>
 
       <ng-container matColumnDef="irkId">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> IrkId</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Irk id</th>
         <td mat-cell *matCellDef="let element" class="mat-cell"><a mat-button
                                                                    href="{{getApplicationIrkUrl(element)}}"
                                                                    target="_blank">{{element.irkId}}</a>
@@ -105,7 +113,7 @@
       </ng-container>
 
       <ng-container matColumnDef="usosId">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> usosId</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> usos id</th>
         <td mat-cell *matCellDef="let element" class="mat-cell"><a mat-button
                                                                    href="{{getPersonUsosUrl(element)}}"
                                                                    target="_blank">{{element.applicant.usosId}}</a>
@@ -127,8 +135,8 @@
       </ng-container>
 
       <ng-container matColumnDef="pesel">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Pesel</th>
-        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.applicant.basicData.pesel}} </td>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Pesel / Nr. dokumentu</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{getPeselOrIdNumber(element)}} </td>
       </ng-container>
 
       <ng-container matColumnDef="secondarySchoolDocumentNumber">
@@ -199,13 +207,13 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Status importu</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
           <div [ngSwitch]="element.importStatus">
-            <div *ngSwitchCase="'NOT_IMPORTED'">
+            <div *ngSwitchCase="'NOT_IMPORTED'" matTooltip="Oczekujące">
               <mat-icon>hourglass_empty</mat-icon>
             </div>
-            <div *ngSwitchCase="'IMPORTED'">
+            <div *ngSwitchCase="'IMPORTED'" matTooltip="Powodzenie">
               <mat-icon>done</mat-icon>
             </div>
-            <div *ngSwitchCase="'ERROR'">
+            <div *ngSwitchCase="'ERROR'" matTooltip="Błąd">
               <mat-icon>error</mat-icon>
             </div>
           </div>
@@ -229,20 +237,5 @@
                    [pageSize]="pageSize"
                    (page)="switchPage($event)">
     </mat-paginator>
-  </div>
-  <div class="card-centered">
-    <p>Legenda:</p>
-    <p>
-      <mat-icon>hourglass_empty</mat-icon>
-      - Oczekujące
-    </p>
-    <p>
-      <mat-icon>done</mat-icon>
-      - Powodzenie
-    </p>
-    <p>
-      <mat-icon>error</mat-icon>
-      - Błąd
-    </p>
   </div>
 </ng-template>

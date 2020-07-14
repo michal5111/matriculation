@@ -23,7 +23,6 @@ class AdditionalData(
 
         var documentExpDate: Date?,
 
-        @Column(unique = true)
         var documentNumber: String?,
 
         var documentType: String?,

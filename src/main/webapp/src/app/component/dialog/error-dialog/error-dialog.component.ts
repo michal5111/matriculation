@@ -21,16 +21,20 @@ export class ErrorDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(`Error: ${this.data.error}`);
+    console.log(this.data.error.constructor.name);
     this.title = this.data.title;
     this.stacktrace = this.data.stacktrace;
     if (this.data.error instanceof Error) {
+      console.log(`Error: ${this.data.error}`);
       this.message = this.data.error.message;
       this.title += ` ${this.data.error.name}`;
       this.data.stacktrace = this.data.error.stack;
-      if (this.data.error instanceof HttpErrorResponse) {
-        this.message = this.data.error.error.message;
-      }
+    }
+    if (this.data.error instanceof HttpErrorResponse) {
+      console.log(`Error: ${JSON.stringify(this.data.error.error)}`);
+      this.message = this.data.error.message;
+      this.title += ` ${this.data.error.name}`;
+      this.data.stacktrace = this.data.error.statusText;
     }
     if (typeof this.data.error === 'string') {
       this.message = this.data.error;

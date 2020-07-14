@@ -180,12 +180,12 @@ class IrkService {
             registration: String?,
             pageNumber: Int?): Page<ApplicationDTO> {
         val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("${apiUrl}applications/")
-        if (admitted) {
-            uriComponentBuilder.queryParam("admitted", admitted)
-        }
-        if (paid) {
-            uriComponentBuilder.queryParam("paid", paid)
-        }
+//        if (admitted) {
+//            uriComponentBuilder.queryParam("admitted", admitted)
+//        }
+//        if (paid) {
+//            uriComponentBuilder.queryParam("paid", paid)
+//        }
         registration?.let {
             uriComponentBuilder.queryParam("registration", "^${registration}$")
         }

@@ -2,6 +2,7 @@ package pl.poznan.ue.matriculation.local.domain.applicants
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.io.Serializable
+import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -13,7 +14,7 @@ class ContactData(
         @JoinColumn(name = "applicant_id", referencedColumnName = "id")
         var applicant: Applicant? = null,
 
-        var modificationDate: String?,
+        var modificationDate: Date?,
 
         var officialCity: String?,
 

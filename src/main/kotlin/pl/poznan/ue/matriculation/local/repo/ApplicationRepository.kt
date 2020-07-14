@@ -37,4 +37,6 @@ interface ApplicationRepository : PagingAndSortingRepository<Application, Long> 
 
     @Transactional(rollbackFor = [Exception::class], propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     fun deleteAllByImportId(importId: Long)
+
+    fun findAllByImportId(importId: Long): Stream<Application>
 }

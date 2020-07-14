@@ -164,18 +164,18 @@ class OrganizationalUnit(
         @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
         val folders: MutableList<Folder>
 ) {
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-                other as OrganizationalUnit
+        other as OrganizationalUnit
 
-                if (code != other.code) return false
+        if (code != other.code) return false
 
-                return true
-        }
+        return true
+    }
 
-        override fun hashCode(): Int {
-                return code.hashCode()
-        }
+    override fun hashCode(): Int {
+        return code.hashCode()
+    }
 }

@@ -16,7 +16,6 @@ class BasicData(
 
         var sex: String,
 
-        @Column(unique = true)
         var pesel: String?,
 
         var dateOfBirth: Date?,

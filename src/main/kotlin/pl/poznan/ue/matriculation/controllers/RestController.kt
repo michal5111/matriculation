@@ -2,10 +2,10 @@ package pl.poznan.ue.matriculation.controllers
 
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
 import pl.poznan.ue.matriculation.irk.dto.Page
 import pl.poznan.ue.matriculation.irk.dto.applicants.ApplicantDTO
 import pl.poznan.ue.matriculation.irk.dto.applications.ApplicationDTO
@@ -111,10 +111,10 @@ class RestController(
     )
 
     @PutMapping("/import/{id}")
-    fun importApplicants(@PathVariable("id") importId: Long): ResponseEntity<Void> {
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun importApplicants(@PathVariable("id") importId: Long) {
         importService.prepareForImporting(importId)
         asyncService.importApplicantsAsync(importId)
-        return ResponseEntity.accepted().build()
     }
 
     @GetMapping("/import/{id}")
@@ -125,10 +125,10 @@ class RestController(
     fun getProgress(@PathVariable("id") importId: Long): ImportProgress = importService.getProgress(importId)
 
     @GetMapping("/import/{id}/save")
-    fun savePersons(@PathVariable("id") importId: Long): ResponseEntity<Void> {
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun savePersons(@PathVariable("id") importId: Long) {
         importService.prepareForSaving(importId)
         asyncService.savePersons(importId)
-        return ResponseEntity.accepted().build()
     }
 
     @GetMapping("/import")
@@ -168,9 +168,10 @@ class RestController(
     @PutMapping("/import/{id}/archive")
     fun archiveImport(@PathVariable("id") importId: Long) {
         val import = importService.get(importId)
-        if (import.importProgress?.importStatus == ImportStatus.COMPLETE)
+        if (import.importProgress?.importStatus == ImportStatus.COMPLETE) {
+            asyncService.archiveApplicants(importId)
             return importService.setImportStatus(ImportStatus.ARCHIVED, importId)
-        else
-            throw IllegalStateException("Zły stan importu!")
+        } else
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Zły stan importu!")
     }
 }

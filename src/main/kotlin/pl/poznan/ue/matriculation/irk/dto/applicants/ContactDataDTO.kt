@@ -2,10 +2,11 @@ package pl.poznan.ue.matriculation.irk.dto.applicants
 
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.util.*
 
 data class ContactDataDTO(
         @JsonProperty("modification_date")
-        val modificationDate: String?,
+        val modificationDate: Date?,
         @JsonProperty("official_city")
         val officialCity: String?,
         @JsonProperty("official_city_is_city")

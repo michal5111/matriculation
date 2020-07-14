@@ -13,6 +13,7 @@ import pl.poznan.ue.matriculation.irk.service.IrkService
 import pl.poznan.ue.matriculation.kotlinExtensions.stackTraceToString
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
+import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.dto.ImportDtoJpa
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
 import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
@@ -79,17 +80,17 @@ class ProcessService(
         application.applicant = applicant
         logger.debug("Zapisałem aplikanta")
 
-        if (!applicant.applications.any { it.irkId == application.irkId }) {
-            application.applicant = applicant
-            applicant.applications.add(application)
-        }
+//        if (!applicant.applications.any { it.irkId == application.irkId }) {
+//            application.applicant = applicant
+//            applicant.applications.add(application)
+//        }
 
-        application.certificate = applicant.educationData.documents.find {
-            irkService.getPrimaryCertificate(application.irkId)?.let { primaryCertificate ->
-                return@let it.documentNumber == primaryCertificate.documentNumber &&
-                        it.certificateTypeCode == primaryCertificate.certificateTypeCode
-            } ?: false
-        }
+//        application.certificate = applicant.educationData.documents.find {
+//            irkService.getPrimaryCertificate(application.irkId)?.let { primaryCertificate ->
+//                return@let it.documentNumber == primaryCertificate.documentNumber &&
+//                        it.certificateTypeCode == primaryCertificate.certificateTypeCode
+//            } ?: false
+//        }
         //application.certificate?.Applications?.add(application)
         logger.debug("zapisuję aplikację")
         applicationRepository.save(application)
@@ -168,7 +169,8 @@ class ProcessService(
     fun processPersons(
             importId: Long,
             importDto: ImportDtoJpa
-    ) {
+    ): Int {
+        var errorCount = 0
         val applicationsPage: Stream<Application> = applicationRepository.getAllByImportIdAndApplicationImportStatus(importId)
         applicationsPage.use {
             it.forEach { application ->
@@ -180,8 +182,25 @@ class ProcessService(
                     )
                     oracleEntityManager.detach(person)
                 } catch (e: Exception) {
+                    errorCount++
                     self.handleSaveException(e, application, importId)
                 }
+            }
+        }
+        return errorCount
+    }
+
+    @Transactional(rollbackFor = [Exception::class, RuntimeException::class], propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
+    fun archivePersons(importId: Long) {
+        val applicationStream = applicationRepository.findAllByImportId(importId)
+        applicationStream.use {
+            it.filter { application ->
+                application.applicant!!.applications.none { applicantApplication ->
+                    applicantApplication != application
+                            && applicantApplication.import?.importProgress?.importStatus != ImportStatus.ARCHIVED
+                }
+            }.forEach { application ->
+                applicantService.clearPersonalData(application.applicant!!)
             }
         }
     }

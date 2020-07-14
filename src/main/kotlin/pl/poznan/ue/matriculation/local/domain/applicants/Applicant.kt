@@ -15,7 +15,6 @@ class Applicant(
         @Column(unique = true)
         val irkId: Long,
 
-        @Column(unique = true)
         var email: String,
 
         var indexNumber: String?,

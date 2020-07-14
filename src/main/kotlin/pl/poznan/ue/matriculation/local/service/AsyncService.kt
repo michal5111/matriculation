@@ -70,11 +70,19 @@ class AsyncService(
     @Async
     fun savePersons(importId: Long) {
         val importDto = importRepository.getDtoById(importId)
-        processService.processPersons(
+        val errorsCount = processService.processPersons(
                 importId = importId,
                 importDto = importDto
         )
-        importService.setImportStatus(ImportStatus.COMPLETE, importId)
+        if (errorsCount > 0) {
+            importService.setImportStatus(ImportStatus.COMPLETED_WITH_ERRORS, importId)
+        } else {
+            importService.setImportStatus(ImportStatus.COMPLETE, importId)
+        }
     }
 
+    @Async
+    fun archiveApplicants(importId: Long) {
+        processService.archivePersons(importId)
+    }
 }
