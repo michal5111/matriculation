@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
 
 data class BasicDataDTO(
-        val sex: String,
+        val sex: Char,
 
         val pesel: String?,
 

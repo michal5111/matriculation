@@ -3,7 +3,7 @@ import {Document} from "./document";
 
 export interface Application {
   id: number;
-  irkId: number;
+  foreignId: number;
   user: number;
   applicant: Applicant;
   payment: string;
@@ -28,4 +28,6 @@ export interface Application {
   importError: string;
   stackTrace: string;
   irkInstance: string;
+  dataSourceType: string;
+  foreignIdType: string;
 }

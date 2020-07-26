@@ -31,6 +31,7 @@ export class ImportComponent implements OnInit, OnDestroy {
   sortDirString = 'desc';
   displayedColumns: string[] = [
     'id',
+    'dataSourceType',
     'registration',
     'programmeCode',
     'stageCode',
@@ -129,6 +130,15 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.dialog.open(ErrorDialogComponent, {
       data: new ErrorDialogData(title, error)
     });
+  }
+
+  isDeleteButtonDisabled(importObject: Import): boolean {
+    return importObject.importProgress.importStatus === 'STARTED'
+      || importObject.importProgress.importStatus === 'SAVING'
+      || importObject.importProgress.importStatus === 'COMPLETE'
+      || importObject.importProgress.importStatus === 'COMPLETED_WITH_ERRORS'
+      || (importObject.importProgress.importStatus === 'IMPORTED'
+        && importObject.importProgress.importedApplications > 0);
   }
 
   ngOnDestroy(): void {

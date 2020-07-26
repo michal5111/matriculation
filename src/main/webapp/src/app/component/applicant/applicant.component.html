@@ -30,33 +30,33 @@
           </mat-list>
         </ng-template>
       </mat-expansion-panel>
-      <mat-expansion-panel [disabled]="!applicant.contactData">
-        <mat-expansion-panel-header>
-          <mat-panel-title>Dane kontaktowe</mat-panel-title>
-        </mat-expansion-panel-header>
-        <ng-template matExpansionPanelContent>
-          <mat-list>
-            <mat-list-item>Numer telefonu: {{applicant.contactData.phoneNumber}}</mat-list-item>
-            <mat-list-item>Typ numeru telefonu: {{applicant.contactData.phoneNumberType}}</mat-list-item>
-            <mat-list-item>Drugi numer telefonu: {{applicant.contactData.phoneNumber2}}</mat-list-item>
-            <mat-list-item>Typ drugiego numeru telefonu: {{applicant.contactData.phoneNumber2Type}}</mat-list-item>
-            <mat-list-item>Nazwa ulicy zameldowania: {{applicant.contactData.officialStreet}}</mat-list-item>
-            <mat-list-item>Numer ulicy zameldowania: {{applicant.contactData.officialStreetNumber}}</mat-list-item>
-            <mat-list-item>Numer mieszkania zameldowania: {{applicant.contactData.officialFlatNumber}}</mat-list-item>
-            <mat-list-item>Kod pocztowy zameldowania: {{applicant.contactData.officialPostCode}}</mat-list-item>
-            <mat-list-item>Nazwa miejsca zameldowania: {{applicant.contactData.officialCity}}</mat-list-item>
-            <mat-list-item>
-              Czy miasto:
-              <div *ngIf="applicant.contactData.officialCityIsCity">
-                Tak
-              </div>
-              <div *ngIf="!applicant.contactData.officialCityIsCity">
-                Nie
-              </div>
-            </mat-list-item>
-          </mat-list>
-        </ng-template>
-      </mat-expansion-panel>
+      <!--      <mat-expansion-panel [disabled]="!applicant.contactData">-->
+      <!--        <mat-expansion-panel-header>-->
+      <!--          <mat-panel-title>Dane kontaktowe</mat-panel-title>-->
+      <!--        </mat-expansion-panel-header>-->
+      <!--        <ng-template matExpansionPanelContent>-->
+      <!--          <mat-list>-->
+      <!--            <mat-list-item>Numer telefonu: {{applicant.contactData.phoneNumber}}</mat-list-item>-->
+      <!--            <mat-list-item>Typ numeru telefonu: {{applicant.contactData.phoneNumberType}}</mat-list-item>-->
+      <!--            <mat-list-item>Drugi numer telefonu: {{applicant.contactData.phoneNumber2}}</mat-list-item>-->
+      <!--            <mat-list-item>Typ drugiego numeru telefonu: {{applicant.contactData.phoneNumber2Type}}</mat-list-item>-->
+      <!--            <mat-list-item>Nazwa ulicy zameldowania: {{applicant.contactData.officialStreet}}</mat-list-item>-->
+      <!--            <mat-list-item>Numer ulicy zameldowania: {{applicant.contactData.officialStreetNumber}}</mat-list-item>-->
+      <!--            <mat-list-item>Numer mieszkania zameldowania: {{applicant.contactData.officialFlatNumber}}</mat-list-item>-->
+      <!--            <mat-list-item>Kod pocztowy zameldowania: {{applicant.contactData.officialPostCode}}</mat-list-item>-->
+      <!--            <mat-list-item>Nazwa miejsca zameldowania: {{applicant.contactData.officialCity}}</mat-list-item>-->
+      <!--            <mat-list-item>-->
+      <!--              Czy miasto:-->
+      <!--              <div *ngIf="applicant.contactData.officialCityIsCity">-->
+      <!--                Tak-->
+      <!--              </div>-->
+      <!--              <div *ngIf="!applicant.contactData.officialCityIsCity">-->
+      <!--                Nie-->
+      <!--              </div>-->
+      <!--            </mat-list-item>-->
+      <!--          </mat-list>-->
+      <!--        </ng-template>-->
+      <!--      </mat-expansion-panel>-->
     </mat-card-content>
     <mat-card-actions></mat-card-actions>
   </mat-card>

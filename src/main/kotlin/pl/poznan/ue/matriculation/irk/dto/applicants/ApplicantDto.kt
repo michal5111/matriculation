@@ -1,9 +1,11 @@
 package pl.poznan.ue.matriculation.irk.dto.applicants
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import pl.poznan.ue.matriculation.local.dto.AbstractApplicantDto
+import java.io.Serializable
 import java.util.*
 
-data class ApplicantDTO(
+data class ApplicantDto(
         val id: Long,
 
         val email: String,
@@ -17,7 +19,7 @@ data class ApplicantDTO(
 
         val phone: String?,
 
-        val citizenship: String?,
+        val citizenship: String,
 
         val photo: String?,
 
@@ -44,4 +46,8 @@ data class ApplicantDTO(
 
         @JsonProperty("education_data")
         val educationData: EducationDataDTO
-)
+) : Serializable, AbstractApplicantDto() {
+    override fun getForeignId(): Long {
+        return id
+    }
+}

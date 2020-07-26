@@ -25,7 +25,7 @@ data class DocumentDTO(
         @JsonProperty("issue_institution")
         val issueInstitution: String?,
         @JsonProperty("issue_institution_usos_code")
-        val issueInstitutionUsosCode: String?,
+        val issueInstitutionUsosCode: Long?,
         @JsonProperty("modification_date")
         val modificationDate: String?
 )

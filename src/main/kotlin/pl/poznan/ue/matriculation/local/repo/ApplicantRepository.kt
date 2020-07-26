@@ -7,7 +7,12 @@ import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 @Repository
 interface ApplicantRepository : JpaRepository<Applicant, Long> {
 
-    fun findByIrkId(irkId: Long): Applicant?
+    fun findByForeignIdAndDatasourceId(foreignId: Long, datasourceId: String): Applicant?
 
     fun findByUsosId(usosId: Long): Applicant?
+
+//    @Modifying
+//    @Transactional
+//    @Query("delete from Applicant a where ")
+//    fun deleteAllByApplicationsId()
 }

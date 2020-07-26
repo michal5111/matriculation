@@ -1,13 +1,15 @@
 package pl.poznan.ue.matriculation.oracle.service
 
+import org.hibernate.exception.GenericJDBCException
 import org.springframework.stereotype.Service
+import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.exception.IndexChangeException
+import pl.poznan.ue.matriculation.exception.IndexNotFoundException
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
 import pl.poznan.ue.matriculation.oracle.dto.IndexTypeDto
 import pl.poznan.ue.matriculation.oracle.repo.IndexTypeRepository
 import pl.poznan.ue.matriculation.oracle.repo.ProgrammeStageRepository
 import pl.poznan.ue.matriculation.oracle.repo.StudentRepository
-import java.sql.SQLException
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -41,9 +43,9 @@ class UsosService(
 
     fun updateIndexNumberByUsosIdAndIndexType(usosId: Long, indexTypeCode: String, newIndexNumber: String) {
         val student = studentRepository.findByPersonIdAndIndexTypeCode(usosId, indexTypeCode)
-                ?: throw IllegalStateException("IndexNotFound")
+                ?: throw IndexNotFoundException()
         val applicant = applicantRepository.findByUsosId(usosId)
-                ?: throw java.lang.IllegalStateException("Applicant not found")
+                ?: throw ApplicantNotFoundException()
         student.apply {
             indexNumber = newIndexNumber
         }
@@ -56,9 +58,8 @@ class UsosService(
         } catch (e: Exception) {
             var t: Throwable? = e
             while (t!!.cause != null) {
-                if (t is SQLException) {
-                    println("${t.errorCode} ${t.sqlState}")
-                    throw IndexChangeException(t.message, e)
+                if (t is GenericJDBCException) {
+                    throw IndexChangeException("${t.sqlException} ${t.message}", e)
                 }
                 t = t.cause
             }

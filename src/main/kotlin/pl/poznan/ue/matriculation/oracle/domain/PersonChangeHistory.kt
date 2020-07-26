@@ -43,7 +43,7 @@ class PersonChangeHistory(
         var citizenship: Citizenship? = null,
 
         @Column(name = "TYP_DOKUMENTU", length = 1, nullable = true)
-        var documentType: String? = null,
+        var documentType: Char? = null,
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "KRAJ_DOK_KOD", referencedColumnName = "KOD", nullable = true)
@@ -60,7 +60,7 @@ class PersonChangeHistory(
         var changeDate: Date = Date(),
 
         @Column(name = "PLEC", nullable = true, length = 1)
-        var sex: String? = null
+        var sex: Char? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

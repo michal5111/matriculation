@@ -6,17 +6,15 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
-import pl.poznan.ue.matriculation.irk.dto.Page
-import pl.poznan.ue.matriculation.irk.dto.applicants.ApplicantDTO
-import pl.poznan.ue.matriculation.irk.dto.applications.ApplicationDTO
-import pl.poznan.ue.matriculation.irk.dto.programmes.ProgrammeGroupsDTO
-import pl.poznan.ue.matriculation.irk.dto.registrations.RegistrationDTO
-import pl.poznan.ue.matriculation.irk.service.IrkService
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.domain.import.ImportProgress
+import pl.poznan.ue.matriculation.local.dto.DataSourceDto
 import pl.poznan.ue.matriculation.local.dto.ImportDto
+import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
+import pl.poznan.ue.matriculation.local.dto.RegistrationDto
+import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceService
 import pl.poznan.ue.matriculation.local.service.ApplicationService
 import pl.poznan.ue.matriculation.local.service.AsyncService
 import pl.poznan.ue.matriculation.local.service.ImportService
@@ -26,7 +24,7 @@ import pl.poznan.ue.matriculation.oracle.service.UsosService
 @RestController
 @RequestMapping("/api")
 class RestController(
-        private val irkService: IrkService,
+        private val applicationDataSourceService: ApplicationDataSourceService,
         private val importService: ImportService,
         private val asyncService: AsyncService,
         private val usosService: UsosService,
@@ -55,46 +53,61 @@ class RestController(
 //        return personRepository.getOne(id)
 //    }
 
-    @GetMapping("/applicants/{id}")
-    fun getApplicantById(@PathVariable("id") id: Long): ApplicantDTO? = irkService.getApplicantById(id)
+//    @GetMapping("/applicants/{dataSourceType}/{id}")
+//    fun getApplicantById(@PathVariable("id") id: Long, @PathVariable("dataSourceType") dataSourceType: String): Applicant = applicationDataSourceService
+//            .getDataSource(dataSourceType)
+//            .getApplicantById(id) as Applicant
 
-    @GetMapping("/applicants/")
-    fun getApplicantByParam(
-            @RequestParam(required = false) pesel: String?,
-            @RequestParam(required = false) surname: String?,
-            @RequestParam(required = false) email: String?
-    ): Page<ApplicantDTO>? {
-        if (pesel != null) return irkService.getApplicantsByPesel(pesel)
-        if (surname != null) return irkService.getApplicantsBySurname(surname)
-        if (email != null) return irkService.getApplicantsByEmail(email)
-        throw IllegalArgumentException()
-    }
+//    @GetMapping("/applicants/")
+//    fun getApplicantByParam(
+//            @RequestParam(required = false) pesel: String?,
+//            @RequestParam(required = false) surname: String?,
+//            @RequestParam(required = false) email: String?
+//    ): Page<ApplicantDTO>? {
+//        if (pesel != null) return irkService.getApplicantsByPesel(pesel)
+//        if (surname != null) return irkService.getApplicantsBySurname(surname)
+//        if (email != null) return irkService.getApplicantsByEmail(email)
+//        throw IllegalArgumentException()
+//    }
 
-    @GetMapping("/registrations/{id}")
-    fun getRegistration(@PathVariable("id") id: String): RegistrationDTO? = irkService.getRegistration(id)
-
-
-    @GetMapping("/registrations/codes")
-    fun getRegistrationCodes(): MutableList<Map<String, String>> = irkService.getAvailableRegistrations()
-
-    @GetMapping("/registrations/codes/{id}")
-    fun getRegistrationCodes(@PathVariable("id") id: String): List<String?> = irkService.getAvailableRegistrationProgrammes(id)
+//    @GetMapping("/registrations/{dataSourceType}/{id}")
+//    fun getRegistration(@PathVariable("id") id: String, @PathVariable("dataSourceType") dataSourceType: String): Registration? = applicationDataSourceService
+//            .getDataSource(dataSourceType)
+//            .getRegistrationByCode(id)
 
 
-    @GetMapping("/applications/{id}")
-    fun getApplication(@PathVariable("id") id: Long): ApplicationDTO? = irkService.getApplication(id)
+    @GetMapping("/registrations/{dataSourceType}/codes")
+    fun getRegistrationCodes(
+            @PathVariable("dataSourceType") dataSourceType: String
+    ): List<RegistrationDto> = applicationDataSourceService
+            .getDataSource(dataSourceType)
+            .getAvailableRegistrations()
 
-    @GetMapping("/applications")
-    fun getApplications(
-            @RequestParam(required = false) admitted: Boolean,
-            @RequestParam(required = false) paid: Boolean,
-            @RequestParam(required = false) programme: String?,
-            @RequestParam(required = false) registration: String?,
-            @RequestParam(required = false) pageNumber: Int?
-    ): Page<ApplicationDTO>? = irkService.getApplications(admitted, paid, programme, registration, pageNumber)
+    @GetMapping("/registrations/{dataSourceType}/codes/{id}")
+    fun getRegistrationCodes(
+            @PathVariable("id") id: String,
+            @PathVariable("dataSourceType") dataSourceType: String): List<ProgrammeDto> = applicationDataSourceService
+            .getDataSource(dataSourceType)
+            .getAvailableRegistrationProgrammes(id)
 
-    @GetMapping("/programmesGroups/{id}")
-    fun getProgrammesGroups(@PathVariable("id") id: String): ProgrammeGroupsDTO? = irkService.getProgrammesGroups(id)
+
+//    @GetMapping("/applications/{dataSourceType}/{id}")
+//    fun getApplication(@PathVariable("id") id: Long, @PathVariable("dataSourceType") dataSourceType: String): Application? = applicationDataSourceService
+//            .getDataSource(dataSourceType)
+//            .getApplicationById(id)
+
+//    @GetMapping("/applications/{dataSourceType}")
+//    fun getApplications(
+//            programme: String,
+//            registration: String,
+//            pageNumber: Int,
+//            @PathVariable("dataSourceType") dataSourceType: String
+//    ): Page<Application> = applicationDataSourceService
+//            .getDataSource(dataSourceType)
+//            .getApplicationsPage(registration, programme, pageNumber)
+
+//    @GetMapping("/programmesGroups/{id}")
+//    fun getProgrammesGroups(@PathVariable("id") id: String): ProgrammeGroupsDTO? = irkService.getProgrammesGroups(id)
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/import")
@@ -107,7 +120,8 @@ class RestController(
             startDate = importDto.startDate,
             dateOfAddmision = importDto.dateOfAddmision,
             stageCode = importDto.stageCode,
-            didacticCycleCode = importDto.didacticCycleCode
+            didacticCycleCode = importDto.didacticCycleCode,
+            dataSourceType = importDto.dataSourceId
     )
 
     @PutMapping("/import/{id}")
@@ -173,5 +187,10 @@ class RestController(
             return importService.setImportStatus(ImportStatus.ARCHIVED, importId)
         } else
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Zły stan importu!")
+    }
+
+    @GetMapping("/import/dataSources")
+    fun getDataSources(): List<DataSourceDto> {
+        return applicationDataSourceService.getDataSources()
     }
 }

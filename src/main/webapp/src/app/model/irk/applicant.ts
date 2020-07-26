@@ -1,8 +1,11 @@
 import {Document} from './document';
 import {Observable} from 'rxjs';
+import {Address} from "./address";
+import {PhoneNumber} from "./phoneNumber";
 
 export class Applicant {
   id: number;
+  foreignId: number
   email: string;
   indexNumber: string;
   password: string;
@@ -17,48 +20,29 @@ export class Applicant {
     photo: string;
     image: any;
     image$: Observable<Blob>;
-    photoPermission: null;
-    casPasswordOverwrite: Boolean;
-    modification_date: Date;
-    basicData: {
-        sex: string;
-        pesel: string;
-        dateOfBirth: Date;
-        cityOfBirth: string;
-        countryOfBirth: string;
-        dataSource: string;
-    };
-    contactData: {
-        phoneNumber: string;
-        phoneNumberType: string;
-        phoneNumber2: string;
-        phoneNumber2Type: string;
-        officialStreet: string;
-        officialStreetNumber: string;
-        officialFlatNumber: string;
-        officialPostCode: string;
-        officialCity: string;
-        officialCityIsCity: Boolean;
-        officialCountry: string;
-        realStreet: string;
-        realStreetNumber: string;
-        realFlatNumber: string;
-        realPostCode: string;
-        realCity: string;
-        realCityIsCity: Boolean;
-        realCountry: string;
-        modificationDate: Date;
-    };
-    additionalData: {
-        documentType: string;
-        documentNumber: string;
-        documentExpDate: Date;
-        documentCountry: string;
-        militaryStatus: string;
-        militaryCategory: string;
-        wku: string;
-        cityOfBirth: string;
-        countryOfBirth: string;
+  photoPermission: null;
+  casPasswordOverwrite: boolean;
+  modification_date: Date;
+  basicData: {
+    sex: string;
+    pesel: string;
+    dateOfBirth: Date;
+    cityOfBirth: string;
+    countryOfBirth: string;
+    dataSource: string;
+  };
+  addresses: [Address];
+  phoneNumbers: [PhoneNumber];
+  additionalData: {
+    documentType: string;
+    documentNumber: string;
+    documentExpDate: Date;
+    documentCountry: string;
+    militaryStatus: string;
+    militaryCategory: string;
+    wku: string;
+    cityOfBirth: string;
+    countryOfBirth: string;
         mothersName: string;
         fathersName: string;
     };
@@ -78,5 +62,6 @@ export class Applicant {
         documents: [Document];
     };
     usosId: number;
-    assignedIndexNumber: number;
+  assignedIndexNumber: number;
+  foreignIdType: string;
 }

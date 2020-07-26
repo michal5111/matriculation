@@ -25,7 +25,7 @@ class AdditionalData(
 
         var documentNumber: String?,
 
-        var documentType: String?,
+        var documentType: Char?,
 
         var fathersName: String?,
 

@@ -8,6 +8,7 @@ import javax.persistence.*
 class EducationData(
 
         @Id
+        @JsonIgnore
         var applicantId: Long? = null,
 
         @MapsId
@@ -16,7 +17,7 @@ class EducationData(
         @JoinColumn(name = "applicant_id", referencedColumnName = "id")
         var applicant: Applicant? = null,
 
-        @OneToMany(mappedBy = "educationData", cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
+        @OneToMany(mappedBy = "educationData", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
         var documents: MutableList<Document>,
 
         var highSchoolCity: String?,

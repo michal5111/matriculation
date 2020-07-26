@@ -10,13 +10,17 @@ import java.io.Serializable
 import javax.persistence.*
 
 @Entity
+@Table(uniqueConstraints = [UniqueConstraint(name = "ForeignIdUniqueConstraint", columnNames = ["foreignId", "datasourceId"])])
 class Application(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long? = null,
 
-        @Column(unique = true)
-        val irkId: Long,
+        @Column(nullable = false, name = "foreignId")
+        val foreignId: Long,
+
+        @Column(nullable = false, name = "datasourceId")
+        var datasourceId: String? = null,
 
         var admitted: String?,
 
@@ -47,8 +51,6 @@ class Application(
         @Lob
         var stackTrace: String? = null,
 
-        val irkInstance: String,
-
         @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
         @JoinColumn(name = "applicant_id", referencedColumnName = "id")
         var applicant: Applicant? = null,
@@ -60,9 +62,9 @@ class Application(
 ) : Serializable {
 
     override fun toString(): String {
-        return "Application(id=$id, irkId=$irkId, admitted=$admitted, comment=$comment, payment=$payment, " +
+        return "Application(id=$id, irkId=$foreignId, admitted=$admitted, comment=$comment, payment=$payment, " +
                 "position=$position, qualified=$qualified, score=$score, importError=$importError, " +
-                "stackTrace=$stackTrace, irkInstance='$irkInstance')"
+                "stackTrace=$stackTrace)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -72,14 +74,14 @@ class Application(
         other as Application
 
         if (id != other.id) return false
-        if (irkId != other.irkId) return false
+        if (foreignId != other.foreignId) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = id?.hashCode() ?: 0
-        result = 31 * result + irkId.hashCode()
+        result = 31 * result + foreignId.hashCode()
         return result
     }
 

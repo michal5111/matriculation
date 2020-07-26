@@ -16,7 +16,7 @@ data class AdditionalDataDTO(
         @JsonProperty("document_number")
         val documentNumber: String?,
         @JsonProperty("document_type")
-        val documentType: String?,
+        val documentType: Char?,
         @JsonProperty("fathers_name")
         val fathersName: String?,
         @JsonProperty("military_category")

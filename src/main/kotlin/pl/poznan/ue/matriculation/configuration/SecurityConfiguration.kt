@@ -38,8 +38,8 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Value("\${cas.service.logout}")
     private lateinit var CAS_URL_LOGOUT: String
 
-    @Value("\${cas.url.prefix}")
-    private lateinit var CAS_URL_PREFIX: String
+//    @Value("\${pl.poznan.ue.matriculation.cas.url}")
+//    private lateinit var CAS_URL_PREFIX: String
 
     @Value("\${cas.ticket.validate.url}")
     private lateinit var CAS_VALIDATE_URL: String
@@ -47,7 +47,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Value("\${app.service.security}")
     private lateinit var CAS_SERVICE_URL: String
 
-    @Value("\${app.service.home}")
+    @Value("\${pl.poznan.ue.matriculation.service.home}")
     private lateinit var APP_SERVICE_HOME: String
 
     @Value("\${pl.poznan.ue.matriculation.admin.userName}")

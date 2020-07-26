@@ -8,6 +8,8 @@ import {ImportProgress} from '../../model/import/import-progress';
 import {IndexType} from '../../model/oracle/index-type';
 import {Registration} from '../../model/irk/registration';
 import {APP_BASE_HREF} from '@angular/common';
+import {DataSource} from "../../model/import/dataSource";
+import {Programme} from "../../model/irk/programme";
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -23,7 +25,8 @@ export class ImportService {
 
   private apiUrl = `${this.baseHref}api`;
 
-  constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) { }
+  constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) {
+  }
 
   getImportsPage(page: number, size: number, sort?: string, sortDir?: string): Observable<Page<Import>> {
     if (sort && sortDir) {
@@ -32,12 +35,12 @@ export class ImportService {
     return this.http.get<Page<Import>>(`${this.apiUrl}/import?page=${page}&size=${size}`, httpOptions);
   }
 
-  getAvailableRegistrations(): Observable<[Registration]> {
-    return this.http.get<[Registration]>(`${this.apiUrl}/registrations/codes`, httpOptions);
+  getAvailableRegistrations(dataSourceType: string): Observable<[Registration]> {
+    return this.http.get<[Registration]>(`${this.apiUrl}/registrations/${dataSourceType}/codes`, httpOptions);
   }
 
-  getAvailableRegistrationProgrammes(programmeCode: string): Observable<[string]> {
-    return this.http.get<[string]>(`${this.apiUrl}/registrations/codes/${encodeURIComponent(programmeCode)}`);
+  getAvailableRegistrationProgrammes(registrationCode: string, dataSourceType: string): Observable<[Programme]> {
+    return this.http.get<[Programme]>(`${this.apiUrl}/registrations/${dataSourceType}/codes/${encodeURIComponent(registrationCode)}`);
   }
 
   getAvailableIndexPools(): Observable<[IndexType]> {
@@ -91,5 +94,9 @@ export class ImportService {
 
   archiveImport(importId: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/import/${importId}/archive`, null, httpOptions);
+  }
+
+  getAvailableDataSources(): Observable<[DataSource]> {
+    return this.http.get<[DataSource]>(`${this.apiUrl}/import/dataSources`);
   }
 }

@@ -25,6 +25,7 @@ class Document(
 
         val certificateUsosCode: Char?,
 
+        @Lob
         var comment: String?,
 
         var documentNumber: String,
@@ -39,7 +40,7 @@ class Document(
 
         var issueInstitution: String?,
 
-        var issueInstitutionUsosCode: String?,
+        var issueInstitutionUsosCode: Long?,
 
         var modificationDate: String?,
 

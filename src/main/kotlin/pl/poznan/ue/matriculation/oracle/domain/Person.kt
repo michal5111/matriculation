@@ -97,7 +97,7 @@ class Person(
 //        val modificationDate: Date? = null,
 
         @Column(name = "PLEC", nullable = false, length = 1)
-        var sex: String,
+        var sex: Char,
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "TYTUL_PRZED", nullable = true)
@@ -135,7 +135,7 @@ class Person(
         var middleSchool: School? = null,
 
         @Column(name = "TYP_DOKUMENTU", length = 1, nullable = true)
-        var documentType: String? = null,
+        var documentType: Char? = null,
 
         @Column(name = "NR_KARTY_BIBL", length = 30, nullable = true)
         val libraryCardNumber: String? = null,

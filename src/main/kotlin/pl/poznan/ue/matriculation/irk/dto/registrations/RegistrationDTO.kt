@@ -10,10 +10,10 @@ data class RegistrationDTO(
         val code: String,
         val cycle: Cycle,
         @JsonProperty("employees_only")
-        val employeesOnly: Boolean?,
+        val employeesOnly: Boolean,
         val name: Name,
-        val programmes: List<String?>,
+        val programmes: List<String>,
         val status: String,
         val tag: String?,
-        val turn: List<TurnDTO?>?
+        val turn: List<TurnDTO>?
 )

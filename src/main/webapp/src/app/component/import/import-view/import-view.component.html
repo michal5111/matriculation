@@ -67,22 +67,15 @@
           <p>Błędy przy zapisywaniu: {{importProgress.saveErrors}}</p>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-button (click)="startImport()" [disabled]="
-                importProgress.importStatus === 'ARCHIVED'
-                || importProgress.importStatus === 'SAVING'
-                || importProgress.importStatus === 'STARTED'
-                || importProgress.savedApplicants == importProgress.totalCount">
+          <button mat-button (click)="startImport()" [disabled]="isStartImportButtonDisabled()">
             <mat-icon>cloud_download</mat-icon>
             Importuj osoby
           </button>
-          <button mat-button (click)="savePersons()"
-                  [disabled]="(importProgress.importStatus !== 'COMPLETED_WITH_ERRORS' && importProgress.importStatus !== 'IMPORTED')
-                || totalElements < 1
-                || importProgress.savedApplicants == importProgress.totalCount">
+          <button mat-button (click)="savePersons()" [disabled]="isSavePersonsButtonDisabled()">
             <mat-icon>save</mat-icon>
             Zapisz osoby
           </button>
-          <button mat-button (click)="onArchiveClick()" [disabled]="importProgress.importStatus !== 'COMPLETE'">
+          <button mat-button (click)="onArchiveClick()" [disabled]="isArchiveButtonDisabled()">
             <mat-icon>archived</mat-icon>
             Archiwizuj
           </button>
@@ -104,11 +97,11 @@
         <td mat-cell *matCellDef="let element" class="mat-cell">  {{element.id}}  </td>
       </ng-container>
 
-      <ng-container matColumnDef="irkId">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Irk id</th>
+      <ng-container matColumnDef="foreignId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Obcy id</th>
         <td mat-cell *matCellDef="let element" class="mat-cell"><a mat-button
                                                                    href="{{getApplicationIrkUrl(element)}}"
-                                                                   target="_blank">{{element.irkId}}</a>
+                                                                   target="_blank">{{element.foreignId}}</a>
         </td>
       </ng-container>
 

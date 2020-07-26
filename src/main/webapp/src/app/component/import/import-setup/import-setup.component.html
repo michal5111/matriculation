@@ -1,12 +1,22 @@
 <div class="wrapper">
   <form [formGroup]="importCreationFormGroup" (ngSubmit)="onSubmit()">
     <mat-form-field class="form-field wide-field">
+      <mat-label>Źródło danych</mat-label>
+      <mat-select formControlName="dataSource" required="true"
+                  (selectionChange)="onDataSourceSelectionChange($event)">
+        <mat-option
+          *ngFor="let dataSource of $availableDataSourcesObservable | async"
+          [value]="dataSource.id">{{dataSource.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="form-field wide-field">
       <mat-label>Rekrutacja</mat-label>
       <mat-select formControlName="registration" required="true"
                   (selectionChange)="onRegistrationSelectionChange($event)">
         <mat-option
-          *ngFor="let registration of $availableRegistrationsObservable | async"
-          [value]="registration.code">{{registration.code}} {{registration.name}}
+          *ngFor="let registration of registrations"
+          [value]="registration.id">{{registration.id}} {{registration.name}}
         </mat-option>
       </mat-select>
     </mat-form-field>
@@ -16,7 +26,7 @@
                   (selectionChange)="onRegistrationProgrammeChange($event)">
         <mat-option
           *ngFor="let registrationProgramme of registrationProgrammes"
-          [value]="registrationProgramme">{{registrationProgramme}}
+          [value]="registrationProgramme.id">{{registrationProgramme.name}}
         </mat-option>
       </mat-select>
     </mat-form-field>

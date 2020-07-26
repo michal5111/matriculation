@@ -12,6 +12,8 @@ import {MatDialog} from '@angular/material/dialog';
 import {ErrorDialogComponent} from '../../dialog/error-dialog/error-dialog.component';
 import {ErrorDialogData} from '../../../model/dialog/error-dialog-data';
 import {MatSelectChange} from '@angular/material/select';
+import {DataSource} from '../../../model/import/dataSource';
+import {Programme} from '../../../model/irk/programme';
 
 @Component({
   selector: 'app-import-setup',
@@ -21,8 +23,10 @@ import {MatSelectChange} from '@angular/material/select';
 export class ImportSetupComponent implements OnInit, OnDestroy {
 
   import: Import = new Import();
-  $availableRegistrationsObservable: Observable<[Registration]> = this.importService.getAvailableRegistrations();
-  registrationProgrammes: string[];
+  dataSourceId: string;
+  $availableDataSourcesObservable: Observable<[DataSource]> = this.importService.getAvailableDataSources();
+  registrations: Registration[];
+  registrationProgrammes: Programme[];
   $indexPoolsObservable: Observable<[IndexType]> = this.importService.getAvailableIndexPools();
   stages: string[];
   didacticCycles: string[];
@@ -41,6 +45,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.importCreationFormGroup = this.formBuilder.group({
+      dataSource: ['', Validators.required],
       registration: ['', Validators.required],
       registrationProgramme: ['', Validators.required],
       indexPoolCode: ['', Validators.required],
@@ -53,7 +58,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   }
 
   onRegistrationSelectionChange(event: MatSelectChange): void {
-    this.importService.getAvailableRegistrationProgrammes(event.value).pipe(
+    this.importService.getAvailableRegistrationProgrammes(event.value, this.dataSourceId).pipe(
       tap(results => this.registrationProgrammes = results)
     ).subscribe(
       () => {
@@ -94,6 +99,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.import.startDate = this.importCreationFormGroup.value.startDate;
     this.import.indexPoolCode = this.importCreationFormGroup.value.indexPoolCode;
     this.import.stageCode = this.importCreationFormGroup.value.stage;
+    this.import.dataSourceId = this.importCreationFormGroup.value.dataSource;
     this.importService.createImport(this.import).subscribe(
       importObject => this.onImportCreated(importObject),
       error => this.onError('Błąd przy tworzeniu importu', error)
@@ -122,5 +128,17 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.snackBar.ngOnDestroy();
     this.changesSubscription.unsubscribe();
+  }
+
+  onDataSourceSelectionChange(event: MatSelectChange) {
+    this.dataSourceId = event.value;
+    this.importService.getAvailableRegistrations(event.value).pipe(
+      tap(results => this.registrations = results)
+    ).subscribe(
+      () => {
+        this.importCreationFormGroup.patchValue({registration: null, registrationProgramme: null, stage: null});
+      },
+      error => this.onError('Błąd przy pobieraniu rekrutacji', error)
+    );
   }
 }

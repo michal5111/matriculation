@@ -22,9 +22,9 @@ interface ApplicationRepository : PagingAndSortingRepository<Application, Long> 
     @Query("SELECT a FROM Application a WHERE a.import.id = :importId")
     fun findAllByImportId(pageable: Pageable, @Param("importId") importId: Long): Page<Application>
 
-    fun existsByIrkId(irkId: Long): Boolean
+    fun existsByForeignIdAndDatasourceId(foreignId: Long, datasourceId: String): Boolean
 
-    fun getByIrkId(irkId: Long): Application
+    fun getByForeignIdAndDatasourceId(foreignId: Long, foreignIdType: String): Application
 
     //@QueryHints(value = [QueryHint(name = HINT_FETCH_SIZE, value = "" + Integer.MIN_VALUE)]) //MySql
     @QueryHints(value = [

@@ -8,12 +8,13 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionSynchronizationManager
-import pl.poznan.ue.matriculation.irk.dto.applications.ApplicationDTO
-import pl.poznan.ue.matriculation.irk.service.IrkService
+import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
 import pl.poznan.ue.matriculation.kotlinExtensions.stackTraceToString
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
+import pl.poznan.ue.matriculation.local.dto.AbstractApplicantDto
+import pl.poznan.ue.matriculation.local.dto.AbstractApplicationDto
 import pl.poznan.ue.matriculation.local.dto.ImportDtoJpa
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
 import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
@@ -31,10 +32,8 @@ class ProcessService(
         private val importRepository: ImportRepository,
         private val applicationRepository: ApplicationRepository,
         private val applicantRepository: ApplicantRepository,
-        private val irkService: IrkService,
         private val applicantService: ApplicantService,
         private val personService: PersonService,
-        private val applicationService: ApplicationService,
         private val importProgressRepository: ImportProgressRepository
 ) {
 
@@ -47,32 +46,47 @@ class ProcessService(
     private lateinit var oracleEntityManager: EntityManager
 
     @Transactional(rollbackFor = [Exception::class, RuntimeException::class], propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
-    fun processApplication(importId: Long, applicationDTO: ApplicationDTO): Application {
+    fun processApplication(importId: Long, applicationDto: AbstractApplicationDto, applicationDtoDataSource: IApplicationDataSource<AbstractApplicationDto, AbstractApplicantDto>): Application {
         if (!TransactionSynchronizationManager.isActualTransactionActive()) {
             throw IllegalStateException("Nie ma aktywnej transakcji")
         }
         logger.debug("Pobieram import...")
         val import = importRepository.getOne(importId)
-        logger.debug("Pobrałem import... Sprawdzam czy istnieje już aplikacja o takim irkId")
-        val application = if (applicationRepository.existsByIrkId(applicationDTO.id)) {
+        val applicantDto = applicationDtoDataSource.getApplicantById(applicationDto.getForeignApplicantId())
+        applicationDtoDataSource.preprocess(applicationDto, applicantDto)
+        logger.debug("Pobrałem import... Sprawdzam czy istnieje już aplikacja o takim foreignId i foreignIdType")
+        val application = if (applicationRepository.existsByForeignIdAndDatasourceId(
+                        applicationDto.getForeignId(),
+                        applicationDtoDataSource.getId())
+        ) {
             logger.debug("Istnieje aktualizuję...")
-            applicationService.update(
-                    applicationRepository.getByIrkId(applicationDTO.id),
-                    applicationDTO
+            applicationDtoDataSource.updateApplication(
+                    applicationRepository.getByForeignIdAndDatasourceId(
+                            applicationDto.getForeignId(),
+                            applicationDtoDataSource.getId()
+                    ),
+                    applicationDto
             )
         } else {
             logger.debug("Nie istnieje dodaję...")
-            applicationService.create(applicationDTO)
+            applicationDtoDataSource.mapApplicationDtoToApplication(applicationDto).also {
+                it.datasourceId = applicationDtoDataSource.getId()
+            }
         }
-        logger.debug("Sprawdzam czy istnieje już aplikant o takim irkId")
-        val applicant = irkService.getApplicantById(applicationDTO.user)!!.let {
-            val applicant = applicantRepository.findByIrkId(it.id)
+        logger.debug("Sprawdzam czy istnieje już aplikant o takim foreignId i foreignIdType")
+        val applicant = applicantDto.let { abstractApplicantDto ->
+            val applicant = applicantRepository.findByForeignIdAndDatasourceId(
+                    abstractApplicantDto.getForeignId(),
+                    applicationDtoDataSource.getId()
+            )
             if (applicant != null) {
                 logger.debug("Istnieje aktualizuję...")
-                return@let applicantService.update(applicant, it)
+                return@let applicationDtoDataSource.updateApplicant(applicant, abstractApplicantDto)
             } else {
                 logger.debug("Nie istnieje dodaję...")
-                return@let applicantService.create(it)
+                return@let applicationDtoDataSource.mapApplicantDtoToApplicant(abstractApplicantDto).also {
+                    it.datasourceId = applicationDtoDataSource.getId()
+                }
             }
         }
         logger.debug("zapisuję aplikanta")
@@ -85,12 +99,10 @@ class ProcessService(
 //            applicant.applications.add(application)
 //        }
 
-//        application.certificate = applicant.educationData.documents.find {
-//            irkService.getPrimaryCertificate(application.irkId)?.let { primaryCertificate ->
-//                return@let it.documentNumber == primaryCertificate.documentNumber &&
-//                        it.certificateTypeCode == primaryCertificate.certificateTypeCode
-//            } ?: false
-//        }
+        application.certificate = applicationDtoDataSource.getPrimaryCertificate(
+                application.foreignId,
+                applicant.educationData.documents
+        )
         //application.certificate?.Applications?.add(application)
         logger.debug("zapisuję aplikację")
         applicationRepository.save(application)
@@ -111,12 +123,17 @@ class ProcessService(
     fun processPerson(
             importId: Long,
             application: Application,
-            importDto: ImportDtoJpa
+            importDto: ImportDtoJpa,
+            applicationDtoDataSource: IApplicationDataSource<AbstractApplicationDto, AbstractApplicantDto>
     ): Person {
         if (!TransactionSynchronizationManager.isActualTransactionActive()) {
             throw IllegalStateException("Nie ma aktywnej transakcji")
         }
         val importProgress = importProgressRepository.getOne(importId)
+        application.applicant!!.photo?.let {
+            application.applicant!!.photoByteArray = applicationDtoDataSource.getPhoto(it)
+        }
+        applicantService.check(application.applicant!!)
         val personAndAssignedNumber = personService.processPerson(
                 application = application,
                 dateOfAddmision = importDto.dateOfAddmision,
@@ -126,7 +143,9 @@ class ProcessService(
                 registration = importDto.registration,
                 stageCode = importDto.stageCode,
                 startDate = importDto.startDate
-        )
+        ) {
+            applicationDtoDataSource.postMatriculation(applicationId = application.id!!, irkApplication = it)
+        }
         personAndAssignedNumber.let { pair ->
             application.applicant!!.usosId = pair.first.id
             application.applicant!!.assignedIndexNumber = pair.second
@@ -168,7 +187,8 @@ class ProcessService(
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     fun processPersons(
             importId: Long,
-            importDto: ImportDtoJpa
+            importDto: ImportDtoJpa,
+            applicationDtoDataSource: IApplicationDataSource<AbstractApplicationDto, AbstractApplicantDto>
     ): Int {
         var errorCount = 0
         val applicationsPage: Stream<Application> = applicationRepository.getAllByImportIdAndApplicationImportStatus(importId)
@@ -178,7 +198,8 @@ class ProcessService(
                     val person = self.processPerson(
                             importId = importId,
                             application = application,
-                            importDto = importDto
+                            importDto = importDto,
+                            applicationDtoDataSource = applicationDtoDataSource
                     )
                     oracleEntityManager.detach(person)
                 } catch (e: Exception) {

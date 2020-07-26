@@ -1,0 +1,46 @@
+package pl.poznan.ue.matriculation.applicantDataSources
+
+import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
+import pl.poznan.ue.matriculation.local.domain.applicants.Document
+import pl.poznan.ue.matriculation.local.domain.applications.Application
+import pl.poznan.ue.matriculation.local.dto.AbstractApplicantDto
+import pl.poznan.ue.matriculation.local.dto.AbstractApplicationDto
+import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
+import pl.poznan.ue.matriculation.local.dto.RegistrationDto
+import pl.poznan.ue.matriculation.oracle.domain.IrkApplication
+
+interface IApplicationDataSource<applicationDTO : AbstractApplicationDto, applicantDTO : AbstractApplicantDto> {
+    fun getApplicationsPage(registrationId: String, programmeId: String, pageNumber: Int): IPage<applicationDTO>
+
+    fun getApplicantById(applicantId: Long): applicantDTO
+
+    fun getPhoto(photoUrl: String): ByteArray
+
+    fun getName(): String
+
+    fun getId(): String
+
+    fun postMatriculation(applicationId: Long, irkApplication: IrkApplication)
+
+    fun getAvailableRegistrationProgrammes(registration: String): List<ProgrammeDto>
+
+    fun getAvailableRegistrations(): List<RegistrationDto>
+
+//    fun getRegistrationByCode(registration: String): Registration?
+
+    fun getApplicationById(applicationId: Long): applicationDTO?
+
+    fun mapApplicationDtoToApplication(applicationDto: applicationDTO): Application
+
+    fun mapApplicantDtoToApplicant(applicantDto: applicantDTO): Applicant
+
+    fun updateApplication(application: Application, applicationDto: applicationDTO): Application
+
+    fun updateApplicant(applicant: Applicant, applicantDto: applicantDTO): Applicant
+
+    fun getInstanceUrl(): String
+
+    fun preprocess(applicationDto: applicationDTO, applicantDto: applicantDTO)
+
+    fun getPrimaryCertificate(applicationId: Long, documents: List<Document>): Document?
+}

@@ -7,5 +7,6 @@ class ImportDto(
         val startDate: String,
         val dateOfAddmision: String,
         val stageCode: String,
-        val didacticCycleCode: String
+        val didacticCycleCode: String,
+        val dataSourceId: String
 )

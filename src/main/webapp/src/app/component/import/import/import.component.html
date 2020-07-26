@@ -16,11 +16,17 @@
   <ng-template [ngIf]="userService.isAuthenticated">
     <h3 class="mat-h3">Utworzone importy</h3>
     <div class="mat-elevation-z2">
-      <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)">
+      <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)"
+             matSortActive="id" matSortDirection="desc" matSortDisableClear>
 
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Id</th>
           <td mat-cell *matCellDef="let element">{{element.id}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="dataSourceType">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Źródło danych</th>
+          <td mat-cell *matCellDef="let element">{{element.dataSourceId}}</td>
         </ng-container>
 
         <ng-container matColumnDef="programmeCode">
@@ -97,7 +103,7 @@
         <ng-container matColumnDef="deleteImport">
           <th mat-header-cell *matHeaderCellDef> Usuń</th>
           <td mat-cell *matCellDef="let element">
-            <button mat-button (click)="onDeleteImportClick(element.id)">
+            <button mat-button (click)="onDeleteImportClick(element.id)" [disabled]="isDeleteButtonDisabled(element)">
               <mat-icon>delete</mat-icon>
             </button>
           </td>

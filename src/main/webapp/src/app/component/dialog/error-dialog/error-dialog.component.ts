@@ -32,9 +32,9 @@ export class ErrorDialogComponent implements OnInit {
     }
     if (this.data.error instanceof HttpErrorResponse) {
       console.log(`Error: ${JSON.stringify(this.data.error.error)}`);
-      this.message = this.data.error.message;
-      this.title += ` ${this.data.error.name}`;
-      this.data.stacktrace = this.data.error.statusText;
+      this.message = this.data.error.error.message;
+      this.title += `${this.data.error.error.status} ${this.data.error.error.error}`;
+      this.data.stacktrace = this.data.error.error.path;
     }
     if (typeof this.data.error === 'string') {
       this.message = this.data.error;

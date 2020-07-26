@@ -20,4 +20,7 @@ interface ImportProgressRepository : JpaRepository<ImportProgress, Long> {
     @Transactional(transactionManager = "transactionManager")
     @Query("update ImportProgress ip set ip.importStatus = :importStatus where ip.id = :importId")
     fun setStatus(importStatus: ImportStatus, importId: Long)
+
+//    @Query("select new pl.poznan.ue.matriculation.local.dto.ImportProgressDto(ip.id, ip.importedApplications, ip.saveErrors, ip.savedApplicants, ip.totalCount, ip.error) from ImportProgress ip where ip.id = :importId")
+//    fun getImportProgressDtoById(importId: Long): ImportProgressDto?
 }

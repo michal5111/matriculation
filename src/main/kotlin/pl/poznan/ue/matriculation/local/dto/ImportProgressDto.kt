@@ -5,19 +5,19 @@ import java.io.Serializable
 
 data class ImportProgressDto(
 
-        var id: Long,
+        val id: Long,
 
-        var importedApplications: Int,
+        val importedApplications: Int,
 
-        var saveErrors: Int,
+        val saveErrors: Int,
 
-        var savedApplicants: Int,
+        val savedApplicants: Int,
 
-        var totalCount: Int,
+        val totalCount: Int?,
 
-        var importStatus: ImportStatus = ImportStatus.PENDING,
+        val importStatus: ImportStatus = ImportStatus.PENDING,
 
-        var error: String? = null
+        val error: String? = null
 ) : Serializable {
     override fun toString(): String {
         return "ImportProgress(id=$id, " +

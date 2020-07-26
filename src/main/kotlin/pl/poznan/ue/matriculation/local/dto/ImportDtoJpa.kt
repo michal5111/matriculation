@@ -9,5 +9,6 @@ class ImportDtoJpa(
         val startDate: Date,
         val dateOfAddmision: Date,
         val stageCode: String,
-        val didacticCycleCode: String
+        val didacticCycleCode: String,
+        val dataSourceId: String
 )

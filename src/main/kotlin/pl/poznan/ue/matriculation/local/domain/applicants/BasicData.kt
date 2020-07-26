@@ -14,7 +14,7 @@ class BasicData(
         @JoinColumn(name = "applicant_id", referencedColumnName = "id")
         var applicant: Applicant? = null,
 
-        var sex: String,
+        var sex: Char,
 
         var pesel: String?,
 

@@ -25,11 +25,13 @@ class Import(
 
         val didacticCycleCode: String,
 
+        val dataSourceId: String,
+
         @JsonIgnore
         @OneToMany(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
         val applications: MutableList<Application> = mutableListOf(),
 
-        @OneToOne(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
+        @OneToOne(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.REMOVE])
         var importProgress: ImportProgress? = null
 ) {
 

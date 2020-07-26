@@ -41,7 +41,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = [
     'lp',
     'id',
-    'irkId',
+    'foreignId',
     'usosId',
     'names',
     'birthDateAndPlace',
@@ -58,7 +58,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   ];
   sortingMap: Map<string, string> = new Map<string, string>([
     ['id', 'id'],
-    ['irkId', 'irkId'],
+    ['foreignId', 'foreignId'],
     ['usosId', 'applicant.usosId'],
     ['names', 'applicant.name.family'],
     ['birthDateAndPlace', 'applicant.basicData.dateOfBirth'],
@@ -228,7 +228,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   getApplicationIrkUrl(application: Application): string {
-    return application.irkInstance + '/pl/admin/application/' + application.irkId + '/edit/';
+    return application.irkInstance + '/pl/admin/application/' + application.foreignId + '/edit/';
   }
 
   getPersonUsosUrl(application: Application): string {
@@ -268,5 +268,22 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     } else {
       return application.applicant.additionalData.documentNumber;
     }
+  }
+
+  isStartImportButtonDisabled(): boolean {
+    return this.importProgress.importStatus === 'ARCHIVED'
+      || this.importProgress.importStatus === 'SAVING'
+      || this.importProgress.importStatus === 'STARTED'
+      || this.importProgress.savedApplicants === this.importProgress.totalCount;
+  }
+
+  isSavePersonsButtonDisabled(): boolean {
+    return (this.importProgress.importStatus !== 'COMPLETED_WITH_ERRORS' && this.importProgress.importStatus !== 'IMPORTED')
+      || this.totalElements < 1
+      || this.importProgress.savedApplicants === this.importProgress.totalCount;
+  }
+
+  isArchiveButtonDisabled(): boolean {
+    return this.importProgress.importStatus !== 'COMPLETE';
   }
 }
