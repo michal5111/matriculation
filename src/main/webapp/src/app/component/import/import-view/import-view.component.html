@@ -52,6 +52,10 @@
             <mat-icon>warning</mat-icon>
             Zakończono z błędami
           </span>
+            <span *ngSwitchCase="'ERROR'">
+            <mat-icon>ERROR</mat-icon>
+            Błąd
+          </span>
           </div>
           <p>Błąd importu:
             <mark class="error-color">{{importProgress.error}}</mark>

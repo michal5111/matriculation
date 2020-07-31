@@ -133,12 +133,16 @@ export class ImportComponent implements OnInit, OnDestroy {
   }
 
   isDeleteButtonDisabled(importObject: Import): boolean {
-    return importObject.importProgress.importStatus === 'STARTED'
-      || importObject.importProgress.importStatus === 'SAVING'
-      || importObject.importProgress.importStatus === 'COMPLETE'
-      || importObject.importProgress.importStatus === 'COMPLETED_WITH_ERRORS'
-      || (importObject.importProgress.importStatus === 'IMPORTED'
-        && importObject.importProgress.importedApplications > 0);
+    switch (importObject.importProgress.importStatus) {
+      case "STARTED":
+      case "SAVING":
+      case "COMPLETE":
+      case "COMPLETED_WITH_ERRORS":
+      case "IMPORTED":
+        return importObject.importProgress.importedApplications > 0;
+      default:
+        return false
+    }
   }
 
   ngOnDestroy(): void {

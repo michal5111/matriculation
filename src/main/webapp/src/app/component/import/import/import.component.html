@@ -96,6 +96,10 @@
             <mat-icon>warning</mat-icon>
             Zakończono z błędami
           </span>
+              <span *ngSwitchCase="'ERROR'">
+            <mat-icon>error</mat-icon>
+            Błąd
+          </span>
             </div>
           </td>
         </ng-container>

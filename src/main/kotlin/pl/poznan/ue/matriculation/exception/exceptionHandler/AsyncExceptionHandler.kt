@@ -36,7 +36,7 @@ class AsyncExceptionHandler : AsyncUncaughtExceptionHandler {
                             e.message.toString()
                     )
                 }
-                importService.setImportStatus(ImportStatus.PENDING, importId)
+                importService.setImportStatus(ImportStatus.ERROR, importId)
             }
             if (e is ImportStartException) {
                 val importId = e.importId
@@ -44,7 +44,7 @@ class AsyncExceptionHandler : AsyncUncaughtExceptionHandler {
                         importId,
                         e.message.toString()
                 )
-                importService.setImportStatus(ImportStatus.PENDING, importId)
+                importService.setImportStatus(ImportStatus.ERROR, importId)
             }
             e = e?.cause
         } while (e != null)

@@ -72,12 +72,12 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     tap(result => this.importProgress = result),
     flatMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString)),
     tap(() => {
-      if (this.importProgress.importStatus === 'IMPORTED'
-        || this.importProgress.importStatus === 'COMPLETE'
-        || this.importProgress.importStatus === 'PENDING'
-        || this.importProgress.importStatus === 'ARCHIVED'
-        || this.importProgress.importStatus === 'COMPLETED_WITH_ERRORS') {
-        this.progressSubscription.unsubscribe();
+      switch (this.importProgress.importStatus) {
+        case "STARTED":
+        case "SAVING":
+          return;
+        default:
+          this.progressSubscription.unsubscribe();
       }
     })
   );
@@ -271,16 +271,25 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   isStartImportButtonDisabled(): boolean {
-    return this.importProgress.importStatus === 'ARCHIVED'
-      || this.importProgress.importStatus === 'SAVING'
-      || this.importProgress.importStatus === 'STARTED'
-      || this.importProgress.savedApplicants === this.importProgress.totalCount;
+    switch (this.importProgress.importStatus) {
+      case "ARCHIVED":
+      case "SAVING":
+      case "STARTED":
+      case "COMPLETE":
+        return true;
+      default:
+        return false;
+    }
   }
 
   isSavePersonsButtonDisabled(): boolean {
-    return (this.importProgress.importStatus !== 'COMPLETED_WITH_ERRORS' && this.importProgress.importStatus !== 'IMPORTED')
-      || this.totalElements < 1
-      || this.importProgress.savedApplicants === this.importProgress.totalCount;
+    switch (this.importProgress.importStatus) {
+      case "COMPLETED_WITH_ERRORS":
+      case "IMPORTED":
+        return false;
+      default:
+        return true;
+    }
   }
 
   isArchiveButtonDisabled(): boolean {

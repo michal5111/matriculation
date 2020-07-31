@@ -5,5 +5,6 @@ export type ImportStatus =
   | 'SAVING'
   | 'COMPLETE'
   | 'ARCHIVED'
-  | 'COMPLETED_WITH_ERRORS';
+  | 'COMPLETED_WITH_ERRORS'
+  | 'ERROR'
 
