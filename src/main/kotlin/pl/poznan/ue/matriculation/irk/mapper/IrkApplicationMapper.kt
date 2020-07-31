@@ -1,12 +1,12 @@
 package pl.poznan.ue.matriculation.irk.mapper
 
-import pl.poznan.ue.matriculation.irk.dto.applications.ApplicationDTO
+import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.applications.ApplicationForeignerData
 
 class IrkApplicationMapper {
 
-    fun mapApplicationDtoToApplication(applicationDTO: ApplicationDTO): Application {
+    fun mapApplicationDtoToApplication(applicationDTO: IrkApplicationDTO): Application {
         return Application(
                 admitted = applicationDTO.admitted,
                 comment = applicationDTO.comment,
@@ -33,7 +33,7 @@ class IrkApplicationMapper {
         }
     }
 
-    fun update(application: Application, applicationDto: ApplicationDTO): Application {
+    fun update(application: Application, applicationDto: IrkApplicationDTO): Application {
         application.apply {
             admitted = applicationDto.admitted
             comment = applicationDto.comment

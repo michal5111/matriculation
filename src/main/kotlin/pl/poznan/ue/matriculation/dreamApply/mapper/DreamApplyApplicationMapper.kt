@@ -1,14 +1,14 @@
 package pl.poznan.ue.matriculation.dreamApply.mapper
 
-import pl.poznan.ue.matriculation.dreamApply.dto.application.ApplicationDto
+import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 
 class DreamApplyApplicationMapper {
 
-    fun map(applicationDto: ApplicationDto): Application {
+    fun map(dreamApplyApplicationDto: DreamApplyApplicationDto): Application {
         return Application(
-                foreignId = applicationDto.id,
-                admitted = applicationDto.status,
+                foreignId = dreamApplyApplicationDto.id,
+                admitted = dreamApplyApplicationDto.status,
                 payment = "paid",
                 comment = null,
                 position = null,
@@ -18,9 +18,9 @@ class DreamApplyApplicationMapper {
         )
     }
 
-    fun update(application: Application, applicationDto: ApplicationDto): Application {
+    fun update(application: Application, dreamApplyApplicationDto: DreamApplyApplicationDto): Application {
         application.apply {
-            admitted = applicationDto.status
+            admitted = dreamApplyApplicationDto.status
             payment = "paid"
             comment = null
             position = null

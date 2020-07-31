@@ -37,8 +37,8 @@ class AsyncService(
             do {
                 logger.debug("Pobieram osoby...")
                 val page = applicantDataSource.getApplicationsPage(
-                        programmeId = import.programmeCode,
-                        registrationId = import.registration,
+                        programmeForeignId = import.programmeForeignId,
+                        registrationCode = import.registration,
                         pageNumber = currentPage
                 )
                 logger.debug("Pobrałem osoby...")

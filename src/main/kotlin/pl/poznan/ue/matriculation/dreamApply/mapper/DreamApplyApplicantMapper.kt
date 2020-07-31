@@ -1,6 +1,7 @@
 package pl.poznan.ue.matriculation.dreamApply.mapper
 
-import pl.poznan.ue.matriculation.dreamApply.dto.applicant.ApplicantDto
+import pl.poznan.ue.matriculation.dreamApply.dto.applicant.DreamApplyApplicantDto
+import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.local.domain.applicants.*
 import pl.poznan.ue.matriculation.local.domain.const.BasicDataDatasourceType
 import pl.poznan.ue.matriculation.local.domain.const.IdentityDocumentType
@@ -12,31 +13,36 @@ import java.util.*
 
 class DreamApplyApplicantMapper {
 
-    private val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T", Locale.US)
+    private val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
-    fun map(applicantDto: ApplicantDto): Applicant {
-        val application = applicantDto.application ?: throw java.lang.IllegalStateException("Application is null")
+    fun map(dreamApplyApplicantDto: DreamApplyApplicantDto): Applicant {
+        val application = dreamApplyApplicantDto.dreamApplyApplication ?: throw java.lang.IllegalStateException("Application is null")
+        val profile = application.profile ?: throw java.lang.IllegalStateException("Profile is null")
         return Applicant(
-                foreignId = applicantDto.id,
+                foreignId = dreamApplyApplicantDto.id,
                 name = Name(
-                        given = applicantDto.name.given,
-                        middle = applicantDto.name.middle,
-                        family = applicantDto.name.family,
+                        given = dreamApplyApplicantDto.name.given.nameCapitalize(),
+                        middle = dreamApplyApplicantDto.name.middle.takeIf {
+                            !it.isNullOrBlank()
+                        }?.nameCapitalize(),
+                        family = dreamApplyApplicantDto.name.family.nameCapitalize(),
                         maiden = null
                 ),
-                email = applicantDto.email,
-                photo = applicantDto.photo,
-                phone = applicantDto.phone,
-                citizenship = applicantDto.citizenship,
+                email = dreamApplyApplicantDto.email,
+                photo = dreamApplyApplicantDto.photo,
+                phone = dreamApplyApplicantDto.phone,
+                citizenship = dreamApplyApplicantDto.citizenship,
                 nationality = application.profile.nationality,
                 photoPermission = PhotoPermissionType.NOBODY,
                 password = null,
-                modificationDate = applicantDto.registered,
+                modificationDate = dreamApplyApplicantDto.registered,
                 basicData = application.let {
                     BasicData(
-                            cityOfBirth = it.profile.birth.place,
-                            countryOfBirth = it.profile.nationality,
-                            dateOfBirth = simpleDateFormat.parse(it.profile.birth.date),
+                            cityOfBirth = it.profile!!.birth?.place,
+                            countryOfBirth = it.profile.nationality ?: dreamApplyApplicantDto.citizenship,
+                            dateOfBirth = it.profile.birth?.date?.let { birthDate ->
+                                simpleDateFormat.parse(birthDate)
+                            },
                             pesel = null,
                             sex = if (it.profile.gender == 'M') 'M' else 'K',
                             dataSource = BasicDataDatasourceType.USER
@@ -46,14 +52,16 @@ class DreamApplyApplicantMapper {
                     AdditionalData(
                             documentType = IdentityDocumentType.PASSPORT,
                             documentCountry = null,
-                            documentExpDate = simpleDateFormat.parse(it.profile.passport.expiry),
-                            documentNumber = it.profile.passport.number,
-                            mothersName = it.profile.family.mother,
-                            fathersName = it.profile.family.father,
+                            documentExpDate = it.profile!!.passport?.expiry?.let { expiryDate ->
+                                simpleDateFormat.parse(expiryDate)
+                            },
+                            documentNumber = it.profile.passport?.number,
+                            mothersName = it.profile.family?.mother,
+                            fathersName = it.profile.family?.father,
                             wku = null,
                             militaryCategory = null,
                             militaryStatus = null,
-                            cityOfBirth = it.profile.birth.place,
+                            cityOfBirth = it.profile.birth?.place,
                             countryOfBirth = it.profile.nationality
                     )
                 },
@@ -68,56 +76,64 @@ class DreamApplyApplicantMapper {
                 ),
                 applicantForeignerData = null
         ).apply {
-            addAddress(this, applicantDto)
+            educationData.applicant = this
+            additionalData.applicant = this
+            basicData.applicant = this
+            name.applicant = this
+            addAddress(this, dreamApplyApplicantDto)
             createPhoneNumbers(
                     applicant = this,
-                    day = application.contact.telephone.day,
-                    evening = application.contact.telephone.evening,
-                    mobile = application.contact.telephone.mobile,
-                    fax = application.contact.telephone.fax,
-                    emergency = application.contact.emergency.telephone
+                    day = application.contact?.telephone?.day,
+                    evening = application.contact?.telephone?.evening,
+                    mobile = application.contact?.telephone?.mobile,
+                    fax = application.contact?.telephone?.fax,
+                    emergency = application.contact?.emergency?.telephone
             )
         }
     }
 
-    fun update(applicant: Applicant, applicantDto: ApplicantDto): Applicant {
-        val application = applicantDto.application ?: throw IllegalStateException("Application is null")
+    fun update(applicant: Applicant, dreamApplyApplicantDto: DreamApplyApplicantDto): Applicant {
+        val application = dreamApplyApplicantDto.dreamApplyApplication ?: throw IllegalStateException("Application is null")
         return applicant.apply {
             name.apply {
-                given = applicant.name.given
-                middle = applicant.name.middle
-                family = applicant.name.family
+                given = applicant.name.given.nameCapitalize()
+                middle = applicant.name.middle?.nameCapitalize()
+                family = applicant.name.family.nameCapitalize()
             }
-            email = applicantDto.email
-            photo = applicantDto.photo
-            photo = applicantDto.phone
-            citizenship = applicantDto.citizenship
-            nationality = application.profile.nationality
+            email = dreamApplyApplicantDto.email
+            photo = dreamApplyApplicantDto.photo
+            photo = dreamApplyApplicantDto.phone
+            citizenship = dreamApplyApplicantDto.citizenship
+            nationality = application.profile!!.nationality
             basicData.apply {
-                cityOfBirth = application.profile.birth.place
-                countryOfBirth = application.profile.nationality
-                dateOfBirth = simpleDateFormat.parse(application.profile.birth.date)
+                cityOfBirth = application.profile.birth?.place
+                countryOfBirth = application.profile.nationality ?: dreamApplyApplicantDto.citizenship
+                dateOfBirth = application.profile.birth?.date?.let { birthDate ->
+                    simpleDateFormat.parse(birthDate)
+                }
                 sex = if (application.profile.gender == 'M') 'M' else 'K'
             }
             additionalData.apply {
-                documentExpDate = simpleDateFormat.parse(application.profile.passport.expiry)
-                documentNumber = application.profile.passport.number
-                mothersName = application.profile.family.mother
-                fathersName = application.profile.family.father
-                cityOfBirth = application.profile.birth.place
+                documentExpDate = application.profile.passport?.expiry?.let {
+                    simpleDateFormat.parse(it)
+                }
+                documentNumber = application.profile.passport?.number
+                mothersName = application.profile.family?.mother
+                fathersName = application.profile.family?.father
+                cityOfBirth = application.profile.birth?.place
                 countryOfBirth = application.profile.nationality
             }
             phoneNumbers.clear()
             createPhoneNumbers(
                     applicant = this,
-                    day = application.contact.telephone.day,
-                    evening = application.contact.telephone.evening,
-                    mobile = application.contact.telephone.mobile,
-                    fax = application.contact.telephone.fax,
-                    emergency = application.contact.emergency.telephone
+                    day = application.contact?.telephone?.day,
+                    evening = application.contact?.telephone?.evening,
+                    mobile = application.contact?.telephone?.mobile,
+                    fax = application.contact?.telephone?.fax,
+                    emergency = application.contact?.emergency?.telephone
             )
             addresses.clear()
-            addAddress(this, applicantDto)
+            addAddress(this, dreamApplyApplicantDto)
         }
     }
 
@@ -174,18 +190,18 @@ class DreamApplyApplicantMapper {
         )
     }
 
-    private fun addAddress(applicant: Applicant, applicantDto: ApplicantDto) {
-        applicantDto.application!!.let {
+    private fun addAddress(applicant: Applicant, dreamApplyApplicantDto: DreamApplyApplicantDto) {
+        dreamApplyApplicantDto.dreamApplyApplication!!.let {
             applicant.addresses.add(
                     Address(
                             applicant = applicant,
                             addressType = AddressType.RESIDENCE,
-                            city = it.contact.address.municipality,
+                            city = it.contact?.address?.municipality,
                             cityIsCity = false,
-                            countryCode = it.contact.address.country,
-                            postalCode = it.contact.address.postalcode,
-                            street = it.contact.address.street,
-                            streetNumber = it.contact.address.street,
+                            countryCode = it.contact?.address?.country,
+                            postalCode = it.contact?.address?.postalcode,
+                            street = it.contact?.address?.street,
+                            streetNumber = it.contact?.address?.street,
                             flatNumber = null
                     )
             )

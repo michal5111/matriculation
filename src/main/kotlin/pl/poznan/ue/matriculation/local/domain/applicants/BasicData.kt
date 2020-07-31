@@ -20,7 +20,7 @@ class BasicData(
 
         var dateOfBirth: Date?,
 
-        var cityOfBirth: String,
+        var cityOfBirth: String?,
 
         var countryOfBirth: String,
 

@@ -84,7 +84,7 @@ class RestController(
             .getAvailableRegistrations()
 
     @GetMapping("/registrations/{dataSourceType}/codes/{id}")
-    fun getRegistrationCodes(
+    fun getProgrammesCodes(
             @PathVariable("id") id: String,
             @PathVariable("dataSourceType") dataSourceType: String): List<ProgrammeDto> = applicationDataSourceService
             .getDataSource(dataSourceType)
@@ -115,6 +115,7 @@ class RestController(
             @RequestBody importDto: ImportDto
     ): Import = importService.create(
             programmeCode = importDto.programmeCode,
+            programmeForeignId = importDto.programmeForeignId,
             registration = importDto.registration,
             indexPoolCode = importDto.indexPoolCode,
             startDate = importDto.startDate,

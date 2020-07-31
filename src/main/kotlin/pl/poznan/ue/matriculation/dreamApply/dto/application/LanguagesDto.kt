@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class LanguagesDto(
         @JsonProperty("0")
-        val firstLanguage: LanguageDto,
+        val firstLanguage: LanguageDto?,
         @JsonProperty("1")
-        val secondLanguage: LanguageDto,
+        val secondLanguage: LanguageDto?,
         @JsonProperty("2")
-        val thirdLanguage: LanguageDto,
+        val thirdLanguage: LanguageDto?,
         val native: String
 ) {
 }

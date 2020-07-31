@@ -4,6 +4,7 @@ import java.util.*
 
 class ImportDtoJpa(
         val programmeCode: String,
+        val programmeForeignId: String,
         val registration: String,
         val indexPoolCode: String,
         val startDate: Date,

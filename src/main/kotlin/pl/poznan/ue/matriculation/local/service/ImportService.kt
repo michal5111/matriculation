@@ -28,6 +28,7 @@ class ImportService(
 
     fun create(
             programmeCode: String,
+            programmeForeignId: String,
             registration: String,
             indexPoolCode: String,
             startDate: String,
@@ -51,6 +52,7 @@ class ImportService(
                 didacticCycleCode = didacticCycleCode,
                 indexPoolCode = indexPoolCode,
                 programmeCode = programmeCode,
+                programmeForeignId = programmeForeignId,
                 registration = registration,
                 startDate = simpleDateFormat.parse(startDate),
                 stageCode = stageCode,

@@ -1,8 +1,8 @@
 package pl.poznan.ue.matriculation.irk.dto.applicants
 
-import pl.poznan.ue.matriculation.irk.dto.applications.ApplicationDTO
+import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
 
 data class MatriculationDataDTO(
-        val application: ApplicationDTO,
-        val user: ApplicantDto
+        val application: IrkApplicationDTO,
+        val user: IrkApplicantDto
 )

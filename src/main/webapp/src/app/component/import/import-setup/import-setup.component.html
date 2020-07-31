@@ -26,7 +26,7 @@
                   (selectionChange)="onRegistrationProgrammeChange($event)">
         <mat-option
           *ngFor="let registrationProgramme of registrationProgrammes"
-          [value]="registrationProgramme.id">{{registrationProgramme.name}}
+          [value]="registrationProgramme">{{registrationProgramme.name}}
         </mat-option>
       </mat-select>
     </mat-form-field>

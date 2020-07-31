@@ -13,6 +13,8 @@ class Import(
 
         val programmeCode: String,
 
+        val programmeForeignId: String,
+
         val stageCode: String,
 
         val registration: String,

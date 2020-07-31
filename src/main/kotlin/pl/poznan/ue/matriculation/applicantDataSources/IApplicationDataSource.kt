@@ -10,11 +10,11 @@ import pl.poznan.ue.matriculation.local.dto.RegistrationDto
 import pl.poznan.ue.matriculation.oracle.domain.IrkApplication
 
 interface IApplicationDataSource<applicationDTO : AbstractApplicationDto, applicantDTO : AbstractApplicantDto> {
-    fun getApplicationsPage(registrationId: String, programmeId: String, pageNumber: Int): IPage<applicationDTO>
+    fun getApplicationsPage(registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<applicationDTO>
 
     fun getApplicantById(applicantId: Long): applicantDTO
 
-    fun getPhoto(photoUrl: String): ByteArray
+    fun getPhoto(photoUrl: String): ByteArray?
 
     fun getName(): String
 

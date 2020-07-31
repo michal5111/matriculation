@@ -69,7 +69,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   }
 
   onRegistrationProgrammeChange(event: MatSelectChange): void {
-    this.importService.getAvailableStages(event.value).pipe(
+    this.importService.getAvailableStages(event.value.usosId).pipe(
       tap(results => this.stages = results)
     ).subscribe(
       () => {
@@ -93,7 +93,8 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     this.import.registration = this.importCreationFormGroup.value.registration;
-    this.import.programmeCode = this.importCreationFormGroup.value.registrationProgramme;
+    this.import.programmeCode = this.importCreationFormGroup.value.registrationProgramme.usosId;
+    this.import.programmeForeignId = this.importCreationFormGroup.value.registrationProgramme.id;
     this.import.didacticCycleCode = this.importCreationFormGroup.value.didacticCycle;
     this.import.dateOfAddmision = this.importCreationFormGroup.value.dateOfAddmision;
     this.import.startDate = this.importCreationFormGroup.value.startDate;

@@ -3,8 +3,8 @@ package pl.poznan.ue.matriculation.applicantDataSources
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.web.client.HttpStatusCodeException
 import pl.poznan.ue.matriculation.irk.dto.ErrorMessageDto
-import pl.poznan.ue.matriculation.irk.dto.applicants.ApplicantDto
-import pl.poznan.ue.matriculation.irk.dto.applications.ApplicationDTO
+import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
+import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
 import pl.poznan.ue.matriculation.irk.mapper.IrkApplicantMapper
 import pl.poznan.ue.matriculation.irk.mapper.IrkApplicationMapper
 import pl.poznan.ue.matriculation.irk.service.IrkService
@@ -20,25 +20,25 @@ class IrkApplicationDataSourceImpl(
         private val name: String,
         private val id: String,
         private val setAsAccepted: Boolean
-) : IApplicationDataSource<ApplicationDTO, ApplicantDto> {
+) : IApplicationDataSource<IrkApplicationDTO, IrkApplicantDto> {
 
     private val irkApplicationMapper = IrkApplicationMapper()
     private val irkApplicantMapper = IrkApplicantMapper()
 
-    override fun getApplicationsPage(registrationId: String, programmeId: String, pageNumber: Int): IPage<ApplicationDTO> {
+    override fun getApplicationsPage(registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<IrkApplicationDTO> {
         val page = irkService.getApplications(
-                admitted = false,
-                paid = false,
-                registration = registrationId,
-                programme = programmeId,
+                admitted = true,
+                paid = true,
+                registration = registrationCode,
+                programme = programmeForeignId,
                 pageNumber = pageNumber
         )
-        return object : IPage<ApplicationDTO> {
+        return object : IPage<IrkApplicationDTO> {
             override fun getSize(): Int {
                 return page.count
             }
 
-            override fun getResultsList(): List<ApplicationDTO> {
+            override fun getResultsList(): List<IrkApplicationDTO> {
                 return page.results
             }
 
@@ -48,11 +48,11 @@ class IrkApplicationDataSourceImpl(
         }
     }
 
-    override fun getApplicantById(applicantId: Long): ApplicantDto {
+    override fun getApplicantById(applicantId: Long): IrkApplicantDto {
         return irkService.getApplicantById(applicantId) ?: throw IllegalArgumentException("Unable to get applicant")
     }
 
-    override fun getPhoto(photoUrl: String): ByteArray {
+    override fun getPhoto(photoUrl: String): ByteArray? {
         return irkService.getPhoto(photoUrl)
     }
 
@@ -79,7 +79,8 @@ class IrkApplicationDataSourceImpl(
         return irkService.getAvailableRegistrationProgrammes(registration).map {
             ProgrammeDto(
                     id = it,
-                    name = it
+                    name = it,
+                    usosId = it
             )
         }
     }
@@ -115,7 +116,7 @@ class IrkApplicationDataSourceImpl(
 //        }
 //    }
 
-    override fun getApplicationById(applicationId: Long): ApplicationDTO? {
+    override fun getApplicationById(applicationId: Long): IrkApplicationDTO? {
         return irkService.getApplication(applicationId)
     }
 
@@ -123,32 +124,31 @@ class IrkApplicationDataSourceImpl(
         return irkService.serviceUrl
     }
 
-    override fun mapApplicationDtoToApplication(applicationDto: ApplicationDTO): Application {
+    override fun mapApplicationDtoToApplication(applicationDto: IrkApplicationDTO): Application {
         return irkApplicationMapper.mapApplicationDtoToApplication(applicationDto)
     }
 
-    override fun mapApplicantDtoToApplicant(applicantDto: ApplicantDto): Applicant {
+    override fun mapApplicantDtoToApplicant(applicantDto: IrkApplicantDto): Applicant {
         return irkApplicantMapper.mapApplicantDtoToApplicant(applicantDto)
     }
 
-    override fun updateApplication(application: Application, applicationDto: ApplicationDTO): Application {
+    override fun updateApplication(application: Application, applicationDto: IrkApplicationDTO): Application {
         return irkApplicationMapper.update(application, applicationDto)
     }
 
-    override fun updateApplicant(applicant: Applicant, applicantDto: ApplicantDto): Applicant {
+    override fun updateApplicant(applicant: Applicant, applicantDto: IrkApplicantDto): Applicant {
         return irkApplicantMapper.update(applicant, applicantDto)
     }
 
-    override fun preprocess(applicationDto: ApplicationDTO, applicantDto: ApplicantDto) {
+    override fun preprocess(applicationDto: IrkApplicationDTO, applicantDto: IrkApplicantDto) {
     }
 
     override fun getPrimaryCertificate(applicationId: Long, documents: List<Document>): Document? {
-//        return documents.find {
-//            irkService.getPrimaryCertificate(applicationId)?.let { primaryCertificate ->
-//                return@let it.documentNumber == primaryCertificate.documentNumber &&
-//                        it.certificateTypeCode == primaryCertificate.certificateTypeCode
-//            } ?: false
-//        }
-        return null
+        return documents.find {
+            irkService.getPrimaryCertificate(applicationId)?.let { primaryCertificate ->
+                return@let it.documentNumber == primaryCertificate.documentNumber &&
+                        it.certificateTypeCode == primaryCertificate.certificateTypeCode
+            } ?: false
+        }
     }
 }

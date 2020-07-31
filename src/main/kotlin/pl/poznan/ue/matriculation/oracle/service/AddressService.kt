@@ -37,7 +37,7 @@ class AddressService(
                 }
         ).apply {
             countryCode?.let {
-                if (it == "PL") {
+                if (it == "PL" && zipCode?.length == 5) {
                     this.zipCode = zipCode
                 } else {
                     this.foreignZipCode = zipCode
@@ -66,7 +66,7 @@ class AddressService(
                 citizenshipRepository.getOne(it)
             }
             countryCode?.let {
-                if (it == "PL") {
+                if (it == "PL" && zipCode?.length == 5) {
                     this.zipCode = zipCode
                 } else {
                     this.foreignZipCode = zipCode

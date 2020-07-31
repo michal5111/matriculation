@@ -1,23 +1,24 @@
 package pl.poznan.ue.matriculation.irk.mapper
 
-import pl.poznan.ue.matriculation.irk.dto.applicants.ApplicantDto
 import pl.poznan.ue.matriculation.irk.dto.applicants.ContactDataDTO
+import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
+import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.local.domain.applicants.*
 import pl.poznan.ue.matriculation.local.domain.enum.AddressType
 
 class IrkApplicantMapper {
 
-    fun mapApplicantDtoToApplicant(applicantDto: ApplicantDto): Applicant {
+    fun mapApplicantDtoToApplicant(applicantDto: IrkApplicantDto): Applicant {
         return Applicant(
                 foreignId = applicantDto.id,
                 email = applicantDto.email,
                 indexNumber = applicantDto.indexNumber,
                 password = applicantDto.password,
                 name = Name(
-                        middle = applicantDto.name.middle?.capitalize(),
-                        family = applicantDto.name.family.capitalize(),
-                        maiden = applicantDto.name.maiden?.capitalize(),
-                        given = applicantDto.name.given.capitalize()
+                        middle = applicantDto.name.middle?.nameCapitalize(),
+                        family = applicantDto.name.family.nameCapitalize(),
+                        maiden = applicantDto.name.maiden?.nameCapitalize(),
+                        given = applicantDto.name.given.nameCapitalize()
                 ),
                 phone = applicantDto.phone,
                 citizenship = applicantDto.citizenship,
@@ -105,16 +106,16 @@ class IrkApplicantMapper {
         }
     }
 
-    fun update(applicant: Applicant, applicantDto: ApplicantDto): Applicant {
+    fun update(applicant: Applicant, applicantDto: IrkApplicantDto): Applicant {
         applicant.apply {
             email = applicantDto.email
             indexNumber = applicantDto.indexNumber
             password = applicantDto.password
             name.apply {
-                middle = applicantDto.name.middle
-                family = applicantDto.name.family
-                maiden = applicantDto.name.maiden
-                given = applicantDto.name.given
+                middle = applicantDto.name.middle?.nameCapitalize()
+                family = applicantDto.name.family.nameCapitalize()
+                maiden = applicantDto.name.maiden?.nameCapitalize()
+                given = applicantDto.name.given.nameCapitalize()
             }
             phone = applicantDto.phone
             citizenship = applicantDto.citizenship

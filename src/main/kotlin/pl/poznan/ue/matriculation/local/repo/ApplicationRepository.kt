@@ -10,8 +10,6 @@ import org.springframework.data.jpa.repository.QueryHints
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import org.springframework.transaction.annotation.Propagation
-import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import java.util.stream.Stream
 import javax.persistence.QueryHint
@@ -35,7 +33,7 @@ interface ApplicationRepository : PagingAndSortingRepository<Application, Long> 
     @Query("select an from Application an where an.import.id = :id and (an.importStatus = 'NOT_IMPORTED' or an.importStatus = 'ERROR')")
     fun getAllByImportIdAndApplicationImportStatus(@Param("id") importId: Long): Stream<Application>
 
-    @Transactional(rollbackFor = [Exception::class], propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
+//    @Transactional(rollbackFor = [Exception::class], propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     fun deleteAllByImportId(importId: Long)
 
     fun findAllByImportId(importId: Long): Stream<Application>

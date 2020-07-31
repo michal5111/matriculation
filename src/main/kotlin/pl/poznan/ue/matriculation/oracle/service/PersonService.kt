@@ -6,6 +6,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applications.Application
@@ -65,15 +66,15 @@ class PersonService(
             }
             if (name != applicant.name.given) {
                 changeHistory.name = name
-                name = applicant.name.given.capitalize()
+                name = applicant.name.given.nameCapitalize()
             }
             if (middleName != applicant.name.middle) {
                 changeHistory.middleName = middleName
-                middleName = applicant.name.middle?.capitalize()
+                middleName = applicant.name.middle?.nameCapitalize()
             }
             if (surname != applicant.name.family) {
                 changeHistory.surname = surname
-                surname = applicant.name.family.capitalize()
+                surname = applicant.name.family.nameCapitalize()
             }
             if (citizenship?.code != applicant.citizenship) {
                 changeHistory.citizenship = citizenship

@@ -11,7 +11,7 @@ import pl.poznan.ue.matriculation.local.dto.ImportDtoJpa
 @Repository
 interface ImportRepository : JpaRepository<Import, Long>, PagingAndSortingRepository<Import, Long> {
 
-    @Query("select new pl.poznan.ue.matriculation.local.dto.ImportDtoJpa(i.programmeCode, i.registration, i.indexPoolCode, i.startDate, i.dateOfAddmision, i.stageCode, i.didacticCycleCode, i.dataSourceId) from Import i where i.id = :id")
+    @Query("select new pl.poznan.ue.matriculation.local.dto.ImportDtoJpa(i.programmeCode, i.programmeForeignId, i.registration, i.indexPoolCode, i.startDate, i.dateOfAddmision, i.stageCode, i.didacticCycleCode, i.dataSourceId) from Import i where i.id = :id")
     fun getDtoById(@Param("id") importId: Long): ImportDtoJpa
 
     fun existsByProgrammeCodeAndRegistration(programmeCode: String, registration: String): Boolean

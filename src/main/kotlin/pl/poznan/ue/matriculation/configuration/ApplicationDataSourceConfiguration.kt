@@ -5,10 +5,14 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import pl.poznan.ue.matriculation.applicantDataSources.DreamApplyDataSourceImpl
 import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
 import pl.poznan.ue.matriculation.applicantDataSources.IrkApplicationDataSourceImpl
-import pl.poznan.ue.matriculation.irk.dto.applicants.ApplicantDto
-import pl.poznan.ue.matriculation.irk.dto.applications.ApplicationDTO
+import pl.poznan.ue.matriculation.dreamApply.dto.applicant.DreamApplyApplicantDto
+import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
+import pl.poznan.ue.matriculation.dreamApply.service.DreamApplyService
+import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
+import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
 import pl.poznan.ue.matriculation.irk.service.IrkService
 
 @Configuration
@@ -32,6 +36,31 @@ class ApplicationDataSourceConfiguration {
     @Value("\${pl.poznan.ue.matriculation.primaryIrkInstanceSetAsAccepted}")
     private var primarySetAsAccepted: Boolean = false
 
+    @Value("\${pl.poznan.ue.matriculation.dreamApplyInstance}")
+    private lateinit var dreamApplyInstanceUrl: String
+
+    @Value("\${pl.poznan.ue.matriculation.dreamApplyApiKey}")
+    private lateinit var dreamApplyApiKey: String
+
+    @Bean(name = ["DreamApplyService"])
+    fun dreamApplyService(): DreamApplyService {
+        return DreamApplyService(
+                apiKey = dreamApplyApiKey,
+                instanceUrl = dreamApplyInstanceUrl
+        )
+    }
+
+    @Bean(name = ["DreamApplyApplicantDataSource"])
+    fun dreamApplyApplicantDataSource(
+            @Autowired @Qualifier("DreamApplyService") dreamApplyService: DreamApplyService
+    ): IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
+        return DreamApplyDataSourceImpl(
+                dreamApplyService = dreamApplyService,
+                name = "Dream Apply",
+                id = "DREAM_APPLY"
+        )
+    }
+
     @Bean(name = ["TestIrkService"])
     fun testIrkService(): IrkService {
         return IrkService(
@@ -43,7 +72,7 @@ class ApplicationDataSourceConfiguration {
     @Bean(name = ["testIrkApplicantDataSource"])
     fun testIrkApplicantDataSource(
             @Autowired @Qualifier("TestIrkService") irkService: IrkService
-    ): IApplicationDataSource<ApplicationDTO, ApplicantDto> {
+    ): IApplicationDataSource<IrkApplicationDTO, IrkApplicantDto> {
         return IrkApplicationDataSourceImpl(
                 id = "IRK_TEST",
                 name = "Testowa IRK",
@@ -63,7 +92,7 @@ class ApplicationDataSourceConfiguration {
     @Bean(name = ["primaryIrkApplicantDataSource"])
     fun primaryIrkApplicantDataSource(
             @Autowired @Qualifier("primaryIrkService") irkService: IrkService
-    ): IApplicationDataSource<ApplicationDTO, ApplicantDto> {
+    ): IApplicationDataSource<IrkApplicationDTO, IrkApplicantDto> {
         return IrkApplicationDataSourceImpl(
                 id = "IRK_PRIMARY",
                 name = "Główna IRK",

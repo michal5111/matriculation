@@ -6,6 +6,8 @@ export class Import {
 
   programmeCode: string;
 
+  programmeForeignId: string;
+
   stageCode: string;
 
   registration: string;

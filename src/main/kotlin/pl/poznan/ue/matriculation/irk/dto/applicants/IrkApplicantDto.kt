@@ -5,7 +5,7 @@ import pl.poznan.ue.matriculation.local.dto.AbstractApplicantDto
 import java.io.Serializable
 import java.util.*
 
-data class ApplicantDto(
+data class IrkApplicantDto(
         val id: Long,
 
         val email: String,

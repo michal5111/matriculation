@@ -9,3 +9,9 @@ fun Exception.stackTraceToString(): String {
     this.printStackTrace(PrintWriter(sw))
     return sw.toString()
 }
+
+fun String.nameCapitalize(): String {
+    return this.toLowerCase().split(" ").joinToString(" ") {
+        it.capitalize()
+    }
+}

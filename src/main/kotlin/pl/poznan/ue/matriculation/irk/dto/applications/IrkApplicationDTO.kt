@@ -7,7 +7,7 @@ import pl.poznan.ue.matriculation.irk.dto.applicants.DocumentDTO
 import pl.poznan.ue.matriculation.local.dto.AbstractApplicationDto
 import java.io.Serializable
 
-data class ApplicationDTO(
+data class IrkApplicationDTO(
         val admitted: String?,
         val comment: String?,
         @JsonProperty("foreigner_data")
