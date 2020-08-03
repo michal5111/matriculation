@@ -3,13 +3,14 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Page} from '../../model/oracle/page/page';
 import {Import} from '../../model/import/import';
-import {Application} from '../../model/irk/application';
+import {Application} from '../../model/applications/application';
 import {ImportProgress} from '../../model/import/import-progress';
 import {IndexType} from '../../model/oracle/index-type';
-import {Registration} from '../../model/irk/registration';
+import {Registration} from '../../model/applications/registration';
 import {APP_BASE_HREF} from '@angular/common';
 import {DataSource} from "../../model/import/dataSource";
-import {Programme} from "../../model/irk/programme";
+import {Programme} from "../../model/applications/programme";
+import {UrlDto} from "../../model/import/urlDto";
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -98,5 +99,9 @@ export class ImportService {
 
   getAvailableDataSources(): Observable<[DataSource]> {
     return this.http.get<[DataSource]>(`${this.apiUrl}/import/dataSources`);
+  }
+
+  getUsosUrl(): Observable<UrlDto> {
+    return this.http.get<UrlDto>(`${this.apiUrl}/usos/url`);
   }
 }

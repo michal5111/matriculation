@@ -14,11 +14,9 @@ data class CourseDto(
         val mode: String,
         val duration: String?,
         val credits: String?,
-        val language: String,
-        val country: String,
-        val location: String,
+        val language: String?,
+        val country: String?,
+        val location: String?,
         val code: String?,
         val quota: String?
-) {
-
-}
+)

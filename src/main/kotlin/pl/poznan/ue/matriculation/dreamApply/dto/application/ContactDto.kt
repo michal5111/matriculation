@@ -5,6 +5,4 @@ data class ContactDto(
         val telephone: TelephoneDto?,
         val email: String?,
         val emergency: EmergencyDto?
-) {
-
-}
+)

@@ -42,7 +42,7 @@ class Document(
 
         var issueInstitutionUsosCode: Long?,
 
-        var modificationDate: String?,
+        var modificationDate: Date?,
 
         @get:JsonIgnore
         @OneToMany(mappedBy = "certificate", fetch = FetchType.LAZY)

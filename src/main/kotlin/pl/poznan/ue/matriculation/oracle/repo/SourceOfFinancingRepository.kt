@@ -5,5 +5,4 @@ import org.springframework.stereotype.Repository
 import pl.poznan.ue.matriculation.oracle.domain.SourceOfFinancing
 
 @Repository
-interface SourceOfFinancingRepository : JpaRepository<SourceOfFinancing, String> {
-}
+interface SourceOfFinancingRepository : JpaRepository<SourceOfFinancing, String>

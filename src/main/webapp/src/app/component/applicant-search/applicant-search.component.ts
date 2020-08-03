@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ApplicantService} from '../../service/applicant-service/applicant.service';
-import {Applicant} from '../../model/irk/applicant';
+import {Applicant} from '../../model/applications/applicant';
 import {flatMap, map, tap} from 'rxjs/operators';
 import {MatTableDataSource} from '@angular/material/table';
 

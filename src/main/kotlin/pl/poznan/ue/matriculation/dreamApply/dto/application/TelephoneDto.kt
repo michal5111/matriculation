@@ -5,6 +5,4 @@ data class TelephoneDto(
         val evening: String?,
         val mobile: String?,
         val fax: String?
-) {
-
-}
+)

@@ -10,6 +10,7 @@ import pl.poznan.ue.matriculation.dreamApply.dto.academicTerms.AcademicTermDto
 import pl.poznan.ue.matriculation.dreamApply.dto.academicTerms.CourseDto
 import pl.poznan.ue.matriculation.dreamApply.dto.applicant.DreamApplyApplicantDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
+import pl.poznan.ue.matriculation.dreamApply.dto.application.OfferDto
 
 class DreamApplyService(
         val instanceUrl: String,
@@ -21,7 +22,8 @@ class DreamApplyService(
 
     private class LongApplicationMapResult : ParameterizedTypeReference<Map<Long, DreamApplyApplicationDto>>()
     private class LongAcademicTermMapResult : ParameterizedTypeReference<Map<Long, AcademicTermDto>>()
-    private class LongCourseMapResult: ParameterizedTypeReference<Map<Long, CourseDto>>()
+    private class LongCourseMapResult : ParameterizedTypeReference<Map<Long, CourseDto>>()
+    private class LongOfferDtoResult : ParameterizedTypeReference<Map<Long, OfferDto>>()
 
     fun getApplicationsCountByFilter(academicTermID: String? = null, academicYear: String? = null, additionalFilters: Map<String, String>?): Long {
         val httpHeaders = HttpHeaders()
@@ -169,6 +171,21 @@ class DreamApplyService(
                 HttpMethod.GET,
                 httpEntity,
                 LongCourseMapResult()
+        )
+        return response.body
+    }
+
+    fun getApplicationOffers(path: String): Map<Long, OfferDto>? {
+        val httpHeaders = HttpHeaders()
+        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        httpHeaders.set("Authorization", "DREAM apikey=\"$apiKey\"")
+        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
+        val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("$instanceUrl$path")
+        val response: ResponseEntity<Map<Long, OfferDto>> = restTemplate.exchange(
+                uriComponentBuilder.build().toUri(),
+                HttpMethod.GET,
+                httpEntity,
+                LongOfferDtoResult()
         )
         return response.body
     }

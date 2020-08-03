@@ -89,6 +89,7 @@ class ProcessService(
                 }
             }
         }
+        application.editUrl = applicationDtoDataSource.getApplicationEditUrl(application.foreignId)
         logger.debug("zapisuję aplikanta")
         applicantRepository.save(applicant)
         application.applicant = applicant
@@ -115,7 +116,7 @@ class ProcessService(
         application.import = import
 
         logger.debug("zwiększam liczbę zaimportowanych")
-        import.importProgress!!.importedApplications++
+        import.importProgress.importedApplications++
         return application
     }
 

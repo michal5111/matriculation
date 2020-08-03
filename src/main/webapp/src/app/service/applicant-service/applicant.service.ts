@@ -1,7 +1,7 @@
 import {Inject, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Page} from '../../model/irk/page';
-import {Applicant} from '../../model/irk/applicant';
+import {Page} from '../../model/applications/page';
+import {Applicant} from '../../model/applications/applicant';
 import {APP_BASE_HREF} from '@angular/common';
 
 const httpOptions = {

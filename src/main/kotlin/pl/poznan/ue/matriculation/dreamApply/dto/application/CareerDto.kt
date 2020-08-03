@@ -5,6 +5,4 @@ data class CareerDto(
         val position: String?,
         val period: PeriodDto?,
         val weekly: String?
-) {
-
-}
+)

@@ -82,7 +82,9 @@ class PersonService(
             }
             birthDate = applicant.basicData.dateOfBirth
             birthCity = applicant.basicData.cityOfBirth
-            birthCountry = citizenshipRepository.getOne(applicant.basicData.countryOfBirth)
+            birthCountry = applicant.basicData.countryOfBirth?.let {
+                citizenshipRepository.getOne(it)
+            }
             if (sex != applicant.basicData.sex) {
                 changeHistory.sex = sex
                 sex = applicant.basicData.sex
@@ -134,18 +136,21 @@ class PersonService(
                 person.pesel = it
             }
         }
-        applicant.additionalData.documentNumber?.let {
-            if (person.documentType != applicant.additionalData.documentType) {
+        val identityDocument = applicant.identityDocuments.find {
+            person.idNumber == it.number
+        } ?: applicant.identityDocuments[0]
+        identityDocument.number?.let {
+            if (person.documentType != identityDocument.type) {
                 changeHistory.documentType = person.documentType
-                person.documentType = applicant.additionalData.documentType
+                person.documentType = identityDocument.type
             }
             if (person.idNumber != it) {
                 changeHistory.idNumber = person.idNumber
                 person.idNumber = it
             }
-            person.documentType = applicant.additionalData.documentType
-            person.identityDocumentExpirationDate = applicant.additionalData.documentExpDate
-            person.identityDocumentIssuerCountry = applicant.additionalData.documentCountry?.let { documentCountry ->
+            person.documentType = identityDocument.type
+            person.identityDocumentExpirationDate = identityDocument.expDate
+            person.identityDocumentIssuerCountry = identityDocument.country?.let { documentCountry ->
                 citizenshipRepository.getOne(documentCountry)
             }
         }
@@ -178,7 +183,7 @@ class PersonService(
             cityIsCity: Boolean,
             countryCode: String?
     ) {
-        if (city.isNullOrBlank() || street.isNullOrBlank() || houseNumber.isNullOrBlank() || zipCode.isNullOrBlank()) {
+        if (city.isNullOrBlank() || street.isNullOrBlank() || zipCode.isNullOrBlank()) {
             return
         }
         val address = addressRepository.findByPersonAndAddressType(person, addressType)
@@ -279,26 +284,26 @@ class PersonService(
 
     private fun createOrUpdateOwnedDocuments(person: Person, applicant: Applicant) {
         if (applicant.applicantForeignerData?.baseOfStay == null
-                || applicant.applicantForeignerData.baseOfStay != "OKP") {
+                || applicant.applicantForeignerData?.baseOfStay != "OKP") {
             return
         }
-        val ownedDocument = ownedDocumentRepository.findByPersonAndAndDocumentType(
+        val ownedDocument = ownedDocumentRepository.findByPersonAndDocumentType(
                 person,
-                documentTypeRepository.getOne(applicant.applicantForeignerData.baseOfStay!!)
+                documentTypeRepository.getOne(applicant.applicantForeignerData!!.baseOfStay!!)
         )
         if (ownedDocument != null) {
             ownedDocument.apply {
-                documentType = documentTypeRepository.getOne(applicant.applicantForeignerData.baseOfStay!!)
-                issueDate = applicant.applicantForeignerData.polishCardIssueDate
-                issueCountry = applicant.applicantForeignerData.polishCardIssueCountry?.let { countryCode ->
+                documentType = documentTypeRepository.getOne(applicant.applicantForeignerData!!.baseOfStay!!)
+                issueDate = applicant.applicantForeignerData!!.polishCardIssueDate
+                issueCountry = applicant.applicantForeignerData!!.polishCardIssueCountry?.let { countryCode ->
                     citizenshipRepository.getOne(countryCode)
                 }
-                number = applicant.applicantForeignerData.polishCardNumber
-                expirationDate = applicant.applicantForeignerData.polishCardValidTo
+                number = applicant.applicantForeignerData!!.polishCardNumber
+                expirationDate = applicant.applicantForeignerData!!.polishCardValidTo
             }
         } else {
             applicant.applicantForeignerData.let {
-                if (it.baseOfStay == null || it.baseOfStay != "OKP") {
+                if (it!!.baseOfStay == null || it.baseOfStay != "OKP") {
                     return@let
                 }
                 person.ownedDocuments.add(
@@ -407,8 +412,13 @@ class PersonService(
             }
         }
         if (person == null) {
-            applicant.additionalData.documentNumber?.let { idNumber ->
-                person = personRepository.findOneByIdNumber(idNumber)
+            applicant.identityDocuments.forEach {
+                if (person != null) {
+                    return@forEach
+                }
+                it.number?.let { idNumber ->
+                    person = personRepository.findOneByIdNumber(idNumber)
+                }
             }
         }
         if (person == null) {

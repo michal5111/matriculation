@@ -151,4 +151,8 @@ class IrkApplicationDataSourceImpl(
             } ?: false
         }
     }
+
+    override fun getApplicationEditUrl(applicationId: Long): String {
+        return "${getInstanceUrl()}/pl/admin/application/${applicationId}/edit/"
+    }
 }

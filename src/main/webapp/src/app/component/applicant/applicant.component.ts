@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Applicant} from '../../model/irk/applicant';
+import {Applicant} from '../../model/applications/applicant';
 import {ApplicantService} from '../../service/applicant-service/applicant.service';
 import {ActivatedRoute} from '@angular/router';
 

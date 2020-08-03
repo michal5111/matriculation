@@ -5,6 +5,4 @@ data class LanguageDto(
         val proficiency: String?,
         val experience: Int?,
         val information: String
-) {
-
-}
+)

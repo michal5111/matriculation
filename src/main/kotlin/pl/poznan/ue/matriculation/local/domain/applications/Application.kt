@@ -38,6 +38,8 @@ class Application(
 
         var score: String?,
 
+        var editUrl: String? = null,
+
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "certificate_id", referencedColumnName = "id")
         var certificate: Document? = null,

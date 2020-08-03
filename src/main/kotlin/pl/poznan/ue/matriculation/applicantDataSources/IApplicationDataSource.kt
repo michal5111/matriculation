@@ -43,4 +43,6 @@ interface IApplicationDataSource<applicationDTO : AbstractApplicationDto, applic
     fun preprocess(applicationDto: applicationDTO, applicantDto: applicantDTO)
 
     fun getPrimaryCertificate(applicationId: Long, documents: List<Document>): Document?
+
+    fun getApplicationEditUrl(applicationId: Long): String
 }

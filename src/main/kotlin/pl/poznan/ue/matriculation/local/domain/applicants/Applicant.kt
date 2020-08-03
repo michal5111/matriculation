@@ -60,7 +60,7 @@ class Applicant(
         val additionalData: AdditionalData,
 
         @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-        val applicantForeignerData: ApplicantForeignerData?,
+        var applicantForeignerData: ApplicantForeignerData?,
 
         @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
         val educationData: EducationData,
@@ -70,6 +70,9 @@ class Applicant(
 
         @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
         val addresses: MutableList<Address> = mutableListOf(),
+
+        @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+        var identityDocuments: MutableList<IdentityDocument> = mutableListOf(),
 
         var usosId: Long? = null,
 

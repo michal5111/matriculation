@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {ApplicationsService} from '../../service/application-service/applications.service';
 import {ApplicantService} from '../../service/applicant-service/applicant.service';
-import {Page} from '../../model/irk/page';
+import {Page} from '../../model/applications/page';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {MatTableDataSource} from '@angular/material/table';
-import {Application} from '../../model/irk/application';
+import {Application} from '../../model/applications/application';
 
 @Component({
   selector: 'app-applications',

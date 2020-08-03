@@ -4,6 +4,4 @@ data class NameDto(
         val given: String,
         val middle: String?,
         val family: String
-) {
-
-}
+)

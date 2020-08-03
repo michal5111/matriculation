@@ -8,5 +8,5 @@ import pl.poznan.ue.matriculation.oracle.domain.Person
 
 @Repository
 interface OwnedDocumentRepository : JpaRepository<OwnedDocument, Long> {
-    fun findByPersonAndAndDocumentType(person: Person, documentType: DocumentType): OwnedDocument?
+    fun findByPersonAndDocumentType(person: Person, documentType: DocumentType): OwnedDocument?
 }

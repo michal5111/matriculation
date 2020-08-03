@@ -36,12 +36,6 @@ class IrkApplicantMapper {
                 ),
                 additionalData = applicantDto.additionalData.let {
                     AdditionalData(
-                            countryOfBirth = it.countryOfBirth,
-                            cityOfBirth = it.cityOfBirth,
-                            documentCountry = it.documentCountry,
-                            documentExpDate = it.documentExpDate,
-                            documentNumber = it.documentNumber,
-                            documentType = it.documentType,
                             fathersName = it.fathersName,
                             militaryCategory = it.militaryCategory,
                             militaryStatus = it.militaryStatus,
@@ -89,9 +83,6 @@ class IrkApplicantMapper {
                             highSchoolUsosCode = it.highSchoolUsosCode
                     )
                 }
-//                photoByteArray = applicantDTO.photo?.let {
-//                    irkService.getPhoto(it)
-//                }
         ).apply {
             additionalData.applicant = this
             basicData.applicant = this
@@ -103,6 +94,17 @@ class IrkApplicantMapper {
             name.applicant = this
             addPhoneNumbers(this, applicantDto.contactData)
             addAddresses(this, applicantDto.contactData)
+            identityDocuments = applicantDto.additionalData.let {
+                mutableListOf(
+                        IdentityDocument(
+                                country = it.documentCountry,
+                                expDate = it.documentExpDate,
+                                number = it.documentNumber,
+                                type = it.documentType,
+                                applicant = this
+                        )
+                )
+            }
         }
     }
 
@@ -139,12 +141,6 @@ class IrkApplicantMapper {
             }
             applicantDto.additionalData.let {
                 applicant.additionalData.apply {
-                    countryOfBirth = it.countryOfBirth
-                    cityOfBirth = it.cityOfBirth
-                    documentCountry = it.documentCountry
-                    documentExpDate = it.documentExpDate
-                    documentNumber = it.documentNumber
-                    documentType = it.documentType
                     fathersName = it.fathersName
                     militaryCategory = it.militaryCategory
                     militaryStatus = it.militaryStatus
@@ -195,6 +191,18 @@ class IrkApplicantMapper {
                     highSchoolUsosCode = it.highSchoolUsosCode
                 }
             }
+            identityDocuments.clear()
+            identityDocuments.add(
+                    applicantDto.additionalData.let {
+                        IdentityDocument(
+                                country = it.documentCountry,
+                                expDate = it.documentExpDate,
+                                number = it.documentNumber,
+                                type = it.documentType,
+                                applicant = applicant
+                        )
+                    }
+            )
         }
         return applicant
     }

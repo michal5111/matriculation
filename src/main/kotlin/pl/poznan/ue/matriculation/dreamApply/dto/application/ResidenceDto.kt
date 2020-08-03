@@ -4,6 +4,4 @@ data class ResidenceDto(
         val country: String?,
         val purpose: String?,
         val period: PeriodDto?
-) {
-
-}
+)

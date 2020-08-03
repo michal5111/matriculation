@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.controllers
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
@@ -10,10 +11,7 @@ import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.domain.import.ImportProgress
-import pl.poznan.ue.matriculation.local.dto.DataSourceDto
-import pl.poznan.ue.matriculation.local.dto.ImportDto
-import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
-import pl.poznan.ue.matriculation.local.dto.RegistrationDto
+import pl.poznan.ue.matriculation.local.dto.*
 import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceService
 import pl.poznan.ue.matriculation.local.service.ApplicationService
 import pl.poznan.ue.matriculation.local.service.AsyncService
@@ -30,6 +28,10 @@ class RestController(
         private val usosService: UsosService,
         private val applicationService: ApplicationService
 ) {
+
+    @Value("\${pl.poznan.ue.matriculation.usos.url}")
+    private lateinit var usosUrl: String
+
     @GetMapping("/user")
     fun user(): Any {
         val principal = SecurityContextHolder.getContext().authentication.principal
@@ -183,7 +185,7 @@ class RestController(
     @PutMapping("/import/{id}/archive")
     fun archiveImport(@PathVariable("id") importId: Long) {
         val import = importService.get(importId)
-        if (import.importProgress?.importStatus == ImportStatus.COMPLETE) {
+        if (import.importProgress.importStatus == ImportStatus.COMPLETE) {
             asyncService.archiveApplicants(importId)
             return importService.setImportStatus(ImportStatus.ARCHIVED, importId)
         } else
@@ -193,5 +195,10 @@ class RestController(
     @GetMapping("/import/dataSources")
     fun getDataSources(): List<DataSourceDto> {
         return applicationDataSourceService.getDataSources()
+    }
+
+    @GetMapping("/usos/url")
+    fun getUsosUrl(): UrlDto {
+        return UrlDto(usosUrl)
     }
 }

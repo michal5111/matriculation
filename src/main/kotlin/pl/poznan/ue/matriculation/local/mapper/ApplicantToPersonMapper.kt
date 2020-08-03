@@ -39,7 +39,9 @@ class ApplicantToPersonMapper(
                 citizenship = citizenshipRepository.getOne(applicant.citizenship),
                 birthDate = applicant.basicData.dateOfBirth,
                 birthCity = applicant.basicData.cityOfBirth,
-                birthCountry = citizenshipRepository.getOne(applicant.basicData.countryOfBirth),
+                birthCountry = applicant.basicData.countryOfBirth?.let {
+                    citizenshipRepository.getOne(it)
+                },
                 pesel = applicant.basicData.pesel,
                 sex = applicant.basicData.sex,
                 nationality = applicant.nationality?.let {
@@ -60,6 +62,8 @@ class ApplicantToPersonMapper(
                             cityIsCity = it.cityIsCity,
                             countryCode = it.countryCode
                     )
+                }.filter {
+                    !(it.city.isNullOrBlank() || it.street.isNullOrBlank() || it.zipCode.isNullOrBlank())
                 }.toMutableList(),
                 phoneNumbers = applicant.phoneNumbers.map {
                     PhoneNumber(
@@ -68,12 +72,12 @@ class ApplicantToPersonMapper(
                             comments = it.comment
                     )
                 }.toMutableList(),
-                idNumber = applicant.additionalData.documentNumber,
-                documentType = applicant.additionalData.documentNumber?.let {
-                    applicant.additionalData.documentType
+                idNumber = applicant.identityDocuments[0].number,
+                documentType = applicant.identityDocuments[0].number?.let {
+                    applicant.identityDocuments[0].type
                 },
-                identityDocumentExpirationDate = applicant.additionalData.documentExpDate,
-                identityDocumentIssuerCountry = applicant.additionalData.documentCountry?.let {
+                identityDocumentExpirationDate = applicant.identityDocuments[0].expDate,
+                identityDocumentIssuerCountry = applicant.identityDocuments[0].country?.let {
                     citizenshipRepository.getOne(it)
                 },
                 mothersName = applicant.additionalData.mothersName,

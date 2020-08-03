@@ -10,5 +10,4 @@ data class LanguagesDto(
         @JsonProperty("2")
         val thirdLanguage: LanguageDto?,
         val native: String
-) {
-}
+)

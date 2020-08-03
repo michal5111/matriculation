@@ -46,8 +46,8 @@ class AsyncService(
                     if (page.getSize() == 0) {
                         throw IllegalStateException("Liczba kandydatów wynosi 0!")
                     }
-                    import.importProgress!!.totalCount = page.getSize()
-                    importProgressRepository.save(import.importProgress!!)
+                    import.importProgress.totalCount = page.getSize()
+                    importProgressRepository.save(import.importProgress)
                     set = false
                 }
                 logger.debug("Przetwarzam osoby...")

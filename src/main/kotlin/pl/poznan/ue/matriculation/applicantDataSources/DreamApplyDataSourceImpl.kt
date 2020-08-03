@@ -31,13 +31,21 @@ class DreamApplyDataSourceImpl(
                         "byOfferDecisions" to "Final"
                 )
         ) ?: throw java.lang.IllegalArgumentException("Unable to get applicants")
+        val applications = applicationMap.values.filter { dreamApplyApplicationDto ->
+            val applicationOffers = dreamApplyService.getApplicationOffers(dreamApplyApplicationDto.offers)
+            applicationOffers!!.any {
+                it.value.course == "/api/courses/$programmeForeignId"
+                        && it.value.type == "Enrolled"
+                        && it.value.decision == "Final"
+            }
+        }
         return object : IPage<DreamApplyApplicationDto> {
             override fun getSize(): Int {
-                return applicationMap.values.size
+                return applications.size
             }
 
             override fun getResultsList(): List<DreamApplyApplicationDto> {
-                return applicationMap.values.toList()
+                return applications.toList()
             }
 
             override fun hasNext(): Boolean {
@@ -70,13 +78,13 @@ class DreamApplyDataSourceImpl(
     }
 
     override fun getAvailableRegistrationProgrammes(registration: String): List<ProgrammeDto> {
-        val courses = dreamApplyService.getCourses("Draft")
+        val courses = dreamApplyService.getCourses()
         return courses!!.values.filter {
             it.code != null
         }.map {
             ProgrammeDto(
                     id = it.id.toString(),
-                    name = it.name,
+                    name = "${it.code} ${it.name}",
                     usosId = it.code!!
             )
         }
@@ -90,6 +98,8 @@ class DreamApplyDataSourceImpl(
                     id = it.key.toString(),
                     name = it.value.name
             )
+        }.sortedByDescending {
+            it.id.toLong()
         }
     }
 
@@ -125,5 +135,9 @@ class DreamApplyDataSourceImpl(
 
     override fun getPrimaryCertificate(applicationId: Long, documents: List<Document>): Document? {
         return null
+    }
+
+    override fun getApplicationEditUrl(applicationId: Long): String {
+        return "${getInstanceUrl()}/application/view/id/$applicationId"
     }
 }

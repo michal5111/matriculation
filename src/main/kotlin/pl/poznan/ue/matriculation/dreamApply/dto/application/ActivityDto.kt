@@ -4,6 +4,4 @@ data class ActivityDto(
         val organization: String?,
         val nature: String?,
         val period: PeriodDto?
-) {
-
-}
+)

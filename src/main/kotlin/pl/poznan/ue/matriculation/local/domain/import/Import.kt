@@ -31,11 +31,11 @@ class Import(
 
         @JsonIgnore
         @OneToMany(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
-        val applications: MutableList<Application> = mutableListOf(),
-
-        @OneToOne(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.REMOVE])
-        var importProgress: ImportProgress? = null
+        val applications: MutableList<Application> = mutableListOf()
 ) {
+
+    @OneToOne(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.REMOVE])
+    var importProgress: ImportProgress = ImportProgress(import = this)
 
     override fun toString(): String {
         return "Import(id=$id, programmeCode='$programmeCode', stageCode='$stageCode', " +

@@ -4,6 +4,4 @@ data class FamilyDto(
         val mother: String?,
         val father: String?,
         val guardian: String?
-) {
-
-}
+)

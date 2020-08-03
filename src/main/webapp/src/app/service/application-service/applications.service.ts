@@ -1,7 +1,7 @@
 import {Inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Page} from '../../model/irk/page';
-import {Application} from '../../model/irk/application';
+import {Page} from '../../model/applications/page';
+import {Application} from '../../model/applications/application';
 import {APP_BASE_HREF} from '@angular/common';
 
 @Injectable({

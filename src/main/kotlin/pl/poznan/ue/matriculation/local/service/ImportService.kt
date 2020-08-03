@@ -12,7 +12,6 @@ import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.oracle.repo.DidacticCycleRepository
 import pl.poznan.ue.matriculation.oracle.repo.ProgrammeRepository
-import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -58,11 +57,7 @@ class ImportService(
                 startDate = simpleDateFormat.parse(startDate),
                 stageCode = stageCode,
                 dataSourceId = dataSourceType
-        ).apply {
-            importProgress = ImportProgress(
-                    import = this
-            )
-        }
+        )
         return importRepository.save(import)
     }
 
@@ -72,15 +67,15 @@ class ImportService(
 
     fun prepareForSaving(importId: Long) {
         val import = getForPersonSave(importId)
-        import.importProgress!!.saveErrors = 0
-        import.importProgress!!.importStatus = ImportStatus.SAVING
+        import.importProgress.saveErrors = 0
+        import.importProgress.importStatus = ImportStatus.SAVING
         importRepository.save(import)
     }
 
     fun prepareForImporting(importId: Long) {
         val import = getForApplicantImport(importId)
-        import.importProgress!!.importStatus = ImportStatus.STARTED
-        import.importProgress!!.importedApplications = 0
+        import.importProgress.importStatus = ImportStatus.STARTED
+        import.importProgress.importedApplications = 0
         importRepository.save(import)
     }
 
@@ -105,7 +100,7 @@ class ImportService(
     fun getForApplicantImport(importId: Long): Import {
         val import: Import = importRepository.findByIdOrNull(importId)
                 ?: throw ImportNotFoundException("Nie znaleziono importu.")
-        when (import.importProgress!!.importStatus) {
+        when (import.importProgress.importStatus) {
             ImportStatus.ARCHIVED -> throw ImportException(importId, "Import został zarchiwizowany.")
             ImportStatus.STARTED,
             ImportStatus.SAVING -> throw ImportException(importId, "Import już się rozpoczął.")
@@ -114,14 +109,14 @@ class ImportService(
             ImportStatus.PENDING,
             ImportStatus.COMPLETED_WITH_ERRORS,
             ImportStatus.ERROR -> return import
-            else -> throw ImportException(importId, "Unknown state")
+            else -> throw ImportException(importId, "Nieznany stan")
         }
     }
 
     fun getForPersonSave(importId: Long): Import {
         val import: Import = importRepository.findByIdOrNull(importId)
                 ?: throw ImportNotFoundException("Nie znaleziono importu.")
-        val importProgress = import.importProgress!!
+        val importProgress = import.importProgress
         when (importProgress.importStatus) {
             ImportStatus.ARCHIVED -> throw ImportException(importId, "Import został zarchiwizowany.")
             ImportStatus.PENDING,
@@ -131,14 +126,14 @@ class ImportService(
             ImportStatus.IMPORTED,
             ImportStatus.COMPLETE,
             ImportStatus.COMPLETED_WITH_ERRORS -> {
-                val totalCount = importProgress.totalCount ?: throw ImportStartException(importId,"Applicant total count is null")
+                val totalCount = importProgress.totalCount
+                        ?: throw ImportStartException(importId, "Liczba aplikantów to null")
                 if (totalCount < 1 || totalCount == importProgress.savedApplicants) {
-                    return import
-                } else {
-                    throw ImportStartException(importId,"Applicants count is 0 or all are saved")
+                    throw ImportStartException(importId, "Liczba aplikantów wynosi 0 lub wszyscy są już zapisani")
                 }
+                return import
             }
-            else -> throw IllegalStateException("Unknown state")
+            else -> throw IllegalStateException("Nieznany stan")
         }
     }
 

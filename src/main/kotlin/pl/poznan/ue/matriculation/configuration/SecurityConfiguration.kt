@@ -33,47 +33,47 @@ import pl.poznan.ue.matriculation.security.CustomUserDetailsService
 @Order(2)
 class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Value("\${cas.service.login}")
-    private lateinit var CAS_URL_LOGIN: String
+    private lateinit var casUrlLogin: String
 
     @Value("\${cas.service.logout}")
-    private lateinit var CAS_URL_LOGOUT: String
+    private lateinit var casUrlLogout: String
 
 //    @Value("\${pl.poznan.ue.matriculation.cas.url}")
 //    private lateinit var CAS_URL_PREFIX: String
 
     @Value("\${cas.ticket.validate.url}")
-    private lateinit var CAS_VALIDATE_URL: String
+    private lateinit var casValidateUrl: String
 
     @Value("\${app.service.security}")
-    private lateinit var CAS_SERVICE_URL: String
+    private lateinit var casServiceUrl: String
 
     @Value("\${pl.poznan.ue.matriculation.service.home}")
-    private lateinit var APP_SERVICE_HOME: String
+    private lateinit var appServiceHome: String
 
     @Value("\${pl.poznan.ue.matriculation.admin.userName}")
-    private lateinit var APP_ADMIN_USER_NAMES: List<String>
+    private lateinit var appAdminUsernames: List<String>
 
     @Value("\${pl.poznan.ue.matriculation.user.userName}")
-    private lateinit var APP_USER_USER_NAMES: List<String>
+    private lateinit var appUserUsernames: List<String>
 
     @Bean
     fun adminList(): Set<String> {
         val admins = HashSet<String>()
-        admins.addAll(APP_ADMIN_USER_NAMES)
+        admins.addAll(appAdminUsernames)
         return admins
     }
 
     @Bean
     fun userList(): Set<String> {
         val users = HashSet<String>()
-        users.addAll(APP_USER_USER_NAMES)
+        users.addAll(appUserUsernames)
         return users
     }
 
     @Bean
     fun serviceProperties(): ServiceProperties {
         val sp = ServiceProperties()
-        sp.service = CAS_SERVICE_URL
+        sp.service = casServiceUrl
         sp.isSendRenew = false
         return sp
     }
@@ -100,7 +100,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
 
     @Bean
     fun cas20ServiceTicketValidator(): Cas20ServiceTicketValidator {
-        return Cas20ServiceTicketValidator(CAS_VALIDATE_URL)
+        return Cas20ServiceTicketValidator(casValidateUrl)
     }
 
     @Bean
@@ -114,7 +114,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
 
     fun casAuthenticationEntryPoint(): CasAuthenticationEntryPoint {
         val casAuthenticationEntryPoint = CasAuthenticationEntryPoint()
-        casAuthenticationEntryPoint.loginUrl = CAS_URL_LOGIN
+        casAuthenticationEntryPoint.loginUrl = casUrlLogin
         casAuthenticationEntryPoint.serviceProperties = serviceProperties()
         return casAuthenticationEntryPoint
     }
@@ -127,7 +127,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Bean
     fun requestCasGlobalLogoutFilter(): LogoutFilter {
         val logoutFilter = LogoutFilter(
-                "$CAS_URL_LOGOUT?service=$APP_SERVICE_HOME",
+                "$casUrlLogout?service=$appServiceHome",
                 SecurityContextLogoutHandler())
         logoutFilter.setLogoutRequestMatcher(AntPathRequestMatcher("/logout", "GET"))
         return logoutFilter

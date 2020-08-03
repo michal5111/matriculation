@@ -5,13 +5,13 @@ import {Page} from '../../../model/oracle/page/page';
 import {filter, flatMap, map, tap} from 'rxjs/operators';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, Sort} from '@angular/material/sort';
-import {Application} from '../../../model/irk/application';
+import {Application} from '../../../model/applications/application';
 import {ActivatedRoute} from '@angular/router';
 import {ImportProgress} from '../../../model/import/import-progress';
 import {Observable, Subscription, timer} from 'rxjs';
 import {Import} from '../../../model/import/import';
 import {UserService} from '../../../service/user-service/user.service';
-import {Document} from '../../../model/irk/document';
+import {Document} from '../../../model/applications/document';
 import {MatDialog} from '@angular/material/dialog';
 import {UpdateIndexNumberDialogComponent} from '../../dialog/update-index-number-dialog/update-index-number-dialog.component';
 import {ConfirmationDialogComponent} from '../../dialog/confirmation-dialog/confirmation-dialog.component';
@@ -19,6 +19,7 @@ import {ConfirmationDialogData} from '../../../model/dialog/confirmation-dialog-
 import {ErrorDialogComponent} from '../../dialog/error-dialog/error-dialog.component';
 import {ErrorDialogData} from '../../../model/dialog/error-dialog-data';
 import {HttpErrorResponse} from '@angular/common/http';
+import {UrlDto} from '../../../model/import/urlDto';
 
 @Component({
   selector: 'app-import-view',
@@ -31,6 +32,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   import: Import;
   importProgress: ImportProgress;
   progressSubscription: Subscription;
+  usosUrl: UrlDto;
   pageSize = 5;
   pageNumber = 0;
   totalElements = 0;
@@ -73,8 +75,8 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     flatMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString)),
     tap(() => {
       switch (this.importProgress.importStatus) {
-        case "STARTED":
-        case "SAVING":
+        case 'STARTED':
+        case 'SAVING':
           return;
         default:
           this.progressSubscription.unsubscribe();
@@ -119,6 +121,12 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       return;
     }
     this.getImport(this.importId).subscribe();
+    this.importService.getUsosUrl().subscribe(
+      result => {
+        this.usosUrl = result;
+      },
+      error => this.onError('Błąd przy pobieraniu url usosa', error)
+    );
     this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe(() => {
         this.progressSubscription = this.$importProgressObservable.subscribe();
       },
@@ -227,12 +235,12 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  getApplicationIrkUrl(application: Application): string {
-    return application.irkInstance + '/pl/admin/application/' + application.foreignId + '/edit/';
+  getApplicationEditUrl(application: Application): string {
+    return application.editUrl;
   }
 
   getPersonUsosUrl(application: Application): string {
-    return 'http://usosadm.ue.poznan:8080/usosadm/studenci/programyOsob.jsf?osobaId=' + application.applicant.usosId;
+    return `${this.usosUrl.url}/studenci/programyOsob.jsf?osobaId=${application.applicant.usosId}`;
   }
 
   ngOnDestroy(): void {
@@ -266,16 +274,16 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     if (application.applicant.basicData.pesel != null) {
       return application.applicant.basicData.pesel;
     } else {
-      return application.applicant.additionalData.documentNumber;
+      return application.applicant.identityDocuments[0].number;
     }
   }
 
   isStartImportButtonDisabled(): boolean {
     switch (this.importProgress.importStatus) {
-      case "ARCHIVED":
-      case "SAVING":
-      case "STARTED":
-      case "COMPLETE":
+      case 'ARCHIVED':
+      case 'SAVING':
+      case 'STARTED':
+      case 'COMPLETE':
         return true;
       default:
         return false;
@@ -284,8 +292,8 @@ export class ImportViewComponent implements OnInit, OnDestroy {
 
   isSavePersonsButtonDisabled(): boolean {
     switch (this.importProgress.importStatus) {
-      case "COMPLETED_WITH_ERRORS":
-      case "IMPORTED":
+      case 'COMPLETED_WITH_ERRORS':
+      case 'IMPORTED':
         return false;
       default:
         return true;

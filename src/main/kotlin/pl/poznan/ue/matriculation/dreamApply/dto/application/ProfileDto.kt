@@ -11,6 +11,6 @@ data class ProfileDto(
         val citizenship: String?,
         val gender: Char?,
         val maritial: Char?,
-        val family: FamilyDto?
-) {
-}
+        val family: FamilyDto?,
+        val nationalidcode: NationalCodeDto?
+)

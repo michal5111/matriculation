@@ -22,7 +22,7 @@ class BasicData(
 
         var cityOfBirth: String?,
 
-        var countryOfBirth: String,
+        var countryOfBirth: String?,
 
         var dataSource: String
 ) : Serializable {

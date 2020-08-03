@@ -6,14 +6,14 @@ import {Observable, Subscription} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
 import {filter, flatMap, tap} from 'rxjs/operators';
 import {IndexType} from '../../../model/oracle/index-type';
-import {Registration} from '../../../model/irk/registration';
+import {Registration} from '../../../model/applications/registration';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatDialog} from '@angular/material/dialog';
 import {ErrorDialogComponent} from '../../dialog/error-dialog/error-dialog.component';
 import {ErrorDialogData} from '../../../model/dialog/error-dialog-data';
 import {MatSelectChange} from '@angular/material/select';
 import {DataSource} from '../../../model/import/dataSource';
-import {Programme} from '../../../model/irk/programme';
+import {Programme} from '../../../model/applications/programme';
 
 @Component({
   selector: 'app-import-setup',

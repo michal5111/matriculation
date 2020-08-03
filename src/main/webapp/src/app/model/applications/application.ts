@@ -30,4 +30,5 @@ export interface Application {
   irkInstance: string;
   dataSourceType: string;
   foreignIdType: string;
+  editUrl: string;
 }

@@ -27,7 +27,7 @@ class ApplicantService(
 //                logger.warn("Brak daty lub numeru dokumentu uprawniającego do podjęcia studiów. Pomijam dodawnie Tego dokumentu. ApplicantId: ${it.educationData?.applicantId}")
 //            }
 //        }
-        if (applicant.basicData.pesel.isNullOrBlank() && applicant.additionalData.documentNumber.isNullOrBlank()) {
+        if (applicant.basicData.pesel.isNullOrBlank() && !applicant.identityDocuments.any { it.number != null }) {
             throw ApplicantCheckException("Brak peselu lub dokumentu tożsamości")
         }
     }
@@ -35,58 +35,53 @@ class ApplicantService(
     fun clearPersonalData(applicant: Applicant): Applicant {
         applicant.apply {
             email = ""
-            indexNumber = ""
-            password = ""
+            indexNumber = null
+            password = null
             name.apply {
-                middle = ""
+                middle = null
                 family = ""
-                maiden = ""
+                maiden = null
                 given = ""
             }
-            phone = ""
+            phone = null
             citizenship = ""
-            photo = ""
-            photoPermission = ""
-            casPasswordOverride = ""
+            photo = null
+            photoPermission = null
+            casPasswordOverride = null
             modificationDate = Date()
             basicData.apply {
-                cityOfBirth = ""
-                countryOfBirth = ""
+                cityOfBirth = null
+                countryOfBirth = null
                 dataSource = ""
-                dateOfBirth = Date()
-                pesel = ""
+                dateOfBirth = null
+                pesel = null
                 sex = 'M'
             }
             applicant.addresses.clear()
             phoneNumbers.clear()
             applicant.additionalData.apply {
-                countryOfBirth = ""
-                cityOfBirth = ""
-                documentCountry = ""
-                documentExpDate = Date()
-                documentNumber = ""
-                documentType = 'P'
-                fathersName = ""
-                militaryCategory = ""
-                militaryStatus = ""
-                mothersName = ""
-                wku = ""
+                fathersName = null
+                militaryCategory = null
+                militaryStatus = null
+                mothersName = null
+                wku = null
             }
             applicant.applicantForeignerData?.apply {
-                baseOfStay = ""
+                baseOfStay = null
                 foreignerStatus.clear()
-                polishCardIssueCountry = ""
-                polishCardIssueDate = Date()
-                polishCardNumber = ""
-                polishCardValidTo = Date()
+                polishCardIssueCountry = null
+                polishCardIssueDate = null
+                polishCardNumber = null
+                polishCardValidTo = null
             }
             applicant.educationData.apply {
                 documents.clear()
-                highSchoolCity = ""
-                highSchoolName = ""
-                highSchoolType = ""
-                highSchoolUsosCode = -1L
+                highSchoolCity = null
+                highSchoolName = null
+                highSchoolType = null
+                highSchoolUsosCode = null
             }
+            applicant.identityDocuments.clear()
         }
         return applicant
     }
