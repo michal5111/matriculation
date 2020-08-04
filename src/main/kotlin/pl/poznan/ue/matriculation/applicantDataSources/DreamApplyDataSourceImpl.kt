@@ -9,6 +9,7 @@ import pl.poznan.ue.matriculation.dreamApply.service.DreamApplyService
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applications.Application
+import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
 import pl.poznan.ue.matriculation.oracle.domain.IrkApplication
@@ -128,16 +129,20 @@ class DreamApplyDataSourceImpl(
     }
 
     override fun preprocess(applicationDto: DreamApplyApplicationDto, applicantDto: DreamApplyApplicantDto) {
-        println("https://apply.ue.poznan.pl/api/applicants/${applicantDto.id}")
-        println("https://apply.ue.poznan.pl/api/applications/${applicationDto.id}")
         applicantDto.dreamApplyApplication = getApplicationById(applicationDto.id)
-    }
-
-    override fun getPrimaryCertificate(applicationId: Long, documents: List<Document>): Document? {
-        return null
     }
 
     override fun getApplicationEditUrl(applicationId: Long): String {
         return "${getInstanceUrl()}/application/view/id/$applicationId"
+    }
+
+    override fun getPrimaryCertificate(
+            application: Application,
+            applicationDto: DreamApplyApplicationDto,
+            applicant: Applicant,
+            applicantDto: DreamApplyApplicantDto,
+            import: Import
+    ): Document? {
+        return null
     }
 }

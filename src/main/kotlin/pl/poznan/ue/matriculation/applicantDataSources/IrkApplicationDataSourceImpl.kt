@@ -11,6 +11,7 @@ import pl.poznan.ue.matriculation.irk.service.IrkService
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applications.Application
+import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
 import pl.poznan.ue.matriculation.oracle.domain.IrkApplication
@@ -143,16 +144,22 @@ class IrkApplicationDataSourceImpl(
     override fun preprocess(applicationDto: IrkApplicationDTO, applicantDto: IrkApplicantDto) {
     }
 
-    override fun getPrimaryCertificate(applicationId: Long, documents: List<Document>): Document? {
-        return documents.find {
-            irkService.getPrimaryCertificate(applicationId)?.let { primaryCertificate ->
+    override fun getApplicationEditUrl(applicationId: Long): String {
+        return "${getInstanceUrl()}/pl/admin/application/${applicationId}/edit/"
+    }
+
+    override fun getPrimaryCertificate(
+            application: Application,
+            applicationDto: IrkApplicationDTO,
+            applicant: Applicant,
+            applicantDto: IrkApplicantDto,
+            import: Import
+    ): Document? {
+        return applicant.educationData.documents.find {
+            irkService.getPrimaryCertificate(applicationDto.id)?.let { primaryCertificate ->
                 return@let it.documentNumber == primaryCertificate.documentNumber &&
                         it.certificateTypeCode == primaryCertificate.certificateTypeCode
             } ?: false
         }
-    }
-
-    override fun getApplicationEditUrl(applicationId: Long): String {
-        return "${getInstanceUrl()}/pl/admin/application/${applicationId}/edit/"
     }
 }

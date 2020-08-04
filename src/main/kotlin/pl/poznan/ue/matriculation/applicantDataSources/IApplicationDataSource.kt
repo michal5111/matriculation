@@ -3,6 +3,7 @@ package pl.poznan.ue.matriculation.applicantDataSources
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applications.Application
+import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.AbstractApplicantDto
 import pl.poznan.ue.matriculation.local.dto.AbstractApplicationDto
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
@@ -42,7 +43,7 @@ interface IApplicationDataSource<applicationDTO : AbstractApplicationDto, applic
 
     fun preprocess(applicationDto: applicationDTO, applicantDto: applicantDTO)
 
-    fun getPrimaryCertificate(applicationId: Long, documents: List<Document>): Document?
+    fun getPrimaryCertificate(application: Application, applicationDto: applicationDTO, applicant: Applicant, applicantDto: applicantDTO, import: Import): Document?
 
     fun getApplicationEditUrl(applicationId: Long): String
 }

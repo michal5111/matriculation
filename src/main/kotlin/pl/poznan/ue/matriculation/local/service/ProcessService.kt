@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionSynchronizationManager
 import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
 import pl.poznan.ue.matriculation.kotlinExtensions.stackTraceToString
+import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
@@ -50,74 +51,56 @@ class ProcessService(
         if (!TransactionSynchronizationManager.isActualTransactionActive()) {
             throw IllegalStateException("Nie ma aktywnej transakcji")
         }
-        logger.debug("Pobieram import...")
         val import = importRepository.getOne(importId)
         val applicantDto = applicationDtoDataSource.getApplicantById(applicationDto.getForeignApplicantId())
         applicationDtoDataSource.preprocess(applicationDto, applicantDto)
-        logger.debug("Pobrałem import... Sprawdzam czy istnieje już aplikacja o takim foreignId i foreignIdType")
-        val application = if (applicationRepository.existsByForeignIdAndDatasourceId(
-                        applicationDto.getForeignId(),
-                        applicationDtoDataSource.getId())
-        ) {
-            logger.debug("Istnieje aktualizuję...")
+        val application = createOrUpdateApplication(applicationDto, applicationDtoDataSource)
+        val applicant = createOrUpdateApplicant(applicantDto, applicationDtoDataSource)
+        applicantRepository.save(applicant)
+        application.applicant = applicant
+        application.certificate = applicationDtoDataSource.getPrimaryCertificate(
+                applicant = applicant,
+                application = application,
+                applicantDto = applicantDto,
+                applicationDto = applicationDto,
+                import = import
+        )
+        applicationRepository.save(application)
+        application.import = import
+        import.importProgress.importedApplications++
+        return application
+    }
+
+    private fun createOrUpdateApplication(applicationDto: AbstractApplicationDto, applicationDtoDataSource: IApplicationDataSource<AbstractApplicationDto, AbstractApplicantDto>): Application {
+        val foundApplication = applicationRepository.findByForeignIdAndDataSourceId(
+                applicationDto.getForeignId(),
+                applicationDtoDataSource.getId()
+        )
+        return if (foundApplication != null) {
             applicationDtoDataSource.updateApplication(
-                    applicationRepository.getByForeignIdAndDatasourceId(
-                            applicationDto.getForeignId(),
-                            applicationDtoDataSource.getId()
-                    ),
+                    foundApplication,
                     applicationDto
             )
         } else {
-            logger.debug("Nie istnieje dodaję...")
             applicationDtoDataSource.mapApplicationDtoToApplication(applicationDto).also {
+                it.datasourceId = applicationDtoDataSource.getId()
+                it.editUrl = applicationDtoDataSource.getApplicationEditUrl(it.foreignId)
+            }
+        }
+    }
+
+    private fun createOrUpdateApplicant(applicantDto: AbstractApplicantDto, applicationDtoDataSource: IApplicationDataSource<AbstractApplicationDto, AbstractApplicantDto>): Applicant {
+        val foundApplicant = applicantRepository.findByForeignIdAndDatasourceId(
+                applicantDto.getForeignId(),
+                applicationDtoDataSource.getId()
+        )
+        return if (foundApplicant != null) {
+            applicationDtoDataSource.updateApplicant(foundApplicant, applicantDto)
+        } else {
+            applicationDtoDataSource.mapApplicantDtoToApplicant(applicantDto).also {
                 it.datasourceId = applicationDtoDataSource.getId()
             }
         }
-        logger.debug("Sprawdzam czy istnieje już aplikant o takim foreignId i foreignIdType")
-        val applicant = applicantDto.let { abstractApplicantDto ->
-            val applicant = applicantRepository.findByForeignIdAndDatasourceId(
-                    abstractApplicantDto.getForeignId(),
-                    applicationDtoDataSource.getId()
-            )
-            if (applicant != null) {
-                logger.debug("Istnieje aktualizuję...")
-                return@let applicationDtoDataSource.updateApplicant(applicant, abstractApplicantDto)
-            } else {
-                logger.debug("Nie istnieje dodaję...")
-                return@let applicationDtoDataSource.mapApplicantDtoToApplicant(abstractApplicantDto).also {
-                    it.datasourceId = applicationDtoDataSource.getId()
-                }
-            }
-        }
-        application.editUrl = applicationDtoDataSource.getApplicationEditUrl(application.foreignId)
-        logger.debug("zapisuję aplikanta")
-        applicantRepository.save(applicant)
-        application.applicant = applicant
-        logger.debug("Zapisałem aplikanta")
-
-//        if (!applicant.applications.any { it.irkId == application.irkId }) {
-//            application.applicant = applicant
-//            applicant.applications.add(application)
-//        }
-
-        application.certificate = applicationDtoDataSource.getPrimaryCertificate(
-                application.foreignId,
-                applicant.educationData.documents
-        )
-        //application.certificate?.Applications?.add(application)
-        logger.debug("zapisuję aplikację")
-        applicationRepository.save(application)
-
-//        if (!applicationRepository.existsByImportIdAndIrkId(importId, application.irkId)) {
-//            import.applications.add(application)
-//            application.import = import
-//        }
-
-        application.import = import
-
-        logger.debug("zwiększam liczbę zaimportowanych")
-        import.importProgress.importedApplications++
-        return application
     }
 
     @Transactional(rollbackFor = [Exception::class, RuntimeException::class], propagation = Propagation.REQUIRES_NEW, transactionManager = "transactionManager")
