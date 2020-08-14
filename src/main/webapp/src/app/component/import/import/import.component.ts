@@ -3,7 +3,7 @@ import {Page} from '../../../model/oracle/page/page';
 import {Import} from '../../../model/import/import';
 import {MatTableDataSource} from '@angular/material/table';
 import {ImportService} from '../../../service/import-service/import.service';
-import {flatMap, map, tap} from 'rxjs/operators';
+import {map, switchMap, tap} from 'rxjs/operators';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, Sort} from '@angular/material/sort';
 import {MatExpansionPanel} from '@angular/material/expansion';
@@ -45,7 +45,7 @@ export class ImportComponent implements OnInit, OnDestroy {
   ];
 
   $importProgressObservable = timer(0, 1000).pipe(
-    flatMap(() => this.getPage(this.pageIndex, this.pageSize, this.sortString, this.sortDirString)),
+    switchMap(() => this.getPage(this.pageIndex, this.pageSize, this.sortString, this.sortDirString)),
   );
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -102,7 +102,7 @@ export class ImportComponent implements OnInit, OnDestroy {
   }
 
   onImportCreated(event: Import): void {
-    this.importCreateExpansionPanel.close();
+    // this.importCreateExpansionPanel.close();
     this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe(
       () => {
       },
@@ -112,7 +112,7 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   onDeleteImportClick(importId: number): void {
     this.importService.deleteImport(importId).pipe(
-      flatMap(() => this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString))
+      switchMap(() => this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString))
     ).subscribe(
       () => {
       },
@@ -134,14 +134,14 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   isDeleteButtonDisabled(importObject: Import): boolean {
     switch (importObject.importProgress.importStatus) {
-      case "STARTED":
-      case "SAVING":
-      case "COMPLETE":
-      case "COMPLETED_WITH_ERRORS":
-      case "IMPORTED":
+      case 'STARTED':
+      case 'SAVING':
+      case 'COMPLETE':
+      case 'COMPLETED_WITH_ERRORS':
+      case 'IMPORTED':
         return importObject.importProgress.importedApplications > 0;
       default:
-        return false
+        return false;
     }
   }
 

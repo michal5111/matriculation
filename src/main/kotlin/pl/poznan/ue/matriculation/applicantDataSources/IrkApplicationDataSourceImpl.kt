@@ -14,17 +14,15 @@ import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
-import pl.poznan.ue.matriculation.oracle.domain.IrkApplication
 
 class IrkApplicationDataSourceImpl(
         private val irkService: IrkService,
         private val name: String,
         private val id: String,
-        private val setAsAccepted: Boolean
+        private val setAsAccepted: Boolean,
+        private val irkApplicantMapper: IrkApplicantMapper,
+        private val irkApplicationMapper: IrkApplicationMapper
 ) : IApplicationDataSource<IrkApplicationDTO, IrkApplicantDto> {
-
-    private val irkApplicationMapper = IrkApplicationMapper()
-    private val irkApplicantMapper = IrkApplicantMapper()
 
     override fun getApplicationsPage(registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<IrkApplicationDTO> {
         val page = irkService.getApplications(
@@ -65,14 +63,14 @@ class IrkApplicationDataSourceImpl(
         return id
     }
 
-    override fun postMatriculation(applicationId: Long, irkApplication: IrkApplication) {
-        if (!setAsAccepted) return
-        try {
+    override fun postMatriculation(applicationId: Long): Int {
+        if (!setAsAccepted) return 1
+        return try {
             irkService.completeImmatriculation(applicationId)
-            irkApplication.confirmationStatus = 1
+            1
         } catch (e: HttpStatusCodeException) {
             val errorMessageDto = jacksonObjectMapper().readValue(e.responseBodyAsString, ErrorMessageDto::class.java)
-            irkApplication.confirmationStatus = errorMessageDto.error
+            errorMessageDto.error
         }
     }
 
@@ -101,21 +99,6 @@ class IrkApplicationDataSourceImpl(
         } while (hasNext)
         return availableRegistrations
     }
-
-//    override fun getRegistrationByCode(registration: String): Registration? {
-//        return irkService.getRegistration(registration)?.let {
-//            Registration(
-//                    code = it.code,
-//                    cycle = it.cycle,
-//                    employeesOnly = it.employeesOnly,
-//                    name = it.name,
-//                    programmes = it.programmes,
-//                    status = it.status,
-//                    turnDTOS = it.turn,
-//                    tag = it.tag
-//            )
-//        }
-//    }
 
     override fun getApplicationById(applicationId: Long): IrkApplicationDTO? {
         return irkService.getApplication(applicationId)

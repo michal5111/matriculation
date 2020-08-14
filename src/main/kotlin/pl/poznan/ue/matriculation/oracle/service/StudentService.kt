@@ -2,6 +2,7 @@ package pl.poznan.ue.matriculation.oracle.service
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.SqlOutParameter
 import org.springframework.jdbc.core.SqlParameter
@@ -37,6 +38,9 @@ class StudentService(
 
     private lateinit var jdbcCall: SimpleJdbcCall
 
+    @Value("\${pl.poznan.ue.matriculation.defaultStudentOrganizationalUnit}")
+    lateinit var defaultStudentOrganizationalUnitString: String
+
     @PostConstruct
     fun init() {
         val jdbcTemplate = JdbcTemplate(dataSource)
@@ -62,7 +66,9 @@ class StudentService(
         val resultMap: MutableMap<String, Any> = jdbcCall.execute(paramMap)
         val student = Student(
                 indexType = indexType,
-                organizationalUnit = organizationalUnitRepository.getOne(resultMap["p_jed_org_kod"] as String),
+                organizationalUnit =
+                if (resultMap["p_jed_org_kod"] != null) organizationalUnitRepository.getOne(resultMap["p_jed_org_kod"] as String)
+                else organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitString),
                 indexNumber = resultMap["p_numer"] as String,
                 mainIndex = 'T',
                 person = person

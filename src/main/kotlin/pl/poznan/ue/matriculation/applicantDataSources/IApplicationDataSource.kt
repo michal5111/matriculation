@@ -8,7 +8,6 @@ import pl.poznan.ue.matriculation.local.dto.AbstractApplicantDto
 import pl.poznan.ue.matriculation.local.dto.AbstractApplicationDto
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
-import pl.poznan.ue.matriculation.oracle.domain.IrkApplication
 
 interface IApplicationDataSource<applicationDTO : AbstractApplicationDto, applicantDTO : AbstractApplicantDto> {
     fun getApplicationsPage(registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<applicationDTO>
@@ -21,13 +20,11 @@ interface IApplicationDataSource<applicationDTO : AbstractApplicationDto, applic
 
     fun getId(): String
 
-    fun postMatriculation(applicationId: Long, irkApplication: IrkApplication)
+    fun postMatriculation(applicationId: Long): Int
 
     fun getAvailableRegistrationProgrammes(registration: String): List<ProgrammeDto>
 
     fun getAvailableRegistrations(): List<RegistrationDto>
-
-//    fun getRegistrationByCode(registration: String): Registration?
 
     fun getApplicationById(applicationId: Long): applicationDTO?
 

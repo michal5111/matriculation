@@ -20,7 +20,7 @@ export class PersonService {
 
   constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) { }
 
-  getPersonById(id: Number): Observable<Person> {
+  getPersonById(id: number): Observable<Person> {
     return this.http.get<Person>(`${this.apiUrl}/${id}`, httpOptions);
   }
 
@@ -29,9 +29,5 @@ export class PersonService {
       return this.http.get<Page<Person>>(`${this.apiUrl}?page=${page}&size=${size}&sort=${sort},${sortDir}`, httpOptions);
     }
     return this.http.get<Page<Person>>(`${this.apiUrl}?page=${page}&size=${size}`, httpOptions);
-  }
-
-  updateIndexNumberByUsosIdAndIndexType(personId: number, indexTypeCode: string, indexNumber: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${personId}/indexNumber?indexType=${indexTypeCode}&indexNumber=${indexNumber}`, null, httpOptions);
   }
 }

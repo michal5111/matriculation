@@ -1,5 +1,5 @@
 import {Applicant} from './applicant';
-import {Document} from "./document";
+import {Document} from './document';
 
 export interface Application {
   id: number;
@@ -28,7 +28,6 @@ export interface Application {
   importError: string;
   stackTrace: string;
   irkInstance: string;
-  dataSourceType: string;
-  foreignIdType: string;
+  dataSourceId: string;
   editUrl: string;
 }

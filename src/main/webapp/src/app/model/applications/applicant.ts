@@ -6,7 +6,7 @@ import {IdentityDocument} from "./identityDocument";
 
 export class Applicant {
   id: number;
-  foreignId: number
+  foreignId: number;
   email: string;
   indexNumber: string;
   password: string;
@@ -65,5 +65,5 @@ export class Applicant {
   identityDocuments: [IdentityDocument];
   usosId: number;
   assignedIndexNumber: number;
-  foreignIdType: string;
+  dataSourceId: number;
 }

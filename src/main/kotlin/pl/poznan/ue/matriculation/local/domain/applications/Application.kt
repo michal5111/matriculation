@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.local.domain.applications
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.*
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
@@ -20,7 +20,7 @@ class Application(
         val foreignId: Long,
 
         @Column(nullable = false, name = "datasourceId")
-        var datasourceId: String? = null,
+        var dataSourceId: String? = null,
 
         var admitted: String?,
 
@@ -40,6 +40,9 @@ class Application(
 
         var editUrl: String? = null,
 
+        @JsonProperty("certificateId")
+        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
+        @JsonIdentityReference(alwaysAsId = true)
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "certificate_id", referencedColumnName = "id")
         var certificate: Document? = null,

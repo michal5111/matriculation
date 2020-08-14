@@ -10,9 +10,13 @@ import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
 import pl.poznan.ue.matriculation.applicantDataSources.IrkApplicationDataSourceImpl
 import pl.poznan.ue.matriculation.dreamApply.dto.applicant.DreamApplyApplicantDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
+import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicantMapper
+import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicationMapper
 import pl.poznan.ue.matriculation.dreamApply.service.DreamApplyService
 import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
 import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
+import pl.poznan.ue.matriculation.irk.mapper.IrkApplicantMapper
+import pl.poznan.ue.matriculation.irk.mapper.IrkApplicationMapper
 import pl.poznan.ue.matriculation.irk.service.IrkService
 
 @Configuration
@@ -57,7 +61,9 @@ class ApplicationDataSourceConfiguration {
         return DreamApplyDataSourceImpl(
                 dreamApplyService = dreamApplyService,
                 name = "Dream Apply",
-                id = "DREAM_APPLY"
+                id = "DREAM_APPLY",
+                applicantMapper = DreamApplyApplicantMapper(),
+                applicationMapper = DreamApplyApplicationMapper()
         )
     }
 
@@ -77,7 +83,9 @@ class ApplicationDataSourceConfiguration {
                 id = "IRK_TEST",
                 name = "Testowa IRK",
                 irkService = irkService,
-                setAsAccepted = testSetAsAccepted
+                setAsAccepted = testSetAsAccepted,
+                irkApplicantMapper = IrkApplicantMapper(),
+                irkApplicationMapper = IrkApplicationMapper()
         )
     }
 
@@ -97,7 +105,9 @@ class ApplicationDataSourceConfiguration {
                 id = "IRK_PRIMARY",
                 name = "Główna IRK",
                 irkService = irkService,
-                setAsAccepted = primarySetAsAccepted
+                setAsAccepted = primarySetAsAccepted,
+                irkApplicationMapper = IrkApplicationMapper(),
+                irkApplicantMapper = IrkApplicantMapper()
         )
     }
 }

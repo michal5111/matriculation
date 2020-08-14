@@ -9,7 +9,7 @@ import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 @Repository
 interface ApplicantRepository : JpaRepository<Applicant, Long> {
 
-    fun findByForeignIdAndDatasourceId(foreignId: Long, datasourceId: String): Applicant?
+    fun findByForeignIdAndDataSourceId(foreignId: Long, dataSourceId: String): Applicant?
 
     fun findByUsosId(usosId: Long): Applicant?
 

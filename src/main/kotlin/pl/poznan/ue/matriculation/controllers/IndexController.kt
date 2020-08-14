@@ -14,7 +14,6 @@ class IndexController {
 
     @GetMapping("/login")
     fun login(@RequestParam service: String): ResponseEntity<String> {
-        println(service)
         val httpHeaders = HttpHeaders()
         httpHeaders.location = URI(service)
         return ResponseEntity(httpHeaders, HttpStatus.MOVED_PERMANENTLY)

@@ -1,10 +1,10 @@
-import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup, FormGroupDirective, Validators} from '@angular/forms';
 import {Observable, Subscription} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
-import {filter, flatMap, tap} from 'rxjs/operators';
+import {filter, switchMap, tap} from 'rxjs/operators';
 import {IndexType} from '../../../model/oracle/index-type';
 import {Registration} from '../../../model/applications/registration';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -14,6 +14,7 @@ import {ErrorDialogData} from '../../../model/dialog/error-dialog-data';
 import {MatSelectChange} from '@angular/material/select';
 import {DataSource} from '../../../model/import/dataSource';
 import {Programme} from '../../../model/applications/programme';
+import {UsosService} from '../../../service/usos-service/usos.service';
 
 @Component({
   selector: 'app-import-setup',
@@ -27,7 +28,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   $availableDataSourcesObservable: Observable<[DataSource]> = this.importService.getAvailableDataSources();
   registrations: Registration[];
   registrationProgrammes: Programme[];
-  $indexPoolsObservable: Observable<[IndexType]> = this.importService.getAvailableIndexPools();
+  $indexPoolsObservable: Observable<[IndexType]> = this.usosService.getAvailableIndexPools();
   stages: string[];
   didacticCycles: string[];
   importCreationFormGroup: FormGroup;
@@ -35,6 +36,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
 
   constructor(
     private importService: ImportService,
+    private usosService: UsosService,
     private formBuilder: FormBuilder,
     private snackBar: MatSnackBar,
     private dialog: MatDialog
@@ -42,6 +44,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   }
 
   @Output() importCreated = new EventEmitter<Import>();
+  @ViewChild(FormGroupDirective) formGroupDirective: FormGroupDirective;
 
   ngOnInit(): void {
     this.importCreationFormGroup = this.formBuilder.group({
@@ -69,7 +72,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   }
 
   onRegistrationProgrammeChange(event: MatSelectChange): void {
-    this.importService.getAvailableStages(event.value.usosId).pipe(
+    this.usosService.getAvailableStages(event.value.usosId).pipe(
       tap(results => this.stages = results)
     ).subscribe(
       () => {
@@ -82,7 +85,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   onDidacticCycleInputChanges(): void {
     this.changesSubscription = this.importCreationFormGroup.get('didacticCycle').valueChanges.pipe(
       filter(value => value !== undefined && value !== '' && value !== null && value.length >= 2),
-      flatMap(value => this.importService.findDidacticCycleCodes(value)),
+      switchMap(value => this.usosService.findDidacticCycleCodes(value)),
       tap(didacticCycles => this.didacticCycles = didacticCycles)
     ).subscribe(
       () => {
@@ -121,7 +124,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
       duration: 3000
     });
     snackBarRef.onAction().subscribe(() => snackBarRef.dismiss());
-    this.importCreationFormGroup.reset();
+    this.formGroupDirective.resetForm();
     this.import = importObject;
     this.importCreated.next(this.import);
   }

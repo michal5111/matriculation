@@ -163,19 +163,19 @@ class RestController(
             : org.springframework.data.domain.Page<Application> = applicationService.findAllApplicationsByImportId(pageable, importId)
 
 
-    @GetMapping("/indexPool")
+    @GetMapping("/usos/indexPool")
     fun getAvailableIndexPools(): List<IndexTypeDto> = usosService.getAvailableIndexPoolsCodes()
 
 
-    @GetMapping("/programme/{code}/stages")
+    @GetMapping("/usos/programme/{code}/stages")
     fun getAvailableIndexPools(@PathVariable("code") code: String): List<String> = usosService.getStageByProgrammeCode(code)
 
 
-    @GetMapping("/didacticCycle")
+    @GetMapping("/usos/didacticCycle")
     fun findDidacticCycleByCode(@RequestParam("code") didacticCycleCode: String): List<String> = usosService.findDidacticCycleCodes(didacticCycleCode, 10)
 
 
-    @PutMapping("/person/{id}/indexNumber")
+    @PutMapping("/usos/person/{id}/indexNumber")
     fun updateIndexNumberByUsosIdAndIndexType(
             @PathVariable("id") personId: Long,
             @RequestParam("indexType") indexTypeCode: String,

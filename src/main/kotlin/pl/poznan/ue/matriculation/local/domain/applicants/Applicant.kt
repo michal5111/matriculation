@@ -17,7 +17,7 @@ class Applicant(
         val foreignId: Long,
 
         @Column(name = "datasourceId", nullable = false)
-        var datasourceId: String? = null,
+        var dataSourceId: String? = null,
 
         var email: String,
 
@@ -36,10 +36,6 @@ class Applicant(
 
         var photo: String?,
 
-//        @JsonIgnore
-//        @Basic(fetch = FetchType.LAZY)
-//        @Lob
-//        @Column(length = 4096)
         @Transient
         @JsonIgnore
         var photoByteArray: ByteArray? = null,
@@ -50,19 +46,19 @@ class Applicant(
 
         var modificationDate: Date,
 
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
         var basicData: BasicData,
 
 //        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
 //        var contactData: ContactData,
 
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
         val additionalData: AdditionalData,
 
         @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
         var applicantForeignerData: ApplicantForeignerData?,
 
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
         val educationData: EducationData,
 
         @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)

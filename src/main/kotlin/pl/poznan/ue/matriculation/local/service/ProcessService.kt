@@ -83,14 +83,14 @@ class ProcessService(
             )
         } else {
             applicationDtoDataSource.mapApplicationDtoToApplication(applicationDto).also {
-                it.datasourceId = applicationDtoDataSource.getId()
+                it.dataSourceId = applicationDtoDataSource.getId()
                 it.editUrl = applicationDtoDataSource.getApplicationEditUrl(it.foreignId)
             }
         }
     }
 
     private fun createOrUpdateApplicant(applicantDto: AbstractApplicantDto, applicationDtoDataSource: IApplicationDataSource<AbstractApplicationDto, AbstractApplicantDto>): Applicant {
-        val foundApplicant = applicantRepository.findByForeignIdAndDatasourceId(
+        val foundApplicant = applicantRepository.findByForeignIdAndDataSourceId(
                 applicantDto.getForeignId(),
                 applicationDtoDataSource.getId()
         )
@@ -98,7 +98,7 @@ class ProcessService(
             applicationDtoDataSource.updateApplicant(foundApplicant, applicantDto)
         } else {
             applicationDtoDataSource.mapApplicantDtoToApplicant(applicantDto).also {
-                it.datasourceId = applicationDtoDataSource.getId()
+                it.dataSourceId = applicationDtoDataSource.getId()
             }
         }
     }
@@ -128,7 +128,7 @@ class ProcessService(
                 stageCode = importDto.stageCode,
                 startDate = importDto.startDate
         ) {
-            applicationDtoDataSource.postMatriculation(applicationId = application.id!!, irkApplication = it)
+            applicationDtoDataSource.postMatriculation(application.id!!)
         }
         personAndAssignedNumber.let { pair ->
             application.applicant!!.usosId = pair.first.id

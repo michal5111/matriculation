@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { UpdateIndexNumberDialogComponent } from './update-index-number-dialog.component';
+import {UpdateIndexNumberDialogComponent} from './update-index-number-dialog.component';
 
 describe('UpdateIndexNumberDialogComponent', () => {
   let component: UpdateIndexNumberDialogComponent;

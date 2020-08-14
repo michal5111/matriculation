@@ -5,12 +5,10 @@ import {Page} from '../../model/oracle/page/page';
 import {Import} from '../../model/import/import';
 import {Application} from '../../model/applications/application';
 import {ImportProgress} from '../../model/import/import-progress';
-import {IndexType} from '../../model/oracle/index-type';
 import {Registration} from '../../model/applications/registration';
 import {APP_BASE_HREF} from '@angular/common';
 import {DataSource} from "../../model/import/dataSource";
 import {Programme} from "../../model/applications/programme";
-import {UrlDto} from "../../model/import/urlDto";
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -42,18 +40,6 @@ export class ImportService {
 
   getAvailableRegistrationProgrammes(registrationCode: string, dataSourceType: string): Observable<[Programme]> {
     return this.http.get<[Programme]>(`${this.apiUrl}/registrations/${dataSourceType}/codes/${encodeURIComponent(registrationCode)}`);
-  }
-
-  getAvailableIndexPools(): Observable<[IndexType]> {
-    return this.http.get<[IndexType]>(`${this.apiUrl}/indexPool`);
-  }
-
-  getAvailableStages(programmeCode: string): Observable<[string]> {
-    return this.http.get<[string]>(`${this.apiUrl}/programme/${encodeURIComponent(programmeCode)}/stages`);
-  }
-
-  findDidacticCycleCodes(didacticCycleCode: string): Observable<[string]> {
-    return this.http.get<[string]>(`${this.apiUrl}/didacticCycle?code=${encodeURIComponent(didacticCycleCode)}`);
   }
 
   createImport(importObject: Import): Observable<Import> {
@@ -99,9 +85,5 @@ export class ImportService {
 
   getAvailableDataSources(): Observable<[DataSource]> {
     return this.http.get<[DataSource]>(`${this.apiUrl}/import/dataSources`);
-  }
-
-  getUsosUrl(): Observable<UrlDto> {
-    return this.http.get<UrlDto>(`${this.apiUrl}/usos/url`);
   }
 }

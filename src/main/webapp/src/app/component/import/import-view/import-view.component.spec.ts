@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ImportViewComponent } from './import-view.component';
+import {ImportViewComponent} from './import-view.component';
 
 describe('ImportViewComponent', () => {
   let component: ImportViewComponent;

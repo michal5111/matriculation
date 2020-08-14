@@ -1,4 +1,4 @@
-import { MatPaginatorIntlPl } from './mat-paginator-intl-pl';
+import {MatPaginatorIntlPl} from './mat-paginator-intl-pl';
 
 describe('MatPaginatorIntlPl', () => {
   it('should create an instance', () => {

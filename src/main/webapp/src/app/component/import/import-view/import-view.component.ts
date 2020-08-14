@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {ImportService} from '../../../service/import-service/import.service';
 import {Page} from '../../../model/oracle/page/page';
-import {filter, flatMap, map, tap} from 'rxjs/operators';
+import {filter, map, switchMap, takeWhile, tap} from 'rxjs/operators';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, Sort} from '@angular/material/sort';
 import {Application} from '../../../model/applications/application';
@@ -20,6 +20,7 @@ import {ErrorDialogComponent} from '../../dialog/error-dialog/error-dialog.compo
 import {ErrorDialogData} from '../../../model/dialog/error-dialog-data';
 import {HttpErrorResponse} from '@angular/common/http';
 import {UrlDto} from '../../../model/import/urlDto';
+import {UsosService} from '../../../service/usos-service/usos.service';
 
 @Component({
   selector: 'app-import-view',
@@ -70,18 +71,10 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['importError', 'importError']
   ]);
   $importProgressObservable = timer(0, 1000).pipe(
-    flatMap(() => this.importService.getImportProgress(this.importId)),
+    switchMap(() => this.importService.getImportProgress(this.importId)),
     tap(result => this.importProgress = result),
-    flatMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString)),
-    tap(() => {
-      switch (this.importProgress.importStatus) {
-        case 'STARTED':
-        case 'SAVING':
-          return;
-        default:
-          this.progressSubscription.unsubscribe();
-      }
-    })
+    switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString)),
+    takeWhile(() => this.importProgress.importStatus === 'STARTED' || this.importProgress.importStatus === 'SAVING')
   );
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -89,6 +82,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
 
   constructor(
     private importService: ImportService,
+    private usosService: UsosService,
     private route: ActivatedRoute,
     public userService: UserService,
     private dialog: MatDialog
@@ -121,14 +115,15 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       return;
     }
     this.getImport(this.importId).subscribe();
-    this.importService.getUsosUrl().subscribe(
+    this.usosService.getUsosUrl().subscribe(
       result => {
         this.usosUrl = result;
       },
       error => this.onError('Błąd przy pobieraniu url usosa', error)
     );
-    this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe(() => {
-        this.progressSubscription = this.$importProgressObservable.subscribe();
+    this.progressSubscription = this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).pipe(
+      switchMap(() => this.$importProgressObservable)
+    ).subscribe(() => {
       },
       error => this.onError('Błąd przy archiwizowaniu', error));
   }
@@ -156,7 +151,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   startImport(): void {
     this.progressSubscription.unsubscribe();
     this.progressSubscription = this.importService.startImport(this.importId).pipe(
-      flatMap(() => this.$importProgressObservable)
+      switchMap(() => this.$importProgressObservable)
     ).subscribe(
       () => {
       },
@@ -167,7 +162,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   savePersons(): void {
     this.progressSubscription.unsubscribe();
     this.progressSubscription = this.importService.savePersons(this.importId).pipe(
-      flatMap(() => this.$importProgressObservable)
+      switchMap(() => this.$importProgressObservable)
     ).subscribe(
       () => {
       },
@@ -225,9 +220,9 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().pipe(
       filter(result => result === true),
-      flatMap((result) => this.importService.archiveImport(this.importId)),
-      flatMap(() => this.importService.getImportProgress(this.importId)),
-      flatMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString))
+      switchMap((result) => this.importService.archiveImport(this.importId)),
+      switchMap(() => this.importService.getImportProgress(this.importId)),
+      switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString))
     ).subscribe(
       () => {
       },

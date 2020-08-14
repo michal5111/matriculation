@@ -2,7 +2,7 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {UpdateIndexNumberDialogData} from '../../../model/dialog/update-index-number-dialog-data';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {PersonService} from '../../../service/person-service/person.service';
+import {UsosService} from '../../../service/usos-service/usos.service';
 
 @Component({
   selector: 'app-update-index-number-dialog',
@@ -17,7 +17,7 @@ export class UpdateIndexNumberDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<UpdateIndexNumberDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: UpdateIndexNumberDialogData,
     private formBuilder: FormBuilder,
-    private personService: PersonService
+    private usosService: UsosService
   ) {
   }
 
@@ -31,7 +31,7 @@ export class UpdateIndexNumberDialogComponent implements OnInit {
 
   onSubmit() {
     const newIndexNumber = this.updateIndexNumberFormGroup.value.indexNumber;
-    this.personService.updateIndexNumberByUsosIdAndIndexType(
+    this.usosService.updateIndexNumberByUsosIdAndIndexType(
       this.data.personId,
       this.data.indexTypeCode,
       newIndexNumber

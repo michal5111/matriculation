@@ -3,6 +3,7 @@ package pl.poznan.ue.matriculation.applicantDataSources
 import org.springframework.web.client.HttpClientErrorException
 import pl.poznan.ue.matriculation.dreamApply.dto.applicant.DreamApplyApplicantDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
+import pl.poznan.ue.matriculation.dreamApply.dto.application.EducationLevelType
 import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicantMapper
 import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicationMapper
 import pl.poznan.ue.matriculation.dreamApply.service.DreamApplyService
@@ -12,16 +13,14 @@ import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
-import pl.poznan.ue.matriculation.oracle.domain.IrkApplication
 
 class DreamApplyDataSourceImpl(
         private val name: String,
         private val id: String,
-        private val dreamApplyService: DreamApplyService
+        private val dreamApplyService: DreamApplyService,
+        private val applicantMapper: DreamApplyApplicantMapper,
+        private val applicationMapper: DreamApplyApplicationMapper
 ) : IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
-
-    private val applicantMapper = DreamApplyApplicantMapper()
-    private val applicationMapper = DreamApplyApplicationMapper()
 
     override fun getApplicationsPage(registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<DreamApplyApplicationDto> {
         val applicationMap = dreamApplyService.getApplicationsByFilter(
@@ -75,7 +74,8 @@ class DreamApplyDataSourceImpl(
         return id
     }
 
-    override fun postMatriculation(applicationId: Long, irkApplication: IrkApplication) {
+    override fun postMatriculation(applicationId: Long): Int {
+        return 1
     }
 
     override fun getAvailableRegistrationProgrammes(registration: String): List<ProgrammeDto> {
@@ -143,6 +143,12 @@ class DreamApplyDataSourceImpl(
             applicantDto: DreamApplyApplicantDto,
             import: Import
     ): Document? {
-        return null
+        val programmeLevel = import.programmeCode.substring(0, 2)
+        val levelType = EducationLevelType.values().find {
+            it.programmeLevel == programmeLevel
+        }
+        return applicant.educationData.documents.find {
+            it.certificateUsosCode == levelType?.usosCode
+        }
     }
 }

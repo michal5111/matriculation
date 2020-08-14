@@ -8,8 +8,8 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.exchange
 import org.springframework.web.util.UriComponentsBuilder
 import pl.poznan.ue.matriculation.irk.dto.Page
-import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
 import pl.poznan.ue.matriculation.irk.dto.applicants.DocumentDTO
+import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
 import pl.poznan.ue.matriculation.irk.dto.applicants.MatriculationDataDTO
 import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
 import pl.poznan.ue.matriculation.irk.dto.programmes.ProgrammeGroupsDTO

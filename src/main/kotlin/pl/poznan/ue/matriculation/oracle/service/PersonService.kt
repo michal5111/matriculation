@@ -373,14 +373,14 @@ class PersonService(
             registration: String,
             stageCode: String,
             startDate: Date,
-            postMatriculation: (IrkApplication) -> Unit
+            postMatriculation: () -> Int
     ): Pair<Person, String> {
         val person: Person = createOrUpdatePerson(application.applicant!!)
         personRepository.save(person)
         val irkApplication = IrkApplication(
                 applicationId = application.foreignId,
                 confirmationStatus = 0,
-                irkInstance = applicationDataSourceService.getDataSource(application.datasourceId!!).getInstanceUrl()
+                irkInstance = applicationDataSourceService.getDataSource(application.dataSourceId!!).getInstanceUrl()
         )
         val assignedIndexNumber = _self.immatriculate(
                 person = person,
@@ -396,7 +396,7 @@ class PersonService(
                 sourceOfFinancing = application.applicationForeignerData?.sourceOfFinancing,
                 basisOfAdmission = application.applicationForeignerData?.basisOfAdmission
         )
-        postMatriculation.invoke(irkApplication)
+        irkApplication.confirmationStatus = postMatriculation.invoke()
         irkApplicationRepository.save(irkApplication)
         return Pair(person, assignedIndexNumber)
     }

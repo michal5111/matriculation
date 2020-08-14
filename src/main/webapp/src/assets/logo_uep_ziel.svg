@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Creator: CorelDRAW 2019 (64-Bit Wersja próbna) -->
-<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="177.798mm" height="80.433mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
-viewBox="0 0 17779.8 8043.3"
- xmlns:xlink="http://www.w3.org/1999/xlink"
- xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="177.798mm" height="80.433mm" version="1.1"
+     style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+     viewBox="0 0 17779.8 8043.3"
+>
  <defs>
   <style type="text/css">
-   <![CDATA[
-    .fil1 {fill:#215932}
-    .fil0 {fill:#215932;fill-rule:nonzero}
-   ]]>
+   <
+   !
+   [CDATA[
+   .fil1 {
+     fill: #215932
+   }
+
+   .fil0 {
+     fill: #215932;
+     fill-rule: nonzero
+   }
+
+   ]
+   ]
+   >
   </style>
  </defs>
- <g id="Warstwa_x0020_1">
+  <g id="Warstwa_x0020_1">
   <metadata id="CorelCorpID_0Corel-Layer"/>
   <g id="_2963144897664">
    <path class="fil0" d="M3898.98 936.23c843.95,0 1608.09,342.1 2161.08,895.17 553.03,553.03 895.17,1317.17 895.17,2161.12 0,131.42 -8.31,260.93 -24.41,388l-122.21 0c16.75,-126.98 25.45,-256.47 25.45,-388 0,-810.5 -328.54,-1544.32 -859.69,-2075.43 -531.09,-531.15 -1264.89,-859.7 -2075.39,-859.7 -810.47,0 -1544.27,328.55 -2075.43,859.7 -531.12,531.11 -859.69,1264.93 -859.69,2075.43 0,131.53 8.69,261.02 25.45,388l-122.18 0c-16.1,-127.07 -24.41,-256.58 -24.41,-388 0,-843.95 342.1,-1608.09 895.14,-2161.12 553.03,-553.03 1317.16,-895.17 2161.12,-895.17zm2798.44 4286.68c-153.85,349.38 -371.16,664.51 -637.36,930.71 -552.99,553.07 -1317.13,895.14 -2161.08,895.14 -843.96,0 -1608.09,-342.11 -2161.12,-895.14 -266.21,-266.2 -483.48,-581.33 -637.32,-930.71l132.94 0c146.17,316.09 346.87,601.79 590.07,845.02 531.16,531.13 1264.96,859.71 2075.43,859.71 810.5,0 1544.3,-328.58 2075.39,-859.71 243.23,-243.23 443.89,-528.93 590.06,-845.02l132.99 0z"/>
