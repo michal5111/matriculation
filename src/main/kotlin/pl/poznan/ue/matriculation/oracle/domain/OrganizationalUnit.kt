@@ -162,7 +162,10 @@ class OrganizationalUnit(
         val personProgrammes: MutableList<PersonProgramme>,
 
         @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
-        val folders: MutableList<Folder>
+        val folders: MutableList<Folder>,
+
+        @OneToMany(mappedBy = "organizationalUnit", fetch = FetchType.LAZY)
+        val cooperations: MutableList<Cooperation>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

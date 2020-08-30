@@ -37,7 +37,7 @@ class ImportService(
             didacticCycleCode: String,
             dataSourceType: String
     ): Import {
-        if (importRepository.existsByProgrammeCodeAndRegistration(programmeCode, registration)) {
+        if (importRepository.existsByProgrammeForeignIdAndRegistration(programmeForeignId, registration)) {
             throw ImportCreationException("Import tego programu już istnieje.")
         }
         if (!programmeRepository.existsById(programmeCode)) {
@@ -161,98 +161,4 @@ class ImportService(
     fun save(import: Import): Import {
         return importRepository.save(import)
     }
-
-//    @EventListener
-//    fun onApplicationEvent(event: ContextRefreshedEvent) {
-//        create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-E",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-E",
-//                startDate = "2014-01-01T23:28:56.782Z"
-//        )
-//        create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-FAI",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-FAI",
-//                startDate = "2014-01-01T23:28:56.782Z"
-//        )
-//        create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-GT",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-GT",
-//                startDate = "2014-01-01T23:28:56.782Z"
-//        )
-//        create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-IiE",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-IiE",
-//                startDate = "2014-01-01T23:28:56.782Z"
-//        )
-//        create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-MSG",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-MSG",
-//                startDate = "2014-01-01T23:28:56.782Z"
-//        )
-//        create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-P-E",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-P-E",
-//                startDate = "2014-01-01T23:28:56.782Z"
-//        )
-//        create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-PS",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-PS",
-//                startDate = "2014-01-01T23:28:56.782Z"
-//        )
-//        create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-RiFB",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-RiFB",
-//                startDate = "2014-01-01T23:28:56.782Z"
-//        )
-//        create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-Z",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-Z",
-//                startDate = "2014-01-01T23:28:56.782Z"
-//        )
-//        create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-ZIP",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-ZIP",
-//                startDate = "2014-01-01T23:28:56.782Z"
-//        )
-//    }
 }

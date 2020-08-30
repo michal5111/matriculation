@@ -18,15 +18,15 @@ class EducationData(
         var applicant: Applicant? = null,
 
         @OneToMany(mappedBy = "educationData", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
-        var documents: MutableList<Document>,
+        var documents: MutableList<Document> = mutableListOf(),
 
-        var highSchoolCity: String?,
+        var highSchoolCity: String? = null,
 
-        var highSchoolName: String?,
+        var highSchoolName: String? = null,
 
-        var highSchoolType: String?,
+        var highSchoolType: String? = null,
 
-        var highSchoolUsosCode: Long?
+        var highSchoolUsosCode: Long? = null
 ) : Serializable {
 
     override fun toString(): String {

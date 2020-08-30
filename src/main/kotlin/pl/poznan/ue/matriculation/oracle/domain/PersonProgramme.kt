@@ -159,7 +159,10 @@ class PersonProgramme(
         var personProgrammeSourceOfFinancing: MutableList<PersonProgrammeSourceOfFinancing> = mutableListOf(),
 
         @OneToMany(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-        var personProgrammeBasisOfAdmission: MutableList<PersonProgrammeBasisOfAdmission> = mutableListOf()
+        var personProgrammeBasisOfAdmission: MutableList<PersonProgrammeBasisOfAdmission> = mutableListOf(),
+
+        @OneToMany(mappedBy = "personProgramme", fetch = FetchType.LAZY)
+        var arrivals: MutableList<Arrival> = mutableListOf()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -7,11 +7,13 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import pl.poznan.ue.matriculation.applicantDataSources.DreamApplyDataSourceImpl
 import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
+import pl.poznan.ue.matriculation.applicantDataSources.IncomingDataSourceImpl
 import pl.poznan.ue.matriculation.applicantDataSources.IrkApplicationDataSourceImpl
 import pl.poznan.ue.matriculation.dreamApply.dto.applicant.DreamApplyApplicantDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
 import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicantMapper
 import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicationMapper
+import pl.poznan.ue.matriculation.dreamApply.mapper.IncomingApplicantMapper
 import pl.poznan.ue.matriculation.dreamApply.service.DreamApplyService
 import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
 import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
@@ -46,6 +48,35 @@ class ApplicationDataSourceConfiguration {
     @Value("\${pl.poznan.ue.matriculation.dreamApplyApiKey}")
     private lateinit var dreamApplyApiKey: String
 
+    @Value("\${pl.poznan.ue.matriculation.incomingInstance}")
+    private lateinit var incomingInstanceUrl: String
+
+    @Value("\${pl.poznan.ue.matriculation.incomingApiKey}")
+    private lateinit var incomingApiKey: String
+
+    @Bean(name = ["IncomingService"])
+    fun incomingService(): DreamApplyService {
+        return DreamApplyService(
+                apiKey = incomingApiKey,
+                instanceUrl = incomingInstanceUrl
+        )
+    }
+
+    @Bean(name = ["IncomingApplicantDataSource"])
+    fun incomingApplicantDataSource(
+            @Autowired @Qualifier("IncomingService") IncomingService: DreamApplyService
+    ): IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
+        return IncomingDataSourceImpl(
+                dreamApplyService = IncomingService,
+                name = "Incoming",
+                id = "INCOMING",
+                applicantMapper = IncomingApplicantMapper(),
+                applicationMapper = DreamApplyApplicationMapper(),
+                status = "Enrolled",
+                decision = "None"
+        )
+    }
+
     @Bean(name = ["DreamApplyService"])
     fun dreamApplyService(): DreamApplyService {
         return DreamApplyService(
@@ -63,7 +94,9 @@ class ApplicationDataSourceConfiguration {
                 name = "Dream Apply",
                 id = "DREAM_APPLY",
                 applicantMapper = DreamApplyApplicantMapper(),
-                applicationMapper = DreamApplyApplicationMapper()
+                applicationMapper = DreamApplyApplicationMapper(),
+                status = "Enrolled",
+                decision = "Final"
         )
     }
 

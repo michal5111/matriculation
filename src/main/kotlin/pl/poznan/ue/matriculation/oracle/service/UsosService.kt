@@ -8,7 +8,6 @@ import pl.poznan.ue.matriculation.exception.IndexNotFoundException
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
 import pl.poznan.ue.matriculation.oracle.dto.IndexTypeDto
 import pl.poznan.ue.matriculation.oracle.repo.IndexTypeRepository
-import pl.poznan.ue.matriculation.oracle.repo.OrganizationalUnitRepository
 import pl.poznan.ue.matriculation.oracle.repo.ProgrammeStageRepository
 import pl.poznan.ue.matriculation.oracle.repo.StudentRepository
 import javax.persistence.EntityManager
@@ -20,8 +19,7 @@ class UsosService(
         private val indexTypeRepository: IndexTypeRepository,
         private val programmeStageRepository: ProgrammeStageRepository,
         private val studentRepository: StudentRepository,
-        private val applicantRepository: ApplicantRepository,
-        private val organizationalUnitRepository: OrganizationalUnitRepository
+        private val applicantRepository: ApplicantRepository
 ) {
 
     @PersistenceContext(unitName = "oracle")
@@ -48,12 +46,8 @@ class UsosService(
                 ?: throw IndexNotFoundException()
         val applicant = applicantRepository.findByUsosId(usosId)
                 ?: throw ApplicantNotFoundException()
-        student.apply {
-            indexNumber = newIndexNumber
-        }
-        applicant.apply {
-            assignedIndexNumber = newIndexNumber
-        }
+        student.indexNumber = newIndexNumber
+        applicant.assignedIndexNumber = newIndexNumber
         try {
             studentRepository.save(student)
             applicantRepository.save(applicant)

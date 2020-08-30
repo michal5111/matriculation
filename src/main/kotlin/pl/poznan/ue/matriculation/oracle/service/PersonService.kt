@@ -8,13 +8,15 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
-import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applications.Application
+import pl.poznan.ue.matriculation.local.domain.enum.AccommodationPreference
+import pl.poznan.ue.matriculation.local.domain.enum.DurationType
 import pl.poznan.ue.matriculation.local.service.ApplicantService
 import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceService
 import pl.poznan.ue.matriculation.oracle.domain.*
 import pl.poznan.ue.matriculation.oracle.repo.*
 import java.util.*
+import javax.persistence.EntityNotFoundException
 
 @Service
 class PersonService(
@@ -38,7 +40,8 @@ class PersonService(
         private val documentTypeRepository: DocumentTypeRepository,
         private val ownedDocumentRepository: OwnedDocumentRepository,
         private val personChangeHistoryRepository: PersonChangeHistoryRepository,
-        private val applicationDataSourceService: ApplicationDataSourceService
+        private val applicationDataSourceService: ApplicationDataSourceService,
+        private val didacticCycleRepository: DidacticCycleRepository
 ) {
 
     @Autowired
@@ -333,9 +336,7 @@ class PersonService(
             stageCode: String,
             didacticCycleCode: String,
             irkApplication: IrkApplication,
-            certificate: Document?,
-            sourceOfFinancing: String?,
-            basisOfAdmission: String?
+            application: Application
     ): String {
         val student = studentService.createOrFindStudent(person, indexPoolCode)
         studentRepository.save(student)
@@ -353,12 +354,44 @@ class PersonService(
                 didacticCycleCode = didacticCycleCode,
                 stageCode = stageCode,
                 student = student,
-                certificate = certificate,
-                sourceOfFinancing = sourceOfFinancing,
-                basisOfAdmission = basisOfAdmission
+                certificate = application.certificate,
+                sourceOfFinancing = application.applicationForeignerData?.sourceOfFinancing,
+                basisOfAdmission = application.applicationForeignerData?.basisOfAdmission
         )
         irkApplication.personProgramme = personProgramme
         personProgramme.irkApplication = irkApplication
+        application.applicant?.erasmusData?.let {
+            val didacticCycle = didacticCycleRepository.getOne(didacticCycleCode)
+            val didacticCycleYear = didacticCycleRepository.findDidacticCycleYearBySemesterDates(didacticCycle.dateFrom, didacticCycle.dateTo)
+                    ?: throw EntityNotFoundException("Unable to find didactic Cycle year")
+            person.personArrivals.add(
+                    Arrival(
+                            person = person,
+                            wantAccommodation = if (it.accommodationPreference == AccommodationPreference.DORMITORY) 'T'
+                            else 'N',
+                            personProgramme = personProgramme,
+                            didacticCycleAcademicYear = didacticCycleYear,
+                            startDate = startDate,
+                            financingDidacticCycleAcademicYear = didacticCycleYear,
+                            school = it.homeInstitution?.erasmusCode?.let { erasmusCode ->
+                                schoolRepository.findSchoolByErasmusCode(erasmusCode)
+                            },
+                            arrivalType = when (it.type) {
+                                "Studies" -> "S"
+                                else -> "S"
+                            },
+                            endDate = if (it.duration == DurationType.ONE_SEMESTER) didacticCycle.endDate
+                            else didacticCycleRepository.getNextDidacticCycleEndDate(didacticCycleCode)
+                                    ?: throw IllegalStateException("Unable to get next didactic cycle"),
+                            stayTimePlan = when {
+                                it.duration == DurationType.TWO_SEMESTERS -> 'R'
+                                didacticCycle.description.startsWith("semestr letni") -> 'L'
+                                didacticCycle.description.startsWith("semestr zimowy") -> 'Z'
+                                else -> 'I'
+                            }
+                    )
+            )
+        }
         personProgrammeRepository.save(personProgramme)
         return student.indexNumber
     }
@@ -392,9 +425,7 @@ class PersonService(
                 stageCode = stageCode,
                 startDate = startDate,
                 irkApplication = irkApplication,
-                certificate = application.certificate,
-                sourceOfFinancing = application.applicationForeignerData?.sourceOfFinancing,
-                basisOfAdmission = application.applicationForeignerData?.basisOfAdmission
+                application = application
         )
         irkApplication.confirmationStatus = postMatriculation.invoke()
         irkApplicationRepository.save(irkApplication)

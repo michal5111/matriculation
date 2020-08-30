@@ -48,7 +48,10 @@ class PersonDocument(
         var owner: Char,
 
         @Column(name = "FORMAT", length = 4, nullable = false)
-        var format: String
+        var format: String,
+
+        @OneToMany(mappedBy = "personDocument")
+        var arrivals: MutableList<Arrival>
 
         //Todo Add ELS_CERT_ID
 ) {

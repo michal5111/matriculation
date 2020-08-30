@@ -30,7 +30,8 @@ class IrkApplicationDataSourceImpl(
                 paid = true,
                 registration = registrationCode,
                 programme = programmeForeignId,
-                pageNumber = pageNumber
+                pageNumber = pageNumber,
+                pageLength = 20
         )
         return object : IPage<IrkApplicationDTO> {
             override fun getSize(): Int {

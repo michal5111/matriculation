@@ -8,8 +8,11 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import pl.poznan.ue.matriculation.dreamApply.dto.academicTerms.AcademicTermDto
 import pl.poznan.ue.matriculation.dreamApply.dto.academicTerms.CourseDto
+import pl.poznan.ue.matriculation.dreamApply.dto.applicant.ApplicationCourseDto
 import pl.poznan.ue.matriculation.dreamApply.dto.applicant.DreamApplyApplicantDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
+import pl.poznan.ue.matriculation.dreamApply.dto.application.FlagDto
+import pl.poznan.ue.matriculation.dreamApply.dto.application.FlagInfoDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.OfferDto
 
 class DreamApplyService(
@@ -24,6 +27,9 @@ class DreamApplyService(
     private class LongAcademicTermMapResult : ParameterizedTypeReference<Map<Long, AcademicTermDto>>()
     private class LongCourseMapResult : ParameterizedTypeReference<Map<Long, CourseDto>>()
     private class LongOfferDtoResult : ParameterizedTypeReference<Map<Long, OfferDto>>()
+    private class LongFlagDtoResult : ParameterizedTypeReference<Map<Long, FlagDto>>()
+    private class LongFlagInfoDtoResult : ParameterizedTypeReference<Map<Long, FlagInfoDto>>()
+    private class LongApplicantCourseDtoResult : ParameterizedTypeReference<Map<Long, ApplicationCourseDto>>()
 
     fun getApplicationsCountByFilter(academicTermID: String? = null, academicYear: String? = null, additionalFilters: Map<String, String>?): Long {
         val httpHeaders = HttpHeaders()
@@ -186,6 +192,66 @@ class DreamApplyService(
                 HttpMethod.GET,
                 httpEntity,
                 LongOfferDtoResult()
+        )
+        return response.body
+    }
+
+    fun getAllFlags(): Map<Long, FlagDto>? {
+        val httpHeaders = HttpHeaders()
+        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        httpHeaders.set("Authorization", "DREAM apikey=\"$apiKey\"")
+        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
+        val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("${apiUrl}applications/flags")
+        val response: ResponseEntity<Map<Long, FlagDto>> = restTemplate.exchange(
+                uriComponentBuilder.build().toUri(),
+                HttpMethod.GET,
+                httpEntity,
+                LongFlagDtoResult()
+        )
+        return response.body
+    }
+
+    fun getApplicationFlags(path: String): Map<Long, FlagInfoDto>? {
+        val httpHeaders = HttpHeaders()
+        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        httpHeaders.set("Authorization", "DREAM apikey=\"$apiKey\"")
+        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
+        val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("$instanceUrl$path")
+        val response: ResponseEntity<Map<Long, FlagInfoDto>> = restTemplate.exchange(
+                uriComponentBuilder.build().toUri(),
+                HttpMethod.GET,
+                httpEntity,
+                LongFlagInfoDtoResult()
+        )
+        return response.body
+    }
+
+    fun getApplicantCourse(path: String): Map<Long, ApplicationCourseDto>? {
+        val httpHeaders = HttpHeaders()
+        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        httpHeaders.set("Authorization", "DREAM apikey=\"$apiKey\"")
+        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
+        val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("$instanceUrl$path")
+        val response: ResponseEntity<Map<Long, ApplicationCourseDto>> = restTemplate.exchange(
+                uriComponentBuilder.build().toUri(),
+                HttpMethod.GET,
+                httpEntity,
+                LongApplicantCourseDtoResult()
+        )
+        return response.body
+    }
+
+    fun getCourseByPath(path: String): CourseDto? {
+        val httpHeaders = HttpHeaders()
+        httpHeaders.contentType = MediaType.APPLICATION_JSON
+        httpHeaders.set("Authorization", "DREAM apikey=\"$apiKey\"")
+        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
+        val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("$instanceUrl$path")
+        val response: ResponseEntity<CourseDto> = restTemplate.exchange(
+                uriComponentBuilder.build().toUri(),
+                HttpMethod.GET,
+                httpEntity,
+                CourseDto::class.java
         )
         return response.body
     }

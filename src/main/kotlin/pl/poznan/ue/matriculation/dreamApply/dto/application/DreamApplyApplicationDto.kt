@@ -28,7 +28,10 @@ data class DreamApplyApplicationDto(
         val residences: List<ResidenceDto>?,
         //val motivation: List<MotivationDto>?,
         val misc: MiscDto?,
-        val extras: List<ExtraDto>?
+        val extras: List<ExtraDto>?,
+        val home: HomeDto?,
+        var courseType: String?,
+        var duration: String?
 ) : AbstractApplicationDto() {
     override fun getForeignApplicantId(): Long {
         return applicant.substring(16, applicant.length).toLong()

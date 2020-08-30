@@ -174,7 +174,8 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     return application.applicant.educationData.documents
       .find(document => document.certificateUsosCode === 'D'
         || document.certificateUsosCode === 'N'
-        || document.certificateUsosCode === 'E');
+        || document.certificateUsosCode === 'E'
+        || document.certificateUsosCode === 'Z');
   }
 
   getDiplomaDocument(application: Application): Document {

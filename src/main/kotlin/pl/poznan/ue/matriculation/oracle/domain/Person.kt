@@ -229,7 +229,16 @@ class Person(
         var ownedDocuments: MutableList<OwnedDocument> = mutableListOf(),
 
         @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-        var personChangeHistory: MutableList<PersonChangeHistory> = mutableListOf()
+        var personChangeHistory: MutableList<PersonChangeHistory> = mutableListOf(),
+
+        @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+        var personArrivals: MutableList<Arrival> = mutableListOf(),
+
+        @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+        var personContracts: MutableList<Contract> = mutableListOf(),
+
+        @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+        var personEmployee: MutableList<Employee> = mutableListOf()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

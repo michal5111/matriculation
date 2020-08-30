@@ -56,7 +56,13 @@ class DidacticCycle(
         val personStages: MutableList<PersonStage> = mutableListOf(),
 
         @OneToMany(mappedBy = "didacticCycleRequirement", fetch = FetchType.LAZY)
-        var personStagesRequirements: MutableList<PersonStage> = mutableListOf()
+        var personStagesRequirements: MutableList<PersonStage> = mutableListOf(),
+
+        @OneToMany(mappedBy = "didacticCycleAcademicYear", fetch = FetchType.LAZY)
+        val arrivals: MutableList<Arrival> = mutableListOf(),
+
+        @OneToMany(mappedBy = "financingDidacticCycleAcademicYear", fetch = FetchType.LAZY)
+        var financingArrivals: List<Arrival>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

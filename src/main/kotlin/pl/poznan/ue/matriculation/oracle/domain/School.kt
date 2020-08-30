@@ -107,7 +107,19 @@ class School(
         val persons: Set<Person>,
 
         @OneToMany(mappedBy = "school", fetch = FetchType.LAZY)
-        val entitlementDocuments: Set<EntitlementDocument>
+        val entitlementDocuments: Set<EntitlementDocument>,
+
+        @OneToMany(mappedBy = "school", fetch = FetchType.LAZY)
+        val contracts: Set<Contract>,
+
+        @OneToMany(mappedBy = "school", fetch = FetchType.LAZY)
+        val externalPersons: Set<Person>,
+
+        @OneToMany(mappedBy = "school", fetch = FetchType.LAZY)
+        val externalOrganizationalUnit: Set<ExternalOrganizationalUnit>,
+
+        @OneToMany(mappedBy = "school", fetch = FetchType.LAZY)
+        val arrivals: Set<Arrival>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

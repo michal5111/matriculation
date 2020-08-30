@@ -19,7 +19,10 @@ class IscedCode(
         val programmes: MutableList<Programme>,
 
         @OneToMany(mappedBy = "iscedCode", fetch = FetchType.LAZY)
-        val personProgrammes: MutableList<PersonProgramme>
+        val personProgrammes: MutableList<PersonProgramme>,
+
+        @OneToMany(mappedBy = "iscedCode", fetch = FetchType.LAZY)
+        val arrivals: MutableList<Arrival>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

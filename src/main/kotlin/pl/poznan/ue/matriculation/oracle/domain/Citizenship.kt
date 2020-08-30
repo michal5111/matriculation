@@ -72,7 +72,13 @@ class Citizenship(
         val personsChangeHistoryNationality: Set<PersonChangeHistory>,
 
         @OneToMany(mappedBy = "citizenship", fetch = FetchType.LAZY)
-        val personsChangeHistoryCitizenship: Set<PersonChangeHistory>
+        val personsChangeHistoryCitizenship: Set<PersonChangeHistory>,
+
+        @OneToMany(mappedBy = "country", fetch = FetchType.LAZY)
+        val contracts: Set<Contract>,
+
+        @OneToMany(mappedBy = "hostCountryCode", fetch = FetchType.LAZY)
+        val cooperations: Set<Cooperation>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

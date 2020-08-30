@@ -168,7 +168,7 @@ class RestController(
 
 
     @GetMapping("/usos/programme/{code}/stages")
-    fun getAvailableIndexPools(@PathVariable("code") code: String): List<String> = usosService.getStageByProgrammeCode(code)
+    fun getAvailableStages(@PathVariable("code") code: String): List<String> = usosService.getStageByProgrammeCode(code)
 
 
     @GetMapping("/usos/didacticCycle")

@@ -39,7 +39,10 @@ class Dormitory(
         var address: Address,
 
         @OneToMany(mappedBy = "dormitory")
-        var phoneNumbers: List<PhoneNumber>
+        var phoneNumbers: List<PhoneNumber>,
+
+        @OneToMany(mappedBy = "dormitory")
+        var arrivals: List<Arrival>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

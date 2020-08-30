@@ -70,6 +70,9 @@ class Applicant(
         @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
         var identityDocuments: MutableList<IdentityDocument> = mutableListOf(),
 
+        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+        var erasmusData: ErasmusData? = null,
+
         var usosId: Long? = null,
 
         var assignedIndexNumber: String? = null,

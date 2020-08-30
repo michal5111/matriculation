@@ -13,12 +13,24 @@ import pl.poznan.ue.matriculation.local.domain.enum.AddressType
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DreamApplyApplicantMapper {
+open class DreamApplyApplicantMapper {
 
     private val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+    private val maturaRegex = "M/[0-9]{8}/[0-9]{2}".toRegex()
+    private val okeMap = mapOf(
+            "OKEGdańsk" to 18243L,
+            "OKE Jaworzno" to 18244L,
+            "OKE Kraków" to 18245L,
+            "OKE Łomża" to 18246L,
+            "OKE Łódź" to 18247L,
+            "OKE Poznań" to 18248L,
+            "OKE Warszawa" to 18250L,
+            "OKE Wrocław" to 18249L
+    )
 
-    fun map(dreamApplyApplicantDto: DreamApplyApplicantDto): Applicant {
-        val application = dreamApplyApplicantDto.dreamApplyApplication ?: throw java.lang.IllegalStateException("Application is null")
+    open fun map(dreamApplyApplicantDto: DreamApplyApplicantDto): Applicant {
+        val application = dreamApplyApplicantDto.dreamApplyApplication
+                ?: throw java.lang.IllegalStateException("Application is null")
         val profile = application.profile ?: throw java.lang.IllegalStateException("Profile is null")
         return Applicant(
                 foreignId = dreamApplyApplicantDto.id,
@@ -61,13 +73,7 @@ class DreamApplyApplicantMapper {
                 ),
                 indexNumber = null,
                 casPasswordOverride = null,
-                educationData = EducationData(
-                        highSchoolCity = null,
-                        highSchoolName = null,
-                        highSchoolType = null,
-                        highSchoolUsosCode = null,
-                        documents = mutableListOf()
-                ),
+                educationData = EducationData(),
                 applicantForeignerData = null
         ).apply {
             educationData.applicant = this
@@ -89,7 +95,7 @@ class DreamApplyApplicantMapper {
         }
     }
 
-    fun update(applicant: Applicant, dreamApplyApplicantDto: DreamApplyApplicantDto): Applicant {
+    open fun update(applicant: Applicant, dreamApplyApplicantDto: DreamApplyApplicantDto): Applicant {
         val application = dreamApplyApplicantDto.dreamApplyApplication
                 ?: throw IllegalStateException("Application is null")
         val profile = application.profile ?: throw java.lang.IllegalStateException("Profile is null")
@@ -142,18 +148,18 @@ class DreamApplyApplicantMapper {
 
     private fun createIdentityDocuments(applicant: Applicant, applicationDto: DreamApplyApplicationDto) {
         applicationDto.profile?.passport?.let {
-            if (it.idcard != null) {
+            it.idcard?.run {
                 applicant.identityDocuments.add(
                         IdentityDocument(
                                 type = IdentityDocumentType.ID_CARD,
-                                number = it.idcard,
+                                number = this,
                                 country = null,
                                 expDate = null,
                                 applicant = applicant
                         )
                 )
             }
-            if (it.number != null) {
+            it.number?.run {
                 applicant.identityDocuments.add(
                         IdentityDocument(
                                 type = IdentityDocumentType.PASSPORT,
@@ -162,7 +168,7 @@ class DreamApplyApplicantMapper {
                                     simpleDateFormat.parse(expiryDate)
                                 },
                                 applicant = applicant,
-                                number = it.number
+                                number = this
                         )
                 )
             }
@@ -178,33 +184,40 @@ class DreamApplyApplicantMapper {
                 highSchoolName = it.institution
             }
         }
-        applicant.educationData.documents.addAll(
-                applicationDto.education?.filter {
-                    !it.diploma?.number.isNullOrBlank() && it.level != null && !it.diploma?.issue?.date.isNullOrBlank()
-                            && it.level.usosCode != null
-                }?.map {
-                    Document(
-                            educationData = applicant.educationData,
-                            certificateType = it.level!!.levelName,
-                            certificateTypeCode = it.level.toString(),
-                            certificateUsosCode = it.level.usosCode,
-                            comment = null,
-                            documentNumber = it.diploma!!.number!!,
-                            documentYear = it.diploma.issue!!.date!!.let { dateString ->
-                                val date = simpleDateFormat.parse(dateString)
-                                val cal = Calendar.getInstance()
-                                cal.time = date
-                                cal.get(Calendar.YEAR)
-                            },
-                            issueCity = it.city,
-                            issueCountry = it.country,
-                            issueDate = simpleDateFormat.parse(it.diploma.issue.date),
-                            issueInstitution = it.institution,
-                            issueInstitutionUsosCode = null,
-                            modificationDate = Date()
-                    )
-                }?.toMutableList() ?: mutableListOf()
-        )
+
+        applicationDto.education?.filter {
+            !it.diploma?.number.isNullOrBlank() && it.level != null && !it.diploma?.issue?.date.isNullOrBlank()
+        }?.map {
+            Document(
+                    educationData = applicant.educationData,
+                    certificateType = it.level!!.levelName,
+                    certificateTypeCode = it.level.toString(),
+                    certificateUsosCode = it.level.usosCode ?: when {
+                        it.diploma!!.number!!.matches(maturaRegex) -> 'N'
+                        else -> null
+                    },
+                    comment = null,
+                    documentNumber = it.diploma!!.number!!,
+                    documentYear = it.diploma.issue!!.date!!.let { dateString ->
+                        val date = simpleDateFormat.parse(dateString)
+                        val cal = Calendar.getInstance()
+                        cal.time = date
+                        cal.get(Calendar.YEAR)
+                    },
+                    issueCity = it.city,
+                    issueCountry = it.country,
+                    issueDate = simpleDateFormat.parse(it.diploma.issue.date),
+                    issueInstitution = it.institution,
+                    issueInstitutionUsosCode = applicationDto.extras?.find { extraDto ->
+                        extraDto.id == 212L && extraDto.name == "Please select your OKE"
+                    }?.value?.let { okeName ->
+                        okeMap[okeName]
+                    },
+                    modificationDate = Date()
+            )
+        }?.let {
+            applicant.educationData.documents.addAll(it)
+        }
     }
 
     private fun createPhoneNumber(applicant: Applicant, number: String?, type: String, comment: String) {
@@ -262,7 +275,7 @@ class DreamApplyApplicantMapper {
 
     private fun addAddress(applicant: Applicant, dreamApplyApplication: DreamApplyApplicationDto) {
         dreamApplyApplication.contact?.address?.let { addressDto ->
-            applicant.addresses.add(
+            mutableListOf(
                     Address(
                             applicant = applicant,
                             addressType = AddressType.RESIDENCE,
@@ -273,9 +286,7 @@ class DreamApplyApplicantMapper {
                             street = addressDto.street,
                             streetNumber = addressDto.house,
                             flatNumber = addressDto.apartment
-                    )
-            )
-            applicant.addresses.add(
+                    ),
                     Address(
                             applicant = applicant,
                             addressType = AddressType.CORRESPONDENCE,
@@ -289,10 +300,11 @@ class DreamApplyApplicantMapper {
                             }?.value,
                             flatNumber = addressDto.correspondence?.apartment
                     )
-            )
-        }
-        applicant.addresses.removeAll {
-            it.countryCode.isNullOrBlank() || it.street.isNullOrBlank()
+            ).filterNot {
+                it.countryCode.isNullOrBlank() || it.street.isNullOrBlank()
+            }.let {
+                applicant.addresses.addAll(it)
+            }
         }
     }
 

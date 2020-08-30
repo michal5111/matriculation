@@ -14,12 +14,14 @@ import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
 
-class DreamApplyDataSourceImpl(
+open class DreamApplyDataSourceImpl(
         private val name: String,
         private val id: String,
         private val dreamApplyService: DreamApplyService,
         private val applicantMapper: DreamApplyApplicantMapper,
-        private val applicationMapper: DreamApplyApplicationMapper
+        private val applicationMapper: DreamApplyApplicationMapper,
+        private val status: String,
+        private val decision: String
 ) : IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
 
     override fun getApplicationsPage(registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<DreamApplyApplicationDto> {
@@ -27,16 +29,16 @@ class DreamApplyDataSourceImpl(
                 academicTermID = registrationCode,
                 additionalFilters = mapOf(
                         "byCourseIDs" to programmeForeignId,
-                        "byOfferTypes" to "Enrolled",
-                        "byOfferDecisions" to "Final"
+                        "byOfferTypes" to status,
+                        "byOfferDecisions" to decision
                 )
         ) ?: throw java.lang.IllegalArgumentException("Unable to get applicants")
         val applications = applicationMap.values.filter { dreamApplyApplicationDto ->
             val applicationOffers = dreamApplyService.getApplicationOffers(dreamApplyApplicationDto.offers)
             applicationOffers!!.any {
                 it.value.course == "/api/courses/$programmeForeignId"
-                        && it.value.type == "Enrolled"
-                        && it.value.decision == "Final"
+                        && it.value.type == status
+                        && it.value.decision == decision
             }
         }
         return object : IPage<DreamApplyApplicationDto> {
@@ -79,7 +81,7 @@ class DreamApplyDataSourceImpl(
     }
 
     override fun getAvailableRegistrationProgrammes(registration: String): List<ProgrammeDto> {
-        val courses = dreamApplyService.getCourses()
+        val courses = dreamApplyService.getCourses(statuses = "Online")
         return courses!!.values.filter {
             it.code != null
         }.map {
@@ -143,7 +145,7 @@ class DreamApplyDataSourceImpl(
             applicantDto: DreamApplyApplicantDto,
             import: Import
     ): Document? {
-        val programmeLevel = import.programmeCode.substring(0, 2)
+        val programmeLevel = import.programmeCode.substring(1, 2)
         val levelType = EducationLevelType.values().find {
             it.programmeLevel == programmeLevel
         }

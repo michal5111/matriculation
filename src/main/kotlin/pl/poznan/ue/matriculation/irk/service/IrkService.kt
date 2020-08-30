@@ -150,7 +150,9 @@ class IrkService(
             paid: Boolean,
             programme: String?,
             registration: String?,
-            pageNumber: Int?): Page<IrkApplicationDTO> {
+            pageNumber: Int?,
+            pageLength: Int?
+    ): Page<IrkApplicationDTO> {
         val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("${apiUrl}applications/")
         if (admitted) {
             uriComponentBuilder.queryParam("admitted", admitted)
@@ -166,6 +168,9 @@ class IrkService(
         }
         if (pageNumber != null) {
             uriComponentBuilder.queryParam("page", pageNumber)
+        }
+        pageNumber?.let {
+            uriComponentBuilder.queryParam("page_length", pageLength)
         }
         val httpHeaders = HttpHeaders()
         httpHeaders.contentType = MediaType.APPLICATION_JSON

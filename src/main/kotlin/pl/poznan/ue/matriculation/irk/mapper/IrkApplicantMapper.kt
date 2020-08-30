@@ -166,7 +166,7 @@ class IrkApplicantMapper {
             applicantDto.educationData.let {
                 applicant.educationData.apply {
                     documents.clear()
-                    documents.addAll(it.documents.filter { document ->
+                    it.documents.filter { document ->
                         document.issueDate != null && !document.documentNumber.isNullOrBlank()
                     }.map { documentDto ->
                         Document(
@@ -184,7 +184,9 @@ class IrkApplicantMapper {
                                 issueInstitutionUsosCode = documentDto.issueInstitutionUsosCode,
                                 modificationDate = documentDto.modificationDate
                         )
-                    })
+                    }.let {
+                        documents.addAll(it)
+                    }
                     highSchoolCity = it.highSchoolCity
                     highSchoolName = it.highSchoolName
                     highSchoolType = it.highSchoolType
@@ -211,7 +213,7 @@ class IrkApplicantMapper {
         contactDataDTO.phoneNumber?.let {
             applicant.phoneNumbers.add(
                     PhoneNumber(
-                            number = contactDataDTO.phoneNumber,
+                            number = it,
                             phoneNumberType = contactDataDTO.phoneNumberType!!,
                             comment = "Podstawowy numer telefonu",
                             applicant = applicant
@@ -224,7 +226,7 @@ class IrkApplicantMapper {
         contactDataDTO.phoneNumber2?.let {
             applicant.phoneNumbers.add(
                     PhoneNumber(
-                            number = contactDataDTO.phoneNumber2,
+                            number = it,
                             phoneNumberType = contactDataDTO.phoneNumber2Type!!,
                             comment = "Alternatywny numer telefonu",
                             applicant = applicant
@@ -234,40 +236,36 @@ class IrkApplicantMapper {
     }
 
     private fun addAddresses(applicant: Applicant, contactDataDTO: ContactDataDTO) {
-        contactDataDTO.let {
-            if (!(it.officialCity.isNullOrBlank()
-                            || it.officialStreet.isNullOrBlank()
-                            || it.officialCountry.isNullOrBlank())) {
-                applicant.addresses.add(
-                        Address(
-                                addressType = AddressType.PERMANENT,
-                                city = it.officialCity,
-                                cityIsCity = it.officialCityIsCity,
-                                countryCode = it.officialCountry,
-                                flatNumber = it.officialFlatNumber,
-                                postalCode = it.officialPostCode,
-                                street = it.officialStreet,
-                                streetNumber = it.officialStreetNumber,
-                                applicant = applicant
-                        )
-                )
-            }
-            if (!(it.realCity.isNullOrBlank()
-                            || it.realStreet.isNullOrBlank()
-                            || it.realCountry.isNullOrBlank())) {
-                applicant.addresses.add(
-                        Address(
-                                addressType = AddressType.RESIDENCE,
-                                city = it.realCity,
-                                cityIsCity = it.realCityIsCity,
-                                countryCode = it.realCountry,
-                                flatNumber = it.realFlatNumber,
-                                postalCode = it.realPostCode,
-                                street = it.realStreet,
-                                streetNumber = it.realStreetNumber,
-                                applicant = applicant
-                        )
-                )
+        contactDataDTO.run {
+            mutableListOf(
+                    Address(
+                            addressType = AddressType.PERMANENT,
+                            city = officialCity,
+                            cityIsCity = officialCityIsCity,
+                            countryCode = officialCountry,
+                            flatNumber = officialFlatNumber,
+                            postalCode = officialPostCode,
+                            street = officialStreet,
+                            streetNumber = officialStreetNumber,
+                            applicant = applicant
+                    ),
+                    Address(
+                            addressType = AddressType.RESIDENCE,
+                            city = realCity,
+                            cityIsCity = realCityIsCity,
+                            countryCode = realCountry,
+                            flatNumber = realFlatNumber,
+                            postalCode = realPostCode,
+                            street = realStreet,
+                            streetNumber = realStreetNumber,
+                            applicant = applicant
+                    )
+            ).filter { address ->
+                !(address.city.isNullOrBlank()
+                        || address.street.isNullOrBlank()
+                        || address.countryCode.isNullOrBlank())
+            }.let { list ->
+                applicant.addresses.addAll(list)
             }
         }
     }
