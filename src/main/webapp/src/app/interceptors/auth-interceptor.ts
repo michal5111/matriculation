@@ -5,6 +5,7 @@ import {tap} from 'rxjs/operators';
 import {MatDialog} from '@angular/material/dialog';
 import {UnauthorizedDialogComponent} from '../component/dialog/unauthorized-dialog/unauthorized-dialog.component';
 import {UserService} from '../service/user-service/user.service';
+import {ForbiddenDialogComponent} from '../component/dialog/forbidden-dialog/forbidden-dialog.component';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -31,7 +32,7 @@ export class AuthInterceptor implements HttpInterceptor {
             this.userService.isAuthenticated = false;
           }
           if (err.status === 403) {
-            const dialogRef = this.dialog.open(UnauthorizedDialogComponent, {
+            const dialogRef = this.dialog.open(ForbiddenDialogComponent, {
               width: '250px'
             });
           }

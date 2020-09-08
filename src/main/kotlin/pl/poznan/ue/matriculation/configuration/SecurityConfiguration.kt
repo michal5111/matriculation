@@ -26,12 +26,13 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
+import pl.poznan.ue.matriculation.local.service.UserService
 import pl.poznan.ue.matriculation.security.CustomUserDetailsService
 
 @Configuration
 @EnableWebSecurity
 @Order(2)
-class SecurityConfiguration : WebSecurityConfigurerAdapter() {
+class SecurityConfiguration(val userService: UserService) : WebSecurityConfigurerAdapter() {
     @Value("\${cas.service.login}")
     private lateinit var casUrlLogin: String
 
@@ -53,21 +54,11 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Value("\${pl.poznan.ue.matriculation.admin.userName}")
     private lateinit var appAdminUsernames: List<String>
 
-    @Value("\${pl.poznan.ue.matriculation.user.userName}")
-    private lateinit var appUserUsernames: List<String>
-
     @Bean
     fun adminList(): Set<String> {
         val admins = HashSet<String>()
         admins.addAll(appAdminUsernames)
         return admins
-    }
-
-    @Bean
-    fun userList(): Set<String> {
-        val users = HashSet<String>()
-        users.addAll(appUserUsernames)
-        return users
     }
 
     @Bean
@@ -90,7 +81,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
 
     @Bean
     fun customUserDetailsService(): AuthenticationUserDetailsService<CasAssertionAuthenticationToken> {
-        return CustomUserDetailsService(adminList(), userList())
+        return CustomUserDetailsService(adminList(), userService)
     }
 
     @Bean

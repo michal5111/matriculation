@@ -24,7 +24,7 @@ class IrkApplicationDataSourceImpl(
         private val irkApplicationMapper: IrkApplicationMapper
 ) : IApplicationDataSource<IrkApplicationDTO, IrkApplicantDto> {
 
-    override fun getApplicationsPage(registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<IrkApplicationDTO> {
+    override fun getApplicationsPage(import: Import, registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<IrkApplicationDTO> {
         val page = irkService.getApplications(
                 admitted = true,
                 paid = true,

@@ -37,7 +37,7 @@ class ImportService(
             didacticCycleCode: String,
             dataSourceType: String
     ): Import {
-        if (importRepository.existsByProgrammeForeignIdAndRegistration(programmeForeignId, registration)) {
+        if (importRepository.existsByProgrammeForeignIdAndRegistrationAndStageCode(programmeForeignId, registration, stageCode)) {
             throw ImportCreationException("Import tego programu już istnieje.")
         }
         if (!programmeRepository.existsById(programmeCode)) {

@@ -1,6 +1,7 @@
 package pl.poznan.ue.matriculation.controllers
 
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
@@ -11,11 +12,9 @@ import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.domain.import.ImportProgress
+import pl.poznan.ue.matriculation.local.domain.user.User
 import pl.poznan.ue.matriculation.local.dto.*
-import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceService
-import pl.poznan.ue.matriculation.local.service.ApplicationService
-import pl.poznan.ue.matriculation.local.service.AsyncService
-import pl.poznan.ue.matriculation.local.service.ImportService
+import pl.poznan.ue.matriculation.local.service.*
 import pl.poznan.ue.matriculation.oracle.dto.IndexTypeDto
 import pl.poznan.ue.matriculation.oracle.service.UsosService
 
@@ -26,7 +25,8 @@ class RestController(
         private val importService: ImportService,
         private val asyncService: AsyncService,
         private val usosService: UsosService,
-        private val applicationService: ApplicationService
+        private val applicationService: ApplicationService,
+        private val userService: UserService
 ) {
 
     @Value("\${pl.poznan.ue.matriculation.usos.url}")
@@ -149,7 +149,7 @@ class RestController(
     }
 
     @GetMapping("/import")
-    fun getImportsPage(pageable: Pageable): org.springframework.data.domain.Page<Import> = importService.getAll(pageable)
+    fun getImportsPage(pageable: Pageable): Page<Import> = importService.getAll(pageable)
 
 
     @DeleteMapping("/import/{id}")
@@ -200,5 +200,27 @@ class RestController(
     @GetMapping("/usos/url")
     fun getUsosUrl(): UrlDto {
         return UrlDto(usosUrl)
+    }
+
+    @PostMapping("/user")
+    fun createUser(@RequestBody userDto: UserDto): User {
+        return userService.save(
+                User(uid = userDto.uid)
+        )
+    }
+
+    @PutMapping("/user")
+    fun updateUser(@RequestBody userDto: UserDto): User {
+        return userService.update(userDto)
+    }
+
+    @DeleteMapping("/user/{id}")
+    fun deleteUser(@PathVariable("id") id: Long) {
+        return userService.delete(id)
+    }
+
+    @GetMapping("/users")
+    fun getAllUsers(pageable: Pageable): Page<User> {
+        return userService.getAll(pageable)
     }
 }

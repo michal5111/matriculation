@@ -14,6 +14,6 @@ interface ImportRepository : JpaRepository<Import, Long>, PagingAndSortingReposi
     @Query("select new pl.poznan.ue.matriculation.local.dto.ImportDtoJpa(i.programmeCode, i.programmeForeignId, i.registration, i.indexPoolCode, i.startDate, i.dateOfAddmision, i.stageCode, i.didacticCycleCode, i.dataSourceId) from Import i where i.id = :id")
     fun getDtoById(@Param("id") importId: Long): ImportDtoJpa
 
-    fun existsByProgrammeForeignIdAndRegistration(programmeForeignId: String, registration: String): Boolean
+    fun existsByProgrammeForeignIdAndRegistrationAndStageCode(programmeForeignId: String, registration: String, stageCode: String): Boolean
 
 }

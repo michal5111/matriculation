@@ -24,13 +24,13 @@ open class DreamApplyDataSourceImpl(
         private val decision: String
 ) : IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
 
-    override fun getApplicationsPage(registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<DreamApplyApplicationDto> {
+    override fun getApplicationsPage(import: Import, registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<DreamApplyApplicationDto> {
         val applicationMap = dreamApplyService.getApplicationsByFilter(
                 academicTermID = registrationCode,
                 additionalFilters = mapOf(
                         "byCourseIDs" to programmeForeignId,
-                        "byOfferTypes" to status,
-                        "byOfferDecisions" to decision
+                        "byOfferTypes" to status
+//                        "byOfferDecisions" to decision
                 )
         ) ?: throw java.lang.IllegalArgumentException("Unable to get applicants")
         val applications = applicationMap.values.filter { dreamApplyApplicationDto ->

@@ -10,11 +10,11 @@ import {APP_BASE_HREF, Location} from '@angular/common';
 export class AppComponent {
   title = 'matriculation';
 
-  constructor(public _userService: UserService, @Inject(APP_BASE_HREF) public baseHref: string, public location: Location) {
+  constructor(public userService: UserService, @Inject(APP_BASE_HREF) public baseHref: string, public location: Location) {
     this.getUser();
   }
 
   getUser() {
-    this._userService.getUser().subscribe();
+    this.userService.getUser().subscribe();
   }
 }

@@ -10,10 +10,11 @@ import pl.poznan.ue.matriculation.local.domain.const.IdentityDocumentType
 import pl.poznan.ue.matriculation.local.domain.const.PhoneNumberType
 import pl.poznan.ue.matriculation.local.domain.const.PhotoPermissionType
 import pl.poznan.ue.matriculation.local.domain.enum.AddressType
+import pl.poznan.ue.matriculation.oracle.repo.SchoolRepository
 import java.text.SimpleDateFormat
 import java.util.*
 
-open class DreamApplyApplicantMapper {
+open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
 
     private val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
     private val maturaRegex = "M/[0-9]{8}/[0-9]{2}".toRegex()
@@ -194,7 +195,7 @@ open class DreamApplyApplicantMapper {
                     certificateTypeCode = it.level.toString(),
                     certificateUsosCode = it.level.usosCode ?: when {
                         it.diploma!!.number!!.matches(maturaRegex) -> 'N'
-                        else -> null
+                        else -> 'Z'
                     },
                     comment = null,
                     documentNumber = it.diploma!!.number!!,
@@ -212,7 +213,11 @@ open class DreamApplyApplicantMapper {
                         extraDto.id == 212L && extraDto.name == "Please select your OKE"
                     }?.value?.let { okeName ->
                         okeMap[okeName]
-                    },
+                    } ?: it.institution?.let { schoolName ->
+                        schoolRepository.findByNameIgnoreCase("%${schoolName.trim()}%")
+                    }
+                    ?: if (it.institution?.trim()?.toUpperCase() == "POZNAN UNIVERSITY OF ECONOMICS AND BUSINESS") 110825L
+                    else null,
                     modificationDate = Date()
             )
         }?.let {
@@ -283,7 +288,7 @@ open class DreamApplyApplicantMapper {
                             cityIsCity = false,
                             countryCode = addressDto.country,
                             postalCode = addressDto.postalcode,
-                            street = addressDto.street,
+                            street = addressDto.street?.replace("\n", " "),
                             streetNumber = addressDto.house,
                             flatNumber = addressDto.apartment
                     ),
@@ -294,7 +299,7 @@ open class DreamApplyApplicantMapper {
                             cityIsCity = false,
                             countryCode = addressDto.correspondence?.country,
                             postalCode = addressDto.correspondence?.postalcode,
-                            street = addressDto.correspondence?.street,
+                            street = addressDto.correspondence?.street?.replace("\n", " "),
                             streetNumber = addressDto.correspondence?.house ?: dreamApplyApplication.extras?.find {
                                 it.name == "House number"
                             }?.value,

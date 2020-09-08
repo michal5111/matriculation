@@ -10,7 +10,7 @@ import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
 
 interface IApplicationDataSource<applicationDTO : AbstractApplicationDto, applicantDTO : AbstractApplicantDto> {
-    fun getApplicationsPage(registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<applicationDTO>
+    fun getApplicationsPage(import: Import, registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<applicationDTO>
 
     fun getApplicantById(applicantId: Long): applicantDTO
 

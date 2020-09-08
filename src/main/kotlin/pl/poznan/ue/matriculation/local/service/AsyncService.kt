@@ -39,7 +39,8 @@ class AsyncService(
                 val page = applicantDataSource.getApplicationsPage(
                         programmeForeignId = import.programmeForeignId,
                         registrationCode = import.registration,
-                        pageNumber = currentPage
+                        pageNumber = currentPage,
+                        import = import
                 )
                 logger.debug("Pobrałem osoby...")
                 if (set) {

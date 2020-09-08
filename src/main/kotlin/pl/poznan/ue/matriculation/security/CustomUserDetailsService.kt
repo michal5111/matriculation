@@ -7,11 +7,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import pl.poznan.ue.matriculation.local.service.UserService
 import java.util.*
 
 internal class CustomUserDetailsService(
-        private val admins: Set<String>?,
-        private val users: Set<String>?
+        private val admins: Set<String>,
+        private val userService: UserService
 ) : AuthenticationUserDetailsService<CasAssertionAuthenticationToken> {
 
     private val log = LoggerFactory.getLogger(CustomUserDetailsService::class.java)
@@ -24,23 +25,16 @@ internal class CustomUserDetailsService(
         log.debug("Authenticating '{}'", login)
         val grantedAuthorities = ArrayList<GrantedAuthority>()
 
-        if (admins != null && admins.contains(lowercaseLogin)) {
-            grantedAuthorities.add(SimpleGrantedAuthority(ADMIN))
-        } else if (users != null && users.contains(lowercaseLogin)) {
-            grantedAuthorities.add(SimpleGrantedAuthority(USER))
-        } else {
-            grantedAuthorities.add(SimpleGrantedAuthority(ANONYMOUS))
+        val user = userService.getByUid(lowercaseLogin)
+
+        if (admins.contains(lowercaseLogin)) {
+            grantedAuthorities.add(SimpleGrantedAuthority("ROLE_ADMIN"))
+        }
+
+        user?.roles?.forEach {
+            grantedAuthorities.add(SimpleGrantedAuthority(it.role.code))
         }
 
         return CasUserDetails(lowercaseLogin, grantedAuthorities, token.assertion)
-    }
-
-    companion object {
-
-        const val ADMIN = "ROLE_ADMIN"
-
-        const val USER = "ROLE_USER"
-
-        const val ANONYMOUS = "ROLE_ANONYMOUS"
     }
 }

@@ -27,6 +27,8 @@ import {UpdateIndexNumberDialogComponent} from './component/dialog/update-index-
 import {FooterComponent} from './component/footer/footer.component';
 import {ConfirmationDialogComponent} from './component/dialog/confirmation-dialog/confirmation-dialog.component';
 import {ErrorDialogComponent} from './component/dialog/error-dialog/error-dialog.component';
+import {UserManagerComponent} from './component/user-manager/user-manager.component';
+import {UserEditorComponent} from './component/dialog/user-editor/user-editor.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +47,9 @@ import {ErrorDialogComponent} from './component/dialog/error-dialog/error-dialog
     UpdateIndexNumberDialogComponent,
     FooterComponent,
     ConfirmationDialogComponent,
-    ErrorDialogComponent
+    ErrorDialogComponent,
+    UserManagerComponent,
+    UserEditorComponent
   ],
   imports: [
     BrowserModule,

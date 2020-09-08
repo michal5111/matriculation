@@ -20,6 +20,7 @@ import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
 import pl.poznan.ue.matriculation.irk.mapper.IrkApplicantMapper
 import pl.poznan.ue.matriculation.irk.mapper.IrkApplicationMapper
 import pl.poznan.ue.matriculation.irk.service.IrkService
+import pl.poznan.ue.matriculation.oracle.repo.SchoolRepository
 
 @Configuration
 class ApplicationDataSourceConfiguration {
@@ -64,13 +65,14 @@ class ApplicationDataSourceConfiguration {
 
     @Bean(name = ["IncomingApplicantDataSource"])
     fun incomingApplicantDataSource(
-            @Autowired @Qualifier("IncomingService") IncomingService: DreamApplyService
+            @Autowired @Qualifier("IncomingService") IncomingService: DreamApplyService,
+            @Autowired schoolRepository: SchoolRepository
     ): IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
         return IncomingDataSourceImpl(
                 dreamApplyService = IncomingService,
                 name = "Incoming",
                 id = "INCOMING",
-                applicantMapper = IncomingApplicantMapper(),
+                applicantMapper = IncomingApplicantMapper(schoolRepository),
                 applicationMapper = DreamApplyApplicationMapper(),
                 status = "Enrolled",
                 decision = "None"
@@ -87,13 +89,14 @@ class ApplicationDataSourceConfiguration {
 
     @Bean(name = ["DreamApplyApplicantDataSource"])
     fun dreamApplyApplicantDataSource(
-            @Autowired @Qualifier("DreamApplyService") dreamApplyService: DreamApplyService
+            @Autowired @Qualifier("DreamApplyService") dreamApplyService: DreamApplyService,
+            @Autowired schoolRepository: SchoolRepository
     ): IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
         return DreamApplyDataSourceImpl(
                 dreamApplyService = dreamApplyService,
                 name = "Dream Apply",
                 id = "DREAM_APPLY",
-                applicantMapper = DreamApplyApplicantMapper(),
+                applicantMapper = DreamApplyApplicantMapper(schoolRepository),
                 applicationMapper = DreamApplyApplicationMapper(),
                 status = "Enrolled",
                 decision = "Final"

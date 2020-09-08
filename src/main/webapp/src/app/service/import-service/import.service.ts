@@ -7,8 +7,8 @@ import {Application} from '../../model/applications/application';
 import {ImportProgress} from '../../model/import/import-progress';
 import {Registration} from '../../model/applications/registration';
 import {APP_BASE_HREF} from '@angular/common';
-import {DataSource} from "../../model/import/dataSource";
-import {Programme} from "../../model/applications/programme";
+import {DataSource} from '../../model/import/dataSource';
+import {Programme} from '../../model/applications/programme';
 
 const httpOptions = {
   headers: new HttpHeaders({

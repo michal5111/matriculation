@@ -145,9 +145,9 @@ class PersonProgramme(
         @JoinColumn(name = "KOD_ISCED", referencedColumnName = "KOD")
         var iscedCode: IscedCode? = null,
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "PODST_PODJ_STD_KOD", referencedColumnName = "KOD")
-        var groundsForUndertakingStudies: GroundsForUndertakingStudies? = null,
+//        @ManyToOne(fetch = FetchType.LAZY)
+//        @JoinColumn(name = "PODST_PODJ_STD_KOD", referencedColumnName = "KOD")
+//        var groundsForUndertakingStudies: GroundsForUndertakingStudies? = null,
 
         @OneToMany(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
         val personStages: MutableList<PersonStage> = mutableListOf(),

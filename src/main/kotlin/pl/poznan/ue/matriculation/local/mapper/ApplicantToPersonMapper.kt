@@ -72,7 +72,7 @@ class ApplicantToPersonMapper(
                             comments = it.comment
                     )
                 }.toMutableList(),
-                idNumber = applicant.identityDocuments[0].number,
+                idNumber = applicant.identityDocuments[0].number?.replace(" ", "")?.trim(),
                 documentType = applicant.identityDocuments[0].number?.let {
                     applicant.identityDocuments[0].type
                 },

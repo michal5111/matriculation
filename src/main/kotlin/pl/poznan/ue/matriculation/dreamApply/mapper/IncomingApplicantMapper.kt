@@ -5,8 +5,9 @@ import pl.poznan.ue.matriculation.dreamApply.dto.application.HomeDto
 import pl.poznan.ue.matriculation.local.domain.applicants.*
 import pl.poznan.ue.matriculation.local.domain.enum.AccommodationPreference
 import pl.poznan.ue.matriculation.local.domain.enum.DurationType
+import pl.poznan.ue.matriculation.oracle.repo.SchoolRepository
 
-class IncomingApplicantMapper : DreamApplyApplicantMapper() {
+class IncomingApplicantMapper(schoolRepository: SchoolRepository) : DreamApplyApplicantMapper(schoolRepository) {
 
     override fun map(dreamApplyApplicantDto: DreamApplyApplicantDto): Applicant {
         return super.map(dreamApplyApplicantDto).also {

@@ -8,6 +8,7 @@ import {PersonComponent} from './component/oracle/person/person.component';
 import {PersonsComponent} from './component/oracle/persons/persons.component';
 import {ImportComponent} from './component/import/import/import.component';
 import {ImportViewComponent} from './component/import/import-view/import-view.component';
+import {UserManagerComponent} from './component/user-manager/user-manager.component';
 
 const routes: Routes = [
   {path: 'applicantsearch', component: ApplicantSearchComponent},
@@ -16,6 +17,7 @@ const routes: Routes = [
   {path: 'person/:id', component: PersonComponent},
   {path: 'persons', component: PersonsComponent},
   {path: 'import', component: ImportComponent},
+  {path: 'userManager', component: UserManagerComponent},
   {path: 'import/:id', component: ImportViewComponent},
   {path: '', component: HomeComponent}
 ];

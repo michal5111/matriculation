@@ -5,6 +5,7 @@ import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicati
 import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicantMapper
 import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicationMapper
 import pl.poznan.ue.matriculation.dreamApply.service.DreamApplyService
+import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 
 class IncomingDataSourceImpl(
@@ -27,16 +28,22 @@ class IncomingDataSourceImpl(
 
     val programmePattern = "^([SNsn])([123])-\\w*".toRegex()
 
-    override fun getApplicationsPage(registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<DreamApplyApplicationDto> {
+    override fun getApplicationsPage(import: Import, registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<DreamApplyApplicationDto> {
         val programmeForeignIdSplit = programmeForeignId.split(";")
         val programmeId = programmeForeignIdSplit[0]
         val flagId = programmeForeignIdSplit[1]
+        val semester = import.stageCode.substring(0, 2)
+        val semesterFlagId = dreamApplyService.getAllFlags()?.filter {
+            it.value.name == "${semester[0]}-${semester[1]}"
+        }?.map {
+            it.key
+        }?.firstOrNull()
         val applicationMap = dreamApplyService.getApplicationsByFilter(
                 academicTermID = registrationCode,
                 additionalFilters = mapOf(
                         "byCourseIDs" to programmeId,
                         "byOfferTypes" to status,
-                        "byOfferDecisions" to decision,
+                        //"byOfferDecisions" to decision,
                         "byFlagIDs" to flagId
                 )
         ) ?: throw java.lang.IllegalArgumentException("Unable to get applicants")
@@ -45,7 +52,12 @@ class IncomingDataSourceImpl(
             applicationOffers!!.any {
                 it.value.course == "/api/courses/$programmeId"
                         && it.value.type == status
-                        && it.value.decision == decision
+                //&& it.value.decision == decision
+            }
+        }.filter { dreamApplyApplicationDto ->
+            val applicationFlags = dreamApplyService.getApplicationFlags(dreamApplyApplicationDto.flags)
+            applicationFlags!!.any {
+                it.key == semesterFlagId
             }
         }
         return object : IPage<DreamApplyApplicationDto> {

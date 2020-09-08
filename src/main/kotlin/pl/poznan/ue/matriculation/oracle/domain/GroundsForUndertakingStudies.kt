@@ -1,6 +1,9 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.Table
 
 @Entity
 @Table(name = "DZ_PODSTAWY_PODJECIA_STUDIOW")
@@ -16,10 +19,10 @@ class GroundsForUndertakingStudies(
         val descriptionEng: String?,
 
         @Column(name = "CZY_AKTUALNA", length = 1, nullable = false)
-        val isCurrent: Char = 'T',
+        val isCurrent: Char = 'T'
 
-        @OneToMany(mappedBy = "groundsForUndertakingStudies", fetch = FetchType.LAZY)
-        val personProgrammes: MutableList<PersonProgramme>
+//        @OneToMany(mappedBy = "groundsForUndertakingStudies", fetch = FetchType.LAZY)
+//        val personProgrammes: MutableList<PersonProgramme>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

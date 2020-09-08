@@ -4,16 +4,20 @@
       <button mat-button routerLink="/"><img src="./assets/header_logo.svg" height="50" alt="Logo" class="logo"/>Immatrykulator
         5000
       </button>
-      <ng-template [ngIf]="_userService.isAuthenticated">
-        <button mat-button routerLink="/import">Importy</button>
+      <ng-template [ngIf]="userService.isAuthenticated">
+        <button mat-stroked-button class="toolbarButton" routerLink="/import">Importy</button>
+      </ng-template>
+      <ng-template [ngIf]="userService.hasRole('ROLE_ADMIN')">
+        <button mat-stroked-button class="toolbarButton" routerLink="/userManager">Zarządzaj użytkownikami</button>
       </ng-template>
       <span class="fill-remaining-space"></span>
-      <ng-template [ngIf]="_userService.isAuthenticated" [ngIfElse]="loggedOut">
-        <span>{{_userService.user.casAssertion.principal.attributes.givenname}} {{_userService.user.casAssertion.principal.attributes.lastname}}</span>
-        <a mat-button href="{{baseHref}}logout">Wyloguj</a>
+      <ng-template [ngIf]="userService.isAuthenticated" [ngIfElse]="loggedOut">
+        <span>{{userService.user.casAssertion.principal.attributes.givenname}} {{userService.user.casAssertion.principal.attributes.lastname}}</span>
+        <a mat-stroked-button href="{{baseHref}}logout">Wyloguj</a>
       </ng-template>
       <ng-template #loggedOut>
-        <a mat-button href="{{baseHref}}login?service={{baseHref+location.path().slice(1,location.path().length)}}">Zaloguj</a>
+        <a mat-stroked-button
+           href="{{baseHref}}login?service={{baseHref+location.path().slice(1,location.path().length)}}">Zaloguj</a>
       </ng-template>
     </mat-toolbar>
     <router-outlet></router-outlet>
