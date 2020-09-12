@@ -22,23 +22,29 @@ import pl.poznan.ue.matriculation.local.domain.registrations.Registration
 
 class IrkService(
         val serviceUrl: String,
-        private val apiKey: String
+        apiKey: String
 ) {
 
     private var apiUrl: String = "$serviceUrl/api/"
 
     private val restTemplate: RestTemplate = RestTemplate()
 
+    val httpHeaders = HttpHeaders()
+
+    val httpEntity: HttpEntity<Any>
+
     private class PageOfApplicants : ParameterizedTypeReference<Page<IrkApplicantDto>>()
     private class PageOfApplications : ParameterizedTypeReference<Page<IrkApplicationDTO>>()
     private class PageOfRegistrations : ParameterizedTypeReference<Page<RegistrationDTO>>()
     private class MapResult : ParameterizedTypeReference<Map<String, String>>()
 
-    fun getApplicantById(id: Long): IrkApplicantDto? {
-        val httpHeaders = HttpHeaders()
+    init {
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set("Authorization", "Token $apiKey")
-        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
+        httpEntity = HttpEntity(httpHeaders)
+    }
+
+    fun getApplicantById(id: Long): IrkApplicantDto? {
         val response: ResponseEntity<IrkApplicantDto> = restTemplate.exchange(
                 "${apiUrl}applicants/$id",
                 HttpMethod.GET,
@@ -49,10 +55,6 @@ class IrkService(
     }
 
     fun getApplicantsByPesel(pesel: String): Page<IrkApplicantDto>? {
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        httpHeaders.set("Authorization", "Token $apiKey")
-        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         val response: ResponseEntity<Page<IrkApplicantDto>> = restTemplate.exchange(
                 "${apiUrl}applicants/?pesel=$pesel",
                 HttpMethod.GET,
@@ -63,10 +65,6 @@ class IrkService(
     }
 
     fun getApplicantsBySurname(surname: String): Page<IrkApplicantDto>? {
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        httpHeaders.set("Authorization", "Token $apiKey")
-        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         val response: ResponseEntity<Page<IrkApplicantDto>> = restTemplate.exchange(
                 "${apiUrl}applicants/?surname=$surname",
                 HttpMethod.GET,
@@ -77,10 +75,6 @@ class IrkService(
     }
 
     fun getApplicantsByEmail(email: String): Page<IrkApplicantDto>? {
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        httpHeaders.set("Authorization", "Token $apiKey")
-        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         val response: ResponseEntity<Page<IrkApplicantDto>> = restTemplate.exchange(
                 "${apiUrl}applicants/?email=$email",
                 HttpMethod.GET,
@@ -91,10 +85,6 @@ class IrkService(
     }
 
     fun getRegistration(id: String): RegistrationDTO? {
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        httpHeaders.set("Authorization", "Token $apiKey")
-        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         val response: ResponseEntity<RegistrationDTO> = restTemplate.exchange(
                 "${apiUrl}registrations/$id",
                 HttpMethod.GET,
@@ -105,10 +95,6 @@ class IrkService(
     }
 
     fun getAvailableRegistrationsPage(pageNumber: Int): Page<RegistrationDTO>? {
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        httpHeaders.set("Authorization", "Token $apiKey")
-        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         return restTemplate.exchange(
                 "${apiUrl}registrations/?page=$pageNumber",
                 HttpMethod.GET,
@@ -118,10 +104,6 @@ class IrkService(
     }
 
     fun getAvailableRegistrationProgrammes(registrationCode: String): List<String> {
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        httpHeaders.set("Authorization", "Token $apiKey")
-        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         val response: ResponseEntity<RegistrationDTO> = restTemplate.exchange(
                 "${apiUrl}registrations/$registrationCode",
                 HttpMethod.GET,
@@ -132,10 +114,6 @@ class IrkService(
     }
 
     fun getApplication(id: Long): IrkApplicationDTO? {
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        httpHeaders.set("Authorization", "Token $apiKey")
-        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         val response: ResponseEntity<IrkApplicationDTO> = restTemplate.exchange(
                 "${apiUrl}applications/$id",
                 HttpMethod.GET,
@@ -172,10 +150,6 @@ class IrkService(
         pageNumber?.let {
             uriComponentBuilder.queryParam("page_length", pageLength)
         }
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        httpHeaders.set("Authorization", "Token $apiKey")
-        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         val response: ResponseEntity<Page<IrkApplicationDTO>> = restTemplate.exchange(
                 uriComponentBuilder.build().toUri(),
                 HttpMethod.GET,
@@ -200,10 +174,6 @@ class IrkService(
 //    }
 
     fun getProgrammesGroups(id: String): ProgrammeGroupsDTO? {
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        httpHeaders.set("Authorization", "Token $apiKey")
-        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         val response: ResponseEntity<ProgrammeGroupsDTO> = restTemplate.exchange(
                 "${apiUrl}programme-groups/$id",
                 HttpMethod.GET,
@@ -214,10 +184,6 @@ class IrkService(
     }
 
     fun getPhoto(photoUrl: String): ByteArray {
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        httpHeaders.set("Authorization", "Token $apiKey")
-        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         val responseEntity: ResponseEntity<Resource> = restTemplate.exchange(
                 "$serviceUrl$photoUrl",
                 HttpMethod.GET,
@@ -232,10 +198,6 @@ class IrkService(
     }
 
     fun completeImmatriculation(applicationId: Long): ResponseEntity<Map<String, String>> {
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        httpHeaders.set("Authorization", "Token $apiKey")
-        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         return restTemplate.exchange(
                 "${apiUrl}matriculation/${applicationId}/complete/",
                 HttpMethod.POST,
@@ -245,10 +207,6 @@ class IrkService(
     }
 
     fun getMatriculationData(applicationId: Long): MatriculationDataDTO? {
-        val httpHeaders = HttpHeaders()
-        httpHeaders.contentType = MediaType.APPLICATION_JSON
-        httpHeaders.set("Authorization", "Token $apiKey")
-        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
         val response: ResponseEntity<MatriculationDataDTO> = restTemplate.exchange(
                 "${apiUrl}matriculation/${applicationId}/data/",
                 HttpMethod.GET,

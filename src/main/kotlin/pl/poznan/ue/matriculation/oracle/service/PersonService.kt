@@ -186,7 +186,7 @@ class PersonService(
             cityIsCity: Boolean,
             countryCode: String?
     ) {
-        if (city.isNullOrBlank() || street.isNullOrBlank() || zipCode.isNullOrBlank()) {
+        if (city.isNullOrBlank() || street.isNullOrBlank()) {
             return
         }
         val address = addressRepository.findByPersonAndAddressType(person, addressType)

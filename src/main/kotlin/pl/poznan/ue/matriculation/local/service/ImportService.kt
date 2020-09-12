@@ -12,7 +12,6 @@ import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.oracle.repo.DidacticCycleRepository
 import pl.poznan.ue.matriculation.oracle.repo.ProgrammeRepository
-import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -31,8 +30,8 @@ class ImportService(
             programmeForeignId: String,
             registration: String,
             indexPoolCode: String,
-            startDate: String,
-            dateOfAddmision: String,
+            startDate: Date,
+            dateOfAddmision: Date,
             stageCode: String,
             didacticCycleCode: String,
             dataSourceType: String
@@ -46,15 +45,14 @@ class ImportService(
         if (!didacticCycleRepository.existsById(didacticCycleCode)) {
             throw ImportCreationException("Podany cykl dydaktyczny nie istnieje.")
         }
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
         val import = Import(
-                dateOfAddmision = simpleDateFormat.parse(dateOfAddmision),
+                dateOfAddmision = dateOfAddmision,
                 didacticCycleCode = didacticCycleCode,
                 indexPoolCode = indexPoolCode,
                 programmeCode = programmeCode,
                 programmeForeignId = programmeForeignId,
                 registration = registration,
-                startDate = simpleDateFormat.parse(startDate),
+                startDate = startDate,
                 stageCode = stageCode,
                 dataSourceId = dataSourceType
         )

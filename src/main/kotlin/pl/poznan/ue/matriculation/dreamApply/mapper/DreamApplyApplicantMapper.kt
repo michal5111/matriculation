@@ -37,8 +37,8 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 foreignId = dreamApplyApplicantDto.id,
                 name = Name(
                         given = dreamApplyApplicantDto.name.given.nameCapitalize(),
-                        middle = dreamApplyApplicantDto.name.middle.takeIf {
-                            !it.isNullOrBlank()
+                        middle = dreamApplyApplicantDto.name.middle.takeUnless {
+                            it.isNullOrBlank()
                         }?.nameCapitalize(),
                         family = dreamApplyApplicantDto.name.family.nameCapitalize(),
                         maiden = null
@@ -306,7 +306,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                             flatNumber = addressDto.correspondence?.apartment
                     )
             ).filterNot {
-                it.countryCode.isNullOrBlank() || it.street.isNullOrBlank()
+                it.countryCode.isNullOrBlank() || it.street.isNullOrBlank() || it.city.isNullOrBlank()
             }.let {
                 applicant.addresses.addAll(it)
             }

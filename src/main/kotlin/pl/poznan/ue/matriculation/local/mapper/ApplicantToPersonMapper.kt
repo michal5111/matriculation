@@ -30,8 +30,8 @@ class ApplicantToPersonMapper(
                 email = applicant.email.takeIf {
                     it.endsWith(universityEmailSuffix)
                 },
-                privateEmail = applicant.email.takeIf {
-                    !it.endsWith(universityEmailSuffix)
+                privateEmail = applicant.email.takeUnless {
+                    it.endsWith(universityEmailSuffix)
                 },
                 name = applicant.name.given,
                 middleName = applicant.name.middle,
@@ -62,8 +62,8 @@ class ApplicantToPersonMapper(
                             cityIsCity = it.cityIsCity,
                             countryCode = it.countryCode
                     )
-                }.filter {
-                    !(it.city.isNullOrBlank() || it.street.isNullOrBlank() || it.zipCode.isNullOrBlank())
+                }.filterNot {
+                    it.city.isNullOrBlank() || it.street.isNullOrBlank()
                 }.toMutableList(),
                 phoneNumbers = applicant.phoneNumbers.map {
                     PhoneNumber(
