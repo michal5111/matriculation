@@ -17,5 +17,5 @@ interface SchoolRepository : JpaRepository<School, Long> {
         or upper(utl_raw.cast_to_varchar2((nlssort(NAZWA, 'nls_sort=binary_ai')))) 
         like upper(utl_raw.cast_to_varchar2((nlssort(:name, 'nls_sort=binary_ai'))))
     """)
-    fun findByNameIgnoreCase(name: String): Long?
+    fun findByNameIgnoreCase(name: String): List<Long>
 }

@@ -11,12 +11,10 @@ import pl.poznan.ue.matriculation.local.domain.const.PhoneNumberType
 import pl.poznan.ue.matriculation.local.domain.const.PhotoPermissionType
 import pl.poznan.ue.matriculation.local.domain.enum.AddressType
 import pl.poznan.ue.matriculation.oracle.repo.SchoolRepository
-import java.text.SimpleDateFormat
 import java.util.*
 
 open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
 
-    private val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
     private val maturaRegex = "M/[0-9]{8}/[0-9]{2}".toRegex()
     private val okeMap = mapOf(
             "OKEGdańsk" to 18243L,
@@ -54,9 +52,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 basicData = BasicData(
                         cityOfBirth = profile.birth?.place,
                         countryOfBirth = profile.birth?.country,
-                        dateOfBirth = profile.birth?.date?.let { birthDate ->
-                            simpleDateFormat.parse(birthDate)
-                        },
+                        dateOfBirth = profile.birth?.date,
                         pesel = profile.nationalidcode?.polish,
                         sex = if (profile.gender == 'M') 'M' else 'K',
                         dataSource = BasicDataDatasourceType.USER
@@ -115,9 +111,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 pesel = profile.nationalidcode?.polish
                 cityOfBirth = profile.birth?.place
                 countryOfBirth = profile.birth?.country
-                dateOfBirth = profile.birth?.date?.let { birthDate ->
-                    simpleDateFormat.parse(birthDate)
-                }
+                dateOfBirth = profile.birth?.date
                 sex = if (profile.gender == 'M') 'M' else 'K'
             }
             additionalData.apply {
@@ -153,7 +147,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 applicant.identityDocuments.add(
                         IdentityDocument(
                                 type = IdentityDocumentType.ID_CARD,
-                                number = this,
+                                number = this.replace(" ", ""),
                                 country = null,
                                 expDate = null,
                                 applicant = applicant
@@ -165,11 +159,9 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                         IdentityDocument(
                                 type = IdentityDocumentType.PASSPORT,
                                 country = it.country,
-                                expDate = it.expiry?.let { expiryDate ->
-                                    simpleDateFormat.parse(expiryDate)
-                                },
+                                expDate = it.expiry,
                                 applicant = applicant,
-                                number = this
+                                number = this.replace(" ", "")
                         )
                 )
             }
@@ -187,7 +179,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
         }
 
         applicationDto.education?.filter {
-            !it.diploma?.number.isNullOrBlank() && it.level != null && !it.diploma?.issue?.date.isNullOrBlank()
+            !it.diploma?.number.isNullOrBlank() && it.level != null && it.diploma?.issue?.date != null
         }?.map {
             Document(
                     educationData = applicant.educationData,
@@ -199,15 +191,14 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                     },
                     comment = null,
                     documentNumber = it.diploma!!.number!!,
-                    documentYear = it.diploma.issue!!.date!!.let { dateString ->
-                        val date = simpleDateFormat.parse(dateString)
+                    documentYear = it.diploma.issue!!.date!!.let { date ->
                         val cal = Calendar.getInstance()
                         cal.time = date
                         cal.get(Calendar.YEAR)
                     },
                     issueCity = it.city,
                     issueCountry = it.country,
-                    issueDate = simpleDateFormat.parse(it.diploma.issue.date),
+                    issueDate = it.diploma.issue.date!!,
                     issueInstitution = it.institution,
                     issueInstitutionUsosCode = applicationDto.extras?.find { extraDto ->
                         extraDto.id == 212L && extraDto.name == "Please select your OKE"
@@ -215,7 +206,9 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                         okeMap[okeName]
                     } ?: it.institution?.let { schoolName ->
                         schoolRepository.findByNameIgnoreCase("%${schoolName.trim()}%")
-                    }
+                    }.takeIf { idList ->
+                        idList?.size == 1
+                    }?.get(0)
                     ?: if (it.institution?.trim()?.toUpperCase() == "POZNAN UNIVERSITY OF ECONOMICS AND BUSINESS") 110825L
                     else null,
                     modificationDate = Date()

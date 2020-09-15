@@ -140,7 +140,7 @@ class PersonService(
             }
         }
         val identityDocument = applicant.identityDocuments.find {
-            person.idNumber == it.number
+            person.idNumber?.replace(" ", "") == it.number
         } ?: applicant.identityDocuments[0]
         identityDocument.number?.let {
             if (person.documentType != identityDocument.type) {
@@ -363,7 +363,7 @@ class PersonService(
         application.applicant?.erasmusData?.let {
             val didacticCycle = didacticCycleRepository.getOne(didacticCycleCode)
             val didacticCycleYear = didacticCycleRepository.findDidacticCycleYearBySemesterDates(didacticCycle.dateFrom, didacticCycle.dateTo)
-                    ?: throw EntityNotFoundException("Unable to find didactic Cycle year")
+                    ?: throw EntityNotFoundException("Nie można znaleźć cyklu dydaktycznego")
             person.personArrivals.add(
                     Arrival(
                             person = person,
@@ -382,7 +382,7 @@ class PersonService(
                             },
                             endDate = if (it.duration == DurationType.ONE_SEMESTER) didacticCycle.endDate
                             else didacticCycleRepository.getNextDidacticCycleEndDate(didacticCycleCode)
-                                    ?: throw IllegalStateException("Unable to get next didactic cycle"),
+                                    ?: throw IllegalStateException("Nie można znaleźć cyklu dydaktycznego"),
                             stayTimePlan = when {
                                 it.duration == DurationType.TWO_SEMESTERS -> 'R'
                                 didacticCycle.description.startsWith("semestr letni") -> 'L'
