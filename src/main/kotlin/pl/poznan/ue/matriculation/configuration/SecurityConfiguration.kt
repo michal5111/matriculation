@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.configuration
 
 import org.jasig.cas.client.session.SingleSignOutFilter
-import org.jasig.cas.client.validation.Cas20ServiceTicketValidator
+import org.jasig.cas.client.validation.Cas30ServiceTicketValidator
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -74,7 +74,7 @@ class SecurityConfiguration(val userService: UserService) : WebSecurityConfigure
         val casAuthenticationProvider = CasAuthenticationProvider()
         casAuthenticationProvider.setAuthenticationUserDetailsService(customUserDetailsService())
         casAuthenticationProvider.setServiceProperties(serviceProperties())
-        casAuthenticationProvider.setTicketValidator(cas20ServiceTicketValidator())
+        casAuthenticationProvider.setTicketValidator(cas30ServiceTicketValidator())
         casAuthenticationProvider.setKey("an_id_for_this_auth_provider_only")
         return casAuthenticationProvider
     }
@@ -90,8 +90,8 @@ class SecurityConfiguration(val userService: UserService) : WebSecurityConfigure
     }
 
     @Bean
-    fun cas20ServiceTicketValidator(): Cas20ServiceTicketValidator {
-        return Cas20ServiceTicketValidator(casValidateUrl)
+    fun cas30ServiceTicketValidator(): Cas30ServiceTicketValidator {
+        return Cas30ServiceTicketValidator(casValidateUrl)
     }
 
     @Bean

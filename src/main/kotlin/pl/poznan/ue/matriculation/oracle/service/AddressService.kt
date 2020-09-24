@@ -67,8 +67,10 @@ class AddressService(
             }
             countryCode?.let {
                 if (it == "PL" && zipCode?.length == 5) {
+                    this.foreignZipCode = null
                     this.zipCode = zipCode
                 } else {
+                    this.zipCode = null
                     this.foreignZipCode = zipCode
                 }
             }

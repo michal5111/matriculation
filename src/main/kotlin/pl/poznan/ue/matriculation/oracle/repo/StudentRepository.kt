@@ -12,4 +12,6 @@ interface StudentRepository : JpaRepository<Student, Long> {
     fun findByPersonAndIndexType(person: Person, indexType: IndexType): Student?
 
     fun findByPersonIdAndIndexTypeCode(personId: Long, indexTypeCode: String): Student?
+
+    fun findByPersonAndMainIndex(person: Person, isMain: Char): Student?
 }

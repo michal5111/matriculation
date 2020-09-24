@@ -138,10 +138,14 @@ export class ImportComponent implements OnInit, OnDestroy {
       case 'SAVING':
       case 'COMPLETE':
       case 'COMPLETED_WITH_ERRORS':
+      case 'ARCHIVED':
+        return true;
       case 'IMPORTED':
+      case 'ERROR':
+      case 'PENDING':
         return importObject.importProgress.importedApplications > 0;
       default:
-        return false;
+        return true;
     }
   }
 

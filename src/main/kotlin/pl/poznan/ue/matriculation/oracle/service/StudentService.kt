@@ -73,6 +73,14 @@ class StudentService(
                 mainIndex = 'T',
                 person = person
         )
+        if (student.organizationalUnit.code == defaultStudentOrganizationalUnitString) {
+            val findByPersonAndMainIndex = studentRepository.findByPersonAndMainIndex(person, 'T')
+            findByPersonAndMainIndex?.apply {
+                mainIndex = 'N'
+            }?.let {
+                studentRepository.save(it)
+            }
+        }
         person.student.add(student)
         return student
     }

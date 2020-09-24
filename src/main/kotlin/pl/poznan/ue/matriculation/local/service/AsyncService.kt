@@ -29,6 +29,7 @@ class AsyncService(
     @Throws(ImportException::class)
     fun importApplicantsAsync(importId: Long) {
         val import = importRepository.getOne(importId)
+        import.importProgress.error = null
         val applicantDataSource = applicationDataSourceService.getDataSource(import.dataSourceId)
         var currentPage = 1
         var hasNext: Boolean

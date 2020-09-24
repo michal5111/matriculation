@@ -148,8 +148,24 @@ class ImportService(
 //            }
 //        }
         try {
-            importRepository.deleteById(importId)
-            logger.info("Usuwam import $importId")
+            val import = importRepository.getOne(importId)
+            when (import.importProgress.importStatus) {
+                ImportStatus.ARCHIVED -> throw ImportException(importId, "Import został zarchiwizowany.")
+                ImportStatus.STARTED,
+                ImportStatus.SAVING,
+                ImportStatus.ERROR,
+                ImportStatus.IMPORTED,
+                ImportStatus.COMPLETE,
+                ImportStatus.COMPLETED_WITH_ERRORS -> throw ImportStartException(importId, "Zły stan importu.")
+                ImportStatus.PENDING -> {
+                    if (import.importProgress.importedApplications != 0) {
+                        throw IllegalStateException("Liczba kandydatów jest większa od 0")
+                    }
+                    importRepository.deleteById(importId)
+                    logger.info("Usuwam import $importId")
+                }
+                else -> throw IllegalStateException("Nieznany stan")
+            }
         } catch (e: Exception) {
             logger.error("Błąd przy usuwaniu importu", e)
             throw ImportDeleteException("Nie Można usunąć importu: ${e.message}")
