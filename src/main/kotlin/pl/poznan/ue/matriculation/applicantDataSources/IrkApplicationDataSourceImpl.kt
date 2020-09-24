@@ -28,6 +28,7 @@ class IrkApplicationDataSourceImpl(
         val page = irkService.getApplications(
                 admitted = true,
                 paid = true,
+                qualified = true,
                 registration = registrationCode,
                 programme = programmeForeignId,
                 pageNumber = pageNumber,

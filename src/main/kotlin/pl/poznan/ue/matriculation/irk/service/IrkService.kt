@@ -127,6 +127,7 @@ class IrkService(
             admitted: Boolean,
             paid: Boolean,
             programme: String?,
+            qualified: Boolean,
             registration: String?,
             pageNumber: Int?,
             pageLength: Int?
@@ -137,6 +138,9 @@ class IrkService(
         }
         if (paid) {
             uriComponentBuilder.queryParam("paid", paid)
+        }
+        if (qualified) {
+            uriComponentBuilder.queryParam("qualified", qualified)
         }
         registration?.let {
             uriComponentBuilder.queryParam("registration", "^${registration}$")
