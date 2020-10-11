@@ -74,8 +74,7 @@ class ApplicationDataSourceConfiguration {
                 id = "INCOMING",
                 applicantMapper = IncomingApplicantMapper(schoolRepository),
                 applicationMapper = DreamApplyApplicationMapper(),
-                status = "Enrolled",
-                decision = "None"
+                status = "Enrolled"
         )
     }
 
@@ -98,8 +97,7 @@ class ApplicationDataSourceConfiguration {
                 id = "DREAM_APPLY",
                 applicantMapper = DreamApplyApplicantMapper(schoolRepository),
                 applicationMapper = DreamApplyApplicationMapper(),
-                status = "Enrolled",
-                decision = "Final"
+                status = "Everything OK"
         )
     }
 

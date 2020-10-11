@@ -18,6 +18,7 @@ class IdentityDocument(
 
         var country: String?,
 
+        @Temporal(TemporalType.DATE)
         var expDate: Date?,
 
         var number: String?,

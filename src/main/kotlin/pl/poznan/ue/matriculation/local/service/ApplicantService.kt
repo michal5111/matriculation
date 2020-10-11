@@ -81,6 +81,25 @@ class ApplicantService(
                 highSchoolType = null
                 highSchoolUsosCode = null
             }
+            applicant.erasmusData?.apply {
+                accommodationPreference = null
+                homeInstitution?.apply {
+                    departmentName = null
+                    erasmusCode = null
+                    country = null
+                    address = null
+                }
+                coordinatorData?.apply {
+                    email = null
+                    name = null
+                    phone = null
+                }
+                courseData?.apply {
+                    level = null
+                    name = null
+                    term = null
+                }
+            }
             applicant.identityDocuments.clear()
         }
         return applicant

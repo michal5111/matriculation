@@ -17,7 +17,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
 
     private val maturaRegex = "M/[0-9]{8}/[0-9]{2}".toRegex()
     private val okeMap = mapOf(
-            "OKEGdańsk" to 18243L,
+            "OKE Gdańsk" to 18243L,
             "OKE Jaworzno" to 18244L,
             "OKE Kraków" to 18245L,
             "OKE Łomża" to 18246L,
@@ -54,7 +54,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                         countryOfBirth = profile.birth?.country,
                         dateOfBirth = profile.birth?.date,
                         pesel = profile.nationalidcode?.polish,
-                        sex = if (profile.gender == 'M') 'M' else 'K',
+                        sex = if (profile.gender == "M") 'M' else 'K',
                         dataSource = BasicDataDatasourceType.USER
                 ),
                 additionalData = AdditionalData(
@@ -112,7 +112,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 cityOfBirth = profile.birth?.place
                 countryOfBirth = profile.birth?.country
                 dateOfBirth = profile.birth?.date
-                sex = if (profile.gender == 'M') 'M' else 'K'
+                sex = if (profile.gender == "M") 'M' else 'K'
             }
             additionalData.apply {
                 mothersName = profile.family?.mother ?: application.extras?.find {
@@ -280,7 +280,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                             city = addressDto.city,
                             cityIsCity = false,
                             countryCode = addressDto.country,
-                            postalCode = addressDto.postalcode,
+                            postalCode = addressDto.postalcode?.trim()?.replace("-", ""),
                             street = addressDto.street?.replace("\n", " "),
                             streetNumber = addressDto.house,
                             flatNumber = addressDto.apartment
@@ -298,9 +298,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                             }?.value,
                             flatNumber = addressDto.correspondence?.apartment
                     )
-            ).filterNot {
-                it.countryCode.isNullOrBlank() || it.street.isNullOrBlank() || it.city.isNullOrBlank()
-            }.let {
+            ).let {
                 applicant.addresses.addAll(it)
             }
         }

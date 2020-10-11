@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.service
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.jdbc.core.JdbcTemplate
@@ -29,17 +28,14 @@ class StudentService(
         private val studentRepository: StudentRepository,
         private val entitlementDocumentRepository: EntitlementDocumentRepository,
         private val sourceOfFinancingRepository: SourceOfFinancingRepository,
-        private val basisOfAdmissionRepository: BasisOfAdmissionRepository
+        private val basisOfAdmissionRepository: BasisOfAdmissionRepository,
+        @Qualifier("oracleDataSource") private val dataSource: DataSource
 ) {
-
-    @Autowired
-    @Qualifier("oracleDataSource")
-    private lateinit var dataSource: DataSource
 
     private lateinit var jdbcCall: SimpleJdbcCall
 
     @Value("\${pl.poznan.ue.matriculation.defaultStudentOrganizationalUnit}")
-    lateinit var defaultStudentOrganizationalUnitString: String
+    lateinit var defaultStudentOrganizationalUnitCode: String
 
     @PostConstruct
     fun init() {
@@ -68,12 +64,12 @@ class StudentService(
                 indexType = indexType,
                 organizationalUnit =
                 if (resultMap["p_jed_org_kod"] != null) organizationalUnitRepository.getOne(resultMap["p_jed_org_kod"] as String)
-                else organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitString),
+                else organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitCode),
                 indexNumber = resultMap["p_numer"] as String,
                 mainIndex = 'T',
                 person = person
         )
-        if (student.organizationalUnit.code == defaultStudentOrganizationalUnitString) {
+        if (student.organizationalUnit.code == defaultStudentOrganizationalUnitCode) {
             val findByPersonAndMainIndex = studentRepository.findByPersonAndMainIndex(person, 'T')
             findByPersonAndMainIndex?.apply {
                 mainIndex = 'N'

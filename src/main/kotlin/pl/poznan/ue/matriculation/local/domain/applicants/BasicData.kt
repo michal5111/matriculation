@@ -18,6 +18,7 @@ class BasicData(
 
         var pesel: String?,
 
+        @Temporal(TemporalType.DATE)
         var dateOfBirth: Date?,
 
         var cityOfBirth: String?,

@@ -9,7 +9,7 @@ data class ProfileDto(
         val birth: BirthDto?,
         val nationality: String?,
         val citizenship: String?,
-        val gender: Char?,
+        val gender: String?,
         val maritial: Char?,
         val family: FamilyDto?,
         val nationalidcode: NationalCodeDto?

@@ -10,7 +10,14 @@ import java.io.Serializable
 import javax.persistence.*
 
 @Entity
-@Table(uniqueConstraints = [UniqueConstraint(name = "ForeignIdUniqueConstraint", columnNames = ["foreignId", "datasourceId"])])
+@Table(
+        uniqueConstraints = [UniqueConstraint(name = "ForeignIdUniqueConstraint", columnNames = ["foreignId", "datasourceId"])]
+//        indexes = [
+//            Index(name = "foreignIdDatasourceIdIndex", columnList = "foreignId,datasourceId", unique = true),
+//            Index(name = "importIdIndex", columnList = "import_id", unique = false),
+//            Index(name = "importIdImportStatusIndex", columnList = "import_id,importStatus", unique = false)
+//        ]
+)
 class Application(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

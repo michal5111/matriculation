@@ -8,6 +8,11 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
+//@Table(
+//        indexes = [
+//            Index(name = "educationDataCertificateType", columnList = "education_data_id,certificateType", unique = false)
+//        ]
+//)
 class Document(
 
         @Id
@@ -36,6 +41,7 @@ class Document(
 
         var issueCountry: String?,
 
+        @Temporal(TemporalType.DATE)
         var issueDate: Date,
 
         var issueInstitution: String?,

@@ -25,10 +25,12 @@ class ApplicantForeignerData(
 
         var polishCardIssueCountry: String?,
 
+        @Temporal(TemporalType.DATE)
         var polishCardIssueDate: Date?,
 
         var polishCardNumber: String?,
 
+        @Temporal(TemporalType.DATE)
         var polishCardValidTo: Date?
 ) : Serializable {
 

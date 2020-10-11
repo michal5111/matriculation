@@ -13,7 +13,6 @@ class IncomingDataSourceImpl(
         applicantMapper: DreamApplyApplicantMapper,
         applicationMapper: DreamApplyApplicationMapper,
         val status: String,
-        val decision: String,
         val dreamApplyService: DreamApplyService,
         id: String
 ) : DreamApplyDataSourceImpl(
@@ -21,7 +20,6 @@ class IncomingDataSourceImpl(
         applicantMapper = applicantMapper,
         applicationMapper = applicationMapper,
         status = status,
-        decision = decision,
         dreamApplyService = dreamApplyService,
         id = id
 ) {
@@ -43,7 +41,6 @@ class IncomingDataSourceImpl(
                 additionalFilters = mapOf(
                         "byCourseIDs" to programmeId,
                         "byOfferTypes" to status,
-                        //"byOfferDecisions" to decision,
                         "byFlagIDs" to flagId
                 )
         ) ?: throw java.lang.IllegalArgumentException("Unable to get applicants")
@@ -52,7 +49,6 @@ class IncomingDataSourceImpl(
             applicationOffers!!.any {
                 it.value.course == "/api/courses/$programmeId"
                         && it.value.type == status
-                //&& it.value.decision == decision
             }
         }.filter { dreamApplyApplicationDto ->
             val applicationFlags = dreamApplyService.getApplicationFlags(dreamApplyApplicationDto.flags)
@@ -66,7 +62,7 @@ class IncomingDataSourceImpl(
             }
 
             override fun getResultsList(): List<DreamApplyApplicationDto> {
-                return applications.toList()
+                return applications
             }
 
             override fun hasNext(): Boolean {

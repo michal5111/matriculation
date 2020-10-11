@@ -260,11 +260,7 @@ class IrkApplicantMapper {
                             streetNumber = realStreetNumber,
                             applicant = applicant
                     )
-            ).filter { address ->
-                !(address.city.isNullOrBlank()
-                        || address.street.isNullOrBlank()
-                        || address.countryCode.isNullOrBlank())
-            }.let { list ->
+            ).let { list ->
                 applicant.addresses.addAll(list)
             }
         }

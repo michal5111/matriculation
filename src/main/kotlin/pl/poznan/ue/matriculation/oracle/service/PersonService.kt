@@ -83,8 +83,12 @@ class PersonService(
                 changeHistory.citizenship = citizenship
                 citizenship = citizenshipRepository.getOne(applicant.citizenship)
             }
-            birthDate = applicant.basicData.dateOfBirth
-            birthCity = applicant.basicData.cityOfBirth
+            applicant.basicData.dateOfBirth?.let {
+                birthDate = applicant.basicData.dateOfBirth
+            }
+            applicant.basicData.cityOfBirth?.let {
+                birthCity = applicant.basicData.cityOfBirth
+            }
             birthCountry = applicant.basicData.countryOfBirth?.let {
                 citizenshipRepository.getOne(it)
             }
@@ -107,14 +111,22 @@ class PersonService(
             createOrUpdatePhoneNumbers(this, applicant)
             createOrUpdateIdentityDocument(this, applicant, changeHistory)
 
-            mothersName = applicant.additionalData.mothersName
-            fathersName = applicant.additionalData.fathersName
+            applicant.additionalData.mothersName?.let {
+                mothersName = applicant.additionalData.mothersName
+            }
+            applicant.additionalData.fathersName?.let {
+                fathersName = applicant.additionalData.fathersName
+            }
             wku = applicant.additionalData.wku?.let {
                 wkuRepository.getOne(it)
             }
             createOrUpdateEntitlementDocument(person, applicant)
-            militaryCategory = applicant.additionalData.militaryCategory
-            militaryStatus = applicant.additionalData.militaryStatus
+            applicant.additionalData.militaryCategory?.let {
+                militaryCategory = applicant.additionalData.militaryCategory
+            }
+            applicant.additionalData.militaryStatus?.let {
+                militaryStatus = applicant.additionalData.militaryStatus
+            }
             createOrUpdatePersonPhoto(person, applicant)
             createOrUpdateOwnedDocuments(person, applicant)
             if (
@@ -186,9 +198,6 @@ class PersonService(
             cityIsCity: Boolean,
             countryCode: String?
     ) {
-        if (city.isNullOrBlank() || street.isNullOrBlank()) {
-            return
-        }
         val address = addressRepository.findByPersonAndAddressType(person, addressType)
         if (address != null) {
             addressService.update(
@@ -439,7 +448,7 @@ class PersonService(
         }
         if (person == null) {
             applicant.basicData.pesel?.let { pesel ->
-                person = personRepository.findOneByPesel(pesel)
+                person = personRepository.findOneByPesel(pesel.trim())
             }
         }
         if (person == null) {

@@ -6,7 +6,13 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-@Table(uniqueConstraints = [UniqueConstraint(name = "ForeignIdUniqueConstraint", columnNames = ["foreignId", "datasourceId"])])
+@Table(
+        uniqueConstraints = [UniqueConstraint(name = "ForeignIdUniqueConstraint", columnNames = ["foreignId", "datasourceId"])]
+//        indexes = [
+//            Index(name = "foreignIdDatasourceIdIndex", columnList = "foreignId,datasourceId", unique = true),
+//            Index(name = "usosIdIndex", columnList = "usosId", unique = true)
+//        ]
+)
 class Applicant(
 
         @Id
