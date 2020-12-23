@@ -86,4 +86,9 @@ class AsyncService(
     fun archiveApplicants(importId: Long) {
         processService.archivePersons(importId)
     }
+
+    @Async
+    fun getUids(importId: Long) {
+        processService.getUids(importId)
+    }
 }

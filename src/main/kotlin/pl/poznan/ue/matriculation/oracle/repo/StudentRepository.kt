@@ -9,9 +9,9 @@ import pl.poznan.ue.matriculation.oracle.domain.Student
 @Repository
 interface StudentRepository : JpaRepository<Student, Long> {
 
-    fun findByPersonAndIndexType(person: Person, indexType: IndexType): Student?
+    fun findByPersonAndIndexTypeOrderByIndexNumberAsc(person: Person, indexType: IndexType): List<Student>
 
-    fun findByPersonIdAndIndexTypeCode(personId: Long, indexTypeCode: String): Student?
+    fun findByPersonIdAndIndexTypeCodeOrderByIndexNumberAsc(personId: Long, indexTypeCode: String): List<Student>
 
     fun findByPersonAndMainIndex(person: Person, isMain: Char): Student?
 }

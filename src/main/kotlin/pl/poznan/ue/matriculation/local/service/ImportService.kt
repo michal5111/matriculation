@@ -26,15 +26,16 @@ class ImportService(
     private val logger = LoggerFactory.getLogger(ImportService::class.java)
 
     fun create(
-            programmeCode: String,
-            programmeForeignId: String,
-            registration: String,
-            indexPoolCode: String,
-            startDate: Date,
-            dateOfAddmision: Date,
-            stageCode: String,
-            didacticCycleCode: String,
-            dataSourceType: String
+        programmeCode: String,
+        programmeForeignId: String,
+        registration: String,
+        indexPoolCode: String,
+        startDate: Date,
+        dateOfAddmision: Date,
+        stageCode: String,
+        didacticCycleCode: String,
+        dataSourceType: String,
+        dataFile: String?
     ): Import {
         if (importRepository.existsByProgrammeForeignIdAndRegistrationAndStageCode(programmeForeignId, registration, stageCode)) {
             throw ImportCreationException("Import tego programu już istnieje.")
@@ -46,15 +47,18 @@ class ImportService(
             throw ImportCreationException("Podany cykl dydaktyczny nie istnieje.")
         }
         val import = Import(
-                dateOfAddmision = dateOfAddmision,
-                didacticCycleCode = didacticCycleCode,
-                indexPoolCode = indexPoolCode,
-                programmeCode = programmeCode,
-                programmeForeignId = programmeForeignId,
-                registration = registration,
-                startDate = startDate,
-                stageCode = stageCode,
-                dataSourceId = dataSourceType
+            dateOfAddmision = dateOfAddmision,
+            didacticCycleCode = didacticCycleCode,
+            indexPoolCode = indexPoolCode,
+            programmeCode = programmeCode,
+            programmeForeignId = programmeForeignId,
+            registration = registration,
+            startDate = startDate,
+            stageCode = stageCode,
+            dataSourceId = dataSourceType,
+            dataFile = dataFile?.let {
+                Base64.getDecoder().decode(dataFile)
+            }
         )
         return importRepository.save(import)
     }

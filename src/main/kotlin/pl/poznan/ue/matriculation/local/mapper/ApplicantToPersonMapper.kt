@@ -65,29 +65,29 @@ class ApplicantToPersonMapper(
                 }.filterNot {
                     it.city.isNullOrBlank() || it.street.isNullOrBlank()
                 }.toMutableList(),
-                phoneNumbers = applicant.phoneNumbers.map {
-                    PhoneNumber(
-                            number = it.number,
-                            phoneNumberType = phoneNumberTypeRepository.getOne(it.phoneNumberType),
-                            comments = it.comment
-                    )
-                }.toMutableList(),
-                idNumber = applicant.identityDocuments[0].number?.replace(" ", "")?.trim(),
-                documentType = applicant.identityDocuments[0].number?.let {
-                    applicant.identityDocuments[0].type
-                },
-                identityDocumentExpirationDate = applicant.identityDocuments[0].expDate,
-                identityDocumentIssuerCountry = applicant.identityDocuments[0].country?.let {
-                    citizenshipRepository.getOne(it)
-                },
-                mothersName = applicant.additionalData.mothersName,
-                fathersName = applicant.additionalData.fathersName,
-                wku = applicant.additionalData.wku?.let {
-                    wkuRepository.getOne(it)
-                },
-                entitlementDocuments = applicant.educationData.documents.filter { document ->
-                    document.certificateUsosCode != null
-                }.map {
+            phoneNumbers = applicant.phoneNumbers.map {
+                PhoneNumber(
+                    number = it.number,
+                    phoneNumberType = phoneNumberTypeRepository.getOne(it.phoneNumberType),
+                    comments = it.comment
+                )
+            }.toMutableList(),
+            idNumber = applicant.identityDocuments.firstOrNull()?.number?.replace(" ", "")?.trim(),
+            documentType = applicant.identityDocuments.firstOrNull()?.number?.let {
+                applicant.identityDocuments.firstOrNull()?.type
+            },
+            identityDocumentExpirationDate = applicant.identityDocuments.firstOrNull()?.expDate,
+            identityDocumentIssuerCountry = applicant.identityDocuments.firstOrNull()?.country?.let {
+                citizenshipRepository.getOne(it)
+            },
+            mothersName = applicant.additionalData.mothersName,
+            fathersName = applicant.additionalData.fathersName,
+            wku = applicant.additionalData.wku?.let {
+                wkuRepository.getOne(it)
+            },
+            entitlementDocuments = applicant.educationData.documents.filter { document ->
+                document.certificateUsosCode != null
+            }.map {
                     EntitlementDocument(
                             issueDate = it.issueDate,
                             description = it.issueInstitution.takeIf { _ ->

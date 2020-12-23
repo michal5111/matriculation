@@ -66,4 +66,5 @@ export class Applicant {
   usosId: number;
   assignedIndexNumber: number;
   dataSourceId: number;
+  uid: string;
 }

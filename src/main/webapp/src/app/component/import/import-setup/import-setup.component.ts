@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
 import {FormBuilder, FormGroup, FormGroupDirective, Validators} from '@angular/forms';
@@ -24,7 +24,7 @@ import {UsosService} from '../../../service/usos-service/usos.service';
 export class ImportSetupComponent implements OnInit, OnDestroy {
 
   import: Import = new Import();
-  dataSourceId: string;
+  dataSourceId = '';
   $availableDataSourcesObservable: Observable<[DataSource]> = this.importService.getAvailableDataSources();
   registrations: Registration[];
   registrationProgrammes: Programme[];
@@ -39,7 +39,8 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     private usosService: UsosService,
     private formBuilder: FormBuilder,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cd: ChangeDetectorRef
   ) {
   }
 
@@ -55,9 +56,22 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
       stage: ['', Validators.required],
       didacticCycle: ['', Validators.required],
       startDate: ['', Validators.required],
-      dateOfAddmision: ['', Validators.required]
+      dateOfAddmision: ['', Validators.required],
+      dataFile: ['']
     });
     this.onDidacticCycleInputChanges();
+    this.importCreationFormGroup.controls.dataFile.valueChanges.subscribe((fileInput: any) => {
+      const reader = new FileReader();
+
+      if (fileInput && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          this.import.dataFile = reader.result.toString().replace(/^data:(.*,)?/, '');
+          this.cd.markForCheck();
+        };
+      }
+    });
   }
 
   onRegistrationSelectionChange(event: MatSelectChange): void {

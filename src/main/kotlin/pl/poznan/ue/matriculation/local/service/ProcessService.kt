@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionSynchronizationManager
 import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
 import pl.poznan.ue.matriculation.kotlinExtensions.stackTraceToString
+import pl.poznan.ue.matriculation.ldap.repo.LdapUserRepository
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
@@ -30,12 +31,13 @@ import javax.persistence.PersistenceContext
 
 @Service
 class ProcessService(
-        private val importRepository: ImportRepository,
-        private val applicationRepository: ApplicationRepository,
-        private val applicantRepository: ApplicantRepository,
-        private val applicantService: ApplicantService,
-        private val personService: PersonService,
-        private val importProgressRepository: ImportProgressRepository
+    private val importRepository: ImportRepository,
+    private val applicationRepository: ApplicationRepository,
+    private val applicantRepository: ApplicantRepository,
+    private val applicantService: ApplicantService,
+    private val personService: PersonService,
+    private val importProgressRepository: ImportProgressRepository,
+    private val ldapLdapUserRepository: LdapUserRepository
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(ProcessService::class.java)
@@ -208,5 +210,33 @@ class ProcessService(
                 applicantService.clearPersonalData(application.applicant!!)
             }
         }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
+    fun getUids(importId: Long) {
+        val applicationStream = applicationRepository.findAllByImportIdStream(importId)
+        applicationStream.use {
+            it.forEach { application ->
+                application.applicant?.let { applicant ->
+                    getUid(applicant)
+                }
+            }
+        }
+    }
+
+    @Transactional(
+        rollbackFor = [Exception::class, RuntimeException::class],
+        propagation = Propagation.REQUIRES_NEW,
+        transactionManager = "transactionManager"
+    )
+    fun getUid(applicant: Applicant) {
+        logger.info("Searching for ldap user for usosId {}", applicant.usosId)
+        val ldapUser = applicant.usosId?.let {
+            ldapLdapUserRepository.findByUsosId(it)
+        } ?: return
+        logger.info("Found ldap user {} for usosId {}", ldapUser.username, applicant.usosId)
+        applicant.uid = ldapUser.username
+        logger.info("Apllicant uid is {}", applicant.uid)
+        applicantRepository.save(applicant)
     }
 }

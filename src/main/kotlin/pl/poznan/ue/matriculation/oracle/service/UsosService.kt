@@ -4,7 +4,6 @@ import org.hibernate.exception.GenericJDBCException
 import org.springframework.stereotype.Service
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.exception.IndexChangeException
-import pl.poznan.ue.matriculation.exception.IndexNotFoundException
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
 import pl.poznan.ue.matriculation.oracle.dto.IndexTypeDto
 import pl.poznan.ue.matriculation.oracle.repo.IndexTypeRepository
@@ -42,10 +41,10 @@ class UsosService(
     }
 
     fun updateIndexNumberByUsosIdAndIndexType(usosId: Long, indexTypeCode: String, newIndexNumber: String) {
-        val student = studentRepository.findByPersonIdAndIndexTypeCode(usosId, indexTypeCode)
-                ?: throw IndexNotFoundException()
+        val students = studentRepository.findByPersonIdAndIndexTypeCodeOrderByIndexNumberAsc(usosId, indexTypeCode)
+        val student = students.last()
         val applicant = applicantRepository.findByUsosId(usosId)
-                ?: throw ApplicantNotFoundException()
+            ?: throw ApplicantNotFoundException()
         student.indexNumber = newIndexNumber
         applicant.assignedIndexNumber = newIndexNumber
         try {

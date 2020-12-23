@@ -26,6 +26,7 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MaterialFileInputModule} from "ngx-material-file-input";
 
 @NgModule({
   declarations: [],
@@ -56,7 +57,8 @@ import {MatTooltipModule} from '@angular/material/tooltip';
     MatSnackBarModule,
     MatDialogModule,
     MatSidenavModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MaterialFileInputModule
   ],
   exports: [
     MatToolbarModule,
@@ -84,7 +86,8 @@ import {MatTooltipModule} from '@angular/material/tooltip';
     MatSnackBarModule,
     MatDialogModule,
     MatSidenavModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MaterialFileInputModule
   ]
 })
 export class MaterialModule {

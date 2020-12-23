@@ -53,21 +53,22 @@ class StudentService(
 
     fun createOrFindStudent(person: Person, indexPoolCode: String): Student {
         val indexType = indexTypeRepository.getOne(indexPoolCode)
-        val foundStudent = studentRepository.findByPersonAndIndexType(person, indexType)
-        if (foundStudent != null) {
-            return foundStudent
+        val foundStudent = studentRepository.findByPersonAndIndexTypeOrderByIndexNumberAsc(person, indexType)
+        if (foundStudent.isNotEmpty()) {
+            return foundStudent.last()
         }
         val paramMap = MapSqlParameterSource()
-                .addValue("p_typ", indexPoolCode)
+            .addValue("p_typ", indexPoolCode)
         val resultMap: MutableMap<String, Any> = jdbcCall.execute(paramMap)
         val student = Student(
-                indexType = indexType,
-                organizationalUnit =
-                if (resultMap["p_jed_org_kod"] != null) organizationalUnitRepository.getOne(resultMap["p_jed_org_kod"] as String)
-                else organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitCode),
-                indexNumber = resultMap["p_numer"] as String,
-                mainIndex = 'T',
-                person = person
+            indexType = indexType,
+            organizationalUnit =
+            if (resultMap["p_jed_org_kod"] != null) organizationalUnitRepository.getOne(resultMap["p_jed_org_kod"] as String)
+            else organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitCode),
+            indexNumber = resultMap["p_numer"] as String,
+            mainIndex = if (resultMap["p_jed_org_kod"] == defaultStudentOrganizationalUnitCode) 'T'
+            else 'N',
+            person = person
         )
         if (student.organizationalUnit.code == defaultStudentOrganizationalUnitCode) {
             val findByPersonAndMainIndex = studentRepository.findByPersonAndMainIndex(person, 'T')

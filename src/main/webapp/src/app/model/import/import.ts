@@ -13,4 +13,5 @@ export class Import {
   didacticCycleCode: string;
   importProgress: ImportProgress;
   dataSourceId: string;
+  dataFile: string;
 }

@@ -19,55 +19,55 @@ import javax.persistence.*
 //        ]
 )
 class Application(
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Long? = null,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null,
 
-        @Column(nullable = false, name = "foreignId")
-        val foreignId: Long,
+    @Column(nullable = false, name = "foreignId")
+    val foreignId: Long,
 
-        @Column(nullable = false, name = "datasourceId")
-        var dataSourceId: String? = null,
+    @Column(nullable = false, name = "datasourceId")
+    var dataSourceId: String? = null,
 
-        var admitted: String?,
+    var admitted: String? = null,
 
-        @Column(length = 500)
-        var comment: String?,
+    @Column(length = 500)
+    var comment: String? = null,
 
-        @OneToOne(mappedBy = "application", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
-        val applicationForeignerData: ApplicationForeignerData?,
+    @OneToOne(mappedBy = "application", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    val applicationForeignerData: ApplicationForeignerData? = null,
 
-        var payment: String?,
+    var payment: String? = null,
 
-        var position: String?,
+    var position: String? = null,
 
-        var qualified: String?,
+    var qualified: String? = null,
 
-        var score: String?,
+    var score: String? = null,
 
-        var editUrl: String? = null,
+    var editUrl: String? = null,
 
-        @JsonProperty("certificateId")
-        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
-        @JsonIdentityReference(alwaysAsId = true)
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "certificate_id", referencedColumnName = "id")
-        var certificate: Document? = null,
+    @JsonProperty("certificateId")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "certificate_id", referencedColumnName = "id")
+    var certificate: Document? = null,
 
-        @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
         var importStatus: ApplicationImportStatus = ApplicationImportStatus.NOT_IMPORTED,
 
-        @Column(length = 4096)
+    @Column(length = 4096)
         var importError: String? = null,
 
-        @Lob
+    @Lob
         var stackTrace: String? = null,
 
-        @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
         @JoinColumn(name = "applicant_id", referencedColumnName = "id")
         var applicant: Applicant? = null,
 
-        @JsonIgnore
+    @JsonIgnore
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "import_id", referencedColumnName = "id")
         var import: Import? = null

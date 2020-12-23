@@ -7,31 +7,34 @@ import javax.persistence.*
 
 @Entity
 class Import(
-        @Id
+    @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long? = null,
 
-        val programmeCode: String,
+    val programmeCode: String,
 
-        val programmeForeignId: String,
+    val programmeForeignId: String,
 
-        val stageCode: String,
+    val stageCode: String,
 
-        val registration: String,
+    val registration: String,
 
-        val indexPoolCode: String,
+    val indexPoolCode: String,
 
-        val startDate: Date,
+    val startDate: Date,
 
-        val dateOfAddmision: Date,
+    val dateOfAddmision: Date,
 
-        val didacticCycleCode: String,
+    val didacticCycleCode: String,
 
-        val dataSourceId: String,
+    val dataSourceId: String,
 
-        @JsonIgnore
-        @OneToMany(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
-        val applications: MutableList<Application> = mutableListOf()
+    @Lob
+    val dataFile: ByteArray?,
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+    val applications: MutableList<Application> = mutableListOf()
 ) {
 
     @OneToOne(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.REMOVE])

@@ -10,6 +10,17 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
+
+    <ng-template [ngIf]="dataSourceId.indexOf('FILE') >= 0">
+      <mat-form-field class="form-field wide-field">
+        <ngx-mat-file-input formControlName="dataFile" placeholder="Plik excel"
+                            accept="application/vnd.ms-excel|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            multiple="false" [required]="dataSourceId.indexOf('FILE') >= 0">
+        </ngx-mat-file-input>
+        <mat-icon matSuffix>folder</mat-icon>
+      </mat-form-field>
+    </ng-template>
+
     <mat-form-field class="form-field wide-field">
       <mat-label>Rekrutacja</mat-label>
       <mat-select formControlName="registration" required="true"

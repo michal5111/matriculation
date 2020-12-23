@@ -85,7 +85,9 @@ class Applicant(
 
         @JsonIgnore
         @OneToMany(mappedBy = "applicant")
-        var applications: MutableList<Application> = mutableListOf()
+        var applications: MutableList<Application> = mutableListOf(),
+
+        var uid: String? = null
 ) {
 
     override fun toString(): String {

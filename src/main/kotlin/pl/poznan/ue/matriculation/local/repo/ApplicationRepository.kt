@@ -20,15 +20,26 @@ interface ApplicationRepository : PagingAndSortingRepository<Application, Long> 
     @Query("SELECT a FROM Application a WHERE a.import.id = :importId")
     fun findAllByImportId(pageable: Pageable, @Param("importId") importId: Long): Page<Application>
 
+    @QueryHints(
+        value = [
+            QueryHint(name = HINT_FETCH_SIZE, value = "50"),
+            QueryHint(name = HINT_CACHEABLE, value = "false"),
+            QueryHint(name = READ_ONLY, value = "true")
+        ]
+    )
+    @Query("SELECT a FROM Application a WHERE a.import.id = :importId")
+    fun findAllByImportIdStream(@Param("importId") importId: Long): Stream<Application>
+
     fun existsByForeignIdAndDataSourceId(foreignId: Long, dataSourceId: String): Boolean
 
     fun findByForeignIdAndDataSourceId(foreignId: Long, foreignIdType: String): Application?
 
     //@QueryHints(value = [QueryHint(name = HINT_FETCH_SIZE, value = "" + Integer.MIN_VALUE)]) //MySql
-    @QueryHints(value = [
-        QueryHint(name = HINT_FETCH_SIZE, value = "50"),
-        QueryHint(name = HINT_CACHEABLE, value = "false"),
-        QueryHint(name = READ_ONLY, value = "true")
+    @QueryHints(
+        value = [
+            QueryHint(name = HINT_FETCH_SIZE, value = "50"),
+            QueryHint(name = HINT_CACHEABLE, value = "false"),
+            QueryHint(name = READ_ONLY, value = "true")
     ])
     @Query("select an from Application an where an.import.id = :id and (an.importStatus = 'NOT_IMPORTED' or an.importStatus = 'ERROR')")
     fun getAllByImportIdAndApplicationImportStatus(@Param("id") importId: Long): Stream<Application>

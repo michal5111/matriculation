@@ -5,21 +5,23 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import pl.poznan.ue.matriculation.applicantDataSources.DreamApplyDataSourceImpl
-import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
-import pl.poznan.ue.matriculation.applicantDataSources.IncomingDataSourceImpl
-import pl.poznan.ue.matriculation.applicantDataSources.IrkApplicationDataSourceImpl
+import pl.poznan.ue.matriculation.applicantDataSources.*
 import pl.poznan.ue.matriculation.dreamApply.dto.applicant.DreamApplyApplicantDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
 import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicantMapper
 import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicationMapper
 import pl.poznan.ue.matriculation.dreamApply.mapper.IncomingApplicantMapper
 import pl.poznan.ue.matriculation.dreamApply.service.DreamApplyService
+import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicantDto
+import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicationDto
+import pl.poznan.ue.matriculation.excelfile.mapper.ExcelFileApplicantMapper
+import pl.poznan.ue.matriculation.excelfile.mapper.ExcelFileApplicationMapper
 import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
 import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
 import pl.poznan.ue.matriculation.irk.mapper.IrkApplicantMapper
 import pl.poznan.ue.matriculation.irk.mapper.IrkApplicationMapper
 import pl.poznan.ue.matriculation.irk.service.IrkService
+import pl.poznan.ue.matriculation.oracle.repo.ProgrammeRepository
 import pl.poznan.ue.matriculation.oracle.repo.SchoolRepository
 
 @Configuration
@@ -136,12 +138,23 @@ class ApplicationDataSourceConfiguration {
             @Autowired @Qualifier("primaryIrkService") irkService: IrkService
     ): IApplicationDataSource<IrkApplicationDTO, IrkApplicantDto> {
         return IrkApplicationDataSourceImpl(
-                id = "IRK_PRIMARY",
-                name = "Główna IRK",
-                irkService = irkService,
-                setAsAccepted = primarySetAsAccepted,
-                irkApplicationMapper = IrkApplicationMapper(),
-                irkApplicantMapper = IrkApplicantMapper()
+            id = "IRK_PRIMARY",
+            name = "Główna IRK",
+            irkService = irkService,
+            setAsAccepted = primarySetAsAccepted,
+            irkApplicationMapper = IrkApplicationMapper(),
+            irkApplicantMapper = IrkApplicantMapper()
+        )
+    }
+
+    @Bean(name = ["excelFileApplicantDAtaSource"])
+    fun excelFileApplicantDataSource(
+        programmeRepository: ProgrammeRepository
+    ): IApplicationDataSource<ExcelFileApplicationDto, ExcelFileApplicantDto> {
+        return ExcelFileDataSourceImpl(
+            excelFileApplicantMapper = ExcelFileApplicantMapper(),
+            excelFileApplicationMapper = ExcelFileApplicationMapper(),
+            programmeRepository = programmeRepository
         )
     }
 }

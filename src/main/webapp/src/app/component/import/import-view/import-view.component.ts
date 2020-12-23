@@ -46,6 +46,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     'id',
     'foreignId',
     'usosId',
+    'uid',
     'names',
     'birthDateAndPlace',
     'pesel',

@@ -116,15 +116,16 @@ class RestController(
     fun createImport(
             @RequestBody importDto: ImportDto
     ): Import = importService.create(
-            programmeCode = importDto.programmeCode,
-            programmeForeignId = importDto.programmeForeignId,
-            registration = importDto.registration,
-            indexPoolCode = importDto.indexPoolCode,
-            startDate = importDto.startDate,
-            dateOfAddmision = importDto.dateOfAddmision,
-            stageCode = importDto.stageCode,
-            didacticCycleCode = importDto.didacticCycleCode,
-            dataSourceType = importDto.dataSourceId
+        programmeCode = importDto.programmeCode,
+        programmeForeignId = importDto.programmeForeignId,
+        registration = importDto.registration,
+        indexPoolCode = importDto.indexPoolCode,
+        startDate = importDto.startDate,
+        dateOfAddmision = importDto.dateOfAddmision,
+        stageCode = importDto.stageCode,
+        didacticCycleCode = importDto.didacticCycleCode,
+        dataSourceType = importDto.dataSourceId,
+        dataFile = importDto.dataFile
     )
 
     @PutMapping("/import/{id}")
@@ -222,5 +223,11 @@ class RestController(
     @GetMapping("/users")
     fun getAllUsers(pageable: Pageable): Page<User> {
         return userService.getAll(pageable)
+    }
+
+    @GetMapping("/import/{id}/ldap")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun getUids(@PathVariable("id") importId: Long) {
+        asyncService.getUids(importId)
     }
 }

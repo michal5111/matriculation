@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.irk.mapper
 
+import pl.poznan.ue.matriculation.irk.dto.applicants.AdditionalDataDTO
 import pl.poznan.ue.matriculation.irk.dto.applicants.ContactDataDTO
 import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
 import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
@@ -94,17 +95,7 @@ class IrkApplicantMapper {
             name.applicant = this
             addPhoneNumbers(this, applicantDto.contactData)
             addAddresses(this, applicantDto.contactData)
-            identityDocuments = applicantDto.additionalData.let {
-                mutableListOf(
-                        IdentityDocument(
-                                country = it.documentCountry,
-                                expDate = it.documentExpDate,
-                                number = it.documentNumber?.replace(" ", ""),
-                                type = it.documentType,
-                                applicant = this
-                        )
-                )
-            }
+            addIdentityDocuments(this, applicantDto.additionalData)
         }
     }
 
@@ -194,19 +185,27 @@ class IrkApplicantMapper {
                 }
             }
             identityDocuments.clear()
-            identityDocuments.add(
-                    applicantDto.additionalData.let {
-                        IdentityDocument(
-                                country = it.documentCountry,
-                                expDate = it.documentExpDate,
-                                number = it.documentNumber,
-                                type = it.documentType,
-                                applicant = applicant
-                        )
-                    }
-            )
+            addIdentityDocuments(applicant, applicantDto.additionalData)
         }
         return applicant
+    }
+
+    private fun addIdentityDocuments(applicant: Applicant, additionalDataDTO: AdditionalDataDTO) {
+        additionalDataDTO.let {
+            mutableListOf(
+                IdentityDocument(
+                    country = it.documentCountry,
+                    expDate = it.documentExpDate,
+                    number = it.documentNumber?.replace(" ", ""),
+                    type = it.documentType,
+                    applicant = applicant
+                )
+            )
+        }.filterNot {
+            it.number.isNullOrBlank()
+        }.let {
+            applicant.identityDocuments.addAll(it)
+        }
     }
 
     private fun addPhoneNumbers(applicant: Applicant, contactDataDTO: ContactDataDTO) {

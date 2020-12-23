@@ -151,10 +151,13 @@ class PersonService(
                 person.pesel = it
             }
         }
-        val identityDocument = applicant.identityDocuments.find {
+        var identityDocument = applicant.identityDocuments.find {
             person.idNumber?.replace(" ", "") == it.number
-        } ?: applicant.identityDocuments[0]
-        identityDocument.number?.let {
+        }
+        if (identityDocument == null && applicant.identityDocuments.size > 0) {
+            identityDocument = applicant.identityDocuments[0]
+        }
+        identityDocument?.number?.let {
             if (person.documentType != identityDocument.type) {
                 changeHistory.documentType = person.documentType
                 person.documentType = identityDocument.type
