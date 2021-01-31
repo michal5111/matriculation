@@ -13,7 +13,7 @@ data class User(
     @Id
     val name: Name? = null,
 
-    @Attribute(name = "cn") val username: String? = null,
+    @Attribute(name = "cn") val uid: String? = null,
 
     @Attribute(name = "extensionAttribute14") val usosId: Long? = null,
 

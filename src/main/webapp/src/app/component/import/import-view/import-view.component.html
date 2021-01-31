@@ -20,52 +20,21 @@
       </mat-card>
       <mat-card class="card-centered">
         <mat-card-content *ngIf="importProgress">
-          <div [ngSwitch]="importProgress.importStatus">
-            <span>Status importu: </span>
-            <span *ngSwitchCase="'PENDING'">
-              <mat-icon>hourglass_empty</mat-icon>
-              Oczekujący
-          </span>
-            <span *ngSwitchCase="'STARTED'">
-              <mat-icon>cloud_download</mat-icon>
-              Importowanie...
-          </span>
-            <span *ngSwitchCase="'IMPORTED'">
-              <mat-icon>cloud_done</mat-icon>
-              Zaimportowane
-          </span>
-            <span *ngSwitchCase="'SAVING'">
-              <mat-icon>cloud_upload</mat-icon>
-              Zapisywanie w usosie...
-          </span>
-            <span *ngSwitchCase="'COMPLETE'">
-            <mat-icon>done</mat-icon>
-            Zakończono
-          </span>
-            <span *ngSwitchCase="'ARCHIVED'">
-            <mat-icon>archived</mat-icon>
-            Zarchiwizowany
-          </span>
-            <span *ngSwitchCase="'COMPLETED_WITH_ERRORS'">
-            <mat-icon>warning</mat-icon>
-            Zakończono z błędami
-          </span>
-            <span *ngSwitchCase="'ERROR'">
-            <mat-icon>error</mat-icon>
-            Błąd
-          </span>
-          </div>
-          <p>Błąd importu:
+          <app-import-status-indicator [importStatus]="importProgress.importStatus"></app-import-status-indicator>
+          <p *ngIf="importProgress.error">Błąd importu:
             <mark class="error-color">{{importProgress.error}}</mark>
           </p>
-          <p>Zaimportowane zgłoszenia: {{importProgress.importedApplications}}/{{importProgress.totalCount}}</p>
-          <mat-progress-bar mode="determinate"
-                            value="{{getImportProgressPercentage()}}">
-          </mat-progress-bar>
-          <p>Zapisane zgłoszenia: {{importProgress.savedApplicants}}/{{importProgress.totalCount}}</p>
-          <mat-progress-bar mode="determinate"
-                            value="{{getSaveProgressPercentage()}}">
-          </mat-progress-bar>
+          <app-progress-viewer
+            header="Zaimportowane zgłoszenia:"
+            [value]="importProgress.importedApplications"
+            [total]="importProgress.totalCount">
+          </app-progress-viewer>
+          <app-progress-viewer
+            header="Zapisane zgłoszenia:"
+            [value]="importProgress.savedApplicants"
+            [total]="importProgress.totalCount"
+            [errorsCount]="importProgress.saveErrors">
+          </app-progress-viewer>
           <p>Błędy przy zapisywaniu: {{importProgress.saveErrors}}</p>
         </mat-card-content>
         <mat-card-actions>
@@ -80,6 +49,32 @@
           <button mat-button (click)="onArchiveClick()" [disabled]="isArchiveButtonDisabled()">
             <mat-icon>archived</mat-icon>
             Archiwizuj
+          </button>
+        </mat-card-actions>
+      </mat-card>
+      <mat-card class="card-centered">
+        <mat-card-content>
+          <app-progress-viewer
+            header="Znalezione UIDy:"
+            [value]="importProgress.importedUids"
+            [total]="importProgress.totalCount"
+            [errorsCount]="importProgress.saveErrors">
+          </app-progress-viewer>
+          <app-progress-viewer
+            header="Wysłane powiadomienia:"
+            [value]="importProgress.importedUids"
+            [total]="importProgress.totalCount"
+            [errorsCount]="importProgress.saveErrors">
+          </app-progress-viewer>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button (click)="onFindUidsClick()" [disabled]="isFindUidsButtonDisabled()">
+            <mat-icon>search</mat-icon>
+            Znajdź UIDy
+          </button>
+          <button mat-button (click)="onSendNotificationsClick()" [disabled]="isSendNotificationsDisabled()">
+            <mat-icon>notifications_active</mat-icon>
+            Wyślij powiadomienia
           </button>
         </mat-card-actions>
       </mat-card>
@@ -101,23 +96,22 @@
 
       <ng-container matColumnDef="foreignId">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Obcy id</th>
-        <td mat-cell *matCellDef="let element" class="mat-cell"><a mat-button
-                                                                   href="{{getApplicationEditUrl(element)}}"
-                                                                   target="_blank">{{element.foreignId}}</a>
+        <td mat-cell *matCellDef="let element" class="mat-cell">
+          <a mat-button href="{{getApplicationEditUrl(element)}}" target="_blank">{{element.foreignId}}</a>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="usosId">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> usos id</th>
-        <td mat-cell *matCellDef="let element" class="mat-cell"><a mat-button
-                                                                   href="{{getPersonUsosUrl(element)}}"
-                                                                   target="_blank">{{element.applicant.usosId}}</a>
+        <td mat-cell *matCellDef="let element" class="mat-cell">
+          <a *ngIf="usosUrl" mat-button href="{{getPersonUsosUrl(element)}}"
+             target="_blank">{{element.applicant.usosId}}</a>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="uid">
         <th mat-header-cell *matHeaderCellDef> uid</th>
-        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.uid}}</td>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.applicant.uid}}</td>
       </ng-container>
 
       <ng-container matColumnDef="names">
@@ -198,7 +192,10 @@
         <td mat-cell *matCellDef="let element" class="mat-cell">
           <div *ngIf="element.applicant.assignedIndexNumber">
             <button mat-button (click)="updateIndexNumber(element)"
-                    [disabled]="import.importProgress.importStatus === 'ARCHIVED'">{{element.applicant.assignedIndexNumber}}</button>
+                    [disabled]="import.importProgress.importStatus === 'ARCHIVED'
+                    || !(userService.hasRole('ROLE_IMPORT_CHANGE_INDEX') || userService.hasRole('ROLE_ADMIN'))">
+              {{element.applicant.assignedIndexNumber}}
+            </button>
           </div>
         </td>
       </ng-container>

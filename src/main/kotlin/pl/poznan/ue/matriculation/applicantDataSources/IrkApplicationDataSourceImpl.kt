@@ -16,12 +16,12 @@ import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
 
 class IrkApplicationDataSourceImpl(
-        private val irkService: IrkService,
-        private val name: String,
-        private val id: String,
-        private val setAsAccepted: Boolean,
-        private val irkApplicantMapper: IrkApplicantMapper,
-        private val irkApplicationMapper: IrkApplicationMapper
+    private val irkService: IrkService,
+    override val name: String,
+    override val id: String,
+    private val setAsAccepted: Boolean,
+    private val irkApplicantMapper: IrkApplicantMapper,
+    private val irkApplicationMapper: IrkApplicationMapper
 ) : IApplicationDataSource<IrkApplicationDTO, IrkApplicantDto> {
 
     override fun getApplicationsPage(import: Import, registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<IrkApplicationDTO> {
@@ -57,18 +57,10 @@ class IrkApplicationDataSourceImpl(
         return irkService.getPhoto(photoUrl)
     }
 
-    override fun getName(): String {
-        return name
-    }
-
-    override fun getId(): String {
-        return id
-    }
-
-    override fun postMatriculation(applicationId: Long): Int {
+    override fun postMatriculation(foreignApplicationId: Long): Int {
         if (!setAsAccepted) return 1
         return try {
-            irkService.completeImmatriculation(applicationId)
+            irkService.completeImmatriculation(foreignApplicationId)
             1
         } catch (e: HttpStatusCodeException) {
             val errorMessageDto = jacksonObjectMapper().readValue(e.responseBodyAsString, ErrorMessageDto::class.java)
@@ -106,9 +98,7 @@ class IrkApplicationDataSourceImpl(
         return irkService.getApplication(applicationId)
     }
 
-    override fun getInstanceUrl(): String {
-        return irkService.serviceUrl
-    }
+    override val instanceUrl = irkService.serviceUrl
 
     override fun mapApplicationDtoToApplication(applicationDto: IrkApplicationDTO): Application {
         return irkApplicationMapper.mapApplicationDtoToApplication(applicationDto)
@@ -126,19 +116,16 @@ class IrkApplicationDataSourceImpl(
         return irkApplicantMapper.update(applicant, applicantDto)
     }
 
-    override fun preprocess(applicationDto: IrkApplicationDTO, applicantDto: IrkApplicantDto) {
-    }
-
     override fun getApplicationEditUrl(applicationId: Long): String {
-        return "${getInstanceUrl()}/pl/admin/application/${applicationId}/edit/"
+        return "${instanceUrl}/pl/admin/application/${applicationId}/edit/"
     }
 
     override fun getPrimaryCertificate(
-            application: Application,
-            applicationDto: IrkApplicationDTO,
-            applicant: Applicant,
-            applicantDto: IrkApplicantDto,
-            import: Import
+        application: Application,
+        applicationDto: IrkApplicationDTO,
+        applicant: Applicant,
+        applicantDto: IrkApplicantDto,
+        import: Import
     ): Document? {
         return applicant.educationData.documents.find {
             irkService.getPrimaryCertificate(applicationDto.id)?.let { primaryCertificate ->
@@ -146,5 +133,8 @@ class IrkApplicationDataSourceImpl(
                         it.certificateTypeCode == primaryCertificate.certificateTypeCode
             } ?: false
         }
+    }
+
+    override fun preprocess(applicationDto: IrkApplicationDTO, applicantDto: IrkApplicantDto) {
     }
 }

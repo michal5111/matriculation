@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {ImportStatus} from '../../../model/import/import-status.enum';
 
 @Component({
   selector: 'app-import-status-indicator',
@@ -7,7 +8,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ImportStatusIndicatorComponent implements OnInit {
 
-  constructor() { }
+  @Input() importStatus: ImportStatus;
+  @Input() tooltip = false;
+
+  constructor() {
+  }
 
   ngOnInit(): void {
   }

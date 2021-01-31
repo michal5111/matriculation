@@ -1,4 +1,9 @@
 <div class="mat-elevation-z2">
+  <span>
+    <button mat-stroked-button class="button-padding" (click)="onAddUserClick()">
+      <mat-icon>add</mat-icon>Dodaj
+    </button>
+  </span>
   <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)" matSortActive="id"
          matSortDirection="asc" matSortDisableClear>
 
@@ -14,7 +19,16 @@
 
     <ng-container matColumnDef="edit">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Edytuj</th>
-      <td mat-cell *matCellDef="let element" class="mat-cell">lol</td>
+      <td mat-cell *matCellDef="let element" class="mat-cell">
+        <button mat-button (click)="onEditUserClick(element)">Edytuj</button>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="delete">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Usuń</th>
+      <td mat-cell *matCellDef="let element" class="mat-cell">
+        <button mat-button (click)="onDeleteUserClick(element)">Usuń</button>
+      </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

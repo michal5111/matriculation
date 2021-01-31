@@ -8,8 +8,8 @@ import javax.persistence.*
 @Entity
 class Import(
     @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        var id: Long? = null,
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
 
     val programmeCode: String,
 
@@ -34,7 +34,7 @@ class Import(
 
     @JsonIgnore
     @OneToMany(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
-    val applications: MutableList<Application> = mutableListOf()
+    val applications: MutableSet<Application> = mutableSetOf()
 ) {
 
     @OneToOne(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.REMOVE])

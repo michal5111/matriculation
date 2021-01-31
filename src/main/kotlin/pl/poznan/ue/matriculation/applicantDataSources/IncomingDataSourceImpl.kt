@@ -9,24 +9,29 @@ import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 
 class IncomingDataSourceImpl(
-        name: String,
-        applicantMapper: DreamApplyApplicantMapper,
-        applicationMapper: DreamApplyApplicationMapper,
-        val status: String,
-        val dreamApplyService: DreamApplyService,
-        id: String
+    name: String,
+    applicantMapper: DreamApplyApplicantMapper,
+    applicationMapper: DreamApplyApplicationMapper,
+    val status: String,
+    val dreamApplyService: DreamApplyService,
+    id: String
 ) : DreamApplyDataSourceImpl(
-        name = name,
-        applicantMapper = applicantMapper,
-        applicationMapper = applicationMapper,
-        status = status,
-        dreamApplyService = dreamApplyService,
-        id = id
+    name = name,
+    applicantMapper = applicantMapper,
+    applicationMapper = applicationMapper,
+    status = status,
+    dreamApplyService = dreamApplyService,
+    id = id
 ) {
 
     val programmePattern = "^([SNsn])([123])-\\w*".toRegex()
 
-    override fun getApplicationsPage(import: Import, registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<DreamApplyApplicationDto> {
+    override fun getApplicationsPage(
+        import: Import,
+        registrationCode: String,
+        programmeForeignId: String,
+        pageNumber: Int
+    ): IPage<DreamApplyApplicationDto> {
         val programmeForeignIdSplit = programmeForeignId.split(";")
         val programmeId = programmeForeignIdSplit[0]
         val flagId = programmeForeignIdSplit[1]
@@ -37,22 +42,20 @@ class IncomingDataSourceImpl(
             it.key
         }?.firstOrNull()
         val applicationMap = dreamApplyService.getApplicationsByFilter(
-                academicTermID = registrationCode,
-                additionalFilters = mapOf(
-                        "byCourseIDs" to programmeId,
-                        "byOfferTypes" to status,
-                        "byFlagIDs" to flagId
-                )
+            academicTermID = registrationCode,
+            additionalFilters = mapOf(
+                "byCourseIDs" to programmeId,
+                "byOfferTypes" to status,
+                "byFlagIDs" to flagId
+            )
         ) ?: throw java.lang.IllegalArgumentException("Unable to get applicants")
         val applications = applicationMap.values.filter { dreamApplyApplicationDto ->
             val applicationOffers = dreamApplyService.getApplicationOffers(dreamApplyApplicationDto.offers)
+            val applicationFlags = dreamApplyService.getApplicationFlags(dreamApplyApplicationDto.flags)
             applicationOffers!!.any {
                 it.value.course == "/api/courses/$programmeId"
                         && it.value.type == status
-            }
-        }.filter { dreamApplyApplicationDto ->
-            val applicationFlags = dreamApplyService.getApplicationFlags(dreamApplyApplicationDto.flags)
-            applicationFlags!!.any {
+            } && applicationFlags!!.any {
                 it.key == semesterFlagId
             }
         }
@@ -73,9 +76,9 @@ class IncomingDataSourceImpl(
 
     override fun getAvailableRegistrationProgrammes(registration: String): List<ProgrammeDto> {
         val courses = dreamApplyService.getCourses(statuses = "Online")
-                ?: throw IllegalStateException("Unable to get courses list.")
+            ?: throw IllegalStateException("Unable to get courses list.")
         var flags = dreamApplyService.getAllFlags()
-                ?: throw java.lang.IllegalStateException("Unable to get flags list.")
+            ?: throw java.lang.IllegalStateException("Unable to get flags list.")
         flags = flags.filter {
             it.value.name.matches(programmePattern)
         }
@@ -83,11 +86,11 @@ class IncomingDataSourceImpl(
         courses.values.forEach { courseDto ->
             flags.forEach { flagMapEntry ->
                 programmeList.add(
-                        ProgrammeDto(
-                                id = "${courseDto.id};${flagMapEntry.key}",
-                                name = "${courseDto.name} ${flagMapEntry.value.name}",
-                                usosId = flagMapEntry.value.name
-                        )
+                    ProgrammeDto(
+                        id = "${courseDto.id};${flagMapEntry.key}",
+                        name = "${courseDto.name} ${flagMapEntry.value.name}",
+                        usosId = flagMapEntry.value.name
+                    )
                 )
             }
         }

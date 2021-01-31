@@ -1,1 +1,17 @@
-<p>add-user-dialog works!</p>
+<div>
+  <form [formGroup]="addUserFormGroup" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+      <mat-label>Podaj UID (NIU)</mat-label>
+      <input type="text" matInput formControlName="uid" required="true">
+    </mat-form-field>
+    <mat-selection-list *ngIf="rolesList" #roleSelectionList>
+      <mat-list-option *ngFor="let role of rolesList" [value]="role">
+        {{role.name}}
+      </mat-list-option>
+    </mat-selection-list>
+    <button mat-button type="submit" [disabled]="!addUserFormGroup.valid">
+      <mat-icon>add</mat-icon>
+      Dodaj
+    </button>
+  </form>
+</div>

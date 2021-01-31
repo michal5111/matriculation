@@ -7,4 +7,6 @@ export type ImportStatus =
   | 'ARCHIVED'
   | 'COMPLETED_WITH_ERRORS'
   | 'ERROR'
+  | 'SENDING_NOTIFICATIONS'
+  | 'SEARCHING_UIDS';
 

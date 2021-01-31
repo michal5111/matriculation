@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ImportStatusIndicatorComponent } from './import-status-indicator.component';
+import {ImportStatusIndicatorComponent} from './import-status-indicator.component';
 
 describe('ImportStatusIndicatorComponent', () => {
   let component: ImportStatusIndicatorComponent;

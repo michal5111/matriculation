@@ -19,17 +19,16 @@ import javax.sql.DataSource
 
 @Service
 class StudentService(
-        private val indexTypeRepository: IndexTypeRepository,
-        private val organizationalUnitRepository: OrganizationalUnitRepository,
-        private val programmeRepository: ProgrammeRepository,
-        private val didacticCycleRepository: DidacticCycleRepository,
-        private val programmeStageRepository: ProgrammeStageRepository,
-        private val personProgrammeRepository: PersonProgrammeRepository,
-        private val studentRepository: StudentRepository,
-        private val entitlementDocumentRepository: EntitlementDocumentRepository,
-        private val sourceOfFinancingRepository: SourceOfFinancingRepository,
-        private val basisOfAdmissionRepository: BasisOfAdmissionRepository,
-        @Qualifier("oracleDataSource") private val dataSource: DataSource
+    private val indexTypeRepository: IndexTypeRepository,
+    private val organizationalUnitRepository: OrganizationalUnitRepository,
+    private val programmeRepository: ProgrammeRepository,
+    private val didacticCycleRepository: DidacticCycleRepository,
+    private val programmeStageRepository: ProgrammeStageRepository,
+    private val studentRepository: StudentRepository,
+    private val entitlementDocumentRepository: EntitlementDocumentRepository,
+    private val sourceOfFinancingRepository: SourceOfFinancingRepository,
+    private val basisOfAdmissionRepository: BasisOfAdmissionRepository,
+    @Qualifier("oracleDataSource") private val dataSource: DataSource
 ) {
 
     private lateinit var jdbcCall: SimpleJdbcCall
@@ -41,19 +40,18 @@ class StudentService(
     fun init() {
         val jdbcTemplate = JdbcTemplate(dataSource)
         jdbcCall = SimpleJdbcCall(jdbcTemplate)
-                .withSchemaName("USOS_PROD_TAB")
-                .withCatalogName("pkg_immatrykulacja")
-                .withProcedureName("nowy_indeks")
-                .declareParameters(
-                        SqlParameter("p_typ", Types.VARCHAR),
-                        SqlOutParameter("p_numer", Types.VARCHAR),
-                        SqlOutParameter("p_jed_org_kod", Types.VARCHAR)
-                )
+            .withSchemaName("USOS_PROD_TAB")
+            .withCatalogName("pkg_immatrykulacja")
+            .withProcedureName("nowy_indeks")
+            .declareParameters(
+                SqlParameter("p_typ", Types.VARCHAR),
+                SqlOutParameter("p_numer", Types.VARCHAR),
+                SqlOutParameter("p_jed_org_kod", Types.VARCHAR)
+            )
     }
 
     fun createOrFindStudent(person: Person, indexPoolCode: String): Student {
-        val indexType = indexTypeRepository.getOne(indexPoolCode)
-        val foundStudent = studentRepository.findByPersonAndIndexTypeOrderByIndexNumberAsc(person, indexType)
+        val foundStudent = studentRepository.findByPersonAndIndexTypeCodeOrderByIndexNumberAsc(person, indexPoolCode)
         if (foundStudent.isNotEmpty()) {
             return foundStudent.last()
         }
@@ -61,7 +59,7 @@ class StudentService(
             .addValue("p_typ", indexPoolCode)
         val resultMap: MutableMap<String, Any> = jdbcCall.execute(paramMap)
         val student = Student(
-            indexType = indexType,
+            indexType = indexTypeRepository.getOne(indexPoolCode),
             organizationalUnit =
             if (resultMap["p_jed_org_kod"] != null) organizationalUnitRepository.getOne(resultMap["p_jed_org_kod"] as String)
             else organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitCode),
@@ -71,8 +69,7 @@ class StudentService(
             person = person
         )
         if (student.organizationalUnit.code == defaultStudentOrganizationalUnitCode) {
-            val findByPersonAndMainIndex = studentRepository.findByPersonAndMainIndex(person, 'T')
-            findByPersonAndMainIndex?.apply {
+            studentRepository.findByPersonAndMainIndex(person, 'T')?.apply {
                 mainIndex = 'N'
             }?.let {
                 studentRepository.save(it)
@@ -83,73 +80,73 @@ class StudentService(
     }
 
     fun createPersonProgramme(
-            person: Person,
-            programmeCode: String,
-            startDate: Date,
-            dateOfAddmision: Date,
-            stageCode: String,
-            didacticCycleCode: String,
-            student: Student,
-            certificate: Document?,
-            sourceOfFinancing: String?,
-            basisOfAdmission: String?
+        person: Person,
+        programmeCode: String,
+        startDate: Date,
+        dateOfAddmision: Date,
+        stageCode: String,
+        didacticCycleCode: String,
+        student: Student,
+        certificate: Document?,
+        sourceOfFinancing: String?,
+        basisOfAdmission: String?,
+        isDefault: Boolean
     ): PersonProgramme {
         val programme = programmeRepository.getOne(programmeCode)
         val didacticCycle = didacticCycleRepository.getOne(didacticCycleCode)
         val personProgramme = PersonProgramme(
-                person = person,
-                programme = programme,
-                student = student,
-                startDate = startDate,
-                dateOfAddmision = dateOfAddmision,
-                dateToNextPass = didacticCycle.dateTo,
-                isDefault = if (getPreviousStudyEndDate(person, dateOfAddmision) <= dateOfAddmision) 'T' else 'N',
-                entitlementDocument = certificate?.let {
-                    entitlementDocumentRepository.getByPersonAndTypeAndNumber(
-                            person,
-                            it.certificateUsosCode!!,
-                            it.documentNumber
-                    )
-                }
+            person = person,
+            programme = programme,
+            student = student,
+            startDate = startDate,
+            dateOfAddmision = dateOfAddmision,
+            dateToNextPass = didacticCycle.dateTo,
+            isDefault = if (isDefault) 'T' else 'N',
+            entitlementDocument = certificate?.let {
+                entitlementDocumentRepository.getByPersonAndTypeAndNumber(
+                    person,
+                    it.certificateUsosCode!!,
+                    it.documentNumber
+                )
+            }
         )
         sourceOfFinancing?.let {
             personProgramme.personProgrammeSourceOfFinancing.add(
-                    PersonProgrammeSourceOfFinancing(
-                            sourceOfFinancing = sourceOfFinancingRepository.getOne(it),
-                            dateFrom = dateOfAddmision,
-                            personProgramme = personProgramme
-                    )
+                PersonProgrammeSourceOfFinancing(
+                    sourceOfFinancing = sourceOfFinancingRepository.getOne(it),
+                    dateFrom = dateOfAddmision,
+                    personProgramme = personProgramme
+                )
             )
         }
         basisOfAdmission?.let {
             personProgramme.personProgrammeBasisOfAdmission.add(
-                    PersonProgrammeBasisOfAdmission(
-                            basisOfAdmission = basisOfAdmissionRepository.getOne(it),
-                            dateFrom = dateOfAddmision,
-                            personProgramme = personProgramme
-                    )
+                PersonProgrammeBasisOfAdmission(
+                    basisOfAdmission = basisOfAdmissionRepository.getOne(it),
+                    dateFrom = dateOfAddmision,
+                    personProgramme = personProgramme
+                )
             )
         }
         personProgramme.personStages.add(
-                PersonStage(
-                        didacticCycle = didacticCycle,
-                        passStatus = 'X',
-                        personProgramme = personProgramme,
-                        programmeStage = programmeStageRepository.getOne(ProgrammeStageId(
-                                programmeId = programme.code,
-                                stageId = stageCode
-                        )),
-                        didacticCycleRequirement = didacticCycle,
-                        order = 1,
-                        endDate = didacticCycle.endDate
-                )
+            PersonStage(
+                didacticCycle = didacticCycle,
+                passStatus = 'X',
+                personProgramme = personProgramme,
+                programmeStage = programmeStageRepository.getOne(
+                    ProgrammeStageId(
+                        programmeId = programme.code,
+                        stageId = stageCode
+                    )
+                ),
+                didacticCycleRequirement = didacticCycle,
+                order = 1,
+                endDate = didacticCycle.endDate,
+                conditionCount = 2
+            )
         )
         person.personProgrammes.add(personProgramme)
         student.personProgrammes.add(personProgramme)
         return personProgramme
-    }
-
-    fun getPreviousStudyEndDate(person: Person, dateOfAddmision: Date): Date {
-        return personProgrammeRepository.getPreviousStudyEndDate(person) ?: return dateOfAddmision
     }
 }

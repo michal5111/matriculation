@@ -81,14 +81,21 @@ class ImportService(
         importRepository.save(import)
     }
 
+    fun prepareForSearchingUids(importId: Long) {
+        val import = getForUidsSearch(importId)
+        import.importProgress.importedUids = 0
+        import.importProgress.importStatus = ImportStatus.SEARCHING_UIDS
+        importRepository.save(import)
+    }
+
     fun get(importId: Long): Import {
         return importRepository.findByIdOrNull(importId)
-                ?: throw ImportNotFoundException("Nie znaleziono imoportu.")
+            ?: throw ImportNotFoundException("Nie znaleziono imoportu.")
     }
 
     fun getProgress(importId: Long): ImportProgress {
         return importProgressRepository.findByIdOrNull(importId)
-                ?: throw ImportNotFoundException("Nie znaleziono importu.")
+            ?: throw ImportNotFoundException("Nie znaleziono importu.")
     }
 
     fun setError(importId: Long, errorMessage: String) {
@@ -105,12 +112,15 @@ class ImportService(
         when (import.importProgress.importStatus) {
             ImportStatus.ARCHIVED -> throw ImportException(importId, "Import został zarchiwizowany.")
             ImportStatus.STARTED,
-            ImportStatus.SAVING -> throw ImportException(importId, "Import już się rozpoczął.")
+            ImportStatus.SAVING,
+            ImportStatus.SEARCHING_UIDS,
+            ImportStatus.SENDING_NOTIFICATIONS -> throw ImportException(importId, "Import już się rozpoczął.")
             ImportStatus.COMPLETE -> throw ImportException(importId, "Import zakończony")
             ImportStatus.IMPORTED,
             ImportStatus.PENDING,
             ImportStatus.COMPLETED_WITH_ERRORS,
-            ImportStatus.ERROR -> return import
+            ImportStatus.ERROR -> return if (import.importProgress.savedApplicants != import.importProgress.totalCount) import
+            else throw ImportException(importId, "Wszyscy sa już zapisani")
             else -> throw ImportException(importId, "Nieznany stan")
         }
     }
@@ -124,12 +134,14 @@ class ImportService(
             ImportStatus.PENDING,
             ImportStatus.STARTED,
             ImportStatus.SAVING,
-            ImportStatus.ERROR -> throw ImportStartException(importId, "Zły stan importu.")
+            ImportStatus.ERROR,
+            ImportStatus.SENDING_NOTIFICATIONS,
+            ImportStatus.SEARCHING_UIDS -> throw ImportStartException(importId, "Zły stan importu.")
             ImportStatus.IMPORTED,
             ImportStatus.COMPLETE,
             ImportStatus.COMPLETED_WITH_ERRORS -> {
                 val totalCount = importProgress.totalCount
-                        ?: throw ImportStartException(importId, "Liczba aplikantów to null")
+                    ?: throw ImportStartException(importId, "Liczba aplikantów to null")
                 if (totalCount < 1 || totalCount == importProgress.savedApplicants) {
                     throw ImportStartException(importId, "Liczba aplikantów wynosi 0 lub wszyscy są już zapisani")
                 }
@@ -157,10 +169,12 @@ class ImportService(
                 ImportStatus.ARCHIVED -> throw ImportException(importId, "Import został zarchiwizowany.")
                 ImportStatus.STARTED,
                 ImportStatus.SAVING,
-                ImportStatus.ERROR,
                 ImportStatus.IMPORTED,
                 ImportStatus.COMPLETE,
-                ImportStatus.COMPLETED_WITH_ERRORS -> throw ImportStartException(importId, "Zły stan importu.")
+                ImportStatus.COMPLETED_WITH_ERRORS,
+                ImportStatus.SENDING_NOTIFICATIONS,
+                ImportStatus.SEARCHING_UIDS -> throw ImportStartException(importId, "Zły stan importu.")
+                ImportStatus.ERROR,
                 ImportStatus.PENDING -> {
                     if (import.importProgress.importedApplications != 0) {
                         throw IllegalStateException("Liczba kandydatów jest większa od 0")
@@ -173,6 +187,35 @@ class ImportService(
         } catch (e: Exception) {
             logger.error("Błąd przy usuwaniu importu", e)
             throw ImportDeleteException("Nie Można usunąć importu: ${e.message}")
+        }
+    }
+
+    fun getForUidsSearch(importId: Long): Import {
+        val import: Import = importRepository.findByIdOrNull(importId)
+            ?: throw ImportNotFoundException("Nie znaleziono importu.")
+        val importProgress = import.importProgress
+        when (importProgress.importStatus) {
+            ImportStatus.ARCHIVED -> throw ImportException(importId, "Import został zarchiwizowany.")
+            ImportStatus.PENDING,
+            ImportStatus.STARTED,
+            ImportStatus.SAVING,
+            ImportStatus.IMPORTED,
+            ImportStatus.SENDING_NOTIFICATIONS,
+            ImportStatus.SEARCHING_UIDS -> throw ImportStartException(importId, "Zły stan importu.")
+            ImportStatus.ERROR,
+            ImportStatus.COMPLETE,
+            ImportStatus.COMPLETED_WITH_ERRORS -> {
+                val totalCount = importProgress.totalCount
+                    ?: throw ImportStartException(importId, "Liczba aplikantów to null")
+                if (totalCount < 1) {
+                    throw ImportStartException(importId, "Liczba aplikantów wynosi 0")
+                }
+                if (importProgress.savedApplicants != totalCount) {
+                    throw ImportStartException(importId, "Nie wszyscy kandydaci zostali zapisani")
+                }
+                return import
+            }
+            else -> throw IllegalStateException("Nieznany stan")
         }
     }
 

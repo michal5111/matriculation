@@ -1,5 +1,5 @@
 import {BrowserModule} from '@angular/platform-browser';
-import {LOCALE_ID, NgModule} from '@angular/core';
+import {ErrorHandler, LOCALE_ID, NgModule} from '@angular/core';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
@@ -29,6 +29,10 @@ import {ConfirmationDialogComponent} from './component/dialog/confirmation-dialo
 import {ErrorDialogComponent} from './component/dialog/error-dialog/error-dialog.component';
 import {UserManagerComponent} from './component/user-manager/user-manager.component';
 import {UserEditorComponent} from './component/dialog/user-editor/user-editor.component';
+import {ProgressViewerComponent} from './component/progress-viewer/progress-viewer.component';
+import {ImportStatusIndicatorComponent} from './component/import/import-status-indicator/import-status-indicator.component';
+import {AddUserDialogComponent} from './component/dialog/add-user-dialog/add-user-dialog.component';
+import {ExceptionHandler} from './exceptionHandler/exception-handler';
 
 @NgModule({
   declarations: [
@@ -49,7 +53,10 @@ import {UserEditorComponent} from './component/dialog/user-editor/user-editor.co
     ConfirmationDialogComponent,
     ErrorDialogComponent,
     UserManagerComponent,
-    UserEditorComponent
+    UserEditorComponent,
+    ProgressViewerComponent,
+    ImportStatusIndicatorComponent,
+    AddUserDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -71,6 +78,10 @@ import {UserEditorComponent} from './component/dialog/user-editor/user-editor.co
       provide: APP_BASE_HREF,
       useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(),
       deps: [PlatformLocation]
+    },
+    {
+      provide: ErrorHandler,
+      useClass: ExceptionHandler
     }
   ],
   bootstrap: [AppComponent]

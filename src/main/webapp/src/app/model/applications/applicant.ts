@@ -1,8 +1,8 @@
 import {Document} from './document';
 import {Observable} from 'rxjs';
-import {Address} from "./address";
-import {PhoneNumber} from "./phoneNumber";
-import {IdentityDocument} from "./identityDocument";
+import {Address} from './address';
+import {PhoneNumber} from './phoneNumber';
+import {IdentityDocument} from './identityDocument';
 
 export class Applicant {
   id: number;
@@ -32,8 +32,8 @@ export class Applicant {
     countryOfBirth: string;
     dataSource: string;
   };
-  addresses: [Address];
-  phoneNumbers: [PhoneNumber];
+  addresses: Address[];
+  phoneNumbers: PhoneNumber[];
   additionalData: {
     documentType: string;
     documentNumber: string;
@@ -48,7 +48,7 @@ export class Applicant {
     fathersName: string;
   };
   foreignerData: {
-    foreigner_status: [string];
+    foreigner_status: string[];
     polish_card_issue_date: Date;
     polish_card_valid_to: Date;
     polish_card_number: string;
@@ -60,9 +60,9 @@ export class Applicant {
     highSchoolName: string;
     highSchoolUsosCode: string;
     highSchoolCity: string;
-    documents: [Document];
+    documents: Document[];
   };
-  identityDocuments: [IdentityDocument];
+  identityDocuments: IdentityDocument[];
   usosId: number;
   assignedIndexNumber: number;
   dataSourceId: number;

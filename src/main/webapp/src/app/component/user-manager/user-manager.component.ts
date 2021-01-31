@@ -4,12 +4,15 @@ import {User} from '../../model/user/user';
 import {MatTableDataSource} from '@angular/material/table';
 import {map, tap} from 'rxjs/operators';
 import {Page} from '../../model/oracle/page/page';
-import {MatPaginator, PageEvent} from "@angular/material/paginator";
-import {MatSort, Sort} from "@angular/material/sort";
-import {HttpErrorResponse} from "@angular/common/http";
-import {ErrorDialogComponent} from "../dialog/error-dialog/error-dialog.component";
-import {ErrorDialogData} from "../../model/dialog/error-dialog-data";
-import {MatDialog} from "@angular/material/dialog";
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSort, Sort} from '@angular/material/sort';
+import {MatDialog} from '@angular/material/dialog';
+import {AddUserDialogComponent} from '../dialog/add-user-dialog/add-user-dialog.component';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {ConfirmationDialogData} from '../../model/dialog/confirmation-dialog-data';
+import {ConfirmationDialogComponent} from '../dialog/confirmation-dialog/confirmation-dialog.component';
+import {UserEditorComponent} from '../dialog/user-editor/user-editor.component';
+import {UserEditorData} from '../../model/user/UserEditorData';
 
 @Component({
   selector: 'app-user-manager',
@@ -31,14 +34,16 @@ export class UserManagerComponent implements OnInit {
   displayedColumns: string[] = [
     'id',
     'uid',
-    'edit'
+    'edit',
+    'delete'
   ];
 
   dataSource = new MatTableDataSource<User>();
 
   constructor(
     private userService: UserService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {
   }
 
@@ -47,8 +52,8 @@ export class UserManagerComponent implements OnInit {
     this.dataSource.sort = this.sort;
     this.getUserPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe(
       () => {
-      },
-      error => this.onError('Błąd przy pobieraniu użytkowników', error));
+      }// , error => this.onError('Błąd przy pobieraniu użytkowników', error)
+    );
   }
 
   create(user: User) {
@@ -74,25 +79,24 @@ export class UserManagerComponent implements OnInit {
     );
   }
 
-  onError(title: string, error): void {
-    if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
-      return;
-    }
-    if (this.dialog.openDialogs.length > 0) {
-      return;
-    }
-    this.dialog.open(ErrorDialogComponent, {
-      data: new ErrorDialogData(title, error)
-    });
-  }
+  // onError(title: string, error): void {
+  //   if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
+  //     return;
+  //   }
+  //   if (this.dialog.openDialogs.length > 0) {
+  //     return;
+  //   }
+  //   this.dialog.open(ErrorDialogComponent, {
+  //     data: new ErrorDialogData(title, error)
+  //   });
+  // }
 
   switchPage(pageEvent: PageEvent): void {
     this.pageNumber = pageEvent.pageIndex;
     this.pageSize = pageEvent.pageSize;
     this.getUserPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe(
       () => {
-      },
-      error => this.onError('Błąd przy pobieraniu strony', error)
+      }// , error => this.onError('Błąd przy pobieraniu strony', error)
     );
   }
 
@@ -100,9 +104,52 @@ export class UserManagerComponent implements OnInit {
     this.sortDirString = sortEvent.direction;
     this.getUserPage(this.pageNumber, this.pageSize, this.sortString, sortEvent.active).subscribe(
       () => {
-      },
-      error => this.onError('Błąd przy pobieraniu strony', error)
+      }// , error => this.onError('Błąd przy pobieraniu strony', error)
     );
   }
 
+  onAddUserClick() {
+    const dialogRef = this.dialog.open(AddUserDialogComponent);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== undefined && result !== '') {
+        this.dataSource.data = [...this.dataSource.data, result];
+        const snackbarRef = this.snackBar.open('Użytkownik dodany', 'OK', {
+          duration: 3000
+        });
+        snackbarRef.onAction().subscribe(() => snackbarRef.dismiss());
+      }
+    });
+  }
+
+  onDeleteUserClick(user: User) {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: new ConfirmationDialogData('Jesteś pewien?', 'Czy na pewno chcesz usunąć użytkownika?')
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteUser(user);
+      }
+    });
+  }
+
+  deleteUser(user: User) {
+    this.userService.delete(user.id).subscribe(
+      () => {
+        this.dataSource.data = this.dataSource.data.filter(element => {
+          return element !== user;
+        });
+      }// , error => this.onError('Błąd przy usuwaniu użytkownika', error)
+    );
+  }
+
+  onEditUserClick(user: User) {
+    const dialogRef = this.dialog.open(UserEditorComponent, {
+      data: new UserEditorData(user)
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== undefined && result !== '') {
+
+      }
+    });
+  }
 }

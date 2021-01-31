@@ -18,7 +18,6 @@ import {ConfirmationDialogComponent} from '../../dialog/confirmation-dialog/conf
 import {ConfirmationDialogData} from '../../../model/dialog/confirmation-dialog-data';
 import {ErrorDialogComponent} from '../../dialog/error-dialog/error-dialog.component';
 import {ErrorDialogData} from '../../../model/dialog/error-dialog-data';
-import {HttpErrorResponse} from '@angular/common/http';
 import {UrlDto} from '../../../model/import/urlDto';
 import {UsosService} from '../../../service/usos-service/usos.service';
 
@@ -71,11 +70,19 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['applicationImportStatus', 'importStatus'],
     ['importError', 'importError']
   ]);
+
+  workingStatuses = [
+    'STARTED',
+    'SAVING',
+    'SEARCHING_UIDS',
+    'SENDING_NOTIFICATIONS'
+  ];
+
   $importProgressObservable = timer(0, 1000).pipe(
     switchMap(() => this.importService.getImportProgress(this.importId)),
     tap(result => this.importProgress = result),
     switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString)),
-    takeWhile(() => this.importProgress.importStatus === 'STARTED' || this.importProgress.importStatus === 'SAVING')
+    takeWhile(() => this.workingStatuses.some(status => status === this.importProgress.importStatus))
   );
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -119,71 +126,47 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     this.usosService.getUsosUrl().subscribe(
       result => {
         this.usosUrl = result;
-      },
-      error => this.onError('Błąd przy pobieraniu url usosa', error)
+      }
     );
     this.progressSubscription = this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).pipe(
       switchMap(() => this.$importProgressObservable)
-    ).subscribe(() => {
-      },
-      error => this.onError('Błąd przy archiwizowaniu', error));
+    ).subscribe();
   }
 
   switchPage(pageEvent: PageEvent): void {
     this.pageNumber = pageEvent.pageIndex;
     this.pageSize = pageEvent.pageSize;
-    this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe(
-      () => {
-      },
-      error => this.onError('Błąd przy pobieraniu strony', error)
-    );
+    this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe();
   }
 
   sortEvent(sortEvent: Sort): void {
     this.sortString = this.sortingMap.get(sortEvent.active);
     this.sortDirString = sortEvent.direction;
-    this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe(
-      () => {
-      },
-      error => this.onError('Błąd przy pobieraniu strony', error)
-    );
+    this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe();
   }
 
   startImport(): void {
     this.progressSubscription.unsubscribe();
     this.progressSubscription = this.importService.startImport(this.importId).pipe(
       switchMap(() => this.$importProgressObservable)
-    ).subscribe(
-      () => {
-      },
-      error => this.onError('Błąd przy uruchomieniu importu', error)
-    );
+    ).subscribe();
   }
 
   savePersons(): void {
     this.progressSubscription.unsubscribe();
     this.progressSubscription = this.importService.savePersons(this.importId).pipe(
       switchMap(() => this.$importProgressObservable)
-    ).subscribe(
-      () => {
-      },
-      error => this.onError('Błąd przy rozpoczęciu zapisywania', error)
-    );
+    ).subscribe();
   }
 
   getSecondarySchoolDocument(application: Application): Document {
     return application.applicant.educationData.documents
-      .find(document => document.certificateUsosCode === 'D'
-        || document.certificateUsosCode === 'N'
-        || document.certificateUsosCode === 'E'
-        || document.certificateUsosCode === 'Z');
+      .find(document => ['D', 'N', 'E', 'Z'].some(code => document.certificateUsosCode === code));
   }
 
   getDiplomaDocument(application: Application): Document {
     return application.applicant.educationData.documents
-      .find(document => document.certificateUsosCode === 'L'
-        || document.certificateUsosCode === 'I'
-      );
+      .find(document => ['L', 'I'].some(code => document.certificateUsosCode === code));
   }
 
   updateIndexNumber(application: Application): void {
@@ -207,14 +190,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     return this.page.content.indexOf(application) + this.pageSize * this.page.number + 1;
   }
 
-  getImportProgressPercentage(): number {
-    return this.importProgress.importedApplications * 100 / this.importProgress.totalCount;
-  }
-
-  getSaveProgressPercentage(): number {
-    return (this.importProgress.savedApplicants + this.importProgress.saveErrors) * 100 / this.importProgress.totalCount;
-  }
-
   onArchiveClick(): void {
     const data = new ConfirmationDialogData('Archiwizuj import', 'Czy na pewno chcesz zarchiwizować import? Procesu nie można odwrócić!');
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
@@ -225,11 +200,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       switchMap((result) => this.importService.archiveImport(this.importId)),
       switchMap(() => this.importService.getImportProgress(this.importId)),
       switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString))
-    ).subscribe(
-      () => {
-      },
-      error => this.onError('Błąd przy archiwizowaniu', error)
-    );
+    ).subscribe();
   }
 
   getApplicationEditUrl(application: Application): string {
@@ -242,18 +213,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.progressSubscription.unsubscribe();
-  }
-
-  onError(title: string, error): void {
-    if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
-      return;
-    }
-    if (this.dialog.openDialogs.length > 0) {
-      return;
-    }
-    this.dialog.open(ErrorDialogComponent, {
-      data: new ErrorDialogData(title, error)
-    });
   }
 
   showApplicationErrorDialog(application: Application): void {
@@ -281,7 +240,11 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       case 'SAVING':
       case 'STARTED':
       case 'COMPLETE':
+      case 'SEARCHING_UIDS':
+      case 'SENDING_NOTIFICATIONS':
         return true;
+      case 'ERROR':
+        return this.importProgress.savedApplicants === this.importProgress.totalCount;
       default:
         return false;
     }
@@ -299,5 +262,37 @@ export class ImportViewComponent implements OnInit, OnDestroy {
 
   isArchiveButtonDisabled(): boolean {
     return this.importProgress.importStatus !== 'COMPLETE';
+  }
+
+  isFindUidsButtonDisabled(): boolean {
+    switch (this.importProgress.importStatus) {
+      case 'COMPLETE':
+      case 'COMPLETED_WITH_ERRORS':
+      case 'ERROR':
+        return this.importProgress.savedApplicants !== this.importProgress.totalCount;
+      default:
+        return true;
+    }
+  }
+
+  onFindUidsClick() {
+    this.progressSubscription.unsubscribe();
+    this.progressSubscription = this.importService.findUids(this.importId).pipe(
+      switchMap(() => this.$importProgressObservable)
+    ).subscribe();
+  }
+
+  onSendNotificationsClick() {
+
+  }
+
+  isSendNotificationsDisabled(): boolean {
+    switch (this.importProgress.importStatus) {
+      case 'COMPLETE':
+      case 'COMPLETED_WITH_ERRORS':
+        return false;
+      default:
+        return true;
+    }
   }
 }

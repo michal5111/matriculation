@@ -78,15 +78,13 @@ class ExcelFileDataSourceImpl(
         return null
     }
 
-    override fun getName(): String {
-        return "Plik Excel"
-    }
+    override val name = "Plik Excel"
 
-    override fun getId(): String {
-        return "EXCEL_FILE"
-    }
+    override val id = "EXCEL_FILE"
 
-    override fun postMatriculation(applicationId: Long): Int {
+    override val instanceUrl = "Plik Excel"
+
+    override fun postMatriculation(foreignApplicationId: Long): Int {
         return 1
     }
 
@@ -109,7 +107,7 @@ class ExcelFileDataSourceImpl(
         )
     }
 
-    override fun getApplicationById(applicationId: Long): ExcelFileApplicationDto? {
+    override fun getApplicationById(applicationId: Long): ExcelFileApplicationDto {
         return lastPage?.getResultsList()?.find {
             it.id == applicationId
         } ?: throw IllegalStateException("Unable to find application")
@@ -129,13 +127,6 @@ class ExcelFileDataSourceImpl(
 
     override fun updateApplicant(applicant: Applicant, applicantDto: ExcelFileApplicantDto): Applicant {
         return excelFileApplicantMapper.updateApplicantFromExcelApplicantDto(applicant, applicantDto)
-    }
-
-    override fun getInstanceUrl(): String {
-        return "Plik Excel"
-    }
-
-    override fun preprocess(applicationDto: ExcelFileApplicationDto, applicantDto: ExcelFileApplicantDto) {
     }
 
     override fun getPrimaryCertificate(
@@ -226,5 +217,8 @@ class ExcelFileDataSourceImpl(
                 && headerRow.getCell(18).stringCellValue.trim().toUpperCase() == "NUMER MIESZKANIA"
                 && headerRow.getCell(19).stringCellValue.trim().toUpperCase() == "KOD POCZTOWY"
                 && headerRow.getCell(20).stringCellValue.trim().toUpperCase() == "NR TELEFONU"
+    }
+
+    override fun preprocess(applicationDto: ExcelFileApplicationDto, applicantDto: ExcelFileApplicantDto) {
     }
 }

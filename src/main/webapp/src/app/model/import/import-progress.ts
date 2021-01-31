@@ -13,5 +13,7 @@ export class ImportProgress {
 
   importStatus: ImportStatus;
 
+  importedUids: number;
+
   error: string;
 }

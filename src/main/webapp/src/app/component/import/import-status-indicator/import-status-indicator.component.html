@@ -1,0 +1,42 @@
+<div [ngSwitch]="importStatus">
+  <span *ngSwitchCase="'PENDING'">
+    <mat-icon matTooltip="Oczekujący" [matTooltipDisabled]="!tooltip">hourglass_empty</mat-icon>
+    <span *ngIf="!tooltip">Oczekujący</span>
+  </span>
+  <span *ngSwitchCase="'STARTED'">
+    <mat-icon matTooltip="Importowanie" [matTooltipDisabled]="!tooltip">cloud_download</mat-icon>
+    <span *ngIf="!tooltip">Importowanie</span>
+  </span>
+  <span *ngSwitchCase="'IMPORTED'">
+    <mat-icon matTooltip="Zaimportowane" [matTooltipDisabled]="!tooltip">cloud_done</mat-icon>
+    <span *ngIf="!tooltip">Zaimportowane</span>
+  </span>
+  <span *ngSwitchCase="'SAVING'">
+    <mat-icon matTooltip="Zapisywanie w usosie" [matTooltipDisabled]="!tooltip">cloud_upload</mat-icon>
+    <span *ngIf="!tooltip">Zapisywanie w usosie...</span>
+  </span>
+  <span *ngSwitchCase="'COMPLETE'">
+    <mat-icon matTooltip="Zakończono" [matTooltipDisabled]="!tooltip">done</mat-icon>
+    <span *ngIf="!tooltip">Zakończono</span>
+  </span>
+  <span *ngSwitchCase="'ARCHIVED'">
+    <mat-icon matTooltip="Zarchiwizowany" [matTooltipDisabled]="!tooltip">archived</mat-icon>
+    <span *ngIf="!tooltip">Zarchiwizowany</span>
+  </span>
+  <span *ngSwitchCase="'COMPLETED_WITH_ERRORS'">
+    <mat-icon matTooltip="Zakończono z błędami" [matTooltipDisabled]="!tooltip">warning</mat-icon>
+    <span *ngIf="!tooltip">Zakończono z błędami</span>
+  </span>
+  <span *ngSwitchCase="'ERROR'">
+    <mat-icon matTooltip="Błąd" [matTooltipDisabled]="!tooltip">error</mat-icon>
+    <span *ngIf="!tooltip">Błąd</span>
+  </span>
+  <span *ngSwitchCase="'SEARCHING_UIDS'">
+    <mat-icon matTooltip="Szukam UIDów" [matTooltipDisabled]="!tooltip">search</mat-icon>
+    <span *ngIf="!tooltip">Szukam UIDów</span>
+  </span>
+  <span *ngSwitchCase="'SENDING_NOTIFICATIONS'">
+    <mat-icon matTooltip="Wysyłam powiadomienia" [matTooltipDisabled]="!tooltip">notifications_active</mat-icon>
+    <span *ngIf="!tooltip">Wysyłam powiadomienia</span>
+  </span>
+</div>

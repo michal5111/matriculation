@@ -8,10 +8,6 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, Sort} from '@angular/material/sort';
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {UserService} from '../../../service/user-service/user.service';
-import {ErrorDialogComponent} from '../../dialog/error-dialog/error-dialog.component';
-import {ErrorDialogData} from '../../../model/dialog/error-dialog-data';
-import {MatDialog} from '@angular/material/dialog';
-import {HttpErrorResponse} from '@angular/common/http';
 import {Subscription, timer} from 'rxjs';
 
 @Component({
@@ -54,8 +50,7 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   constructor(
     private importService: ImportService,
-    public userService: UserService,
-    private dialog: MatDialog
+    public userService: UserService
   ) {
   }
 
@@ -76,8 +71,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.dataSource.paginator = this.paginator;
     this.pageSubscription = this.$importProgressObservable.subscribe(
       () => {
-      },
-      error => this.onError('Błąd przy pobieraniu strony', error)
+      }// , error => this.onError('Błąd przy pobieraniu strony', error)
     );
   }
 
@@ -86,8 +80,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.pageIndex = pageEvent.pageIndex;
     this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe(
       () => {
-      },
-      error => this.onError('Błąd przy pobieraniu strony', error)
+      }// , error => this.onError('Błąd przy pobieraniu strony', error)
     );
   }
 
@@ -96,8 +89,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.sortDirString = sortEvent.direction;
     this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe(
       () => {
-      },
-      error => this.onError('Błąd przy pobieraniu strony', error)
+      }// , error => this.onError('Błąd przy pobieraniu strony', error)
     );
   }
 
@@ -105,8 +97,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     // this.importCreateExpansionPanel.close();
     this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe(
       () => {
-      },
-      error => this.onError('Błąd przy pobieraniu strony', error)
+      }// , error => this.onError('Błąd przy pobieraniu strony', error)
     );
   }
 
@@ -115,22 +106,21 @@ export class ImportComponent implements OnInit, OnDestroy {
       switchMap(() => this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString))
     ).subscribe(
       () => {
-      },
-      error => this.onError('Błąd przy pobieraniu strony', error)
+      }// , error => this.onError('Błąd przy pobieraniu strony', error)
     );
   }
 
-  onError(title: string, error): void {
-    if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
-      return;
-    }
-    if (this.dialog.openDialogs.length > 0) {
-      return;
-    }
-    this.dialog.open(ErrorDialogComponent, {
-      data: new ErrorDialogData(title, error)
-    });
-  }
+  // onError(title: string, error): void {
+  //   if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
+  //     return;
+  //   }
+  //   if (this.dialog.openDialogs.length > 0) {
+  //     return;
+  //   }
+  //   this.dialog.open(ErrorDialogComponent, {
+  //     data: new ErrorDialogData(title, error)
+  //   });
+  // }
 
   isDeleteButtonDisabled(importObject: Import): boolean {
     switch (importObject.importProgress.importStatus) {

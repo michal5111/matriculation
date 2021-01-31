@@ -67,40 +67,8 @@
         <ng-container matColumnDef="status">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
           <td mat-cell *matCellDef="let element">
-            <div [ngSwitch]="element.importProgress.importStatus">
-              <span *ngSwitchCase="'PENDING'">
-              <mat-icon>hourglass_empty</mat-icon>
-              Oczekujący
-          </span>
-              <span *ngSwitchCase="'STARTED'">
-              <mat-icon>cloud_download</mat-icon>
-              Importowanie...
-          </span>
-              <span *ngSwitchCase="'IMPORTED'">
-              <mat-icon>cloud_done</mat-icon>
-              Zaimportowane
-          </span>
-              <span *ngSwitchCase="'SAVING'">
-              <mat-icon>cloud_upload</mat-icon>
-              Zapisywanie w usosie...
-          </span>
-              <span *ngSwitchCase="'COMPLETE'">
-            <mat-icon>done</mat-icon>
-            Zakończono
-          </span>
-              <span *ngSwitchCase="'ARCHIVED'">
-            <mat-icon>archived</mat-icon>
-            Zarchiwizowany
-          </span>
-              <span *ngSwitchCase="'COMPLETED_WITH_ERRORS'">
-            <mat-icon>warning</mat-icon>
-            Zakończono z błędami
-          </span>
-              <span *ngSwitchCase="'ERROR'">
-            <mat-icon>error</mat-icon>
-            Błąd
-          </span>
-            </div>
+            <app-import-status-indicator [importStatus]="element.importProgress.importStatus"
+                                         tooltip="false"></app-import-status-indicator>
           </td>
         </ng-container>
 
@@ -134,7 +102,6 @@
                      showFirstLastButtons
                      (page)="switchPage($event)">
       </mat-paginator>
-
     </div>
   </ng-template>
 </div>

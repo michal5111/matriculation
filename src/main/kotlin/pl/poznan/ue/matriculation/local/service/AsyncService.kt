@@ -8,8 +8,6 @@ import pl.poznan.ue.matriculation.exception.ImportException
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
-import javax.persistence.EntityManager
-import javax.persistence.PersistenceContext
 
 @Service
 class AsyncService(
@@ -22,8 +20,8 @@ class AsyncService(
 
     val logger: Logger = LoggerFactory.getLogger(AsyncService::class.java)
 
-    @PersistenceContext
-    private lateinit var localEntityManager: EntityManager
+//    @PersistenceContext
+//    private lateinit var localEntityManager: EntityManager
 
     @Async
     @Throws(ImportException::class)
@@ -55,7 +53,7 @@ class AsyncService(
                 logger.debug("Przetwarzam osoby...")
                 page.getResultsList().forEach {
                     val application = processService.processApplication(importId, it, applicantDataSource)
-                    localEntityManager.detach(application)
+                    //localEntityManager.detach(application)
                 }
                 logger.debug("Przetworzyłem osoby...")
                 hasNext = page.hasNext()
@@ -70,10 +68,10 @@ class AsyncService(
     @Async
     fun savePersons(importId: Long) {
         val importDto = importRepository.getDtoById(importId)
-        val errorsCount = processService.processPersons(
-                importId = importId,
-                importDto = importDto,
-                applicationDtoDataSource = applicationDataSourceService.getDataSource(importDto.dataSourceId)
+        val errorsCount = processService.processApplications(
+            importId = importId,
+            importDto = importDto,
+            applicationDtoDataSource = applicationDataSourceService.getDataSource(importDto.dataSourceId)
         )
         if (errorsCount > 0) {
             importService.setImportStatus(ImportStatus.COMPLETED_WITH_ERRORS, importId)
@@ -90,5 +88,11 @@ class AsyncService(
     @Async
     fun getUids(importId: Long) {
         processService.getUids(importId)
+        val import = importRepository.getOne(importId)
+        if (import.importProgress.saveErrors > 0) {
+            importService.setImportStatus(ImportStatus.COMPLETED_WITH_ERRORS, importId)
+        } else {
+            importService.setImportStatus(ImportStatus.COMPLETE, importId)
+        }
     }
 }

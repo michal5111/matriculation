@@ -7,4 +7,6 @@ import pl.poznan.ue.matriculation.ldap.model.User
 @Repository
 interface LdapUserRepository : LdapRepository<User> {
     fun findByUsosId(usosId: Long): User?
+
+    fun findByUid(uid: String): User?
 }

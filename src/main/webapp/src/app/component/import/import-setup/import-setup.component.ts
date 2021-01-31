@@ -3,14 +3,11 @@ import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
 import {FormBuilder, FormGroup, FormGroupDirective, Validators} from '@angular/forms';
 import {Observable, Subscription} from 'rxjs';
-import {HttpErrorResponse} from '@angular/common/http';
 import {filter, switchMap, tap} from 'rxjs/operators';
 import {IndexType} from '../../../model/oracle/index-type';
 import {Registration} from '../../../model/applications/registration';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatDialog} from '@angular/material/dialog';
-import {ErrorDialogComponent} from '../../dialog/error-dialog/error-dialog.component';
-import {ErrorDialogData} from '../../../model/dialog/error-dialog-data';
 import {MatSelectChange} from '@angular/material/select';
 import {DataSource} from '../../../model/import/dataSource';
 import {Programme} from '../../../model/applications/programme';
@@ -80,8 +77,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     ).subscribe(
       () => {
         this.importCreationFormGroup.patchValue({registrationProgramme: null, stage: null});
-      },
-      error => this.onError('Błąd przy pobieraniu programów', error)
+      }// , error => this.onError('Błąd przy pobieraniu programów', error)
     );
   }
 
@@ -91,8 +87,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     ).subscribe(
       () => {
         this.importCreationFormGroup.patchValue({stage: null});
-      },
-      error => this.onError('Błąd przy pobieraniu etapów', error)
+      }// , error => this.onError('Błąd przy pobieraniu etapów', error)
     );
   }
 
@@ -103,8 +98,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
       tap(didacticCycles => this.didacticCycles = didacticCycles)
     ).subscribe(
       () => {
-      },
-      error => this.onError('Błąd przy pobieraniu cykli dydaktycznych', error)
+      }// , error => this.onError('Błąd przy pobieraniu cykli dydaktycznych', error)
     );
   }
 
@@ -120,18 +114,18 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.import.dataSourceId = this.importCreationFormGroup.value.dataSource;
     this.importService.createImport(this.import).subscribe(
       importObject => this.onImportCreated(importObject),
-      error => this.onError('Błąd przy tworzeniu importu', error)
+      // error => this.onError('Błąd przy tworzeniu importu', error)
     );
   }
 
-  onError(title: string, error): void {
-    if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
-      return;
-    }
-    this.dialog.open(ErrorDialogComponent, {
-      data: new ErrorDialogData(title, error)
-    });
-  }
+  // onError(title: string, error): void {
+  //   if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
+  //     return;
+  //   }
+  //   this.dialog.open(ErrorDialogComponent, {
+  //     data: new ErrorDialogData(title, error)
+  //   });
+  // }
 
   onImportCreated(importObject: Import): void {
     const snackBarRef = this.snackBar.open('Import utworzony', 'OK', {
@@ -155,8 +149,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     ).subscribe(
       () => {
         this.importCreationFormGroup.patchValue({registration: null, registrationProgramme: null, stage: null});
-      },
-      error => this.onError('Błąd przy pobieraniu rekrutacji', error)
+      }// , error => this.onError('Błąd przy pobieraniu rekrutacji', error)
     );
   }
 }

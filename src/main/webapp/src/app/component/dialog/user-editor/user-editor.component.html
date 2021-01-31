@@ -1,1 +1,12 @@
-<p>user-editor works!</p>
+<div>
+  <h3>UID: {{user.uid}}</h3>
+  <mat-selection-list *ngIf="rolesList" #roleSelectionList>
+    <mat-list-option *ngFor="let role of rolesList" [value]="role" [selected]="hasRole(role)">
+      {{role.name}}
+    </mat-list-option>
+  </mat-selection-list>
+  <button mat-button (click)="onUpdateUserClick()">
+    <mat-icon>add</mat-icon>
+    Zapisz
+  </button>
+</div>

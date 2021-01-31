@@ -12,6 +12,7 @@ import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.domain.import.ImportProgress
+import pl.poznan.ue.matriculation.local.domain.user.Role
 import pl.poznan.ue.matriculation.local.domain.user.User
 import pl.poznan.ue.matriculation.local.dto.*
 import pl.poznan.ue.matriculation.local.service.*
@@ -21,12 +22,13 @@ import pl.poznan.ue.matriculation.oracle.service.UsosService
 @RestController
 @RequestMapping("/api")
 class RestController(
-        private val applicationDataSourceService: ApplicationDataSourceService,
-        private val importService: ImportService,
-        private val asyncService: AsyncService,
-        private val usosService: UsosService,
-        private val applicationService: ApplicationService,
-        private val userService: UserService
+    private val applicationDataSourceService: ApplicationDataSourceService,
+    private val importService: ImportService,
+    private val asyncService: AsyncService,
+    private val usosService: UsosService,
+    private val applicationService: ApplicationService,
+    private val userService: UserService,
+    private val roleService: RoleService
 ) {
 
     @Value("\${pl.poznan.ue.matriculation.usos.url}")
@@ -39,44 +41,6 @@ class RestController(
             "{}"
         } else principal
     }
-
-//    @GetMapping("/person")
-//    fun person(): Person {
-//        return personRepository.getOne(SecurityContextHolder.getContext().authentication.name.toLong())
-//    }
-//
-//    @GetMapping("/persons")
-//    fun person(pageable: Pageable): org.springframework.data.domain.Page<Person> {
-//        return personRepository.findAll(pageable)
-//    }
-//
-//    @GetMapping("/persons/{id}")
-//    fun person(@PathVariable("id") id: Long): Person {
-//        return personRepository.getOne(id)
-//    }
-
-//    @GetMapping("/applicants/{dataSourceType}/{id}")
-//    fun getApplicantById(@PathVariable("id") id: Long, @PathVariable("dataSourceType") dataSourceType: String): Applicant = applicationDataSourceService
-//            .getDataSource(dataSourceType)
-//            .getApplicantById(id) as Applicant
-
-//    @GetMapping("/applicants/")
-//    fun getApplicantByParam(
-//            @RequestParam(required = false) pesel: String?,
-//            @RequestParam(required = false) surname: String?,
-//            @RequestParam(required = false) email: String?
-//    ): Page<ApplicantDTO>? {
-//        if (pesel != null) return irkService.getApplicantsByPesel(pesel)
-//        if (surname != null) return irkService.getApplicantsBySurname(surname)
-//        if (email != null) return irkService.getApplicantsByEmail(email)
-//        throw IllegalArgumentException()
-//    }
-
-//    @GetMapping("/registrations/{dataSourceType}/{id}")
-//    fun getRegistration(@PathVariable("id") id: String, @PathVariable("dataSourceType") dataSourceType: String): Registration? = applicationDataSourceService
-//            .getDataSource(dataSourceType)
-//            .getRegistrationByCode(id)
-
 
     @GetMapping("/registrations/{dataSourceType}/codes")
     fun getRegistrationCodes(
@@ -91,25 +55,6 @@ class RestController(
             @PathVariable("dataSourceType") dataSourceType: String): List<ProgrammeDto> = applicationDataSourceService
             .getDataSource(dataSourceType)
             .getAvailableRegistrationProgrammes(id)
-
-
-//    @GetMapping("/applications/{dataSourceType}/{id}")
-//    fun getApplication(@PathVariable("id") id: Long, @PathVariable("dataSourceType") dataSourceType: String): Application? = applicationDataSourceService
-//            .getDataSource(dataSourceType)
-//            .getApplicationById(id)
-
-//    @GetMapping("/applications/{dataSourceType}")
-//    fun getApplications(
-//            programme: String,
-//            registration: String,
-//            pageNumber: Int,
-//            @PathVariable("dataSourceType") dataSourceType: String
-//    ): Page<Application> = applicationDataSourceService
-//            .getDataSource(dataSourceType)
-//            .getApplicationsPage(registration, programme, pageNumber)
-
-//    @GetMapping("/programmesGroups/{id}")
-//    fun getProgrammesGroups(@PathVariable("id") id: String): ProgrammeGroupsDTO? = irkService.getProgrammesGroups(id)
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/import")
@@ -159,9 +104,10 @@ class RestController(
 
     @GetMapping("/import/{id}/applications")
     fun findAllApplicationsByImportId(
-            pageable: Pageable,
-            @PathVariable("id") importId: Long)
-            : org.springframework.data.domain.Page<Application> = applicationService.findAllApplicationsByImportId(pageable, importId)
+        pageable: Pageable,
+        @PathVariable("id") importId: Long
+    )
+            : Page<Application> = applicationService.findAllApplicationsByImportId(pageable, importId)
 
 
     @GetMapping("/usos/indexPool")
@@ -205,9 +151,7 @@ class RestController(
 
     @PostMapping("/user")
     fun createUser(@RequestBody userDto: UserDto): User {
-        return userService.save(
-                User(uid = userDto.uid)
-        )
+        return userService.save(userDto)
     }
 
     @PutMapping("/user")
@@ -225,9 +169,15 @@ class RestController(
         return userService.getAll(pageable)
     }
 
-    @GetMapping("/import/{id}/ldap")
+    @GetMapping("/import/{id}/importUids")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun getUids(@PathVariable("id") importId: Long) {
+        importService.prepareForSearchingUids(importId)
         asyncService.getUids(importId)
+    }
+
+    @GetMapping("/role")
+    fun getAllRoles(): List<Role> {
+        return roleService.getAll()
     }
 }

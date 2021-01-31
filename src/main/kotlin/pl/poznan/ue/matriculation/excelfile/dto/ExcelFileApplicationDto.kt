@@ -1,17 +1,15 @@
 package pl.poznan.ue.matriculation.excelfile.dto
 
-import pl.poznan.ue.matriculation.local.dto.AbstractApplicationDto
+import pl.poznan.ue.matriculation.local.dto.IApplicationDto
 
 data class ExcelFileApplicationDto(
     val id: Long,
     val applicant: ExcelFileApplicantDto
-) : AbstractApplicationDto() {
+) : IApplicationDto {
 
-    override fun getForeignApplicantId(): Long {
-        return applicant.getForeignId()
-    }
+    override val foreignApplicantId: Long
+        get() = applicant.foreignId
 
-    override fun getForeignId(): Long {
-        return id
-    }
+    override val foreignId: Long
+        get() = id
 }

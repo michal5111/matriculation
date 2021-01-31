@@ -5,7 +5,7 @@ import {tap} from 'rxjs/operators';
 import {APP_BASE_HREF} from '@angular/common';
 import {User} from '../../model/user/user';
 import {Observable} from 'rxjs';
-import {Page} from "../../model/oracle/page/page";
+import {Page} from '../../model/oracle/page/page';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -26,18 +26,18 @@ export class UserService {
   }
 
   getUser() {
-    return this.http.get<UserDetails>(this.userUrl).pipe(
+    return this.http.get<UserDetails>(this.userUrl, httpOptions).pipe(
       tap(user => this.user = user),
       tap(user => this.isAuthenticated = !!user.casAssertion)
     );
   }
 
   update(user: User): Observable<User> {
-    return this.http.put<User>(this.userUrl, user);
+    return this.http.put<User>(this.userUrl, user, httpOptions);
   }
 
   create(user: User): Observable<User> {
-    return this.http.post<User>(this.userUrl, user);
+    return this.http.post<User>(this.userUrl, user, httpOptions);
   }
 
   delete(id: number) {

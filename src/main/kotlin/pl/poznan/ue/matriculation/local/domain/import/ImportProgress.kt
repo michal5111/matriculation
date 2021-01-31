@@ -7,28 +7,30 @@ import javax.persistence.*
 
 @Entity
 class ImportProgress(
-        @Id
+    @Id
         var id: Long? = null,
 
-        @MapsId
+    @MapsId
         @OneToOne(fetch = FetchType.LAZY)
         @JsonIgnore
         @JoinColumn(name = "import_id", referencedColumnName = "id")
-        var import: Import,
+    var import: Import,
 
-        var importedApplications: Int = 0,
+    var importedApplications: Int = 0,
 
-        var saveErrors: Int = 0,
+    var saveErrors: Int = 0,
 
-        var savedApplicants: Int = 0,
+    var savedApplicants: Int = 0,
 
-        var totalCount: Int? = null,
+    var totalCount: Int? = null,
 
-        @Enumerated(EnumType.STRING)
-        var importStatus: ImportStatus = ImportStatus.PENDING,
+    var importedUids: Int = 0,
 
-        @Lob
-        var error: String? = null
+    @Enumerated(EnumType.STRING)
+    var importStatus: ImportStatus = ImportStatus.PENDING,
+
+    @Lob
+    var error: String? = null
 ) : Serializable {
 
     override fun toString(): String {

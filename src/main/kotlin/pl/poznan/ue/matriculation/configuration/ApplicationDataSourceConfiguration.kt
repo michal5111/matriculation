@@ -76,7 +76,7 @@ class ApplicationDataSourceConfiguration {
                 id = "INCOMING",
                 applicantMapper = IncomingApplicantMapper(schoolRepository),
                 applicationMapper = DreamApplyApplicationMapper(),
-                status = "Enrolled"
+                status = "Accepted"
         )
     }
 

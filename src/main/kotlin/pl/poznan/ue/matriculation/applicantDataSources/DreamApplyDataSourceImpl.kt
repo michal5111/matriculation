@@ -15,21 +15,28 @@ import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
 
 open class DreamApplyDataSourceImpl(
-        private val name: String,
-        private val id: String,
-        private val dreamApplyService: DreamApplyService,
-        private val applicantMapper: DreamApplyApplicantMapper,
-        private val applicationMapper: DreamApplyApplicationMapper,
-        private val status: String
+    override val name: String,
+    override val id: String,
+    private val dreamApplyService: DreamApplyService,
+    private val applicantMapper: DreamApplyApplicantMapper,
+    private val applicationMapper: DreamApplyApplicationMapper,
+    private val status: String
 ) : IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
 
-    override fun getApplicationsPage(import: Import, registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<DreamApplyApplicationDto> {
+    override val instanceUrl = dreamApplyService.instanceUrl
+
+    override fun getApplicationsPage(
+        import: Import,
+        registrationCode: String,
+        programmeForeignId: String,
+        pageNumber: Int
+    ): IPage<DreamApplyApplicationDto> {
         val applicationMap = dreamApplyService.getApplicationsByFilter(
-                academicTermID = registrationCode,
-                additionalFilters = mapOf(
-                        "byCourseIDs" to programmeForeignId,
-                        "byOfferType" to status
-                )
+            academicTermID = registrationCode,
+            additionalFilters = mapOf(
+                "byCourseIDs" to programmeForeignId,
+                "byOfferType" to status
+            )
         ) ?: throw java.lang.IllegalArgumentException("Unable to get applicants")
         val applications = applicationMap.values.filter { dreamApplyApplicationDto ->
             val applicationOffers = dreamApplyService.getApplicationOffers(dreamApplyApplicationDto.offers)
@@ -65,15 +72,7 @@ open class DreamApplyDataSourceImpl(
         }
     }
 
-    override fun getName(): String {
-        return name
-    }
-
-    override fun getId(): String {
-        return id
-    }
-
-    override fun postMatriculation(applicationId: Long): Int {
+    override fun postMatriculation(foreignApplicationId: Long): Int {
         return 1
     }
 
@@ -123,16 +122,12 @@ open class DreamApplyDataSourceImpl(
         return applicantMapper.update(applicant, applicantDto)
     }
 
-    override fun getInstanceUrl(): String {
-        return dreamApplyService.instanceUrl
-    }
-
     override fun preprocess(applicationDto: DreamApplyApplicationDto, applicantDto: DreamApplyApplicantDto) {
         applicantDto.dreamApplyApplication = getApplicationById(applicationDto.id)
     }
 
     override fun getApplicationEditUrl(applicationId: Long): String {
-        return "${getInstanceUrl()}/application/view/id/$applicationId"
+        return "${instanceUrl}/application/view/id/$applicationId"
     }
 
     override fun getPrimaryCertificate(

@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.dreamApply.dto.application
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import pl.poznan.ue.matriculation.local.dto.AbstractApplicationDto
+import pl.poznan.ue.matriculation.local.dto.IApplicationDto
 import java.util.*
 
 data class DreamApplyApplicationDto(
@@ -22,23 +22,22 @@ data class DreamApplyApplicationDto(
         val profile: ProfileDto?,
         val contact: ContactDto?,
         val education: List<EducationDto>?,
-        //val languages: LanguagesDto?,
+    //val languages: LanguagesDto?,
         val career: List<CareerDto>?,
         val activities: List<ActivityDto>?,
         val residences: List<ResidenceDto>?,
-        //val motivation: List<MotivationDto>?,
+    //val motivation: List<MotivationDto>?,
         val misc: MiscDto?,
         val extras: List<ExtraDto>?,
         val home: HomeDto?,
         var courseType: String?,
         var duration: String?
-) : AbstractApplicationDto() {
-    override fun getForeignApplicantId(): Long {
-        return applicant.substring(16, applicant.length).toLong()
-    }
+) : IApplicationDto {
 
-    override fun getForeignId(): Long {
-        return id
-    }
+    override val foreignApplicantId: Long
+        get() = applicant.substring(16, applicant.length).toLong()
+
+    override val foreignId: Long
+        get() = id
 
 }

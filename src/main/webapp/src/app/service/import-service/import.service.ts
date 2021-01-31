@@ -86,4 +86,8 @@ export class ImportService {
   getAvailableDataSources(): Observable<[DataSource]> {
     return this.http.get<[DataSource]>(`${this.apiUrl}/import/dataSources`);
   }
+
+  findUids(importId: number): Observable<void> {
+    return this.http.get<void>(`${this.apiUrl}/import/${importId}/importUids`);
+  }
 }

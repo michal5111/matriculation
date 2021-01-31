@@ -24,7 +24,7 @@ class AsyncConfiguration(private val asyncExceptionHandler: AsyncExceptionHandle
         executor.corePoolSize = 1
         executor.maxPoolSize = 1
         executor.setQueueCapacity(50)
-        executor.setThreadNamePrefix("USOS-WORKER-")
+        executor.setThreadNamePrefix("ASYNC-WORKER-")
         executor.initialize()
         return executor
     }

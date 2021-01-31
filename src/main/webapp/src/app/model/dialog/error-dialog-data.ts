@@ -1,12 +1,12 @@
 export class ErrorDialogData {
 
-  constructor(title: string, error, stacktrace?: string) {
+  constructor(title: string, message: string, stacktrace?: string) {
     this.title = title;
-    this.error = error;
+    this.message = message;
     this.stacktrace = stacktrace;
   }
 
   title: string;
-  error;
+  message: string;
   stacktrace: string;
 }

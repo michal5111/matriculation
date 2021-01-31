@@ -85,7 +85,7 @@ class Applicant(
 
         @JsonIgnore
         @OneToMany(mappedBy = "applicant")
-        var applications: MutableList<Application> = mutableListOf(),
+        var applications: MutableSet<Application> = mutableSetOf(),
 
         var uid: String? = null
 ) {
@@ -103,15 +103,15 @@ class Applicant(
 
         other as Applicant
 
-        if (id != other.id) return false
         if (foreignId != other.foreignId) return false
+        if (dataSourceId != other.dataSourceId) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = id?.hashCode() ?: 0
-        result = 31 * result + foreignId.hashCode()
+        var result = foreignId.hashCode()
+        result = 31 * result + (dataSourceId?.hashCode() ?: 0)
         return result
     }
 
