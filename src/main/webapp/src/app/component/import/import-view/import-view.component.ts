@@ -269,7 +269,8 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       case 'COMPLETE':
       case 'COMPLETED_WITH_ERRORS':
       case 'ERROR':
-        return this.importProgress.savedApplicants !== this.importProgress.totalCount;
+        return this.importProgress.savedApplicants !== this.importProgress.totalCount
+          || this.importProgress.importedUids === this.importProgress.totalCount;
       default:
         return true;
     }
@@ -283,14 +284,19 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   onSendNotificationsClick() {
-
+    this.progressSubscription.unsubscribe();
+    this.progressSubscription = this.importService.sendNotifications(this.importId).pipe(
+      switchMap(() => this.$importProgressObservable)
+    ).subscribe();
   }
 
   isSendNotificationsDisabled(): boolean {
     switch (this.importProgress.importStatus) {
       case 'COMPLETE':
       case 'COMPLETED_WITH_ERRORS':
-        return false;
+        return this.importProgress.savedApplicants !== this.importProgress.totalCount
+          || this.importProgress.importedUids !== this.importProgress.totalCount
+          || this.importProgress.notificationsSend === this.importProgress.totalCount;
       default:
         return true;
     }

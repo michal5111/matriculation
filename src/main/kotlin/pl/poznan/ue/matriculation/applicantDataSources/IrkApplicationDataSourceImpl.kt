@@ -3,6 +3,7 @@ package pl.poznan.ue.matriculation.applicantDataSources
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.web.client.HttpStatusCodeException
 import pl.poznan.ue.matriculation.irk.dto.ErrorMessageDto
+import pl.poznan.ue.matriculation.irk.dto.NotificationDto
 import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
 import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
 import pl.poznan.ue.matriculation.irk.mapper.IrkApplicantMapper
@@ -136,5 +137,9 @@ class IrkApplicationDataSourceImpl(
     }
 
     override fun preprocess(applicationDto: IrkApplicationDTO, applicantDto: IrkApplicantDto) {
+    }
+
+    override fun sendNotification(foreignApplicantId: Long, notificationDto: NotificationDto) {
+        irkService.sendNotification(foreignApplicantId, notificationDto)
     }
 }

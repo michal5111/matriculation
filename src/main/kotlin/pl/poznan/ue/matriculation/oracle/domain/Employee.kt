@@ -20,8 +20,8 @@ class Employee(
         @Column(name = "PIERWSZE_ZATR", nullable = false, length = 1)
         val isFirstEmployment: Char,
 
-        @Column(name = "NUMER_AKT", nullable = true, length = 10)
-        val fileNumber: Int?,
+        @Column(name = "NUMER_AKT", nullable = true, length = 20)
+        val fileNumber: String?,
 
         @Column(name = "NR_KART", nullable = true, length = 100)
         val cardNumber: String?,

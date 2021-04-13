@@ -90,4 +90,8 @@ export class ImportService {
   findUids(importId: number): Observable<void> {
     return this.http.get<void>(`${this.apiUrl}/import/${importId}/importUids`);
   }
+
+  sendNotifications(importId: number): Observable<void> {
+    return this.http.get<void>(`${this.apiUrl}/import/${importId}/notifications`);
+  }
 }

@@ -7,6 +7,7 @@ import org.springframework.http.*
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.exchange
 import org.springframework.web.util.UriComponentsBuilder
+import pl.poznan.ue.matriculation.irk.dto.NotificationDto
 import pl.poznan.ue.matriculation.irk.dto.Page
 import pl.poznan.ue.matriculation.irk.dto.applicants.DocumentDTO
 import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
@@ -189,12 +190,12 @@ class IrkService(
 
     fun getPhoto(photoUrl: String): ByteArray {
         val responseEntity: ResponseEntity<Resource> = restTemplate.exchange(
-                "$serviceUrl$photoUrl",
-                HttpMethod.GET,
-                httpEntity,
-                Resource::class.java
+            "$serviceUrl$photoUrl",
+            HttpMethod.GET,
+            httpEntity,
+            Resource::class.java
         )
-        var byteArray = ByteArray(0)
+        var byteArray: ByteArray
         responseEntity.body!!.inputStream.use {
             byteArray = IOUtils.toByteArray(it)
         }
@@ -213,14 +214,24 @@ class IrkService(
     fun getMatriculationData(applicationId: Long): MatriculationDataDTO? {
         val response: ResponseEntity<MatriculationDataDTO> = restTemplate.exchange(
                 "${apiUrl}matriculation/${applicationId}/data/",
-                HttpMethod.GET,
-                httpEntity,
-                MatriculationDataDTO::class
+            HttpMethod.GET,
+            httpEntity,
+            MatriculationDataDTO::class
         )
         return response.body
     }
 
     fun getPrimaryCertificate(applicationId: Long): DocumentDTO? {
         return getMatriculationData(applicationId)?.application?.certificate
+    }
+
+    fun sendNotification(userId: Long, notificationDto: NotificationDto): ResponseEntity<Map<String, String>> {
+        val request: HttpEntity<Any> = HttpEntity(notificationDto, httpHeaders)
+        return restTemplate.exchange(
+            "${apiUrl}uep/user/${userId}/notify/",
+            HttpMethod.POST,
+            request,
+            MapResult::class
+        )
     }
 }

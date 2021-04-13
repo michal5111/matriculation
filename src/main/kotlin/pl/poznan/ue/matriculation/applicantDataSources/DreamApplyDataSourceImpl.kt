@@ -4,9 +4,11 @@ import org.springframework.web.client.HttpClientErrorException
 import pl.poznan.ue.matriculation.dreamApply.dto.applicant.DreamApplyApplicantDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.EducationLevelType
+import pl.poznan.ue.matriculation.dreamApply.dto.email.EmailDto
 import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicantMapper
 import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicationMapper
 import pl.poznan.ue.matriculation.dreamApply.service.DreamApplyService
+import pl.poznan.ue.matriculation.irk.dto.NotificationDto
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applications.Application
@@ -131,11 +133,11 @@ open class DreamApplyDataSourceImpl(
     }
 
     override fun getPrimaryCertificate(
-            application: Application,
-            applicationDto: DreamApplyApplicationDto,
-            applicant: Applicant,
-            applicantDto: DreamApplyApplicantDto,
-            import: Import
+        application: Application,
+        applicationDto: DreamApplyApplicationDto,
+        applicant: Applicant,
+        applicantDto: DreamApplyApplicantDto,
+        import: Import
     ): Document? {
         val programmeLevel = import.programmeCode.substring(1, 2)
         val levelType = EducationLevelType.values().find {
@@ -144,5 +146,13 @@ open class DreamApplyDataSourceImpl(
         return applicant.educationData.documents.find {
             it.certificateUsosCode == levelType?.usosCode
         }
+    }
+
+    override fun sendNotification(foreignApplicantId: Long, notificationDto: NotificationDto) {
+        val emailDto = EmailDto(
+            subject = notificationDto.header,
+            message = notificationDto.message
+        )
+        dreamApplyService.sendEmail(foreignApplicantId, emailDto)
     }
 }

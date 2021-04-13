@@ -15,5 +15,7 @@ export class ImportProgress {
 
   importedUids: number;
 
+  notificationsSend: number;
+
   error: string;
 }

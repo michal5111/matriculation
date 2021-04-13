@@ -143,9 +143,6 @@ class Person(
         @Column(name = "BK_EMAIL", length = 100, nullable = true)
         var privateEmail: String? = null,
 
-        @Column(name = "BK_CZYMIGROWAC", length = 2, precision = 0, nullable = false)
-        val careersOfficeMigrate: Int = 0,
-
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "KRAJ_URODZENIA", referencedColumnName = "KOD", nullable = true)
         var birthCountry: Citizenship? = null,
@@ -167,36 +164,12 @@ class Person(
         @Column(name = "EPUAP_SKRYTKA", length = 64, nullable = true)
         val epuapSafe: String? = null,
 
-        @Column(name = "CZY_LOSY_ABSOLWENTOW", length = 1, nullable = false)
-        val isGraduateFate: Char = 'N',
-
-        @Column(name = "CZY_LOSY_ABS_ZGODA", nullable = true)
-        val isGraduateFateDate: Date? = null,
-
-        @Column(name = "CZY_LOSY_ABS_REZYG", nullable = true)
-        val isGraduateFateResignDate: Date? = null,
-
-        @Column(name = "BK_CZY_MIGR_ZGODA", nullable = true)
-        val careersOfficeMigrateApproval: Date? = null,
-
-        @Column(name = "BK_CZY_MIGR_REZYG", nullable = true)
-        val careersOfficeMigrateResignation: Date? = null,
-
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "KRAJ_DOK_KOD", referencedColumnName = "KOD", nullable = true)
         var identityDocumentIssuerCountry: Citizenship? = null,
 
         @Column(name = "DATA_WAZNOSCI_DOWODU", nullable = true)
         var identityDocumentExpirationDate: Date? = null,
-
-        @Column(name = "CZY_KLUB_ABS", length = 1, nullable = false)
-        val graduateClubJoinApproval: Char = 'N',
-
-        @Column(name = "CZY_KLUB_ABS_ZGODA", nullable = true)
-        val graduateClubJoinApprovalDate: Date? = null,
-
-        @Column(name = "CZY_KLUB_ABS_REZYG", nullable = true)
-        val graduateClubJoinResignDate: Date? = null,
 
         @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
         var addresses: MutableList<Address>,

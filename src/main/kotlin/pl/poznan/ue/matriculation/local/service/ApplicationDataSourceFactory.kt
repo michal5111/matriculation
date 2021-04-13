@@ -1,16 +1,23 @@
 package pl.poznan.ue.matriculation.local.service
 
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
 import pl.poznan.ue.matriculation.exception.DataSourceNotFoundException
 import pl.poznan.ue.matriculation.local.dto.DataSourceDto
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
 
-@Service
-class ApplicationDataSourceService(applicationDataSources: List<IApplicationDataSource<*, *>>) {
+@Component
+class ApplicationDataSourceFactory(applicationDataSources: List<IApplicationDataSource<*, *>>) {
 
     private val dataSourcesMap = HashMap<String, IApplicationDataSource<IApplicationDto, IApplicantDto>>()
+
+    init {
+        applicationDataSources as List<IApplicationDataSource<IApplicationDto, IApplicantDto>>
+        applicationDataSources.forEach {
+            dataSourcesMap[it.id] = it
+        }
+    }
 
     fun getDataSources(): List<DataSourceDto> {
         return dataSourcesMap.map {
@@ -23,12 +30,5 @@ class ApplicationDataSourceService(applicationDataSources: List<IApplicationData
 
     fun getDataSource(id: String): IApplicationDataSource<IApplicationDto, IApplicantDto> {
         return dataSourcesMap[id] ?: throw DataSourceNotFoundException()
-    }
-
-    init {
-        applicationDataSources as List<IApplicationDataSource<IApplicationDto, IApplicantDto>>
-        applicationDataSources.forEach {
-            dataSourcesMap[it.id] = it
-        }
     }
 }

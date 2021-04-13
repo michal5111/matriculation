@@ -62,8 +62,6 @@ class ApplicantToPersonMapper(
                     cityIsCity = it.cityIsCity,
                     countryCode = it.countryCode
                 )
-            }.filterNot {
-                it.city.isNullOrBlank() || it.street.isNullOrBlank()
             }.toMutableList(),
             phoneNumbers = applicant.phoneNumbers.map {
                 PhoneNumber(

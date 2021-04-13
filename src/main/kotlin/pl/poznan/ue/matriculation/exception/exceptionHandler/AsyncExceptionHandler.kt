@@ -27,23 +27,16 @@ class AsyncExceptionHandler : AsyncUncaughtExceptionHandler {
                 val importId = e.importId
                 if (e.cause is SQLException) {
                     importService.setError(
-                            importId, (e.cause as SQLException).sqlState + "\n" +
-                            e.message.toString()
+                        importId, (e.cause as SQLException).sqlState + "\n" + e.message.toString()
                     )
                 } else {
-                    importService.setError(
-                            importId,
-                            e.message.toString()
-                    )
+                    importService.setError(importId, e.message.toString())
                 }
                 importService.setImportStatus(ImportStatus.ERROR, importId)
             }
             if (e is ImportStartException) {
                 val importId = e.importId
-                importService.setError(
-                        importId,
-                        e.message.toString()
-                )
+                importService.setError(importId, e.message.toString())
                 importService.setImportStatus(ImportStatus.ERROR, importId)
             }
             e = e?.cause

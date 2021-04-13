@@ -8,6 +8,7 @@ import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicantDto
 import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicationDto
 import pl.poznan.ue.matriculation.excelfile.mapper.ExcelFileApplicantMapper
 import pl.poznan.ue.matriculation.excelfile.mapper.ExcelFileApplicationMapper
+import pl.poznan.ue.matriculation.irk.dto.NotificationDto
 import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
@@ -220,5 +221,9 @@ class ExcelFileDataSourceImpl(
     }
 
     override fun preprocess(applicationDto: ExcelFileApplicationDto, applicantDto: ExcelFileApplicantDto) {
+    }
+
+    override fun sendNotification(foreignApplicantId: Long, notificationDto: NotificationDto) {
+        TODO("Not yet implemented")
     }
 }

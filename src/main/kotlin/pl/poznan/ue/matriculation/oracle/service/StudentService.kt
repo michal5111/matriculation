@@ -142,8 +142,9 @@ class StudentService(
                 didacticCycleRequirement = didacticCycle,
                 order = 1,
                 endDate = didacticCycle.endDate,
-                conditionCount = 2
-            )
+            ).apply {
+                conditionCount = programmeStage.conditionCount
+            }
         )
         person.personProgrammes.add(personProgramme)
         student.personProgrammes.add(personProgramme)

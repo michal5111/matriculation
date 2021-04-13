@@ -17,6 +17,8 @@ data class ImportProgressDto(
 
     val importedUids: Int,
 
+    var notificationsSend: Int,
+
     val importStatus: ImportStatus = ImportStatus.PENDING,
 
     val error: String? = null

@@ -10,4 +10,6 @@ import pl.poznan.ue.matriculation.oracle.domain.Person
 interface AddressRepository : JpaRepository<Address, String> {
 
     fun findByPersonAndAddressType(person: Person, addressType: AddressType): Address?
+
+    fun existsByPersonAndAddressType(person: Person, addressType: AddressType): Boolean
 }

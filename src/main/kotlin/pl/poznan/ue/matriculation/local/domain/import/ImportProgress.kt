@@ -26,6 +26,8 @@ class ImportProgress(
 
     var importedUids: Int = 0,
 
+    var notificationsSend: Int = 0,
+
     @Enumerated(EnumType.STRING)
     var importStatus: ImportStatus = ImportStatus.PENDING,
 

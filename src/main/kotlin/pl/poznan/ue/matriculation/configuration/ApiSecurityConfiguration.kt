@@ -23,6 +23,7 @@ class ApiSecurityConfiguration : WebSecurityConfigurerAdapter() {
             .antMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
             .antMatchers(HttpMethod.GET, "/api/import/*/progress").hasAnyRole("IMPORT_PROGRESS", "ADMIN")
             .antMatchers(HttpMethod.GET, "/api/import/*/save").hasAnyRole("IMPORT_SAVE", "ADMIN")
+            .antMatchers(HttpMethod.GET, "/api/import/*/notifications").hasAnyRole("IMPORT_NOTIFICATIONS", "ADMIN")
             .antMatchers(HttpMethod.GET, "/api/import/dataSources").hasAnyRole("IMPORT_DATA_SOURCES", "ADMIN")
             .antMatchers(HttpMethod.PUT, "/api/import/*/archive").hasAnyRole("IMPORT_ARCHIVE", "ADMIN")
             .antMatchers(HttpMethod.PUT, "/api/usos/person/*/indexNumber")

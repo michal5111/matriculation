@@ -10,7 +10,7 @@ import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.service.ApplicantService
-import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceService
+import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
 import pl.poznan.ue.matriculation.oracle.domain.*
 import pl.poznan.ue.matriculation.oracle.repo.*
 import java.util.*
@@ -38,7 +38,7 @@ class PersonService(
     private val documentTypeRepository: DocumentTypeRepository,
     private val ownedDocumentRepository: OwnedDocumentRepository,
     private val personChangeHistoryRepository: PersonChangeHistoryRepository,
-    private val applicationDataSourceService: ApplicationDataSourceService,
+    private val applicationDataSourceFactory: ApplicationDataSourceFactory,
     private val didacticCycleRepository: DidacticCycleRepository,
     private val erasmusService: ErasmusService
 ) {
@@ -197,6 +197,22 @@ class PersonService(
                 countryCode = it.countryCode
             )
         }
+        val addressType = addressTypeRepository.getOne("KOR")
+        if (!addressRepository.existsByPersonAndAddressType(person, addressType)) {
+            addressRepository.findByPersonAndAddressType(person, addressTypeRepository.getOne("STA"))?.let {
+                createOrUpdateAddress(
+                    person = person,
+                    addressType = addressType,
+                    city = it.city,
+                    street = it.street,
+                    houseNumber = it.houseNumber,
+                    apartmentNumber = it.apartmentNumber,
+                    zipCode = it.zipCode,
+                    cityIsCity = it.cityIsCity == 'T',
+                    countryCode = it.countryCode?.code
+                )
+            }
+        }
     }
 
     private fun createOrUpdateAddress(
@@ -261,25 +277,23 @@ class PersonService(
     private fun createOrUpdateEntitlementDocument(person: Person, applicant: Applicant) {
         applicant.educationData.documents.filter {
             it.certificateUsosCode != null
+        }.filterNot {
+            entitlementDocumentRepository.existsByPersonAndType(person, it.certificateUsosCode!!)
         }.forEach {
-            if (entitlementDocumentRepository.existsByPersonAndType(person, it.certificateUsosCode!!)) {
-                return
-            } else {
-                person.entitlementDocuments.add(
-                    EntitlementDocument(
-                        person = person,
-                        issueDate = it.issueDate,
-                        description = it.issueInstitution.takeIf { _ ->
-                            it.issueInstitutionUsosCode == null
-                        },
-                        number = it.documentNumber,
-                        type = it.certificateUsosCode,
-                        school = it.issueInstitutionUsosCode?.let { schoolId ->
-                            schoolRepository.getOne(schoolId)
-                        }
-                    )
+            person.entitlementDocuments.add(
+                EntitlementDocument(
+                    person = person,
+                    issueDate = it.issueDate,
+                    description = it.issueInstitution.takeIf { _ ->
+                        it.issueInstitutionUsosCode == null
+                    },
+                    number = it.documentNumber,
+                    type = it.certificateUsosCode!!,
+                    school = it.issueInstitutionUsosCode?.let { schoolId ->
+                        schoolRepository.getOne(schoolId)
+                    }
                 )
-            }
+            )
         }
     }
 
@@ -311,9 +325,8 @@ class PersonService(
     private fun createOrUpdateOwnedDocuments(person: Person, applicant: Applicant) {
         if (applicant.applicantForeignerData?.baseOfStay == null
             || applicant.applicantForeignerData?.baseOfStay != "OKP"
-        ) {
-            return
-        }
+        ) return
+
         val ownedDocument = ownedDocumentRepository.findByPersonAndDocumentType(
             person,
             documentTypeRepository.getOne(applicant.applicantForeignerData!!.baseOfStay!!)
@@ -433,7 +446,7 @@ class PersonService(
         val irkApplication = IrkApplication(
             applicationId = application.foreignId,
             confirmationStatus = 0,
-            irkInstance = applicationDataSourceService.getDataSource(application.dataSourceId!!).instanceUrl
+            irkInstance = applicationDataSourceFactory.getDataSource(application.dataSourceId!!).instanceUrl
         )
         val student = _self.immatriculate(
             person = person,

@@ -14,6 +14,7 @@ import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicati
 import pl.poznan.ue.matriculation.dreamApply.dto.application.FlagDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.FlagInfoDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.OfferDto
+import pl.poznan.ue.matriculation.dreamApply.dto.email.EmailDto
 
 class DreamApplyService(
         val instanceUrl: String,
@@ -106,12 +107,12 @@ class DreamApplyService(
 
     fun getPhoto(photoUrl: String): ByteArray {
         val responseEntity: ResponseEntity<Resource> = restTemplate.exchange(
-                "$instanceUrl$photoUrl",
-                HttpMethod.GET,
-                httpEntity,
-                Resource::class.java
+            "$instanceUrl$photoUrl",
+            HttpMethod.GET,
+            httpEntity,
+            Resource::class.java
         )
-        var byteArray = ByteArray(0)
+        var byteArray: ByteArray
         responseEntity.body!!.inputStream.use {
             byteArray = IOUtils.toByteArray(it)
         }
@@ -205,11 +206,21 @@ class DreamApplyService(
     fun getCourseByPath(path: String): CourseDto? {
         val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("$instanceUrl$path")
         val response: ResponseEntity<CourseDto> = restTemplate.exchange(
-                uriComponentBuilder.build().toUri(),
-                HttpMethod.GET,
-                httpEntity,
-                CourseDto::class.java
+            uriComponentBuilder.build().toUri(),
+            HttpMethod.GET,
+            httpEntity,
+            CourseDto::class.java
         )
         return response.body
+    }
+
+    fun sendEmail(applicantId: Long, emailDto: EmailDto) {
+        val httpEntity = HttpEntity<Any>(emailDto, httpHeaders)
+        restTemplate.exchange(
+            "${apiUrl}applicants/$applicantId/emails",
+            HttpMethod.POST,
+            httpEntity,
+            Any::class.java
+        )
     }
 }

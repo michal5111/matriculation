@@ -7,14 +7,13 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.server.ResponseStatusException
 import pl.poznan.ue.matriculation.local.domain.applications.Application
-import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.domain.import.ImportProgress
 import pl.poznan.ue.matriculation.local.domain.user.Role
 import pl.poznan.ue.matriculation.local.domain.user.User
 import pl.poznan.ue.matriculation.local.dto.*
+import pl.poznan.ue.matriculation.local.job.JobType
 import pl.poznan.ue.matriculation.local.service.*
 import pl.poznan.ue.matriculation.oracle.dto.IndexTypeDto
 import pl.poznan.ue.matriculation.oracle.service.UsosService
@@ -22,13 +21,13 @@ import pl.poznan.ue.matriculation.oracle.service.UsosService
 @RestController
 @RequestMapping("/api")
 class RestController(
-    private val applicationDataSourceService: ApplicationDataSourceService,
+    private val applicationDataSourceFactory: ApplicationDataSourceFactory,
     private val importService: ImportService,
-    private val asyncService: AsyncService,
     private val usosService: UsosService,
     private val applicationService: ApplicationService,
     private val userService: UserService,
-    private val roleService: RoleService
+    private val roleService: RoleService,
+    private val jobService: JobService
 ) {
 
     @Value("\${pl.poznan.ue.matriculation.usos.url}")
@@ -44,17 +43,18 @@ class RestController(
 
     @GetMapping("/registrations/{dataSourceType}/codes")
     fun getRegistrationCodes(
-            @PathVariable("dataSourceType") dataSourceType: String
-    ): List<RegistrationDto> = applicationDataSourceService
-            .getDataSource(dataSourceType)
-            .getAvailableRegistrations()
+        @PathVariable("dataSourceType") dataSourceType: String
+    ): List<RegistrationDto> = applicationDataSourceFactory
+        .getDataSource(dataSourceType)
+        .getAvailableRegistrations()
 
     @GetMapping("/registrations/{dataSourceType}/codes/{id}")
     fun getProgrammesCodes(
-            @PathVariable("id") id: String,
-            @PathVariable("dataSourceType") dataSourceType: String): List<ProgrammeDto> = applicationDataSourceService
-            .getDataSource(dataSourceType)
-            .getAvailableRegistrationProgrammes(id)
+        @PathVariable("id") id: String,
+        @PathVariable("dataSourceType") dataSourceType: String
+    ): List<ProgrammeDto> = applicationDataSourceFactory
+        .getDataSource(dataSourceType)
+        .getAvailableRegistrationProgrammes(id)
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/import")
@@ -75,10 +75,7 @@ class RestController(
 
     @PutMapping("/import/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun importApplicants(@PathVariable("id") importId: Long) {
-        importService.prepareForImporting(importId)
-        asyncService.importApplicantsAsync(importId)
-    }
+    fun importApplicants(@PathVariable("id") importId: Long) = jobService.runJob(JobType.IMPORT, importId)
 
     @GetMapping("/import/{id}")
     fun getImport(@PathVariable("id") importId: Long): Import = importService.get(importId)
@@ -89,10 +86,7 @@ class RestController(
 
     @GetMapping("/import/{id}/save")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun savePersons(@PathVariable("id") importId: Long) {
-        importService.prepareForSaving(importId)
-        asyncService.savePersons(importId)
-    }
+    fun savePersons(@PathVariable("id") importId: Long) = jobService.runJob(JobType.SAVE, importId)
 
     @GetMapping("/import")
     fun getImportsPage(pageable: Pageable): Page<Import> = importService.getAll(pageable)
@@ -106,8 +100,7 @@ class RestController(
     fun findAllApplicationsByImportId(
         pageable: Pageable,
         @PathVariable("id") importId: Long
-    )
-            : Page<Application> = applicationService.findAllApplicationsByImportId(pageable, importId)
+    ): Page<Application> = applicationService.findAllApplicationsByImportId(pageable, importId)
 
 
     @GetMapping("/usos/indexPool")
@@ -130,54 +123,39 @@ class RestController(
     ) = usosService.updateIndexNumberByUsosIdAndIndexType(personId, indexTypeCode, indexNumber)
 
     @PutMapping("/import/{id}/archive")
-    fun archiveImport(@PathVariable("id") importId: Long) {
-        val import = importService.get(importId)
-        if (import.importProgress.importStatus == ImportStatus.COMPLETE) {
-            asyncService.archiveApplicants(importId)
-            return importService.setImportStatus(ImportStatus.ARCHIVED, importId)
-        } else
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Zły stan importu!")
-    }
+    fun archiveImport(@PathVariable("id") importId: Long) = jobService.runJob(JobType.ARCHIVE, importId)
 
     @GetMapping("/import/dataSources")
-    fun getDataSources(): List<DataSourceDto> {
-        return applicationDataSourceService.getDataSources()
-    }
+    fun getDataSources(): List<DataSourceDto> = applicationDataSourceFactory.getDataSources()
 
     @GetMapping("/usos/url")
-    fun getUsosUrl(): UrlDto {
-        return UrlDto(usosUrl)
-    }
+    fun getUsosUrl(): UrlDto = UrlDto(usosUrl)
 
     @PostMapping("/user")
-    fun createUser(@RequestBody userDto: UserDto): User {
-        return userService.save(userDto)
-    }
+    fun createUser(@RequestBody userDto: UserDto): User = userService.save(userDto)
 
     @PutMapping("/user")
-    fun updateUser(@RequestBody userDto: UserDto): User {
-        return userService.update(userDto)
-    }
+    fun updateUser(@RequestBody userDto: UserDto): User = userService.update(userDto)
 
     @DeleteMapping("/user/{id}")
-    fun deleteUser(@PathVariable("id") id: Long) {
-        return userService.delete(id)
-    }
+    fun deleteUser(@PathVariable("id") id: Long) = userService.delete(id)
 
     @GetMapping("/users")
-    fun getAllUsers(pageable: Pageable): Page<User> {
-        return userService.getAll(pageable)
-    }
+    fun getAllUsers(pageable: Pageable): Page<User> = userService.getAll(pageable)
 
     @GetMapping("/import/{id}/importUids")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun getUids(@PathVariable("id") importId: Long) {
-        importService.prepareForSearchingUids(importId)
-        asyncService.getUids(importId)
-    }
+    fun getUids(@PathVariable("id") importId: Long) = jobService.runJob(JobType.FIND_UIDS, importId)
+
+    @GetMapping("/import/{id}/notifications")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun sendNotifications(@PathVariable("id") importId: Long) = jobService.runJob(JobType.SEND_NOTIFICATIONS, importId)
 
     @GetMapping("/role")
-    fun getAllRoles(): List<Role> {
-        return roleService.getAll()
-    }
+    fun getAllRoles(): List<Role> = roleService.getAll()
+
+    @GetMapping("/import/{id}/job/{jobType}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun runJob(@PathVariable("id") importId: Long, @PathVariable("jobType") jobType: JobType) =
+        jobService.runJob(jobType, importId)
 }

@@ -1,6 +1,6 @@
 //package pl.poznan.ue.matriculation
 //
-//import org.junit.Assert
+//import org.junit.jupiter.api.Assertions.assertEquals
 //import org.junit.jupiter.api.Test
 //import org.slf4j.LoggerFactory
 //import org.springframework.beans.factory.annotation.Autowired
@@ -13,8 +13,9 @@
 //import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 //import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
 //import pl.poznan.ue.matriculation.local.repo.ImportRepository
-//import pl.poznan.ue.matriculation.local.service.AsyncService
 //import pl.poznan.ue.matriculation.local.service.ImportService
+//import pl.poznan.ue.matriculation.local.service.JobService
+//import java.util.*
 //import java.util.concurrent.Executor
 //
 //@SpringBootTest
@@ -33,128 +34,146 @@
 //    private lateinit var importService: ImportService
 //
 //    @Autowired
-//    private lateinit var asyncService: AsyncService
-//
-//    @Autowired
 //    private lateinit var importRepository: ImportRepository
 //
 //    @Autowired
 //    private lateinit var applicationRepository: ApplicationRepository
+//
+//    @Autowired
+//    private lateinit var jobService: JobService
 //
 //    private val logger = LoggerFactory.getLogger(IntegrationTest::class.java)
 //
 //    @Test
 //    fun testImport() {
 //        importService.create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-E",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-E",
-//                startDate = "2014-01-01T23:28:56.782Z",
-//                dataSourceType = "IRK_TEST"
+//            dateOfAddmision = Date(),
+//            didacticCycleCode = "202021/SL",
+//            indexPoolCode = "C",
+//            programmeCode = "S1-E",
+//            registration = "S1_PL_SZ_202021",
+//            stageCode = "s1-S1-E",
+//            startDate = Date(),
+//            dataSourceType = "IRK_TEST",
+//            programmeForeignId = "S1-E"
 //        )
 //        importService.create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-FAI",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-FAI",
-//                startDate = "2014-01-01T23:28:56.782Z",
-//                dataSourceType = "IRK_TEST"
+//            dateOfAddmision = Date(),
+//            didacticCycleCode = "202021/SL",
+//            indexPoolCode = "C",
+//            programmeCode = "S1-FAI",
+//            registration = "S1_PL_SZ_202021",
+//            stageCode = "s1-S1-FAI",
+//            startDate = Date(),
+//            dataSourceType = "IRK_TEST",
+//            programmeForeignId = "S1-FAI"
 //        )
 //        importService.create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-GT",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-GT",
-//                startDate = "2014-01-01T23:28:56.782Z",
-//                dataSourceType = "IRK_TEST"
+//            dateOfAddmision = Date(),
+//            didacticCycleCode = "202021/SL",
+//            indexPoolCode = "C",
+//            programmeCode = "S1-GT",
+//            registration = "S1_PL_SZ_202021",
+//            stageCode = "s1-S1-GT",
+//            startDate = Date(),
+//            dataSourceType = "IRK_TEST",
+//            programmeForeignId = "S1-GT"
 //        )
 //        importService.create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-IiE",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-IiE",
-//                startDate = "2014-01-01T23:28:56.782Z",
-//                dataSourceType = "IRK_TEST"
+//            dateOfAddmision = Date(),
+//            didacticCycleCode = "202021/SL",
+//            indexPoolCode = "C",
+//            programmeCode = "S1-IiE",
+//            registration = "S1_PL_SZ_202021",
+//            stageCode = "s1-S1-IiE",
+//            startDate = Date(),
+//            dataSourceType = "IRK_TEST",
+//            programmeForeignId = "S1-IiE"
 //        )
 //        importService.create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-MSG",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-MSG",
-//                startDate = "2014-01-01T23:28:56.782Z",
-//                dataSourceType = "IRK_TEST"
+//            dateOfAddmision = Date(),
+//            didacticCycleCode = "202021/SL",
+//            indexPoolCode = "C",
+//            programmeCode = "S1-MSG",
+//            registration = "S1_PL_SZ_202021",
+//            stageCode = "s1-S1-MSG",
+//            startDate = Date(),
+//            dataSourceType = "IRK_TEST",
+//            programmeForeignId = "S1-MSG"
 //        )
 //        importService.create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-P-E",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-P-E",
-//                startDate = "2014-01-01T23:28:56.782Z",
-//                dataSourceType = "IRK_TEST"
+//            dateOfAddmision = Date(),
+//            didacticCycleCode = "202021/SL",
+//            indexPoolCode = "P-E",
+//            programmeCode = "S1-P-E",
+//            registration = "S1_PL_SZ_202021",
+//            stageCode = "s1-S1-P-E",
+//            startDate = Date(),
+//            dataSourceType = "IRK_TEST",
+//            programmeForeignId = "S1-P-E"
 //        )
 //        importService.create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-PS",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-PS",
-//                startDate = "2014-01-01T23:28:56.782Z",
-//                dataSourceType = "IRK_TEST"
+//            dateOfAddmision = Date(),
+//            didacticCycleCode = "202021/SL",
+//            indexPoolCode = "C",
+//            programmeCode = "S1-PS",
+//            registration = "S1_PL_SZ_202021",
+//            stageCode = "s1-S1-PS",
+//            startDate = Date(),
+//            dataSourceType = "IRK_TEST",
+//            programmeForeignId = "S1-PS"
 //        )
 //        importService.create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-RiFB",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-RiFB",
-//                startDate = "2014-01-01T23:28:56.782Z",
-//                dataSourceType = "IRK_TEST"
+//            dateOfAddmision = Date(),
+//            didacticCycleCode = "202021/SL",
+//            indexPoolCode = "C",
+//            programmeCode = "S1-RiFB",
+//            registration = "S1_PL_SZ_202021",
+//            stageCode = "s1-S1-RiFB",
+//            startDate = Date(),
+//            dataSourceType = "IRK_TEST",
+//            programmeForeignId = "S1-RiFB"
 //        )
 //        importService.create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-Z",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-Z",
-//                startDate = "2014-01-01T23:28:56.782Z",
-//                dataSourceType = "IRK_TEST"
+//            dateOfAddmision = Date(),
+//            didacticCycleCode = "202021/SL",
+//            indexPoolCode = "C",
+//            programmeCode = "S1-Z",
+//            registration = "S1_PL_SZ_202021",
+//            stageCode = "s1-S1-Z",
+//            startDate = Date(),
+//            dataSourceType = "IRK_TEST",
+//            programmeForeignId = "S1-Z"
 //        )
 //        importService.create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-ZIP",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-ZIP",
-//                startDate = "2014-01-01T23:28:56.782Z",
-//                dataSourceType = "IRK_TEST"
+//            dateOfAddmision = Date(),
+//            didacticCycleCode = "202021/SL",
+//            indexPoolCode = "C",
+//            programmeCode = "S1-ZIP",
+//            registration = "S1_PL_SZ_202021",
+//            stageCode = "s1-S1-ZIP",
+//            startDate = Date(),
+//            dataSourceType = "IRK_TEST",
+//            programmeForeignId = "S1-ZIP"
 //        )
 //        var allImports = importRepository.findAll()
 //        allImports.forEach {
-//            asyncService.importApplicantsAsync(it.id!!)
-//            asyncService.savePersons(it.id!!)
+//            jobService.importApplications(it.id!!)
+//            jobService.savePersons(it.id!!)
 //        }
 //        allImports = importRepository.findAll()
+//        allImports.forEach { import ->
+//            val applications = applicationRepository.findAllByImportId(importId = import.id!!)
+//            applications.filter {
+//                it.importStatus != ApplicationImportStatus.IMPORTED
+//            }.forEach {
+//                logger.error("Apllication ${it.foreignId} error ${it.importError}")
+//            }
+//        }
 //        allImports.forEach {
-//            Assert.assertEquals(ImportStatus.COMPLETE, it.importProgress!!.importStatus)
+//            assertEquals(ImportStatus.COMPLETE, it.importProgress.importStatus)
 ////            it.applications.forEach { application ->
-////                Assert.assertEquals(ApplicationImportStatus.IMPORTED, application.importStatus)
+////                assertEquals(ApplicationImportStatus.IMPORTED, application.importStatus)
 ////            }
 //        }
 //        val allApplications = applicationRepository.findAll()
@@ -162,164 +181,165 @@
 //            if (it.importStatus == ApplicationImportStatus.ERROR) {
 //                logger.info("Import error: ${it.foreignId}\nStackTrace: ${it.importError}")
 //            }
-//            Assert.assertEquals(ApplicationImportStatus.IMPORTED, it.importStatus)
+//            assertEquals(ApplicationImportStatus.IMPORTED, it.importStatus)
 //        }
 //        allImports.forEach {
-//            if (it.importProgress!!.totalCount != it.importProgress!!.importedApplications) {
-//                logger.info("Imported applications count not equals total count: ${it.programmeCode} Total count: ${it.importProgress!!.totalCount} Saved: ${it.importProgress!!.importedApplications}")
+//            if (it.importProgress.totalCount != it.importProgress.importedApplications) {
+//                logger.info("Imported applications count not equals total count: ${it.programmeCode} Total count: ${it.importProgress.totalCount} Saved: ${it.importProgress.importedApplications}")
 //            }
-//            if (it.importProgress!!.totalCount != it.importProgress!!.savedApplicants) {
-//                logger.info("Saved applications count not equals total count: ${it.programmeCode} Total count: ${it.importProgress!!.totalCount} Saved: ${it.importProgress!!.savedApplicants}")
+//            if (it.importProgress.totalCount != it.importProgress.savedApplicants) {
+//                logger.info("Saved applications count not equals total count: ${it.programmeCode} Total count: ${it.importProgress.totalCount} Saved: ${it.importProgress.savedApplicants}")
 //            }
-//            Assert.assertEquals(it.importProgress!!.totalCount, it.importProgress!!.importedApplications)
-//            Assert.assertEquals(it.importProgress!!.totalCount, it.importProgress!!.savedApplicants)
+//            assertEquals(it.importProgress.totalCount, it.importProgress.importedApplications)
+//            assertEquals(it.importProgress.totalCount, it.importProgress.savedApplicants)
 //        }
-//        logger.info("Total count sum: ${allImports.sumBy { it.importProgress!!.totalCount!! }} Applicants sum = ${allApplications.count()}")
-//        Assert.assertEquals(allImports.sumBy { it.importProgress!!.totalCount!! }, allApplications.count())
+//        logger.info("Total count sum: ${allImports.sumBy { it.importProgress.totalCount!! }} Applicants sum = ${allApplications.count()}")
+//        assertEquals(allImports.sumBy { it.importProgress.totalCount!! }, allApplications.count())
 //    }
 //
 //    @Test
 //    fun testImport2() {
 //        importService.create(
-//                dateOfAddmision = "2014-01-01T23:28:56.782Z",
-//                didacticCycleCode = "202021/SL",
-//                indexPoolCode = "C",
-//                programmeCode = "S1-E",
-//                registration = "S1_PL_SZ_202021",
-//                stageCode = "s1-S1-E",
-//                startDate = "2014-01-01T23:28:56.782Z",
-//                dataSourceType = "IRK_TEST"
+//            dateOfAddmision = Date(),
+//            didacticCycleCode = "202021/SL",
+//            indexPoolCode = "C",
+//            programmeCode = "S1-E",
+//            registration = "S1_PL_SZ_202021",
+//            stageCode = "s1-S1-E",
+//            startDate = Date(),
+//            dataSourceType = "IRK_TEST",
+//            programmeForeignId = "S1-E"
 //        )
 //        var allImports = importRepository.findAll()
 //        allImports.forEach {
-//            asyncService.importApplicantsAsync(it.id!!)
-//            asyncService.savePersons(it.id!!)
+//            jobService.importApplications(it.id!!)
+//            jobService.savePersons(it.id!!)
 //        }
 //        allImports = importRepository.findAll()
 //        allImports.forEach {
-//            Assert.assertEquals(ImportStatus.COMPLETE, it.importProgress!!.importStatus)
+//            assertEquals(ImportStatus.COMPLETE, it.importProgress.importStatus)
 ////            it.applications.forEach { application ->
-////                Assert.assertEquals(ApplicationImportStatus.IMPORTED, application.importStatus)
+////                assertEquals(ApplicationImportStatus.IMPORTED, application.importStatus)
 ////            }
 //        }
 //        val allApplications = applicationRepository.findAll()
 //        allApplications.forEach {
 //            logger.info("Import error: ${it.foreignId}\nStackTrace: ${it.importError}")
-//            Assert.assertEquals(ApplicationImportStatus.IMPORTED, it.importStatus)
+//            assertEquals(ApplicationImportStatus.IMPORTED, it.importStatus)
 //        }
 //    }
 //
 //    @Test
 //    fun testImport3() {
 ////        importService.create(
-////                dateOfAddmision = "2014-01-01T23:28:56.782Z",
+////                dateOfAddmision = Date(),
 ////                didacticCycleCode = "202021/SL",
 ////                indexPoolCode = "C",
 ////                programmeCode = "S1-E",
 ////                registration = "S1_PL_SZ_202021",
 ////                stageCode = "s1-S1-E",
-////                startDate = "2014-01-01T23:28:56.782Z"
+////                startDate = Date()
 ////        )
 ////        importService.create(
-////                dateOfAddmision = "2014-01-01T23:28:56.782Z",
+////                dateOfAddmision = Date(),
 ////                didacticCycleCode = "202021/SL",
 ////                indexPoolCode = "C",
 ////                programmeCode = "S1-FAI",
 ////                registration = "S1_PL_SZ_202021",
 ////                stageCode = "s1-S1-FAI",
-////                startDate = "2014-01-01T23:28:56.782Z"
+////                startDate = Date()
 ////        )
 ////        importService.create(
-////                dateOfAddmision = "2014-01-01T23:28:56.782Z",
+////                dateOfAddmision = Date(),
 ////                didacticCycleCode = "202021/SL",
 ////                indexPoolCode = "C",
 ////                programmeCode = "S1-GT",
 ////                registration = "S1_PL_SZ_202021",
 ////                stageCode = "s1-S1-GT",
-////                startDate = "2014-01-01T23:28:56.782Z"
+////                startDate = Date()
 ////        )
 ////        importService.create(
-////                dateOfAddmision = "2014-01-01T23:28:56.782Z",
+////                dateOfAddmision = Date(),
 ////                didacticCycleCode = "202021/SL",
 ////                indexPoolCode = "C",
 ////                programmeCode = "S1-IiE",
 ////                registration = "S1_PL_SZ_202021",
 ////                stageCode = "s1-S1-IiE",
-////                startDate = "2014-01-01T23:28:56.782Z"
+////                startDate = Date()
 ////        )
 ////        importService.create(
-////                dateOfAddmision = "2014-01-01T23:28:56.782Z",
+////                dateOfAddmision = Date(),
 ////                didacticCycleCode = "202021/SL",
 ////                indexPoolCode = "C",
 ////                programmeCode = "S1-MSG",
 ////                registration = "S1_PL_SZ_202021",
 ////                stageCode = "s1-S1-MSG",
-////                startDate = "2014-01-01T23:28:56.782Z"
+////                startDate = Date()
 ////        )
 ////        importService.create(
-////                dateOfAddmision = "2014-01-01T23:28:56.782Z",
+////                dateOfAddmision = Date(),
 ////                didacticCycleCode = "202021/SL",
 ////                indexPoolCode = "C",
 ////                programmeCode = "S1-P-E",
 ////                registration = "S1_PL_SZ_202021",
 ////                stageCode = "s1-S1-P-E",
-////                startDate = "2014-01-01T23:28:56.782Z"
+////                startDate = Date()
 ////        )
 ////        importService.create(
-////                dateOfAddmision = "2014-01-01T23:28:56.782Z",
+////                dateOfAddmision = Date(),
 ////                didacticCycleCode = "202021/SL",
 ////                indexPoolCode = "C",
 ////                programmeCode = "S1-PS",
 ////                registration = "S1_PL_SZ_202021",
 ////                stageCode = "s1-S1-PS",
-////                startDate = "2014-01-01T23:28:56.782Z"
+////                startDate = Date()
 ////        )
 ////        importService.create(
-////                dateOfAddmision = "2014-01-01T23:28:56.782Z",
+////                dateOfAddmision = Date(),
 ////                didacticCycleCode = "202021/SL",
 ////                indexPoolCode = "C",
 ////                programmeCode = "S1-RiFB",
 ////                registration = "S1_PL_SZ_202021",
 ////                stageCode = "s1-S1-RiFB",
-////                startDate = "2014-01-01T23:28:56.782Z"
+////                startDate = Date()
 ////        )
 ////        importService.create(
-////                dateOfAddmision = "2014-01-01T23:28:56.782Z",
+////                dateOfAddmision = Date(),
 ////                didacticCycleCode = "202021/SL",
 ////                indexPoolCode = "C",
 ////                programmeCode = "S1-Z",
 ////                registration = "S1_PL_SZ_202021",
 ////                stageCode = "s1-S1-Z",
-////                startDate = "2014-01-01T23:28:56.782Z"
+////                startDate = Date()
 ////        )
 ////        importService.create(
-////                dateOfAddmision = "2014-01-01T23:28:56.782Z",
+////                dateOfAddmision = Date(),
 ////                didacticCycleCode = "202021/SL",
 ////                indexPoolCode = "C",
 ////                programmeCode = "S1-ZIP",
 ////                registration = "S1_PL_SZ_202021",
 ////                stageCode = "s1-S1-ZIP",
-////                startDate = "2014-01-01T23:28:56.782Z"
+////                startDate = Date()
 ////        )
 //        var allImports = importRepository.findAll()
 //        allImports.forEach {
-//            asyncService.importApplicantsAsync(it.id!!)
+//            jobService.importApplications(it.id!!)
 //        }
 //        allImports = importRepository.findAll()
 //        allImports.forEach {
-//            Assert.assertEquals(ImportStatus.IMPORTED, it.importProgress!!.importStatus)
+//            assertEquals(ImportStatus.IMPORTED, it.importProgress.importStatus)
 //        }
 //        val allApplications = applicationRepository.findAll()
 //        allApplications.forEach {
-//            Assert.assertEquals(ApplicationImportStatus.NOT_IMPORTED, it.importStatus)
+//            assertEquals(ApplicationImportStatus.NOT_IMPORTED, it.importStatus)
 //        }
 //        allImports.forEach {
-//            if (it.importProgress!!.totalCount != it.importProgress!!.importedApplications) {
-//                logger.info("Imported applications count not equals total count: ${it.programmeCode} Total count: ${it.importProgress!!.totalCount} Saved: ${it.importProgress!!.importedApplications}")
+//            if (it.importProgress.totalCount != it.importProgress.importedApplications) {
+//                logger.info("Imported applications count not equals total count: ${it.programmeCode} Total count: ${it.importProgress.totalCount} Saved: ${it.importProgress.importedApplications}")
 //            }
-//            Assert.assertEquals(it.importProgress!!.totalCount, it.importProgress!!.importedApplications)
+//            assertEquals(it.importProgress.totalCount, it.importProgress.importedApplications)
 //        }
-//        logger.info("Total count sum: ${allImports.sumBy { it.importProgress!!.totalCount!! }} Applicants sum = ${allApplications.count()}")
-//        //Assert.assertEquals(allImports.sumBy { it.importProgress!!.totalCount!! }, allApplications.count())
+//        logger.info("Total count sum: ${allImports.sumBy { it.importProgress.totalCount!! }} Applicants sum = ${allApplications.count()}")
+//        //assertEquals(allImports.sumBy { it.importProgress!!.totalCount!! }, allApplications.count())
 //    }
 //}
