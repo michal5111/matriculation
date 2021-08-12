@@ -7,10 +7,6 @@ import javax.persistence.*
 
 @Entity
 class Address(
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Long? = null,
-
         @JsonIgnore
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "applicant_id", referencedColumnName = "id")
@@ -32,7 +28,7 @@ class Address(
         var street: String?,
 
         var streetNumber: String?
-) : Serializable {
+) : BaseEntityLongId(), Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

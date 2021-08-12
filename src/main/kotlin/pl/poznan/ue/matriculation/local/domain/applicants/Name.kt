@@ -7,17 +7,17 @@ import javax.persistence.*
 @Entity
 class Name(
 
-        @JsonIgnore
-        @Id
-        @OneToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "applicant_id", referencedColumnName = "id")
-        var applicant: Applicant? = null,
+    @JsonIgnore
+    @Id
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "applicant_id", referencedColumnName = "id")
+    var applicant: Applicant? = null,
 
-        var middle: String?,
-        var family: String,
-        var given: String,
-        var maiden: String?
-) : Serializable {
+    var middle: String?,
+    var family: String,
+    var given: String,
+    var maiden: String?
+) : BaseEntity(), Serializable {
 
     override fun toString(): String {
         return "Name(middle=$middle, family=$family, given=$given, maiden=$maiden)"

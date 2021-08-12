@@ -136,5 +136,5 @@ class Arrival(
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "KPS_DOKOS_ID", referencedColumnName = "ID", nullable = true)
-        var personDocument: PersonDocument? = null
-)
+        var personDocument: PersonDocument? = null,
+) : BaseEntity()

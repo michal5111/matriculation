@@ -8,11 +8,17 @@ import pl.poznan.ue.matriculation.oracle.domain.DidacticCycle
 import java.util.*
 
 @Repository
-interface DidacticCycleRepository : JpaRepository<DidacticCycle, String> {
+interface DidacticCycleRepository : JpaRepository<DidacticCycle, String>, DidacticCycleRepositoryCustom {
 
     @Query("select d from DidacticCycle d where (d.dateFrom = :dateFrom or d.dateTo = :dateTo) and d.didacticCycleType = 'ROK'")
-    fun findDidacticCycleYearBySemesterDates(@Param("dateFrom") dateFrom: Date, @Param("dateTo") dateTo: Date): DidacticCycle?
+    fun findDidacticCycleYearBySemesterDates(
+        @Param("dateFrom") dateFrom: Date,
+        @Param("dateTo") dateTo: Date
+    ): DidacticCycle?
 
-    @Query(nativeQuery = true, value = "select DATA_DO from DZ_CYKLE_DYDAKTYCZNE where KOD = (select NAST_CYKL_KOD FROM DZ_KOLEJNOSC_CYKLI_DYD where POPRZ_CYKL_KOD = :didacticCycleCode)")
+    @Query(
+        nativeQuery = true,
+        value = "select DATA_DO from DZ_CYKLE_DYDAKTYCZNE where KOD = (select NAST_CYKL_KOD FROM DZ_KOLEJNOSC_CYKLI_DYD where POPRZ_CYKL_KOD = :didacticCycleCode)"
+    )
     fun getNextDidacticCycleEndDate(@Param("didacticCycleCode") didacticCycleCode: String): Date?
 }

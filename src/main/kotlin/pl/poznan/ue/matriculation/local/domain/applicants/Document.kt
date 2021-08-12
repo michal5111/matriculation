@@ -15,46 +15,42 @@ import javax.persistence.*
 //)
 class Document(
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        var id: Long? = null,
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "education_data_id", referencedColumnName = "applicant_id", nullable = false)
+    var educationData: EducationData? = null,
 
-        @JsonIgnore
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "education_data_id", referencedColumnName = "applicant_id", nullable = false)
-        var educationData: EducationData? = null,
+    val certificateType: String,
 
-        val certificateType: String,
+    val certificateTypeCode: String,
 
-        val certificateTypeCode: String,
+    val certificateUsosCode: Char?,
 
-        val certificateUsosCode: Char?,
+    @Lob
+    var comment: String?,
 
-        @Lob
-        var comment: String?,
+    var documentNumber: String,
 
-        var documentNumber: String,
+    var documentYear: Int?,
 
-        var documentYear: Int?,
+    var issueCity: String?,
 
-        var issueCity: String?,
+    var issueCountry: String?,
 
-        var issueCountry: String?,
+    @Temporal(TemporalType.DATE)
+    var issueDate: Date,
 
-        @Temporal(TemporalType.DATE)
-        var issueDate: Date,
+    var issueInstitution: String?,
 
-        var issueInstitution: String?,
+    var issueInstitutionUsosCode: Long?,
 
-        var issueInstitutionUsosCode: Long?,
+    var modificationDate: Date?,
 
-        var modificationDate: Date?,
+    @get:JsonIgnore
+    @OneToMany(mappedBy = "certificate", fetch = FetchType.LAZY)
+    var Applications: MutableList<Application> = mutableListOf()
 
-        @get:JsonIgnore
-        @OneToMany(mappedBy = "certificate", fetch = FetchType.LAZY)
-        var Applications: MutableList<Application> = mutableListOf()
-
-) : Serializable {
+) : BaseEntityLongId(), Serializable {
 
     override fun toString(): String {
         return "Document(id=$id, certificateType='$certificateType', certificateTypeCode='$certificateTypeCode" +

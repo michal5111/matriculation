@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.local.job
 
+import pl.poznan.ue.matriculation.applicantDataSources.INotificationSender
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.job.startConditions.IStartConditions
@@ -27,10 +28,9 @@ class SendNotificationsJob(
 
     override fun doWork() {
         val import = importRepository.getOne(importId)
-        processService.sendNotifications(
-            importId = importId,
-            applicationDtoDataSource = applicationDataSourceFactory.getDataSource(import.dataSourceId)
-        )
+        val ads = applicationDataSourceFactory.getDataSource(import.dataSourceId)
+        if (ads !is INotificationSender) return
+        processService.sendNotifications(importId = importId, ads)
         if (import.importProgress.saveErrors > 0) {
             importService.setImportStatus(ImportStatus.COMPLETED_WITH_ERRORS, importId)
         } else {

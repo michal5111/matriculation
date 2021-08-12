@@ -1,6 +1,7 @@
 package pl.poznan.ue.matriculation.local.domain.applications
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import pl.poznan.ue.matriculation.local.domain.applicants.BaseEntity
 import java.io.Serializable
 import javax.persistence.*
 
@@ -19,7 +20,7 @@ class ApplicationForeignerData(
         var basisOfAdmission: String?,
 
         var sourceOfFinancing: String?
-) : Serializable {
+) : BaseEntity(), Serializable {
 
     override fun toString(): String {
         return "ApplicationForeignerData(baseOfStay=$baseOfStay, basisOfAdmission=$basisOfAdmission, " +

@@ -6,11 +6,11 @@ import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import pl.poznan.ue.matriculation.properties.OracleDBProperties
-import java.util.*
 import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
@@ -71,6 +71,11 @@ class OracleDbConfig(
     fun oracleTransactionManager(@Qualifier("oracleEntityManagerFactory") oracleEntityManagerFactory: EntityManagerFactory):
             JpaTransactionManager {
         return JpaTransactionManager(oracleEntityManagerFactory)
+    }
+
+    @Bean(name = ["oracleJdbcTemplate"])
+    fun oracleJdbcTemplate(@Qualifier("oracleDataSource") dataSource: DataSource): JdbcTemplate {
+        return JdbcTemplate(dataSource)
     }
 
 //    @Bean(name = ["chainedTransactionManager"])

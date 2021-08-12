@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.applicantDataSources
 
-import pl.poznan.ue.matriculation.irk.dto.NotificationDto
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applications.Application
@@ -25,8 +24,6 @@ interface IApplicationDataSource<applicationDTO : IApplicationDto, applicantDTO 
     ): IPage<applicationDTO>
 
     fun getApplicantById(applicantId: Long): applicantDTO
-
-    fun getPhoto(photoUrl: String): ByteArray?
 
     fun postMatriculation(foreignApplicationId: Long): Int
 
@@ -55,6 +52,4 @@ interface IApplicationDataSource<applicationDTO : IApplicationDto, applicantDTO 
     fun getApplicationEditUrl(applicationId: Long): String
 
     fun preprocess(applicationDto: applicationDTO, applicantDto: applicantDTO)
-
-    fun sendNotification(foreignApplicantId: Long, notificationDto: NotificationDto)
 }

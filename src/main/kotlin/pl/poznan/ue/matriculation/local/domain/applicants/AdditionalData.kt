@@ -23,7 +23,7 @@ class AdditionalData(
         var mothersName: String?,
 
         var wku: String?
-) : Serializable {
+) : BaseEntity(), Serializable {
 
     override fun toString(): String {
         return "AdditionalData(fathersName=$fathersName, militaryCategory=$militaryCategory, " +

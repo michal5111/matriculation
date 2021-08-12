@@ -7,27 +7,27 @@ import javax.persistence.*
 @Entity
 class EducationData(
 
-        @Id
-        @JsonIgnore
-        var applicantId: Long? = null,
+    @Id
+    @JsonIgnore
+    var applicantId: Long? = null,
 
-        @MapsId
-        @JsonIgnore
-        @OneToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "applicant_id", referencedColumnName = "id")
-        var applicant: Applicant? = null,
+    @MapsId
+    @JsonIgnore
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "applicant_id", referencedColumnName = "id")
+    var applicant: Applicant? = null,
 
-        @OneToMany(mappedBy = "educationData", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
-        var documents: MutableList<Document> = mutableListOf(),
+    @OneToMany(mappedBy = "educationData", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    var documents: MutableList<Document> = mutableListOf(),
 
-        var highSchoolCity: String? = null,
+    var highSchoolCity: String? = null,
 
-        var highSchoolName: String? = null,
+    var highSchoolName: String? = null,
 
-        var highSchoolType: String? = null,
+    var highSchoolType: String? = null,
 
-        var highSchoolUsosCode: Long? = null
-) : Serializable {
+    var highSchoolUsosCode: Long? = null
+) : BaseEntity(), Serializable {
 
     override fun toString(): String {
         return "EducationData(applicantId=$applicantId, highSchoolCity=$highSchoolCity, " +

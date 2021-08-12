@@ -8,12 +8,12 @@ import javax.persistence.*
 @Entity
 class ImportProgress(
     @Id
-        var id: Long? = null,
+    var id: Long? = null,
 
     @MapsId
-        @OneToOne(fetch = FetchType.LAZY)
-        @JsonIgnore
-        @JoinColumn(name = "import_id", referencedColumnName = "id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "import_id", referencedColumnName = "id")
     var import: Import,
 
     var importedApplications: Int = 0,
@@ -32,13 +32,8 @@ class ImportProgress(
     var importStatus: ImportStatus = ImportStatus.PENDING,
 
     @Lob
-    var error: String? = null
+    var error: String? = null,
 ) : Serializable {
-
-    override fun toString(): String {
-        return "ImportProgress(id=$id, importedApplications=$importedApplications, saveErrors=$saveErrors, " +
-                "savedApplicants=$savedApplicants, totalCount=$totalCount, importStatus=$importStatus, error=$error)"
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -46,13 +41,17 @@ class ImportProgress(
 
         other as ImportProgress
 
-        if (id != other.id) return false
+        if (import != other.import) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return id?.hashCode() ?: 0
+        return import.hashCode()
+    }
+
+    override fun toString(): String {
+        return "ImportProgress(id=$id, importedApplications=$importedApplications, saveErrors=$saveErrors, savedApplicants=$savedApplicants, totalCount=$totalCount, importedUids=$importedUids, notificationsSend=$notificationsSend, importStatus=$importStatus, error=$error)"
     }
 
 

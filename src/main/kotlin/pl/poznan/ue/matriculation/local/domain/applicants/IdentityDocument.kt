@@ -7,25 +7,25 @@ import javax.persistence.*
 @Entity
 class IdentityDocument(
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Long? = null,
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "applicant_id", referencedColumnName = "id")
+    val applicant: Applicant? = null,
 
-        @JsonIgnore
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "applicant_id", referencedColumnName = "id")
-        val applicant: Applicant? = null,
+    var country: String?,
 
-        var country: String?,
+    @Temporal(TemporalType.DATE)
+    var expDate: Date?,
 
-        @Temporal(TemporalType.DATE)
-        var expDate: Date?,
+    var number: String?,
 
-        var number: String?,
+    var type: Char?
+) : BaseEntityLongId() {
 
-        var type: Char?
-) {
 
+    override fun toString(): String {
+        return "IdentityDocument(id=$id, documentCountry=$country, documentExpDate=$expDate, documentNumber=$number, documentType=$type)"
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -33,17 +33,20 @@ class IdentityDocument(
 
         other as IdentityDocument
 
-        if (id != other.id) return false
+        if (country != other.country) return false
+        if (expDate != other.expDate) return false
+        if (number != other.number) return false
+        if (type != other.type) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return id?.hashCode() ?: 0
-    }
-
-    override fun toString(): String {
-        return "IdentityDocument(id=$id, documentCountry=$country, documentExpDate=$expDate, documentNumber=$number, documentType=$type)"
+        var result = country?.hashCode() ?: 0
+        result = 31 * result + (expDate?.hashCode() ?: 0)
+        result = 31 * result + (number?.hashCode() ?: 0)
+        result = 31 * result + (type?.hashCode() ?: 0)
+        return result
     }
 
 

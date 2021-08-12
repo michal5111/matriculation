@@ -5,25 +5,25 @@ import javax.persistence.*
 @Entity
 @Table(name = "DZ_JEZYKI")
 class Language(
-        @Id
-        @Column(name = "KOD", length = 20, nullable = false)
-        val code: String,
+    @Id
+    @Column(name = "KOD", length = 20, nullable = false)
+    val code: String,
 
-        @Column(name = "NAZWA", length = 30, nullable = false)
-        var name: String,
+    @Column(name = "NAZWA", length = 30, nullable = false)
+    var name: String,
 
-        @Column(name = "NAZWA_ANG", length = 100, nullable = false)
-        var nameEng: String,
+    @Column(name = "NAZWA_ANG", length = 100, nullable = false)
+    var nameEng: String,
 
-        @Column(name = "KOD_ISO6391", length = 2, nullable = true)
-        var Iso6391Code: String? = name,
+    @Column(name = "KOD_ISO6391", length = 2, nullable = true)
+    var Iso6391Code: String? = name,
 
-        @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
-        var conductedFieldsOfStudy: MutableList<ConductedFieldOfStudy>,
+    @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
+    var conductedFieldsOfStudy: MutableList<ConductedFieldOfStudy>,
 
-        @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
-        var personDocuments: MutableList<PersonDocument>
-) {
+    @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
+    var personDocuments: MutableList<PersonDocument>
+) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

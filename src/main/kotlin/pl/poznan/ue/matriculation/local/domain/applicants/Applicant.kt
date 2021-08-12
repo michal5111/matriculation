@@ -7,88 +7,87 @@ import javax.persistence.*
 
 @Entity
 @Table(
-        uniqueConstraints = [UniqueConstraint(name = "ForeignIdUniqueConstraint", columnNames = ["foreignId", "datasourceId"])]
-//        indexes = [
-//            Index(name = "foreignIdDatasourceIdIndex", columnList = "foreignId,datasourceId", unique = true),
-//            Index(name = "usosIdIndex", columnList = "usosId", unique = true)
-//        ]
+    uniqueConstraints = [UniqueConstraint(
+        name = "ForeignIdUniqueConstraint",
+        columnNames = ["foreignId", "datasourceId"]
+    )],
+    indexes = [
+        Index(name = "foreignIdDatasourceIdIndex", columnList = "foreignId,datasourceId", unique = true),
+        Index(name = "usosIdIndex", columnList = "usosId", unique = true)
+    ]
 )
 class Applicant(
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Long? = null,
+    @Column(name = "foreignId")
+    val foreignId: Long,
 
-        @Column(name = "foreignId")
-        val foreignId: Long,
+    @Column(name = "datasourceId", nullable = false)
+    var dataSourceId: String? = null,
 
-        @Column(name = "datasourceId", nullable = false)
-        var dataSourceId: String? = null,
+    var email: String,
 
-        var email: String,
+    var indexNumber: String?,
 
-        var indexNumber: String?,
+    var password: String?,
 
-        var password: String?,
+    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    val name: Name,
 
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
-        val name: Name,
+    var phone: String?,
 
-        var phone: String?,
+    var citizenship: String,
 
-        var citizenship: String,
+    var nationality: String? = null,
 
-        var nationality: String? = null,
+    var photo: String?,
 
-        var photo: String?,
+    @Transient
+    @JsonIgnore
+    var photoByteArray: ByteArray? = null,
 
-        @Transient
-        @JsonIgnore
-        var photoByteArray: ByteArray? = null,
+    var photoPermission: String?,
 
-        var photoPermission: String?,
+    var casPasswordOverride: String?,
 
-        var casPasswordOverride: String?,
+    var modificationDate: Date,
 
-        var modificationDate: Date,
-
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
-        var basicData: BasicData,
+    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    var basicData: BasicData,
 
 //        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
 //        var contactData: ContactData,
 
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
-        val additionalData: AdditionalData,
+    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    val additionalData: AdditionalData,
 
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-        var applicantForeignerData: ApplicantForeignerData?,
+    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    var applicantForeignerData: ApplicantForeignerData?,
 
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
-        val educationData: EducationData,
+    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    val educationData: EducationData,
 
-        @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
-        val phoneNumbers: MutableList<PhoneNumber> = mutableListOf(),
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    val phoneNumbers: MutableList<PhoneNumber> = mutableListOf(),
 
-        @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
-        val addresses: MutableList<Address> = mutableListOf(),
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    val addresses: MutableList<Address> = mutableListOf(),
 
-        @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
-        var identityDocuments: MutableList<IdentityDocument> = mutableListOf(),
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    var identityDocuments: MutableList<IdentityDocument> = mutableListOf(),
 
-        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
-        var erasmusData: ErasmusData? = null,
+    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    var erasmusData: ErasmusData? = null,
 
-        var usosId: Long? = null,
+    var usosId: Long? = null,
 
-        var assignedIndexNumber: String? = null,
+    var assignedIndexNumber: String? = null,
 
-        @JsonIgnore
-        @OneToMany(mappedBy = "applicant")
-        var applications: MutableSet<Application> = mutableSetOf(),
+    @JsonIgnore
+    @OneToMany(mappedBy = "applicant")
+    var applications: MutableSet<Application> = mutableSetOf(),
 
-        var uid: String? = null
-) {
+    var uid: String? = null
+) : BaseEntityLongId() {
 
     override fun toString(): String {
         return "Applicant(id=$id, irkId=$foreignId, email='$email', indexNumber=$indexNumber, " +

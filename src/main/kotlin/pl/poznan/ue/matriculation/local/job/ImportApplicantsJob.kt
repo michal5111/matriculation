@@ -34,31 +34,34 @@ class ImportApplicantsJob(
         import.importProgress.error = null
         val applicantDataSource = applicationDataSourceFactory.getDataSource(import.dataSourceId)
         var currentPage = 1
-        var hasNext: Boolean
-        var set = true
         try {
-            do {
-                val page = applicantDataSource.getApplicationsPage(
+            var page = applicantDataSource.getApplicationsPage(
+                programmeForeignId = import.programmeForeignId,
+                registrationCode = import.registration,
+                pageNumber = currentPage,
+                import = import
+            )
+            import.importProgress.totalCount = page.getSize()
+            importProgressRepository.save(import.importProgress)
+            if (page.getSize() == 0) {
+                throw IllegalStateException("Liczba kandydatów wynosi 0!")
+            }
+            page.getResultsList().forEach {
+                processService.importApplication(importId, it, applicantDataSource)
+            }
+            currentPage++
+            while (page.hasNext()) {
+                page = applicantDataSource.getApplicationsPage(
                     programmeForeignId = import.programmeForeignId,
                     registrationCode = import.registration,
                     pageNumber = currentPage,
                     import = import
                 )
-                if (set) {
-                    if (page.getSize() == 0) {
-                        throw IllegalStateException("Liczba kandydatów wynosi 0!")
-                    }
-                    import.importProgress.totalCount = page.getSize()
-                    importProgressRepository.save(import.importProgress)
-                    set = false
-                }
                 page.getResultsList().forEach {
-                    val application = processService.processApplication(importId, it, applicantDataSource)
-                    //localEntityManager.detach(application)
+                    processService.importApplication(importId, it, applicantDataSource)
                 }
-                hasNext = page.hasNext()
                 currentPage++
-            } while (hasNext)
+            }
             importService.setImportStatus(ImportStatus.IMPORTED, importId)
         } catch (e: Exception) {
             throw ImportException(import.id!!, e.message, e)

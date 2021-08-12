@@ -8,19 +8,19 @@ import javax.persistence.*
 @Table(name = "DZ_ETAPY")
 class Stage(
 
-        @Id
-        @Column(name = "KOD", length = 20, nullable = false)
-        val code: String,
+    @Id
+    @Column(name = "KOD", length = 20, nullable = false)
+    val code: String,
 
-        @Column(name = "OPIS", length = 200, nullable = false)
-        val description: String,
+    @Column(name = "OPIS", length = 200, nullable = false)
+    val description: String,
 
-        @Column(name = "DESCRIPTION", length = 200, nullable = true)
-        val descriptionEng: String? = null,
+    @Column(name = "DESCRIPTION", length = 200, nullable = true)
+    val descriptionEng: String? = null,
 
-        @OneToMany(mappedBy = "stage", fetch = FetchType.LAZY)
-        val programmeStages: MutableList<ProgrammeStage>
-) {
+    @OneToMany(mappedBy = "stage", fetch = FetchType.LAZY)
+    val programmeStages: MutableList<ProgrammeStage>
+) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

@@ -7,19 +7,19 @@ import javax.persistence.*
 @Table(name = "DZ_ZDJECIA_OSOB")
 class PersonPhoto(
 
-        @Id
-        var id: Long? = null,
+    @Id
+    var id: Long? = null,
 
-        @MapsId
-        @OneToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "OS_ID", referencedColumnName = "ID", nullable = false)
-        var person: Person? = null,
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "OS_ID", referencedColumnName = "ID", nullable = false)
+    var person: Person? = null,
 
-        @Basic(fetch = FetchType.LAZY)
-        @Column(name = "FOTO")
-        @Lob
-        var photoBlob: ByteArray
-) : Serializable {
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "FOTO")
+    @Lob
+    var photoBlob: ByteArray
+) : BaseEntity(), Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

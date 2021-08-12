@@ -1,21 +1,20 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
 import java.io.Serializable
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.FetchType
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 
 @Entity
 class Status(
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        var id: Long? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "applicantForeignerData_id", referencedColumnName = "applicant_id")
+    var applicantForeignerData: ApplicantForeignerData? = null,
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "applicantForeignerData_id", referencedColumnName = "applicant_id")
-        var applicantForeignerData: ApplicantForeignerData? = null,
-
-        val status: String
-) : Serializable {
+    val status: String
+) : BaseEntityLongId(), Serializable {
 
     override fun toString(): String {
         return "Status(id=$id, status='$status')"

@@ -8,25 +8,25 @@ import javax.persistence.*
 @Entity
 class BasicData(
 
-        @JsonIgnore
-        @Id
-        @OneToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "applicant_id", referencedColumnName = "id")
-        var applicant: Applicant? = null,
+    @JsonIgnore
+    @Id
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "applicant_id", referencedColumnName = "id")
+    var applicant: Applicant? = null,
 
-        var sex: Char,
+    var sex: Char,
 
-        var pesel: String?,
+    var pesel: String?,
 
-        @Temporal(TemporalType.DATE)
-        var dateOfBirth: Date?,
+    @Temporal(TemporalType.DATE)
+    var dateOfBirth: Date?,
 
-        var cityOfBirth: String?,
+    var cityOfBirth: String?,
 
-        var countryOfBirth: String?,
+    var countryOfBirth: String?,
 
-        var dataSource: String
-) : Serializable {
+    var dataSource: String
+) : BaseEntity(), Serializable {
 
     override fun toString(): String {
         return "BasicData(sex='$sex', pesel=$pesel, dateOfBirth=$dateOfBirth, cityOfBirth='$cityOfBirth', " +

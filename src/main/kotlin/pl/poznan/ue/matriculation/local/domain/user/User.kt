@@ -1,15 +1,12 @@
 package pl.poznan.ue.matriculation.local.domain.user
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import pl.poznan.ue.matriculation.local.domain.applicants.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.serializer.CustomRolesSerializer
 import javax.persistence.*
 
 @Entity
 class User(
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
 
     @Column(unique = true)
     val uid: String,
@@ -19,7 +16,7 @@ class User(
     var roles: MutableSet<UserRole> = mutableSetOf()
 
 
-) {
+) : BaseEntityLongId() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

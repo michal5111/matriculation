@@ -49,9 +49,19 @@ class ExternalPerson(
         @JoinColumn(name = "JED_ORG_ZEW_ID", referencedColumnName = "ID", nullable = true)
         val externalOrganizationalUnit: ExternalOrganizationalUnit?,
 
-        @OneToMany(mappedBy = "coordinatorExternalPerson", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+        @OneToMany(
+                mappedBy = "coordinatorExternalPerson",
+                cascade = [CascadeType.ALL],
+                orphanRemoval = true,
+                fetch = FetchType.LAZY
+        )
         var externalPersonContracts: MutableList<Contract> = mutableListOf(),
 
-        @OneToMany(mappedBy = "coordinatorExternalPerson", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+        @OneToMany(
+                mappedBy = "coordinatorExternalPerson",
+                cascade = [CascadeType.ALL],
+                orphanRemoval = true,
+                fetch = FetchType.LAZY
+        )
         var externalPersonCooperations: MutableList<Cooperation> = mutableListOf()
-)
+) : BaseEntity()

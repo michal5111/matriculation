@@ -3,6 +3,7 @@ package pl.poznan.ue.matriculation.local.domain.applications
 
 import com.fasterxml.jackson.annotation.*
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
+import pl.poznan.ue.matriculation.local.domain.applicants.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
@@ -11,17 +12,15 @@ import javax.persistence.*
 
 @Entity
 @Table(
-        uniqueConstraints = [UniqueConstraint(name = "ForeignIdUniqueConstraint", columnNames = ["foreignId", "datasourceId"])]
-//        indexes = [
-//            Index(name = "foreignIdDatasourceIdIndex", columnList = "foreignId,datasourceId", unique = true),
-//            Index(name = "importIdIndex", columnList = "import_id", unique = false),
-//            Index(name = "importIdImportStatusIndex", columnList = "import_id,importStatus", unique = false)
-//        ]
+    uniqueConstraints = [
+        UniqueConstraint(name = "ForeignIdUniqueConstraint", columnNames = ["foreignId", "datasourceId"])],
+    indexes = [
+        Index(name = "foreignIdDatasourceIdIndex", columnList = "foreignId,datasourceId", unique = true),
+        Index(name = "importIdIndex", columnList = "import_id", unique = false),
+        Index(name = "importIdImportStatusIndex", columnList = "import_id,importStatus", unique = false)
+    ]
 )
 class Application(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
 
     @Column(nullable = false, name = "foreignId")
     val foreignId: Long,
@@ -55,23 +54,23 @@ class Application(
     var certificate: Document? = null,
 
     @Enumerated(EnumType.STRING)
-        var importStatus: ApplicationImportStatus = ApplicationImportStatus.NOT_IMPORTED,
+    var importStatus: ApplicationImportStatus = ApplicationImportStatus.NOT_IMPORTED,
 
     @Column(length = 4096)
-        var importError: String? = null,
+    var importError: String? = null,
 
     @Lob
-        var stackTrace: String? = null,
+    var stackTrace: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
-        @JoinColumn(name = "applicant_id", referencedColumnName = "id")
-        var applicant: Applicant? = null,
+    @JoinColumn(name = "applicant_id", referencedColumnName = "id")
+    var applicant: Applicant? = null,
 
     @JsonIgnore
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "import_id", referencedColumnName = "id")
-        var import: Import? = null
-) : Serializable {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "import_id", referencedColumnName = "id")
+    var import: Import? = null
+) : BaseEntityLongId(), Serializable {
 
     override fun toString(): String {
         return "Application(id=$id, irkId=$foreignId, admitted=$admitted, comment=$comment, payment=$payment, " +

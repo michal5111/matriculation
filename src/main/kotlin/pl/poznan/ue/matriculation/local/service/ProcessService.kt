@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionSynchronizationManager
 import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
+import pl.poznan.ue.matriculation.applicantDataSources.INotificationSender
+import pl.poznan.ue.matriculation.applicantDataSources.IPhotoDownloader
+import pl.poznan.ue.matriculation.configuration.LogExecutionTime
 import pl.poznan.ue.matriculation.exception.ImportException
 import pl.poznan.ue.matriculation.exception.exceptionHandler.ISaveExceptionHandler
 import pl.poznan.ue.matriculation.irk.dto.NotificationDto
@@ -27,8 +30,6 @@ import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.service.PersonService
 import java.util.stream.Stream
-import javax.persistence.EntityManager
-import javax.persistence.PersistenceContext
 
 @Service
 class ProcessService(
@@ -47,15 +48,12 @@ class ProcessService(
     @Autowired
     private lateinit var self: ProcessService
 
-    @PersistenceContext(unitName = "oracle")
-    private lateinit var oracleEntityManager: EntityManager
-
     @Transactional(
         rollbackFor = [Exception::class, RuntimeException::class],
         propagation = Propagation.REQUIRED,
         transactionManager = "transactionManager"
     )
-    fun processApplication(
+    fun importApplication(
         importId: Long,
         applicationDto: IApplicationDto,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
@@ -83,6 +81,7 @@ class ProcessService(
         return application
     }
 
+    @LogExecutionTime
     private fun createOrUpdateApplication(
         applicationDto: IApplicationDto,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
@@ -104,6 +103,7 @@ class ProcessService(
         }
     }
 
+    @LogExecutionTime
     private fun createOrUpdateApplicant(
         applicantDto: IApplicantDto,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
@@ -121,6 +121,7 @@ class ProcessService(
         }
     }
 
+    @LogExecutionTime
     @Transactional(
         rollbackFor = [Exception::class, RuntimeException::class],
         propagation = Propagation.REQUIRES_NEW,
@@ -132,23 +133,20 @@ class ProcessService(
         importDto: ImportDtoJpa,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
     ): Person {
+        logger.info("------------------------------------------------Przetwarzam ${application.id}---------------------------------------------")
         if (!TransactionSynchronizationManager.isActualTransactionActive()) {
             throw IllegalStateException("Nie ma aktywnej transakcji")
         }
         applicantService.check(application.applicant!!)
         val importProgress = importProgressRepository.getOne(importId)
-        application.applicant!!.photo?.let {
-            application.applicant!!.photoByteArray = applicationDtoDataSource.getPhoto(it)
+        if (applicationDtoDataSource is IPhotoDownloader) {
+            application.applicant!!.photo?.let {
+                application.applicant!!.photoByteArray = applicationDtoDataSource.getPhoto(it)
+            }
         }
         val personAndStudent = personService.process(
             application = application,
-            dateOfAddmision = importDto.dateOfAddmision,
-            didacticCycleCode = importDto.didacticCycleCode,
-            indexPoolCode = importDto.indexPoolCode,
-            programmeCode = importDto.programmeCode,
-            registration = importDto.registration,
-            stageCode = importDto.stageCode,
-            startDate = importDto.startDate,
+            importDto = importDto,
             postMatriculation = applicationDtoDataSource::postMatriculation
         )
         application.apply {
@@ -161,9 +159,11 @@ class ProcessService(
         applicantRepository.save(application.applicant!!)
         applicationRepository.save(application)
         importProgress.savedApplicants++
+        logger.info("------------------------------------------------koniec ${application.id}---------------------------------------------")
         return personAndStudent.first
     }
 
+    @LogExecutionTime
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     fun processApplications(
         importId: Long,
@@ -176,13 +176,12 @@ class ProcessService(
         applicationsPage.use {
             it.forEach { application ->
                 try {
-                    val person = self.processApplication(
+                    self.processApplication(
                         importId = importId,
                         application = application,
                         importDto = importDto,
                         applicationDtoDataSource = applicationDtoDataSource
                     )
-                    oracleEntityManager.detach(person)
                 } catch (e: Exception) {
                     errorCount++
                     saveExceptionHandler.handle(e, application, importId)
@@ -250,7 +249,7 @@ class ProcessService(
     @Transactional(propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     fun sendNotifications(
         importId: Long,
-        applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
+        notificationSender: INotificationSender
     ) {
         val applicationStream = applicationRepository.findAllByImportIdStream(importId)
         val importProgress = importProgressRepository.findByIdOrNull(importId)
@@ -258,7 +257,7 @@ class ProcessService(
         applicationStream.use {
             it.forEach { application ->
                 application.applicant?.let { applicant ->
-                    sendNotification(applicant, importId, applicationDtoDataSource)
+                    sendNotification(applicant, importId, notificationSender)
                 }
             }
         }
@@ -272,7 +271,7 @@ class ProcessService(
     fun sendNotification(
         applicant: Applicant,
         importId: Long,
-        applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
+        notificationSender: INotificationSender
     ) {
         try {
             val importProgress = importProgressRepository.findByIdOrNull(importId)
@@ -314,7 +313,7 @@ class ProcessService(
             PUEB IT Centre
                 """.trimIndent()
             )
-            applicationDtoDataSource.sendNotification(applicant.foreignId, notificationDto)
+            notificationSender.sendNotification(applicant.foreignId, notificationDto)
             importProgress!!.notificationsSend++
         } catch (e: Exception) {
             throw ImportException(importId, "Błąd przy wysyłaniu powiadomień", e)

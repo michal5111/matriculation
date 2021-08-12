@@ -32,7 +32,7 @@ class ApplicantForeignerData(
 
         @Temporal(TemporalType.DATE)
         var polishCardValidTo: Date?
-) : Serializable {
+) : BaseEntity(), Serializable {
 
     override fun toString(): String {
         return "ApplicantForeignerData(baseOfStay=$baseOfStay, polishCardIssueCountry=$polishCardIssueCountry, " +

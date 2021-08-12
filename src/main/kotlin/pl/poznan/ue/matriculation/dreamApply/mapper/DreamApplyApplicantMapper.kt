@@ -209,7 +209,9 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 }.takeIf { idList ->
                     idList?.size == 1
                 }?.first()
-                ?: if (it.institution?.trim()?.toUpperCase() == "POZNAN UNIVERSITY OF ECONOMICS AND BUSINESS") 110825L
+                ?: if (it.institution?.trim()
+                        ?.uppercase(Locale.getDefault()) == "POZNAN UNIVERSITY OF ECONOMICS AND BUSINESS"
+                ) 110825L
                 else null,
                 modificationDate = Date()
             )
@@ -298,7 +300,10 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                     }?.value,
                     flatNumber = addressDto.correspondence?.apartment
                 )
-            ).let {
+            ).filterNot {
+                it.city.isNullOrBlank() && it.countryCode.isNullOrBlank() && it.flatNumber.isNullOrBlank()
+                        && it.postalCode.isNullOrBlank() && it.street.isNullOrBlank() && it.streetNumber.isNullOrBlank()
+            }.let {
                 applicant.addresses.addAll(it)
             }
         }

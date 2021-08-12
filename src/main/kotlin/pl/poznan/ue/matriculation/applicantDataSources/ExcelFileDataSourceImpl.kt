@@ -8,7 +8,6 @@ import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicantDto
 import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicationDto
 import pl.poznan.ue.matriculation.excelfile.mapper.ExcelFileApplicantMapper
 import pl.poznan.ue.matriculation.excelfile.mapper.ExcelFileApplicationMapper
-import pl.poznan.ue.matriculation.irk.dto.NotificationDto
 import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
@@ -18,6 +17,7 @@ import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
 import pl.poznan.ue.matriculation.oracle.repo.ProgrammeRepository
 import java.text.SimpleDateFormat
+import java.util.*
 
 
 class ExcelFileDataSourceImpl(
@@ -73,10 +73,6 @@ class ExcelFileDataSourceImpl(
         return lastPage?.getResultsList()?.find {
             it.applicant.id == applicantId
         }?.applicant ?: throw IllegalStateException("Unable to find applicant")
-    }
-
-    override fun getPhoto(photoUrl: String): ByteArray? {
-        return null
     }
 
     override val name = "Plik Excel"
@@ -197,33 +193,30 @@ class ExcelFileDataSourceImpl(
     }
 
     private fun checkSpreadsheet(headerRow: Row): Boolean {
-        return headerRow.getCell(0).stringCellValue.trim().toUpperCase() == "IMIĘ"
-                && headerRow.getCell(1).stringCellValue.trim().toUpperCase() == "DRUGIE IMIĘ"
-                && headerRow.getCell(2).stringCellValue.trim().toUpperCase() == "NAZWISKO"
-                && headerRow.getCell(3).stringCellValue.trim().toUpperCase() == "PŁEĆ"
-                && headerRow.getCell(4).stringCellValue.trim().toUpperCase() == "EMAIL"
-                && headerRow.getCell(5).stringCellValue.trim().toUpperCase() == "PESEL"
-                && headerRow.getCell(6).stringCellValue.trim().toUpperCase() == "NR PASZPORTU"
-                && headerRow.getCell(7).stringCellValue.trim().toUpperCase() == "KRAJ WYDANIA"
-                && headerRow.getCell(8).stringCellValue.trim().toUpperCase() == "DATA WAŻNOŚCI"
-                && headerRow.getCell(9).stringCellValue.trim().toUpperCase() == "DATA URODZENIA"
-                && headerRow.getCell(10).stringCellValue.trim().toUpperCase() == "MIEJSCE URODZENIA"
-                && headerRow.getCell(11).stringCellValue.trim().toUpperCase() == "IMIĘ OJCA"
-                && headerRow.getCell(12).stringCellValue.trim().toUpperCase() == "IMIĘ MATKI"
-                && headerRow.getCell(13).stringCellValue.trim().toUpperCase() == "KOD OBYWATELSTWA"
-                && headerRow.getCell(14).stringCellValue.trim().toUpperCase() == "KOD KRAJU ISO 3166-1 ALFA-2"
-                && headerRow.getCell(15).stringCellValue.trim().toUpperCase() == "MIASTO"
-                && headerRow.getCell(16).stringCellValue.trim().toUpperCase() == "ULICA"
-                && headerRow.getCell(17).stringCellValue.trim().toUpperCase() == "NUMER ULICY"
-                && headerRow.getCell(18).stringCellValue.trim().toUpperCase() == "NUMER MIESZKANIA"
-                && headerRow.getCell(19).stringCellValue.trim().toUpperCase() == "KOD POCZTOWY"
-                && headerRow.getCell(20).stringCellValue.trim().toUpperCase() == "NR TELEFONU"
+        return headerRow.getCell(0).stringCellValue.trim().uppercase(Locale.getDefault()) == "IMIĘ"
+                && headerRow.getCell(1).stringCellValue.trim().uppercase(Locale.getDefault()) == "DRUGIE IMIĘ"
+                && headerRow.getCell(2).stringCellValue.trim().uppercase(Locale.getDefault()) == "NAZWISKO"
+                && headerRow.getCell(3).stringCellValue.trim().uppercase(Locale.getDefault()) == "PŁEĆ"
+                && headerRow.getCell(4).stringCellValue.trim().uppercase(Locale.getDefault()) == "EMAIL"
+                && headerRow.getCell(5).stringCellValue.trim().uppercase(Locale.getDefault()) == "PESEL"
+                && headerRow.getCell(6).stringCellValue.trim().uppercase(Locale.getDefault()) == "NR PASZPORTU"
+                && headerRow.getCell(7).stringCellValue.trim().uppercase(Locale.getDefault()) == "KRAJ WYDANIA"
+                && headerRow.getCell(8).stringCellValue.trim().uppercase(Locale.getDefault()) == "DATA WAŻNOŚCI"
+                && headerRow.getCell(9).stringCellValue.trim().uppercase(Locale.getDefault()) == "DATA URODZENIA"
+                && headerRow.getCell(10).stringCellValue.trim().uppercase(Locale.getDefault()) == "MIEJSCE URODZENIA"
+                && headerRow.getCell(11).stringCellValue.trim().uppercase(Locale.getDefault()) == "IMIĘ OJCA"
+                && headerRow.getCell(12).stringCellValue.trim().uppercase(Locale.getDefault()) == "IMIĘ MATKI"
+                && headerRow.getCell(13).stringCellValue.trim().uppercase(Locale.getDefault()) == "KOD OBYWATELSTWA"
+                && headerRow.getCell(14).stringCellValue.trim()
+            .uppercase(Locale.getDefault()) == "KOD KRAJU ISO 3166-1 ALFA-2"
+                && headerRow.getCell(15).stringCellValue.trim().uppercase(Locale.getDefault()) == "MIASTO"
+                && headerRow.getCell(16).stringCellValue.trim().uppercase(Locale.getDefault()) == "ULICA"
+                && headerRow.getCell(17).stringCellValue.trim().uppercase(Locale.getDefault()) == "NUMER ULICY"
+                && headerRow.getCell(18).stringCellValue.trim().uppercase(Locale.getDefault()) == "NUMER MIESZKANIA"
+                && headerRow.getCell(19).stringCellValue.trim().uppercase(Locale.getDefault()) == "KOD POCZTOWY"
+                && headerRow.getCell(20).stringCellValue.trim().uppercase(Locale.getDefault()) == "NR TELEFONU"
     }
 
     override fun preprocess(applicationDto: ExcelFileApplicationDto, applicantDto: ExcelFileApplicantDto) {
-    }
-
-    override fun sendNotification(foreignApplicantId: Long, notificationDto: NotificationDto) {
-        TODO("Not yet implemented")
     }
 }

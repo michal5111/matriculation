@@ -101,7 +101,7 @@ class IncomingDataSourceImpl(
         super.preprocess(applicationDto, applicantDto).also {
             val applicationCourses = dreamApplyService.getApplicantCourse(applicationDto.courses)
             val course = applicationCourses?.values?.first()?.course?.let { applicationCourse ->
-                return@let dreamApplyService.getCourseByPath(applicationCourse)
+                dreamApplyService.getCourseByPath(applicationCourse)
             }
             applicationDto.courseType = course?.type
             applicationDto.duration = course?.duration

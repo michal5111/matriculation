@@ -85,5 +85,5 @@ class Cooperation(
         var coordinatorExternalPerson: ExternalPerson?,
 
         @OneToMany(mappedBy = "cooperation")
-        val arrivals: MutableList<Arrival> = mutableListOf()
-)
+        val arrivals: MutableList<Arrival> = mutableListOf(),
+) : BaseEntity()

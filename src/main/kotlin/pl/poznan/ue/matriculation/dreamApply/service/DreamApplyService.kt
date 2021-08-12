@@ -43,7 +43,7 @@ class DreamApplyService(
     }
 
     fun getApplicationsCountByFilter(academicTermID: String? = null, academicYear: String? = null, additionalFilters: Map<String, String>?): Long {
-        val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("${apiUrl}applications")
+        val uriComponentBuilder: UriComponentsBuilder = getUriComponentBuilder()
         academicTermID?.run {
             uriComponentBuilder.queryParam("byAcademicTermID", academicTermID)
         }
@@ -66,7 +66,7 @@ class DreamApplyService(
         if (academicTermID == null && academicYear == null) {
             throw IllegalArgumentException("AcademicTerm adn academicYear are null")
         }
-        val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("${apiUrl}applications")
+        val uriComponentBuilder: UriComponentsBuilder = getUriComponentBuilder()
         academicTermID?.run {
             uriComponentBuilder.queryParam("byAcademicTermID", academicTermID)
         }
@@ -223,4 +223,6 @@ class DreamApplyService(
             Any::class.java
         )
     }
+
+    private fun getUriComponentBuilder() = UriComponentsBuilder.fromHttpUrl("${apiUrl}applications")
 }

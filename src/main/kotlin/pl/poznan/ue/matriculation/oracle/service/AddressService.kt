@@ -1,6 +1,7 @@
 package pl.poznan.ue.matriculation.oracle.service
 
 import org.springframework.stereotype.Service
+import pl.poznan.ue.matriculation.kotlinExtensions.getById
 import pl.poznan.ue.matriculation.oracle.domain.Address
 import pl.poznan.ue.matriculation.oracle.domain.AddressType
 import pl.poznan.ue.matriculation.oracle.domain.Person
@@ -33,7 +34,7 @@ class AddressService(
                 apartmentNumber = apartmentNumber,
                 cityIsCity = if (cityIsCity) 'T' else 'N',
                 countryCode = countryCode?.let {
-                    citizenshipRepository.getOne(it)
+                    citizenshipRepository.getById(it)
                 }
         ).apply {
             countryCode?.let {
@@ -63,7 +64,7 @@ class AddressService(
             this.apartmentNumber = apartmentNumber
             this.cityIsCity = if (cityIsCity) 'T' else 'N'
             this.countryCode = countryCode?.let {
-                citizenshipRepository.getOne(it)
+                citizenshipRepository.getById(it)
             }
             countryCode?.let {
                 if (it == "PL" && zipCode?.length == 5) {

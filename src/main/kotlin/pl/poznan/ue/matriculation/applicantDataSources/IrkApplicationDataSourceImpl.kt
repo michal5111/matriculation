@@ -16,24 +16,29 @@ import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
 
-class IrkApplicationDataSourceImpl(
+open class IrkApplicationDataSourceImpl(
     private val irkService: IrkService,
     override val name: String,
     override val id: String,
     private val setAsAccepted: Boolean,
     private val irkApplicantMapper: IrkApplicantMapper,
     private val irkApplicationMapper: IrkApplicationMapper
-) : IApplicationDataSource<IrkApplicationDTO, IrkApplicantDto> {
+) : IApplicationDataSource<IrkApplicationDTO, IrkApplicantDto>, IPhotoDownloader, INotificationSender {
 
-    override fun getApplicationsPage(import: Import, registrationCode: String, programmeForeignId: String, pageNumber: Int): IPage<IrkApplicationDTO> {
+    override fun getApplicationsPage(
+        import: Import,
+        registrationCode: String,
+        programmeForeignId: String,
+        pageNumber: Int
+    ): IPage<IrkApplicationDTO> {
         val page = irkService.getApplications(
-                admitted = true,
-                paid = true,
-                qualified = true,
-                registration = registrationCode,
-                programme = programmeForeignId,
-                pageNumber = pageNumber,
-                pageLength = 20
+            admitted = true,
+            paid = true,
+            qualified = true,
+            registration = registrationCode,
+            programme = programmeForeignId,
+            pageNumber = pageNumber,
+            pageLength = 20
         )
         return object : IPage<IrkApplicationDTO> {
             override fun getSize(): Int {
@@ -128,18 +133,16 @@ class IrkApplicationDataSourceImpl(
         applicantDto: IrkApplicantDto,
         import: Import
     ): Document? {
+        val pc = irkService.getPrimaryCertificate(applicationDto.id) ?: return null
         return applicant.educationData.documents.find {
-            irkService.getPrimaryCertificate(applicationDto.id)?.let { primaryCertificate ->
-                return@let it.documentNumber == primaryCertificate.documentNumber &&
-                        it.certificateTypeCode == primaryCertificate.certificateTypeCode
-            } ?: false
+            it.documentNumber == pc.documentNumber && it.certificateTypeCode == pc.certificateTypeCode
         }
-    }
-
-    override fun preprocess(applicationDto: IrkApplicationDTO, applicantDto: IrkApplicantDto) {
     }
 
     override fun sendNotification(foreignApplicantId: Long, notificationDto: NotificationDto) {
         irkService.sendNotification(foreignApplicantId, notificationDto)
+    }
+
+    override fun preprocess(applicationDto: IrkApplicationDTO, applicantDto: IrkApplicantDto) {
     }
 }

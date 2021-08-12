@@ -23,7 +23,7 @@ open class DreamApplyDataSourceImpl(
     private val applicantMapper: DreamApplyApplicantMapper,
     private val applicationMapper: DreamApplyApplicationMapper,
     private val status: String
-) : IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
+) : IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto>, IPhotoDownloader, INotificationSender {
 
     override val instanceUrl = dreamApplyService.instanceUrl
 

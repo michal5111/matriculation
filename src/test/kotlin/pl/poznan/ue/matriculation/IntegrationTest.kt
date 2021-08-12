@@ -11,10 +11,14 @@
 //import org.springframework.core.task.SyncTaskExecutor
 //import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 //import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
+//import pl.poznan.ue.matriculation.local.job.JobType
 //import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
+//import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
 //import pl.poznan.ue.matriculation.local.repo.ImportRepository
+//import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
 //import pl.poznan.ue.matriculation.local.service.ImportService
 //import pl.poznan.ue.matriculation.local.service.JobService
+//import pl.poznan.ue.matriculation.local.service.ProcessService
 //import java.util.*
 //import java.util.concurrent.Executor
 //
@@ -40,7 +44,16 @@
 //    private lateinit var applicationRepository: ApplicationRepository
 //
 //    @Autowired
+//    private lateinit var importProgressRepository: ImportProgressRepository
+//
+//    @Autowired
 //    private lateinit var jobService: JobService
+//
+//    @Autowired
+//    private lateinit var processService: ProcessService
+//
+//    @Autowired
+//    private lateinit var applicationDataSourceFactory: ApplicationDataSourceFactory
 //
 //    private val logger = LoggerFactory.getLogger(IntegrationTest::class.java)
 //
@@ -158,8 +171,8 @@
 //        )
 //        var allImports = importRepository.findAll()
 //        allImports.forEach {
-//            jobService.importApplications(it.id!!)
-//            jobService.savePersons(it.id!!)
+//            jobService.runJob(JobType.IMPORT, it.id!!)
+//            jobService.runJob(JobType.SAVE, it.id!!)
 //        }
 //        allImports = importRepository.findAll()
 //        allImports.forEach { import ->
@@ -194,7 +207,7 @@
 //            assertEquals(it.importProgress.totalCount, it.importProgress.savedApplicants)
 //        }
 //        logger.info("Total count sum: ${allImports.sumBy { it.importProgress.totalCount!! }} Applicants sum = ${allApplications.count()}")
-//        assertEquals(allImports.sumBy { it.importProgress.totalCount!! }, allApplications.count())
+//        assertEquals(allImports.sumOf { it.importProgress.totalCount!! }, allApplications.count())
 //    }
 //
 //    @Test
@@ -203,17 +216,17 @@
 //            dateOfAddmision = Date(),
 //            didacticCycleCode = "202021/SL",
 //            indexPoolCode = "C",
-//            programmeCode = "S1-E",
-//            registration = "S1_PL_SZ_202021",
-//            stageCode = "s1-S1-E",
+//            programmeCode = "S3-SD",
+//            registration = "S3-SD_202021",
+//            stageCode = "s1-S3-SD",
 //            startDate = Date(),
 //            dataSourceType = "IRK_TEST",
-//            programmeForeignId = "S1-E"
+//            programmeForeignId = "S3-SD"
 //        )
 //        var allImports = importRepository.findAll()
 //        allImports.forEach {
-//            jobService.importApplications(it.id!!)
-//            jobService.savePersons(it.id!!)
+//            jobService.runJob(JobType.IMPORT,it.id!!)
+//            jobService.runJob(JobType.SAVE,it.id!!)
 //        }
 //        allImports = importRepository.findAll()
 //        allImports.forEach {
@@ -323,7 +336,7 @@
 ////        )
 //        var allImports = importRepository.findAll()
 //        allImports.forEach {
-//            jobService.importApplications(it.id!!)
+//            jobService.runJob(JobType.IMPORT,it.id!!)
 //        }
 //        allImports = importRepository.findAll()
 //        allImports.forEach {
@@ -339,7 +352,7 @@
 //            }
 //            assertEquals(it.importProgress.totalCount, it.importProgress.importedApplications)
 //        }
-//        logger.info("Total count sum: ${allImports.sumBy { it.importProgress.totalCount!! }} Applicants sum = ${allApplications.count()}")
+//        logger.info("Total count sum: ${allImports.sumOf { it.importProgress.totalCount!! }} Applicants sum = ${allApplications.count()}")
 //        //assertEquals(allImports.sumBy { it.importProgress!!.totalCount!! }, allApplications.count())
 //    }
 //}

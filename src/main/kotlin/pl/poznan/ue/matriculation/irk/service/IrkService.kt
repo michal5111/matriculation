@@ -32,7 +32,7 @@ class IrkService(
 
     val httpHeaders = HttpHeaders()
 
-    val httpEntity: HttpEntity<Any>
+    private val httpEntity: HttpEntity<Any>
 
     private class PageOfApplicants : ParameterizedTypeReference<Page<IrkApplicantDto>>()
     private class PageOfApplications : ParameterizedTypeReference<Page<IrkApplicationDTO>>()
@@ -188,15 +188,15 @@ class IrkService(
         return response.body
     }
 
-    fun getPhoto(photoUrl: String): ByteArray {
+    fun getPhoto(photoUrl: String): ByteArray? {
         val responseEntity: ResponseEntity<Resource> = restTemplate.exchange(
             "$serviceUrl$photoUrl",
             HttpMethod.GET,
             httpEntity,
             Resource::class.java
         )
-        var byteArray: ByteArray
-        responseEntity.body!!.inputStream.use {
+        var byteArray: ByteArray?
+        responseEntity.body?.inputStream.use {
             byteArray = IOUtils.toByteArray(it)
         }
         return byteArray
