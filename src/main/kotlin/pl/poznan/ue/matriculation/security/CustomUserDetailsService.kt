@@ -20,21 +20,27 @@ internal class CustomUserDetailsService(
     @Throws(UsernameNotFoundException::class)
     override fun loadUserDetails(token: CasAssertionAuthenticationToken): UserDetails {
         val login = token.principal.toString()
-        val lowercaseLogin = login.toLowerCase()
+        val lowercaseLogin = login.lowercase(Locale.getDefault())
 
         log.debug("Authenticating '{}'", login)
         val grantedAuthorities = ArrayList<GrantedAuthority>()
 
-        val user = userService.getByUid(lowercaseLogin)
+        val user = userService.getByUsosId(lowercaseLogin.toLong())
+            ?: throw UsernameNotFoundException("No user with usos_id $lowercaseLogin")
 
         if (admins.contains(lowercaseLogin)) {
             grantedAuthorities.add(SimpleGrantedAuthority("ROLE_ADMIN"))
         }
 
-        user?.roles?.forEach {
+        user.roles.forEach {
             grantedAuthorities.add(SimpleGrantedAuthority(it.role.code))
         }
 
-        return CasUserDetails(lowercaseLogin, grantedAuthorities, token.assertion)
+        return CasUserDetails(
+            userId = user.uid,
+            authorities = grantedAuthorities,
+            casAssertion = token.assertion,
+            usosId = user.usosId
+        )
     }
 }

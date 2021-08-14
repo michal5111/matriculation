@@ -12,5 +12,5 @@ interface EntitlementDocumentRepository : JpaRepository<EntitlementDocument, Lon
     fun existsByPersonIdAndType(personId: Long?, type: Char): Boolean
 
     @Transactional
-    fun getByPersonIdAndTypeAndNumber(personId: Long?, type: Char, number: String): EntitlementDocument?
+    fun getByPersonIdAndTypeAndNumber(personId: Long?, type: Char, number: String): List<EntitlementDocument>?
 }

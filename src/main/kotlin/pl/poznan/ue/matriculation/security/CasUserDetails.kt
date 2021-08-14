@@ -3,11 +3,13 @@ package pl.poznan.ue.matriculation.security
 import org.jasig.cas.client.validation.Assertion
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import java.util.*
 
-class CasUserDetails
-(private val userId: String, private val authorities: Collection<GrantedAuthority>,
- val casAssertion: Assertion) : UserDetails {
+class CasUserDetails(
+    private val userId: String,
+    private val authorities: Collection<GrantedAuthority>,
+    val casAssertion: Assertion,
+    val usosId: Long?
+) : UserDetails {
 
     private val roles = ArrayList<String>()
 
@@ -43,5 +45,9 @@ class CasUserDetails
 
     override fun isEnabled(): Boolean {
         return true
+    }
+
+    override fun toString(): String {
+        return "CasUserDetails(userId='$userId', authorities=$authorities, usosId=$usosId, roles=$roles)"
     }
 }

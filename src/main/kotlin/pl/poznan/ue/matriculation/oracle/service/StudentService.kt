@@ -77,7 +77,7 @@ class StudentService(
             dateOfAddmision = importDto.dateOfAddmision,
             dateToNextPass = didacticCycle.dateTo,
             isDefault = if (isDefault) 'T' else 'N',
-            entitlementDocument = getCertificate(certificate, person)
+            entitlementDocument = getCertificate(certificate, person)?.first()
         )
         addSourceOfFinancing(sourceOfFinancing, personProgramme, importDto.dateOfAddmision)
         addBasisOfAdmission(basisOfAdmission, personProgramme, importDto.dateOfAddmision)

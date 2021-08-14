@@ -196,7 +196,7 @@ class PersonService(
     }
 
     private fun createOrUpdateAddresses(person: Person, applicant: Applicant) {
-        for (it in applicant.addresses) {
+        applicant.addresses.forEach {
             createOrUpdateAddress(
                 person = person,
                 addressType = addressTypeRepository.getById(it.addressType.usosValue),

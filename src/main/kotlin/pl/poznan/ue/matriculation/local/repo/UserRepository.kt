@@ -8,4 +8,6 @@ import pl.poznan.ue.matriculation.local.domain.user.User
 interface UserRepository : PagingAndSortingRepository<User, Long> {
 
     fun getByUid(uid: String): User?
+
+    fun getByUsosId(usosId: Long): User?
 }

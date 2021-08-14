@@ -25,9 +25,13 @@ class UserService(
         return userRepository.getByUid(uid)
     }
 
+    fun getByUsosId(usosId: Long): User? {
+        return userRepository.getByUsosId(usosId)
+    }
+
     fun save(userDto: UserDto): User {
-        ldapUserRepository.findByUid(userDto.uid) ?: throw UidNotFoundException()
-        val user = User(uid = userDto.uid).apply {
+        val ldapUser = ldapUserRepository.findByUid(userDto.uid) ?: throw UidNotFoundException()
+        val user = User(uid = userDto.uid, usosId = ldapUser.usosId).apply {
             userDto.roles.map { roleDto ->
                 UserRole(this, roleService.getOne(roleDto.code))
             }.let {

@@ -13,8 +13,10 @@ class User(
 
     @JsonSerialize(using = CustomRolesSerializer::class)
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true, cascade = [CascadeType.ALL])
-    var roles: MutableSet<UserRole> = mutableSetOf()
+    var roles: MutableSet<UserRole> = mutableSetOf(),
 
+    @Column(unique = true)
+    var usosId: Long? = null
 
 ) : BaseEntityLongId() {
     override fun equals(other: Any?): Boolean {
