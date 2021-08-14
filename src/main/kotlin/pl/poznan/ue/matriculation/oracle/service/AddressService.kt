@@ -1,7 +1,6 @@
 package pl.poznan.ue.matriculation.oracle.service
 
 import org.springframework.stereotype.Service
-import pl.poznan.ue.matriculation.kotlinExtensions.getById
 import pl.poznan.ue.matriculation.oracle.domain.Address
 import pl.poznan.ue.matriculation.oracle.domain.AddressType
 import pl.poznan.ue.matriculation.oracle.domain.Person

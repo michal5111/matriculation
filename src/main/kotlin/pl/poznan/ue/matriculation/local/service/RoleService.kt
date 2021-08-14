@@ -13,6 +13,6 @@ class RoleService(
     }
 
     fun getOne(code: String): Role {
-        return roleRepository.getOne(code)
+        return roleRepository.getById(code)
     }
 }

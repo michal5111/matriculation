@@ -30,7 +30,7 @@ class ImportApplicantsJob(
     }
 
     override fun doWork() {
-        val import = importRepository.getOne(importId)
+        val import = importRepository.getById(importId)
         import.importProgress.error = null
         val applicantDataSource = applicationDataSourceFactory.getDataSource(import.dataSourceId)
         var currentPage = 1

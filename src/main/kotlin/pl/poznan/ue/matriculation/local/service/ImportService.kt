@@ -98,7 +98,7 @@ class ImportService(
 //            }
 //        }
         try {
-            val import = importRepository.getOne(importId)
+            val import = importRepository.getById(importId)
             when (import.importProgress.importStatus) {
                 ImportStatus.ARCHIVED -> throw ImportException(importId, "Import został zarchiwizowany.")
                 ImportStatus.STARTED,

@@ -26,7 +26,7 @@ class GetUidsJob(
 
     override fun doWork() {
         processService.getUids(importId)
-        val import = importRepository.getOne(importId)
+        val import = importRepository.getById(importId)
         if (import.importProgress.saveErrors > 0) {
             importService.setImportStatus(ImportStatus.COMPLETED_WITH_ERRORS, importId)
         } else {

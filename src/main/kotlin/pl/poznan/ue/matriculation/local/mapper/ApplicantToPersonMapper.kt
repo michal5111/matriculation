@@ -36,24 +36,24 @@ class ApplicantToPersonMapper(
             name = applicant.name.given,
             middleName = applicant.name.middle,
             surname = applicant.name.family,
-            citizenship = citizenshipRepository.getOne(applicant.citizenship),
+            citizenship = citizenshipRepository.getById(applicant.citizenship),
             birthDate = applicant.basicData.dateOfBirth,
             birthCity = applicant.basicData.cityOfBirth,
             birthCountry = applicant.basicData.countryOfBirth?.let {
-                citizenshipRepository.getOne(it)
+                citizenshipRepository.getById(it)
             },
             pesel = applicant.basicData.pesel,
             sex = applicant.basicData.sex,
             nationality = applicant.nationality?.let {
-                citizenshipRepository.getOne(it)
+                citizenshipRepository.getById(it)
             },
-            organizationalUnit = organizationalUnitRepository.getOne(defaultStudentOrganizationalUnitString),
+            organizationalUnit = organizationalUnitRepository.getById(defaultStudentOrganizationalUnitString),
             middleSchool = applicant.educationData.highSchoolUsosCode?.let {
-                schoolRepository.getOne(it)
+                schoolRepository.getById(it)
             },
             addresses = applicant.addresses.map {
                 addressService.create(
-                    addressType = addressTypeRepository.getOne(it.addressType.usosValue),
+                    addressType = addressTypeRepository.getById(it.addressType.usosValue),
                     city = it.city,
                     street = it.street,
                     houseNumber = it.streetNumber,
@@ -66,7 +66,7 @@ class ApplicantToPersonMapper(
             phoneNumbers = applicant.phoneNumbers.map {
                 PhoneNumber(
                     number = it.number,
-                    phoneNumberType = phoneNumberTypeRepository.getOne(it.phoneNumberType),
+                    phoneNumberType = phoneNumberTypeRepository.getById(it.phoneNumberType),
                     comments = it.comment
                 )
             }.toMutableList(),
@@ -76,12 +76,12 @@ class ApplicantToPersonMapper(
             },
             identityDocumentExpirationDate = applicant.identityDocuments.firstOrNull()?.expDate,
             identityDocumentIssuerCountry = applicant.identityDocuments.firstOrNull()?.country?.let {
-                citizenshipRepository.getOne(it)
+                citizenshipRepository.getById(it)
             },
             mothersName = applicant.additionalData.mothersName,
             fathersName = applicant.additionalData.fathersName,
             wku = applicant.additionalData.wku?.let {
-                wkuRepository.getOne(it)
+                wkuRepository.getById(it)
             },
             entitlementDocuments = applicant.educationData.documents.filter { document ->
                 document.certificateUsosCode != null
@@ -94,7 +94,7 @@ class ApplicantToPersonMapper(
                     number = it.documentNumber,
                     type = it.certificateUsosCode!!,
                     school = it.issueInstitutionUsosCode?.let { schoolId ->
-                        schoolRepository.getOne(schoolId)
+                        schoolRepository.getById(schoolId)
                     }
                 )
             }.toMutableList(),
@@ -127,11 +127,11 @@ class ApplicantToPersonMapper(
                 }
                 ownedDocuments.add(
                     OwnedDocument(
-                        documentType = documentTypeRepository.getOne(it.baseOfStay!!),
+                        documentType = documentTypeRepository.getById(it.baseOfStay!!),
                         person = this,
                         issueDate = it.polishCardIssueDate,
                         issueCountry = it.polishCardIssueCountry?.let { countryCode ->
-                            citizenshipRepository.getOne(countryCode)
+                            citizenshipRepository.getById(countryCode)
                         },
                         number = it.polishCardNumber,
                         expirationDate = it.polishCardValidTo

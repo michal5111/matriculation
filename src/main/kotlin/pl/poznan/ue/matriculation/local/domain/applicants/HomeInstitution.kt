@@ -1,6 +1,7 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import javax.persistence.Entity
 import javax.persistence.OneToOne
 

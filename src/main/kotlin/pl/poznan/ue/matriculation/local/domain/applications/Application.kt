@@ -2,8 +2,8 @@ package pl.poznan.ue.matriculation.local.domain.applications
 
 
 import com.fasterxml.jackson.annotation.*
+import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
-import pl.poznan.ue.matriculation.local.domain.applicants.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import

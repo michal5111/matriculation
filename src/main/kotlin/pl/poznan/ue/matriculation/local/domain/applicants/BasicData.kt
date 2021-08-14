@@ -1,18 +1,14 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
-import com.fasterxml.jackson.annotation.JsonIgnore
+import pl.poznan.ue.matriculation.local.domain.BaseEntityApplicantId
 import java.io.Serializable
 import java.util.*
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.Temporal
+import javax.persistence.TemporalType
 
 @Entity
 class BasicData(
-
-    @JsonIgnore
-    @Id
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "applicant_id", referencedColumnName = "id")
-    var applicant: Applicant? = null,
 
     var sex: Char,
 
@@ -25,8 +21,10 @@ class BasicData(
 
     var countryOfBirth: String?,
 
-    var dataSource: String
-) : BaseEntity(), Serializable {
+    var dataSource: String,
+
+    applicant: Applicant? = null
+) : BaseEntityApplicantId(applicant), Serializable {
 
     override fun toString(): String {
         return "BasicData(sex='$sex', pesel=$pesel, dateOfBirth=$dateOfBirth, cityOfBirth='$cityOfBirth', " +

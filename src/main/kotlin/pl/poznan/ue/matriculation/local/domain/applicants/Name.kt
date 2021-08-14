@@ -1,23 +1,18 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
-import com.fasterxml.jackson.annotation.JsonIgnore
+import pl.poznan.ue.matriculation.local.domain.BaseEntityApplicantId
 import java.io.Serializable
-import javax.persistence.*
+import javax.persistence.Entity
 
 @Entity
 class Name(
 
-    @JsonIgnore
-    @Id
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "applicant_id", referencedColumnName = "id")
-    var applicant: Applicant? = null,
-
     var middle: String?,
     var family: String,
     var given: String,
-    var maiden: String?
-) : BaseEntity(), Serializable {
+    var maiden: String?,
+    applicant: Applicant? = null
+) : BaseEntityApplicantId(applicant), Serializable {
 
     override fun toString(): String {
         return "Name(middle=$middle, family=$family, given=$given, maiden=$maiden)"

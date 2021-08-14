@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.local.domain.applications
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import pl.poznan.ue.matriculation.local.domain.applicants.BaseEntity
+import pl.poznan.ue.matriculation.local.domain.BaseEntity
 import java.io.Serializable
 import javax.persistence.*
 
@@ -9,17 +9,20 @@ import javax.persistence.*
 @Table(name = "ApplicationForeignerData")
 class ApplicationForeignerData(
 
-        @JsonIgnore
-        @Id
-        @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH, CascadeType.DETACH, CascadeType.REFRESH])
-        @JoinColumn(name = "application_id", referencedColumnName = "id")
-        var application: Application? = null,
+    @Id
+    var applicantId: Long? = null,
 
-        var baseOfStay: String?,
+    @JsonIgnore
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "application_id", referencedColumnName = "id")
+    var application: Application? = null,
 
-        var basisOfAdmission: String?,
+    var baseOfStay: String?,
 
-        var sourceOfFinancing: String?
+    var basisOfAdmission: String?,
+
+    var sourceOfFinancing: String?
 ) : BaseEntity(), Serializable {
 
     override fun toString(): String {

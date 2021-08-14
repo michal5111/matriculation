@@ -51,7 +51,7 @@ class UserService(
                 it.code == userRole.role.code
             }
         }.map {
-            UserRole(user, roleRepository.getOne(it.code))
+            UserRole(user, roleRepository.getById(it.code))
         }.let {
             user.roles.addAll(it)
         }

@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import pl.poznan.ue.matriculation.configuration.LogExecutionTime
-import pl.poznan.ue.matriculation.kotlinExtensions.getById
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.dto.ImportDtoJpa
 import pl.poznan.ue.matriculation.oracle.domain.*

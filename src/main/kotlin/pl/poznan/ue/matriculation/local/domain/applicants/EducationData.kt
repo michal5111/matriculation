@@ -1,21 +1,14 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
-import com.fasterxml.jackson.annotation.JsonIgnore
+import pl.poznan.ue.matriculation.local.domain.BaseEntityApplicantId
 import java.io.Serializable
-import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Entity
+import javax.persistence.FetchType
+import javax.persistence.OneToMany
 
 @Entity
 class EducationData(
-
-    @Id
-    @JsonIgnore
-    var applicantId: Long? = null,
-
-    @MapsId
-    @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "applicant_id", referencedColumnName = "id")
-    var applicant: Applicant? = null,
 
     @OneToMany(mappedBy = "educationData", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     var documents: MutableList<Document> = mutableListOf(),
@@ -26,8 +19,10 @@ class EducationData(
 
     var highSchoolType: String? = null,
 
-    var highSchoolUsosCode: Long? = null
-) : BaseEntity(), Serializable {
+    var highSchoolUsosCode: Long? = null,
+
+    applicant: Applicant? = null
+) : BaseEntityApplicantId(applicant), Serializable {
 
     override fun toString(): String {
         return "EducationData(applicantId=$applicantId, highSchoolCity=$highSchoolCity, " +

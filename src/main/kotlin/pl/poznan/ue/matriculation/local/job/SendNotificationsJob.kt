@@ -27,7 +27,7 @@ class SendNotificationsJob(
     }
 
     override fun doWork() {
-        val import = importRepository.getOne(importId)
+        val import = importRepository.getById(importId)
         val ads = applicationDataSourceFactory.getDataSource(import.dataSourceId)
         if (ads !is INotificationSender) return
         processService.sendNotifications(importId = importId, ads)

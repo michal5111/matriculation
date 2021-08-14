@@ -1,4 +1,4 @@
-package pl.poznan.ue.matriculation.local.domain.applicants
+package pl.poznan.ue.matriculation.local.domain
 
 import javax.persistence.MappedSuperclass
 import javax.persistence.Version

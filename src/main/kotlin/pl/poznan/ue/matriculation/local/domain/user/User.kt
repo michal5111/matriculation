@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.local.domain.user
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import pl.poznan.ue.matriculation.local.domain.applicants.BaseEntityLongId
+import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.serializer.CustomRolesSerializer
 import javax.persistence.*
 

@@ -30,6 +30,7 @@ import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.service.PersonService
 import java.util.stream.Stream
+import javax.persistence.OptimisticLockException
 
 @Service
 class ProcessService(
@@ -61,7 +62,7 @@ class ProcessService(
         if (!TransactionSynchronizationManager.isActualTransactionActive()) {
             throw IllegalStateException("Nie ma aktywnej transakcji")
         }
-        val import = importRepository.getOne(importId)
+        val import = importRepository.getById(importId)
         val applicantDto = applicationDtoDataSource.getApplicantById(applicationDto.foreignApplicantId)
         applicationDtoDataSource.preprocess(applicationDto, applicantDto)
         val application = createOrUpdateApplication(applicationDto, applicationDtoDataSource)
@@ -138,7 +139,7 @@ class ProcessService(
             throw IllegalStateException("Nie ma aktywnej transakcji")
         }
         applicantService.check(application.applicant!!)
-        val importProgress = importProgressRepository.getOne(importId)
+        val importProgress = importProgressRepository.getById(importId)
         if (applicationDtoDataSource is IPhotoDownloader) {
             application.applicant!!.photo?.let {
                 application.applicant!!.photoByteArray = applicationDtoDataSource.getPhoto(it)
@@ -176,12 +177,21 @@ class ProcessService(
         applicationsPage.use {
             it.forEach { application ->
                 try {
-                    self.processApplication(
-                        importId = importId,
-                        application = application,
-                        importDto = importDto,
-                        applicationDtoDataSource = applicationDtoDataSource
-                    )
+                    var retryCount = 0
+                    val maxRetry = 3
+                    while (true) {
+                        try {
+                            self.processApplication(
+                                importId = importId,
+                                application = application,
+                                importDto = importDto,
+                                applicationDtoDataSource = applicationDtoDataSource
+                            )
+                            break
+                        } catch (e: OptimisticLockException) {
+                            if (++retryCount == maxRetry) throw e
+                        }
+                    }
                 } catch (e: Exception) {
                     errorCount++
                     saveExceptionHandler.handle(e, application, importId)
@@ -197,7 +207,7 @@ class ProcessService(
         transactionManager = "transactionManager"
     )
     fun archivePersons(importId: Long) {
-        val import = importRepository.getOne(importId)
+        val import = importRepository.getById(importId)
         val applicationStream = applicationRepository.findAllByImportId(importId)
         applicationStream.use {
             it.filter { application ->

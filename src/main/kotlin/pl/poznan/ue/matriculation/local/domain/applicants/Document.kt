@@ -2,6 +2,7 @@ package pl.poznan.ue.matriculation.local.domain.applicants
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import java.io.Serializable
 import java.util.*
