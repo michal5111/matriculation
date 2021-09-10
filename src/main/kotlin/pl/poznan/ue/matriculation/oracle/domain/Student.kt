@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
 import javax.persistence.*
 
 @Entity
@@ -27,11 +28,12 @@ class Student(
     @JoinColumn(name = "OS_ID", referencedColumnName = "ID", nullable = false)
     var person: Person,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "INDEKS_GLOWNY", length = 1, nullable = false)
-    var mainIndex: Char,
+    var mainIndex: Boolean,
 
     @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
-    val personProgrammes: MutableList<PersonProgramme> = mutableListOf()
+    var personProgrammes: MutableList<PersonProgramme> = mutableListOf()
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -46,5 +48,10 @@ class Student(
 
     override fun hashCode(): Int {
         return id?.hashCode() ?: 0
+    }
+
+    fun addPersonProgramme(personProgramme: PersonProgramme) {
+        personProgrammes.add(personProgramme)
+        personProgramme.student = this
     }
 }

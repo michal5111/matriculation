@@ -14,7 +14,7 @@ class Blob(
     @Basic(fetch = FetchType.LAZY)
     @Lob
     @Column(name = "OBIEKT", nullable = false)
-    val blob: ByteArray,
+    val blob: java.sql.Blob,
 
     @Column(name = "KATEGORIA", length = 100, nullable = true)
     val category: String?,
@@ -23,13 +23,13 @@ class Blob(
     val description: String?,
 
     @OneToMany(mappedBy = "pictureBlob", fetch = FetchType.LAZY)
-    val organizationalUnitPictures: Set<OrganizationalUnit>,
+    val organizationalUnitPictures: List<OrganizationalUnit>,
 
     @OneToMany(mappedBy = "logoBlob", fetch = FetchType.LAZY)
-    val organizationalUnitLogos: Set<OrganizationalUnit>,
+    val organizationalUnitLogos: List<OrganizationalUnit>,
 
     @OneToMany(mappedBy = "logoBlob", fetch = FetchType.LAZY)
-    val schoolLogo: Set<School>
+    val schoolLogo: List<School>
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

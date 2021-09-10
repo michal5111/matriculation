@@ -17,5 +17,7 @@ export class ImportProgress {
 
   notificationsSend: number;
 
+  potentialDuplicates: number;
+
   error: string;
 }

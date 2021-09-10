@@ -1,8 +1,11 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_JEZYKI")
 class Language(
     @Id
@@ -10,19 +13,19 @@ class Language(
     val code: String,
 
     @Column(name = "NAZWA", length = 30, nullable = false)
-    var name: String,
+    val name: String,
 
     @Column(name = "NAZWA_ANG", length = 100, nullable = false)
-    var nameEng: String,
+    val nameEng: String,
 
     @Column(name = "KOD_ISO6391", length = 2, nullable = true)
-    var Iso6391Code: String? = name,
+    val Iso6391Code: String? = name,
 
     @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
-    var conductedFieldsOfStudy: MutableList<ConductedFieldOfStudy>,
+    val conductedFieldsOfStudy: MutableList<ConductedFieldOfStudy>,
 
     @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
-    var personDocuments: MutableList<PersonDocument>
+    val personDocuments: MutableList<PersonDocument>
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -5,8 +5,8 @@ import java.util.*
 
 data class BirthDto(
 
-        @JsonFormat(pattern = "yyyy-MM-dd")
-        val date: Date?,
-        val place: String?,
-        val country: String?
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    val date: Date?,
+    val place: String?,
+    val country: String?
 )

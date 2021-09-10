@@ -12,6 +12,7 @@
     </mat-form-field>
 
     <ng-template [ngIf]="dataSourceId.indexOf('FILE') >= 0">
+      <a mat-button href="assets/files/import_template/szablon_importu.xlsx">Pobierz szablon</a>
       <mat-form-field class="form-field wide-field">
         <ngx-mat-file-input formControlName="dataFile" placeholder="Plik excel"
                             accept="application/vnd.ms-excel|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

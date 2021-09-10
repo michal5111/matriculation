@@ -3,7 +3,7 @@
     <mat-icon>arrow_back</mat-icon>
     Wróć
   </button>
-  <ng-template [ngIf]="importProgress">
+  <ng-template [ngIf]="importProgress && rxStompService.connected()">
     <header *ngIf="import" class="card-wrapper">
       <mat-card class="card-centered">
         <mat-card-title>
@@ -19,7 +19,7 @@
         </mat-card-subtitle>
       </mat-card>
       <mat-card class="card-centered">
-        <mat-card-content *ngIf="importProgress">
+        <mat-card-content *ngIf="importProgress && rxStompService.connected()">
           <app-import-status-indicator [importStatus]="importProgress.importStatus"></app-import-status-indicator>
           <p *ngIf="importProgress.error">Błąd importu:
             <mark class="error-color">{{importProgress.error}}</mark>
@@ -78,10 +78,56 @@
           </button>
         </mat-card-actions>
       </mat-card>
+      <mat-card class="card-centered">
+        <mat-card-content>
+          Potencjalne duplikaty: <span
+          [class.red_backgroud]="importProgress.potentialDuplicates > 0">{{importProgress.potentialDuplicates}}</span>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button (click)="onCheckForPotentialDuplicates()" [disabled]="isCheckForDuplicatesDisabled()">
+            Sprawdź potencjalne duplikaty
+          </button>
+        </mat-card-actions>
+      </mat-card>
     </header>
   </ng-template>
+  <div>
+    <mat-card>
+      <mat-card-title>
+        Wyświetlaj:
+      </mat-card-title>
+      <section class="checkbox-section">
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('id')"
+                      (change)="onColumnCheckboxChange($event, 'id')">id
+        </mat-checkbox>
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('foreignId')"
+                      (change)="onColumnCheckboxChange($event, 'foreignId')">obcy id
+        </mat-checkbox>
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('usosId')"
+                      (change)="onColumnCheckboxChange($event, 'usosId')">usos id
+        </mat-checkbox>
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('uid')"
+                      (change)="onColumnCheckboxChange($event, 'uid')">uid
+        </mat-checkbox>
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('secondarySchoolDocumentNumber')"
+                      (change)="onColumnCheckboxChange($event, 'secondarySchoolDocumentNumber', 'secondarySchoolDocumentIssueInstitution', 'secondarySchoolDocumentIssueDate')">
+          świadectwo dojrzałości
+        </mat-checkbox>
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('diplomaSchoolDocumentNumber')"
+                      (change)="onColumnCheckboxChange($event, 'diplomaSchoolDocumentNumber', 'diplomaSchoolDocumentIssueDateAndPlace', 'diplomaSchoolDocumentIssueInstitution')">
+          dyplom
+        </mat-checkbox>
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('importError')"
+                      (change)="onColumnCheckboxChange($event, 'importError')">błąd przy importowaniu
+        </mat-checkbox>
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('duplicateStatus')"
+                      (change)="onColumnCheckboxChange($event, 'duplicateStatus')">potencjalny duplikat
+        </mat-checkbox>
+      </section>
+    </mat-card>
+  </div>
   <div class="mat-elevation-z2">
-    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)" matSortActive="id"
+    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortEvent($event)" matSortActive="names"
            matSortDirection="asc" matSortDisableClear>
 
       <ng-container matColumnDef="lp">
@@ -110,7 +156,7 @@
       </ng-container>
 
       <ng-container matColumnDef="uid">
-        <th mat-header-cell *matHeaderCellDef> uid</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> uid</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">{{element.applicant.uid}}</td>
       </ng-container>
 
@@ -217,6 +263,29 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="duplicateStatus">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencjalny duplikat</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell"
+            [class.red_backgroud]="element.applicant.potentialDuplicateStatus === 'POTENTIAL_DUPLICATE'">
+          <div [ngSwitch]="element.applicant.potentialDuplicateStatus">
+            <div *ngSwitchCase="'NOT_CHECKED'" matTooltip="Nie sprawdzono">
+              <mat-icon>help</mat-icon>
+            </div>
+            <div *ngSwitchCase="'OK'" matTooltip="W porządku">
+              <mat-icon>done</mat-icon>
+            </div>
+            <div *ngSwitchCase="'POTENTIAL_DUPLICATE'" matTooltip="Potencjalny duplikat">
+              <button mat-button (click)="onPotentialDuplicateClick(element)">
+                <mat-icon>priority_high</mat-icon>
+              </button>
+            </div>
+            <div *ngSwitchCase="'CONFIRMED_NOT_DUPLICATE'" matTooltip="Potwierdzono">
+              <mat-icon>done_all</mat-icon>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="importError">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Błąd przy importowaniu</th>
         <td mat-cell *matCellDef="let element" class="mat-column-error"> {{element.importError}}
@@ -225,8 +294,8 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()"></tr>
+      <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();"></tr>
     </table>
     <mat-paginator [pageSizeOptions]="[5, 10, 15, 20, 25, 50, 100]"
                    showFirstLastButtons

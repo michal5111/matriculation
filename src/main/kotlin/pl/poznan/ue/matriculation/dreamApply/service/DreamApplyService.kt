@@ -1,6 +1,6 @@
 package pl.poznan.ue.matriculation.dreamApply.service
 
-import org.apache.commons.io.IOUtils
+import org.apache.poi.util.IOUtils
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.core.io.Resource
 import org.springframework.http.*
@@ -17,8 +17,8 @@ import pl.poznan.ue.matriculation.dreamApply.dto.application.OfferDto
 import pl.poznan.ue.matriculation.dreamApply.dto.email.EmailDto
 
 class DreamApplyService(
-        val instanceUrl: String,
-        apiKey: String
+    val instanceUrl: String,
+    apiKey: String
 ) {
     private val restTemplate: RestTemplate = RestTemplate()
 
@@ -42,7 +42,11 @@ class DreamApplyService(
         httpEntity = HttpEntity(httpHeaders)
     }
 
-    fun getApplicationsCountByFilter(academicTermID: String? = null, academicYear: String? = null, additionalFilters: Map<String, String>?): Long {
+    fun getApplicationsCountByFilter(
+        academicTermID: String? = null,
+        academicYear: String? = null,
+        additionalFilters: Map<String, String>?
+    ): Long {
         val uriComponentBuilder: UriComponentsBuilder = getUriComponentBuilder()
         academicTermID?.run {
             uriComponentBuilder.queryParam("byAcademicTermID", academicTermID)
@@ -54,15 +58,19 @@ class DreamApplyService(
             uriComponentBuilder.queryParam(filterName, filterValue)
         }
         val response: ResponseEntity<Any> = restTemplate.exchange(
-                uriComponentBuilder.build().toUri(),
-                HttpMethod.HEAD,
-                httpEntity,
-                Any::class.java
+            uriComponentBuilder.build().toUri(),
+            HttpMethod.HEAD,
+            httpEntity,
+            Any::class.java
         )
         return response.headers.getFirst("X-Count")!!.toLong()
     }
 
-    fun getApplicationsByFilter(academicTermID: String? = null, academicYear: String? = null, additionalFilters: Map<String, String>? = null): Map<Long, DreamApplyApplicationDto>? {
+    fun getApplicationsByFilter(
+        academicTermID: String? = null,
+        academicYear: String? = null,
+        additionalFilters: Map<String, String>? = null
+    ): Map<Long, DreamApplyApplicationDto>? {
         if (academicTermID == null && academicYear == null) {
             throw IllegalArgumentException("AcademicTerm adn academicYear are null")
         }
@@ -77,30 +85,30 @@ class DreamApplyService(
             uriComponentBuilder.queryParam(filterName, filterValue)
         }
         val response: ResponseEntity<Map<Long, DreamApplyApplicationDto>> = restTemplate.exchange(
-                uriComponentBuilder.build().toUri(),
-                HttpMethod.GET,
-                httpEntity,
-                LongApplicationMapResult()
+            uriComponentBuilder.build().toUri(),
+            HttpMethod.GET,
+            httpEntity,
+            LongApplicationMapResult()
         )
         return response.body
     }
 
     fun getApplicationById(applicationId: Long): DreamApplyApplicationDto? {
         val response: ResponseEntity<DreamApplyApplicationDto> = restTemplate.exchange(
-                "${apiUrl}applications/$applicationId",
-                HttpMethod.GET,
-                httpEntity,
-                DreamApplyApplicationDto::class.java
+            "${apiUrl}applications/$applicationId",
+            HttpMethod.GET,
+            httpEntity,
+            DreamApplyApplicationDto::class.java
         )
         return response.body
     }
 
     fun getApplicantById(applicantId: Long): DreamApplyApplicantDto? {
         val response: ResponseEntity<DreamApplyApplicantDto> = restTemplate.exchange(
-                "${apiUrl}applicants/$applicantId",
-                HttpMethod.GET,
-                httpEntity,
-                DreamApplyApplicantDto::class.java
+            "${apiUrl}applicants/$applicantId",
+            HttpMethod.GET,
+            httpEntity,
+            DreamApplyApplicantDto::class.java
         )
         return response.body
     }
@@ -121,20 +129,20 @@ class DreamApplyService(
 
     fun getAcademicTerms(): Map<Long, AcademicTermDto>? {
         val responseEntity: ResponseEntity<Map<Long, AcademicTermDto>> = restTemplate.exchange(
-                "${apiUrl}academic-terms",
-                HttpMethod.GET,
-                httpEntity,
-                LongAcademicTermMapResult()
+            "${apiUrl}academic-terms",
+            HttpMethod.GET,
+            httpEntity,
+            LongAcademicTermMapResult()
         )
         return responseEntity.body
     }
 
     fun getAcademicTermById(academicTermId: Long): AcademicTermDto? {
         val responseEntity: ResponseEntity<AcademicTermDto> = restTemplate.exchange(
-                "${apiUrl}academic-terms/$academicTermId",
-                HttpMethod.GET,
-                httpEntity,
-                AcademicTermDto::class.java
+            "${apiUrl}academic-terms/$academicTermId",
+            HttpMethod.GET,
+            httpEntity,
+            AcademicTermDto::class.java
         )
         return responseEntity.body
     }
@@ -151,10 +159,10 @@ class DreamApplyService(
             uriComponentBuilder.queryParam("byModes", modes)
         }
         val response: ResponseEntity<Map<Long, CourseDto>> = restTemplate.exchange(
-                uriComponentBuilder.build().toUri(),
-                HttpMethod.GET,
-                httpEntity,
-                LongCourseMapResult()
+            uriComponentBuilder.build().toUri(),
+            HttpMethod.GET,
+            httpEntity,
+            LongCourseMapResult()
         )
         return response.body
     }
@@ -162,10 +170,10 @@ class DreamApplyService(
     fun getApplicationOffers(path: String): Map<Long, OfferDto>? {
         val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("$instanceUrl$path")
         val response: ResponseEntity<Map<Long, OfferDto>> = restTemplate.exchange(
-                uriComponentBuilder.build().toUri(),
-                HttpMethod.GET,
-                httpEntity,
-                LongOfferDtoResult()
+            uriComponentBuilder.build().toUri(),
+            HttpMethod.GET,
+            httpEntity,
+            LongOfferDtoResult()
         )
         return response.body
     }
@@ -173,10 +181,10 @@ class DreamApplyService(
     fun getAllFlags(): Map<Long, FlagDto>? {
         val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("${apiUrl}applications/flags")
         val response: ResponseEntity<Map<Long, FlagDto>> = restTemplate.exchange(
-                uriComponentBuilder.build().toUri(),
-                HttpMethod.GET,
-                httpEntity,
-                LongFlagDtoResult()
+            uriComponentBuilder.build().toUri(),
+            HttpMethod.GET,
+            httpEntity,
+            LongFlagDtoResult()
         )
         return response.body
     }
@@ -184,10 +192,10 @@ class DreamApplyService(
     fun getApplicationFlags(path: String): Map<Long, FlagInfoDto>? {
         val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("$instanceUrl$path")
         val response: ResponseEntity<Map<Long, FlagInfoDto>> = restTemplate.exchange(
-                uriComponentBuilder.build().toUri(),
-                HttpMethod.GET,
-                httpEntity,
-                LongFlagInfoDtoResult()
+            uriComponentBuilder.build().toUri(),
+            HttpMethod.GET,
+            httpEntity,
+            LongFlagInfoDtoResult()
         )
         return response.body
     }
@@ -195,10 +203,10 @@ class DreamApplyService(
     fun getApplicantCourse(path: String): Map<Long, ApplicationCourseDto>? {
         val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("$instanceUrl$path")
         val response: ResponseEntity<Map<Long, ApplicationCourseDto>> = restTemplate.exchange(
-                uriComponentBuilder.build().toUri(),
-                HttpMethod.GET,
-                httpEntity,
-                LongApplicantCourseDtoResult()
+            uriComponentBuilder.build().toUri(),
+            HttpMethod.GET,
+            httpEntity,
+            LongApplicantCourseDtoResult()
         )
         return response.body
     }

@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
 import java.util.*
 import javax.persistence.*
 
@@ -24,8 +25,9 @@ class PersonProgramme(
     @JoinColumn(name = "ST_ID", referencedColumnName = "ID", nullable = false)
     var student: Student,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_GLOWNY", length = 1, nullable = true)
-    var isDefault: Char? = 'N',
+    var isDefault: Boolean? = false,
 
     @Column(name = "DATA_NAST_ZAL", nullable = true)
     var dateToNextPass: Date? = null,
@@ -34,112 +36,115 @@ class PersonProgramme(
     var professionalPowers: String? = null,
 
     @Column(name = "UPRAWNIENIA_ZAWODOWE_ANG", length = 4000, nullable = true)
-        var professionalPowersEng: String? = null,
+    var professionalPowersEng: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "JED_ORG_KOD", referencedColumnName = "KOD", nullable = true)
-        var organizationalUnit: OrganizationalUnit? = null,
+    var organizationalUnit: OrganizationalUnit? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH])
     @JoinColumn(name = "DOK_UPR_ID", referencedColumnName = "ID")
-        var entitlementDocument: EntitlementDocument? = null,
+    var entitlementDocument: EntitlementDocument? = null,
 
     @Column(name = "DATA_PRZYJECIA", nullable = true)
-        var dateOfAddmision: Date? = null,
+    var dateOfAddmision: Date? = null,
 
     @Column(name = "PLAN_DATA_UKON", nullable = true)
-        var plannedDateOfCompletion: Date? = null,
+    var plannedDateOfCompletion: Date? = null,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_ZGLOSZONY", length = 1, nullable = false)
-        var isReported: Char = 'N',
+    var isReported: Boolean = false,
 
     @Column(name = "STATUS", length = 6, nullable = false)
-        var status: String = "STU",
+    var status: String = "STU",
 
     @Column(name = "DATA_ROZPOCZECIA", nullable = true)
-        var startDate: Date,
+    var startDate: Date,
 
     @Column(name = "NUMER_S", length = 10, nullable = true)
-        var certificateNumberNumeric: Int? = null,
+    var certificateNumberNumeric: Int? = null,
 
     @Column(name = "NUMER_SWIADECTWA", length = 10, nullable = true)
-        var certificateNumberString: String? = null,
+    var certificateNumberString: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TECZ_ID", referencedColumnName = "ID")
-        var folder: Folder? = null,
+    var folder: Folder? = null,
 
     @Column(name = "DATA_ARCH", nullable = true)
-        var archiveDate: Date? = null,
+    var archiveDate: Date? = null,
 
     @Column(name = "WARUNKI_PRZYJEC_NA_PROG", length = 2000, nullable = true)
-        var programmeAdmissionConditions: String? = null,
+    var programmeAdmissionConditions: String? = null,
 
     @Column(name = "WARUNKI_PRZYJEC_NA_PROG_ANG", length = 2000, nullable = true)
-        var programmeAdmissionConditionsEng: String? = null,
+    var programmeAdmissionConditionsEng: String? = null,
 
     @Column(name = "NUMER_DO_BANKU", length = 10, nullable = true)
-        var numberToBankNumeric: Int? = null,
+    var numberToBankNumeric: Int? = null,
 
     @Column(name = "NUMER_DO_BANKU_SYGN", length = 50, nullable = true)
-        var numberToBankString: String? = null,
+    var numberToBankString: String? = null,
 
     @Column(name = "NUMER_5_PROC", length = 10, nullable = true)
-        var numberFivePercentNumeric: Int? = null,
+    var numberFivePercentNumeric: Int? = null,
 
     @Column(name = "NUMER_5_PROC_SYGN", length = 10, nullable = true)
-        var numberFivePercentString: String? = null,
+    var numberFivePercentString: String? = null,
 
     @Column(name = "STATUS_ARCH", length = 1, nullable = false)
-        var archiveStatus: Char = 'N',
+    var archiveStatus: Char = 'N',
 
+    @Basic(fetch = FetchType.LAZY)
     @Column(name = "OSIAGNIECIA", nullable = true)
     @Lob
-        var achievements: String? = null,
+    var achievements: String? = null,
 
+    @Basic(fetch = FetchType.LAZY)
     @Column(name = "OSIAGNIECIA_ANG", nullable = true)
     @Lob
-        var achievementsEng: String? = null,
+    var achievementsEng: String? = null,
 
     @Column(name = "NR_KIERUNKU_USTAWA", length = 1, nullable = true)
-        var fieldOfStudyNumberAct: Char? = null,
+    var fieldOfStudyNumberAct: Char? = null,
 
     @Column(name = "LIMIT_ECTS", length = 15, nullable = true)
-        var ectsLimit: Double? = null,
+    var ectsLimit: Double? = null,
 
     @Column(name = "DODATKOWE_ECTS_UCZELNIA", length = 15, nullable = false)
-        var additionalEctsUniversity: Double = 0.0,
+    var additionalEctsUniversity: Double = 0.0,
 
     @Column(name = "WYKORZYSTANE_ECTS_OBCE", length = 15, nullable = false)
-        var usedEctsForeign: Double = 0.0,
+    var usedEctsForeign: Double = 0.0,
 
     @Column(name = "LIMIT_ECTS_PODPIECIA", length = 15, nullable = true)
-        var ectsLimitAttaching: Double? = null,
+    var ectsLimitAttaching: Double? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRGOS_ID", referencedColumnName = "ID")
-        var personProgramme: PersonProgramme? = null,
+    var personProgramme: PersonProgramme? = null,
 
     @Column(name = "OSIAGNIECIA_PROGRAMU", length = 4000, nullable = true)
-        var programmeAchievements: String? = null,
+    var programmeAchievements: String? = null,
 
     @Column(name = "OSIAGNIECIA_PROGRAMU_ANG", length = 4000, nullable = true)
-        var programmeAchievementsEng: String? = null,
+    var programmeAchievementsEng: String? = null,
 
     @Column(name = "WYNIK_STUDIOW", length = 100, nullable = true)
-        var studyScore: String? = null,
+    var studyScore: String? = null,
 
     @Column(name = "WYNIK_STUDIOW_ANG", length = 100, nullable = true)
-        var studyScoreEng: String? = null,
+    var studyScoreEng: String? = null,
 
     @Column(name = "UMOWA_DATA_PRZECZYTANIA", nullable = true)
-        var agreementReadDate: Date? = null,
+    var agreementReadDate: Date? = null,
 
     @Column(name = "UMOWA_DATA_PODPISANIA", nullable = true)
-        var agreementSignDate: Date? = null,
+    var agreementSignDate: Date? = null,
 
     @Column(name = "UMOWA_SYGNATURA", length = 20, nullable = true)
-        var agreementSignature: String? = null,
+    var agreementSignature: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "KOD_ISCED", referencedColumnName = "KOD")
@@ -152,7 +157,7 @@ class PersonProgramme(
     @OneToMany(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     val personStages: MutableList<PersonStage> = mutableListOf(),
 
-    @OneToOne(mappedBy = "personProgramme", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     var irkApplication: IrkApplication? = null,
 
     @OneToMany(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
@@ -161,7 +166,7 @@ class PersonProgramme(
     @OneToMany(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     var personProgrammeBasisOfAdmission: MutableList<PersonProgrammeBasisOfAdmission> = mutableListOf(),
 
-    @OneToMany(mappedBy = "personProgramme", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     var arrivals: MutableList<Arrival> = mutableListOf()
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
@@ -177,5 +182,25 @@ class PersonProgramme(
 
     override fun hashCode(): Int {
         return id?.hashCode() ?: 0
+    }
+
+    fun addPersonStage(personStage: PersonStage) {
+        personStages.add(personStage)
+        personStage.personProgramme = this
+    }
+
+    fun addPersonProgrammeBasisOfAdmission(ppboa: PersonProgrammeBasisOfAdmission) {
+        personProgrammeBasisOfAdmission.add(ppboa)
+        ppboa.personProgramme = this
+    }
+
+    fun addPersonProgrammeSourceOfFinancing(ppsof: PersonProgrammeSourceOfFinancing) {
+        personProgrammeSourceOfFinancing.add(ppsof)
+        ppsof.personProgramme = this
+    }
+
+    fun addArrival(arrival: Arrival) {
+        arrivals.add(arrival)
+        arrival.personProgramme = this
     }
 }

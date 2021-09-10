@@ -19,11 +19,10 @@ class JobFactory(
     fun create(jobType: JobType, importId: Long): IJob {
         return when (jobType) {
             IMPORT -> ImportApplicantsJob(
-                applicationDataSourceFactory = applicationDataSourceFactory,
                 importRepository = importRepository,
                 importProgressRepository = importProgressRepository,
                 processService = processService,
-                importService = importService,
+                applicationDataSourceFactory = applicationDataSourceFactory,
                 importId = importId
             )
             SAVE -> SavePersonsJob(
@@ -36,7 +35,6 @@ class JobFactory(
             FIND_UIDS -> GetUidsJob(
                 processService = processService,
                 importService = importService,
-                importRepository = importRepository,
                 importId = importId
             )
             ARCHIVE -> ArchiveApplicationsJob(
@@ -49,6 +47,11 @@ class JobFactory(
                 importId = importId,
                 importRepository = importRepository,
                 importService = importService
+            )
+            CHECK_FOR_POTENTIAL_DUPLICATES -> CheckForPotentialDuplicatesJob(
+                processService = processService,
+                importId = importId,
+                importProgressRepository = importProgressRepository
             )
         }
     }

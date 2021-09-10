@@ -3,6 +3,7 @@ import {Observable} from 'rxjs';
 import {Address} from './address';
 import {PhoneNumber} from './phoneNumber';
 import {IdentityDocument} from './identityDocument';
+import {PotentialDuplicateStatus} from '../import/potential-duplicate-status.enum';
 
 export class Applicant {
   id: number;
@@ -67,4 +68,5 @@ export class Applicant {
   assignedIndexNumber: number;
   dataSourceId: number;
   uid: string;
+  potentialDuplicateStatus: PotentialDuplicateStatus;
 }

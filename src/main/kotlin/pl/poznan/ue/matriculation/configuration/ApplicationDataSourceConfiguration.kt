@@ -60,82 +60,82 @@ class ApplicationDataSourceConfiguration {
     @Bean(name = ["IncomingService"])
     fun incomingService(): DreamApplyService {
         return DreamApplyService(
-                apiKey = incomingApiKey,
-                instanceUrl = incomingInstanceUrl
+            apiKey = incomingApiKey,
+            instanceUrl = incomingInstanceUrl
         )
     }
 
     @Bean(name = ["IncomingApplicantDataSource"])
     fun incomingApplicantDataSource(
-            @Autowired @Qualifier("IncomingService") IncomingService: DreamApplyService,
-            @Autowired schoolRepository: SchoolRepository
+        @Autowired @Qualifier("IncomingService") IncomingService: DreamApplyService,
+        @Autowired schoolRepository: SchoolRepository
     ): IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
         return IncomingDataSourceImpl(
-                dreamApplyService = IncomingService,
-                name = "Incoming",
-                id = "INCOMING",
-                applicantMapper = IncomingApplicantMapper(schoolRepository),
-                applicationMapper = DreamApplyApplicationMapper(),
-                status = "Accepted"
+            dreamApplyService = IncomingService,
+            name = "Incoming",
+            id = "INCOMING",
+            applicantMapper = IncomingApplicantMapper(schoolRepository),
+            applicationMapper = DreamApplyApplicationMapper(),
+            status = "Accepted"
         )
     }
 
     @Bean(name = ["DreamApplyService"])
     fun dreamApplyService(): DreamApplyService {
         return DreamApplyService(
-                apiKey = dreamApplyApiKey,
-                instanceUrl = dreamApplyInstanceUrl
+            apiKey = dreamApplyApiKey,
+            instanceUrl = dreamApplyInstanceUrl
         )
     }
 
     @Bean(name = ["DreamApplyApplicantDataSource"])
     fun dreamApplyApplicantDataSource(
-            @Autowired @Qualifier("DreamApplyService") dreamApplyService: DreamApplyService,
-            @Autowired schoolRepository: SchoolRepository
+        @Autowired @Qualifier("DreamApplyService") dreamApplyService: DreamApplyService,
+        @Autowired schoolRepository: SchoolRepository
     ): IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
         return DreamApplyDataSourceImpl(
-                dreamApplyService = dreamApplyService,
-                name = "Dream Apply",
-                id = "DREAM_APPLY",
-                applicantMapper = DreamApplyApplicantMapper(schoolRepository),
-                applicationMapper = DreamApplyApplicationMapper(),
-                status = "Everything OK"
+            dreamApplyService = dreamApplyService,
+            name = "Dream Apply",
+            id = "DREAM_APPLY",
+            applicantMapper = DreamApplyApplicantMapper(schoolRepository),
+            applicationMapper = DreamApplyApplicationMapper(),
+            status = "Everything OK"
         )
     }
 
     @Bean(name = ["TestIrkService"])
     fun testIrkService(): IrkService {
         return IrkService(
-                testServiceUrl,
-                testApiKey
+            testServiceUrl,
+            testApiKey
         )
     }
 
     @Bean(name = ["testIrkApplicantDataSource"])
     fun testIrkApplicantDataSource(
-            @Autowired @Qualifier("TestIrkService") irkService: IrkService
+        @Autowired @Qualifier("TestIrkService") irkService: IrkService
     ): IApplicationDataSource<IrkApplicationDTO, IrkApplicantDto> {
         return IrkApplicationDataSourceImpl(
-                id = "IRK_TEST",
-                name = "Testowa IRK",
-                irkService = irkService,
-                setAsAccepted = testSetAsAccepted,
-                irkApplicantMapper = IrkApplicantMapper(),
-                irkApplicationMapper = IrkApplicationMapper()
+            id = "IRK_TEST",
+            name = "Testowa IRK",
+            irkService = irkService,
+            setAsAccepted = testSetAsAccepted,
+            irkApplicantMapper = IrkApplicantMapper(),
+            irkApplicationMapper = IrkApplicationMapper()
         )
     }
 
     @Bean(name = ["primaryIrkService"])
     fun primaryIrkService(): IrkService {
         return IrkService(
-                primaryServiceUrl,
-                primaryApiKey
+            primaryServiceUrl,
+            primaryApiKey
         )
     }
 
     @Bean(name = ["primaryIrkApplicantDataSource"])
     fun primaryIrkApplicantDataSource(
-            @Autowired @Qualifier("primaryIrkService") irkService: IrkService
+        @Autowired @Qualifier("primaryIrkService") irkService: IrkService
     ): IApplicationDataSource<IrkApplicationDTO, IrkApplicantDto> {
         return IrkApplicationDataSourceImpl(
             id = "IRK_PRIMARY",

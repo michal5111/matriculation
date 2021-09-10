@@ -39,4 +39,8 @@
     <mat-icon matTooltip="Wysyłam powiadomienia" [matTooltipDisabled]="!tooltip">notifications_active</mat-icon>
     <span *ngIf="!tooltip">Wysyłam powiadomienia</span>
   </span>
+  <span *ngSwitchCase="'CHECKING_POTENTIAL_DUPLICATES'">
+    <mat-icon matTooltip="Sprawdzam potencjalne duplikaty" [matTooltipDisabled]="!tooltip">search</mat-icon>
+    <span *ngIf="!tooltip">Sprawdzam potencjalne duplikaty</span>
+  </span>
 </div>

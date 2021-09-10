@@ -1,11 +1,13 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
+import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
 import java.util.*
 import javax.persistence.*
 
 @Entity
-//@Cacheable
-//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_CYKLE_DYDAKTYCZNE")
 class DidacticCycle(
     @Id
@@ -13,56 +15,59 @@ class DidacticCycle(
     val code: String,
 
     @Column(name = "OPIS", length = 100, nullable = false)
-    var description: String,
+    val description: String,
 
     @Column(name = "DATA_OD", nullable = false)
-    var dateFrom: Date,
+    val dateFrom: Date,
 
     @Column(name = "DATA_DO", nullable = false)
-    var dateTo: Date,
+    val dateTo: Date,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_WYSWIETLAC", length = 1, nullable = false)
-    var display: Char = 'N',
+    val display: Boolean = false,
 
     @Column(name = "DATA_ZAKON", nullable = false)
-    var endDate: Date,
+    val endDate: Date,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TCDYD_KOD", referencedColumnName = "KOD")
-    var didacticCycleType: DidacticCycleType,
+    val didacticCycleType: DidacticCycleType,
 
     @Column(name = "STATUS_CYKLU", length = 1, nullable = false)
-    var cycleStatus: Char = 'A',
+    val cycleStatus: Char = 'A',
 
     @Column(name = "DESCRIPTION", length = 100, nullable = false)
-    var descriptionEng: String? = null,
+    val descriptionEng: String? = null,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "ARCHIWIZACJA_ZALICZEN", length = 1, nullable = false)
-    var passArchive: Char = 'N',
+    val passArchive: Boolean = false,
 
     @Column(name = "DATA_MOD_ARCH_ZAL", nullable = false)
-    var passArchiveModDate: Date,
+    val passArchiveModDate: Date,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "ARCHIWIZACJA_ETAPOW", length = 1, nullable = false)
-    var stageArchive: Char = 'N',
+    val stageArchive: Boolean = false,
 
     @Column(name = "DATA_MOD_ARCH_ETP", nullable = false)
-    var stageArchiveModDate: Date,
+    val stageArchiveModDate: Date,
 
     @Column(name = "KOLEJNOSC", length = 10, nullable = false)
-    var order: Int = 0,
+    val order: Int = 0,
 
     @OneToMany(mappedBy = "didacticCycle", fetch = FetchType.LAZY)
     val personStages: MutableList<PersonStage> = mutableListOf(),
 
     @OneToMany(mappedBy = "didacticCycleRequirement", fetch = FetchType.LAZY)
-    var personStagesRequirements: MutableList<PersonStage> = mutableListOf(),
+    val personStagesRequirements: MutableList<PersonStage> = mutableListOf(),
 
     @OneToMany(mappedBy = "didacticCycleAcademicYear", fetch = FetchType.LAZY)
     val arrivals: MutableList<Arrival> = mutableListOf(),
 
     @OneToMany(mappedBy = "financingDidacticCycleAcademicYear", fetch = FetchType.LAZY)
-    var financingArrivals: List<Arrival>,
+    val financingArrivals: List<Arrival>,
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

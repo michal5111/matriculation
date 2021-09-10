@@ -17,8 +17,6 @@ class Role(
     @JsonIgnore
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     val userRoles: MutableSet<UserRole>
-
-
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

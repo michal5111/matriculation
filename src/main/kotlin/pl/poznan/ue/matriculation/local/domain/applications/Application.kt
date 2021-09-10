@@ -10,6 +10,28 @@ import pl.poznan.ue.matriculation.local.domain.import.Import
 import java.io.Serializable
 import javax.persistence.*
 
+@NamedEntityGraph(
+    name = "application.applicant",
+    attributeNodes = [
+        NamedAttributeNode("applicant", subgraph = "subgraph.data"),
+        NamedAttributeNode("applicationForeignerData"),
+        NamedAttributeNode("certificate")
+    ],
+    subgraphs = [
+        NamedSubgraph(
+            name = "subgraph.data",
+            attributeNodes = [
+                NamedAttributeNode("name"),
+                NamedAttributeNode("basicData"),
+                NamedAttributeNode("additionalData"),
+                NamedAttributeNode("educationData"),
+                NamedAttributeNode("applicantForeignerData"),
+                NamedAttributeNode("educationData"),
+                NamedAttributeNode("identityDocuments")
+            ]
+        )
+    ]
+)
 @Entity
 @Table(
     uniqueConstraints = [
@@ -33,7 +55,7 @@ class Application(
     @Column(length = 500)
     var comment: String? = null,
 
-    @OneToOne(mappedBy = "application", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @OneToOne(mappedBy = "application", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     val applicationForeignerData: ApplicationForeignerData? = null,
 
     var payment: String? = null,
@@ -62,7 +84,7 @@ class Application(
     @Lob
     var stackTrace: String? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", referencedColumnName = "id")
     var applicant: Applicant? = null,
 
@@ -74,8 +96,8 @@ class Application(
 
     override fun toString(): String {
         return "Application(id=$id, irkId=$foreignId, admitted=$admitted, comment=$comment, payment=$payment, " +
-                "position=$position, qualified=$qualified, score=$score, importError=$importError, " +
-                "stackTrace=$stackTrace)"
+            "position=$position, qualified=$qualified, score=$score, importError=$importError, " +
+            "stackTrace=$stackTrace)"
     }
 
     override fun equals(other: Any?): Boolean {

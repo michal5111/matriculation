@@ -2,9 +2,11 @@ package pl.poznan.ue.matriculation.local.domain.import
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
+import pl.poznan.ue.matriculation.local.entityListeners.MessageAfterUpdateListener
 import java.io.Serializable
 import javax.persistence.*
 
+@EntityListeners(MessageAfterUpdateListener::class)
 @Entity
 class ImportProgress(
     @Id
@@ -27,6 +29,8 @@ class ImportProgress(
     var importedUids: Int = 0,
 
     var notificationsSend: Int = 0,
+
+    var potentialDuplicates: Int = 0,
 
     @Enumerated(EnumType.STRING)
     var importStatus: ImportStatus = ImportStatus.PENDING,

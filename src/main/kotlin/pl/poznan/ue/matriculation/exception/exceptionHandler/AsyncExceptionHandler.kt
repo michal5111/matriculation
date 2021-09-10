@@ -24,18 +24,16 @@ class AsyncExceptionHandler : AsyncUncaughtExceptionHandler {
         var e: Throwable? = throwable
         do {
             if (e is ImportException) {
-                val importId = e.importId
+                val importId = e.importId ?: continue
                 if (e.cause is SQLException) {
-                    importService.setError(
-                        importId, (e.cause as SQLException).sqlState + "\n" + e.message.toString()
-                    )
+                    importService.setError(importId, (e.cause as SQLException).sqlState + "\n" + e.message.toString())
                 } else {
                     importService.setError(importId, e.message.toString())
                 }
                 importService.setImportStatus(ImportStatus.ERROR, importId)
             }
             if (e is ImportStartException) {
-                val importId = e.importId
+                val importId = e.importId ?: continue
                 importService.setError(importId, e.message.toString())
                 importService.setImportStatus(ImportStatus.ERROR, importId)
             }
@@ -49,4 +47,6 @@ class AsyncExceptionHandler : AsyncUncaughtExceptionHandler {
         }
         logger.error("Async exception", throwable)
     }
+
+
 }

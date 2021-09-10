@@ -10,8 +10,8 @@ import javax.persistence.OneToMany
 @Entity
 class EducationData(
 
-    @OneToMany(mappedBy = "educationData", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
-    var documents: MutableList<Document> = mutableListOf(),
+    @OneToMany(mappedBy = "educationData", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val documents: MutableSet<Document> = HashSet(),
 
     var highSchoolCity: String? = null,
 
@@ -26,8 +26,8 @@ class EducationData(
 
     override fun toString(): String {
         return "EducationData(applicantId=$applicantId, highSchoolCity=$highSchoolCity, " +
-                "highSchoolName=$highSchoolName, highSchoolType=$highSchoolType, " +
-                "highSchoolUsosCode=$highSchoolUsosCode)"
+            "highSchoolName=$highSchoolName, highSchoolType=$highSchoolType, " +
+            "highSchoolUsosCode=$highSchoolUsosCode)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -45,5 +45,14 @@ class EducationData(
         return applicantId?.hashCode() ?: 0
     }
 
+    fun addDocument(document: Document) {
+        documents.add(document)
+        document.educationData = this
+    }
+
+    fun removeDocument(document: Document) {
+        documents.remove(document)
+        document.educationData = null
+    }
 
 }

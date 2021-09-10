@@ -6,14 +6,18 @@ import pl.poznan.ue.matriculation.local.serializer.CustomRolesSerializer
 import javax.persistence.*
 
 @Entity
+@NamedEntityGraph(
+    name = "user.roles",
+    attributeNodes = [NamedAttributeNode(value = "roles")]
+)
 class User(
 
     @Column(unique = true)
     val uid: String,
 
     @JsonSerialize(using = CustomRolesSerializer::class)
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true, cascade = [CascadeType.ALL])
-    var roles: MutableSet<UserRole> = mutableSetOf(),
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    var roles: MutableSet<UserRole> = HashSet(),
 
     @Column(unique = true)
     var usosId: Long? = null

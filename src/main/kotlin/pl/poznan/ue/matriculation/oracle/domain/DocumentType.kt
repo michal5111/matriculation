@@ -1,8 +1,12 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
+import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_TYPY_DOKUMENTOW")
 class DocumentType(
     @Id
@@ -10,16 +14,17 @@ class DocumentType(
     val code: String,
 
     @Column(name = "OPIS", length = 200, nullable = false)
-    var description: String,
+    val description: String,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_AKTUALNY", length = 1, nullable = false)
-    var isCurrent: Char = 'T',
+    val isCurrent: Boolean = true,
 
     @OneToMany(mappedBy = "documentType", fetch = FetchType.LAZY)
-    var personDocuments: MutableList<PersonDocument>,
+    val personDocuments: MutableList<PersonDocument>,
 
     @OneToMany(mappedBy = "documentType", fetch = FetchType.LAZY)
-    var ownedDocuments: MutableList<OwnedDocument>,
+    val ownedDocuments: MutableList<OwnedDocument>,
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

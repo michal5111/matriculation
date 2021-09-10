@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
 import javax.persistence.*
 
 @Entity
@@ -22,22 +23,26 @@ class Folder(
     var warehouse: String? = null,
 
     @Column(name = "CZY_MATURA", length = 1, nullable = true)
-    var containingSecondarySchoolCertificate: Char? = 'N',
+    var containingSecondarySchoolCertificate: Boolean? = false,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_METRYKA_BIBL", length = 1, nullable = true)
-    var containingMetric: Char? = 'N',
+    var containingMetric: Boolean? = false,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_INDEKS_RECEN", length = 1, nullable = true)
-    var containingIndexOrReview: Char? = 'N',
+    var containingIndexOrReview: Boolean = false,
 
     @Column(name = "UWAGI", length = 200, nullable = true)
     var comments: String? = null,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_LEGITYMACJA", length = 1, nullable = false)
-    var containingStudentCard: Char = 'N',
+    var containingStudentCard: Boolean = false,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_DYPLOM", length = 1, nullable = false)
-    var containingDiploma: Char = 'N',
+    var containingDiploma: Boolean = false,
 
     @Column(name = "STATUS", length = 1, nullable = false)
     var status: Char = 'N',

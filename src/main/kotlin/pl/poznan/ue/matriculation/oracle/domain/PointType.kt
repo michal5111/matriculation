@@ -1,8 +1,11 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_TYPY_PUNKTOW")
 class PointType(
     @Id
@@ -10,13 +13,13 @@ class PointType(
     val code: String,
 
     @Column(name = "OPIS", length = 100, nullable = true)
-    var description: String,
+    val description: String,
 
     @Column(name = "DESCRIPTION", length = 100, nullable = true)
-    var descriptionEng: String,
+    val descriptionEng: String,
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "pointType")
-    var mediumConfigurations: MutableList<MediumConfiguration>
+    val arithmeticAverageConfigurations: MutableList<ArithmeticAverageConfiguration>
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

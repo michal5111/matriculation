@@ -1,11 +1,13 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
+import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
 import java.util.*
 import javax.persistence.*
 
 @Entity
-//@Cacheable
-//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_PROGRAMY")
 class Programme(
 
@@ -14,138 +16,142 @@ class Programme(
     val code: String,
 
     @Column(name = "OPIS", length = 200, nullable = false)
-    var description: String,
+    val description: String,
 
     @Column(name = "DATA_OD", nullable = false)
-    var dateFrom: Date,
+    val dateFrom: Date,
 
     @Column(name = "DATA_DO", nullable = true)
-    var dateTo: Date? = null,
+    val dateTo: Date? = null,
 
     @Column(name = "TRYB_STUDIOW", length = 100, nullable = true)
-    var studyMode: String? = null,
+    val studyMode: String? = null,
 
     @Column(name = "RODZAJ_STUDIOW", length = 100, nullable = true)
-    var typeOfStudies: String? = null,
+    val typeOfStudies: String? = null,
 
     @Column(name = "CZAS_TRWANIA", length = 100, nullable = true)
-    var duration: String? = null,
+    val duration: String? = null,
 
     @Column(name = "DESCRIPTION", length = 200, nullable = true)
-    var descriptionEng: String? = null,
+    val descriptionEng: String? = null,
 
     @Column(name = "DALSZE_STUDIA", length = 200, nullable = true)
-    var furtherStudies: String? = null,
+    val furtherStudies: String? = null,
 
     @Column(name = "DALSZE_STUDIA_ANG", length = 200, nullable = true)
-    var furtherStudiesEng: String? = null,
+    val furtherStudiesEng: String? = null,
 
     @Column(name = "RODZAJ_STUDIOW_ANG", length = 100, nullable = true)
-    var typeOfStudiesEng: String? = null,
+    val typeOfStudiesEng: String? = null,
 
     @Column(name = "CZAS_TRWANIA_ANG", length = 100, nullable = true)
-    var durationEng: String? = null,
+    val durationEng: String? = null,
 
     @Column(name = "TRYB_STUDIOW_ANG", length = 100, nullable = true)
-    var studyModeEng: String? = null,
+    val studyModeEng: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TCDYD_KOD", referencedColumnName = "KOD", nullable = true)
-    var didacticCycleType: DidacticCycleType? = null,
+    val didacticCycleType: DidacticCycleType? = null,
 
     @Column(name = "LICZBA_JEDN", length = 10, nullable = false)
-    var unitsNumber: Long? = null,
+    val unitsNumber: Long? = null,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_WYSWIETLAC", length = 1, nullable = false)
-    var display: Char = 'T',
+    val display: Boolean = true,
 
+    @Basic(fetch = FetchType.LAZY)
     @Column(name = "UPRAWNIENIA_ZAWODOWE", nullable = true)
     @Lob
-    var professionalQualifications: String? = null,
+    val professionalQualifications: String? = null,
 
+    @Basic(fetch = FetchType.LAZY)
     @Column(name = "UPRAWNIENIA_ZAWODOWE_ANG", nullable = true)
     @Lob
-    var professionalQualificationsEng: String? = null,
+    val professionalQualificationsEng: String? = null,
 
     @Column(name = "OPIS_NIE", length = 200, nullable = true)
-    var descriptionGer: String? = null,
+    val descriptionGer: String? = null,
 
     @Column(name = "OPIS_ROS", length = 200, nullable = true)
-    var descriptionRus: String? = null,
+    val descriptionRus: String? = null,
 
     @Column(name = "OPIS_HIS", length = 200, nullable = true)
-    var descriptionHis: String? = null,
+    val descriptionHis: String? = null,
 
     @Column(name = "OPIS_FRA", length = 200, nullable = true)
-    var descriptionFra: String? = null,
+    val descriptionFra: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "KONF_SR_KOD", referencedColumnName = "KOD")
-    var mediumConfiguration: MediumConfiguration,
+    val arithmeticAverageConfiguration: ArithmeticAverageConfiguration,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PROW_KIER_ID", referencedColumnName = "ID")
-    var conductedFieldOfStudy: ConductedFieldOfStudy,
+    val conductedFieldOfStudy: ConductedFieldOfStudy,
 
     @Column(name = "PROFIL", length = 1, nullable = true)
-    var profile: Char? = null,
+    val profile: Char? = null,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_STUDIA_MIEDZYOBSZAROWE", length = 1, nullable = false)
-    var isInternationalStudies: Char = 'N',
+    val isInternationalStudies: Boolean = false,
 
     @Column(name = "CZY_BEZPLATNY_USTAWA")
-    var isFreeAct: Char? = null,
+    val isFreeAct: Char? = null,
 
     @Column(name = "LIMIT_ECTS", length = 15, nullable = true)
-    var ectsLimit: Double? = null,
+    val ectsLimit: Double? = null,
 
     @Column(name = "DODATKOWE_ECTS_USTAWA", length = 15, nullable = false)
-    var additionalEctsAct: Double = 0.0,
+    val additionalEctsAct: Double = 0.0,
 
     @Column(name = "DODATKOWE_ECTS_UCZELNIA", length = 15, nullable = false)
-    var additionalEctsUniversity: Double = 0.0,
+    val additionalEctsUniversity: Double = 0.0,
 
     @Column(name = "CZYNNIKI_SZKODLIWE", length = 4000, nullable = true)
-    var harmfulFactors: String? = null,
+    val harmfulFactors: String? = null,
 
     @Column(name = "ZAKRES", length = 500, nullable = true)
-    var range: String? = null,
+    val range: String? = null,
 
     @Column(name = "ZAKRES_ANG", length = 500, nullable = true)
-    var rangeEng: String? = null,
+    val rangeEng: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "JED_ORG_KOD_PODST", referencedColumnName = "KOD", nullable = true)
-    var organizationalUnitPrimary: OrganizationalUnit? = null,
+    val organizationalUnitPrimary: OrganizationalUnit? = null,
 
     @Column(name = "KOD_POLON_ISM", length = 20, nullable = true)
-    var polonCodeIsm: String? = null,
+    val polonCodeIsm: String? = null,
 
     @Column(name = "KOD_POLON_DR", length = 20, nullable = true)
-    var polonCodeDr: String? = null,
+    val polonCodeDr: String? = null,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "KOD_ISCED", referencedColumnName = "KOD", nullable = true)
-    var iscedCode: IscedCode? = null,
+    val iscedCode: IscedCode? = null,
 
     @Column(name = "KOD_POLON_REKRUTACJA", length = 20, nullable = true)
-    var polonCodeRegistration: String? = null,
+    val polonCodeRegistration: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "JED_ORG_KOD_PROW", referencedColumnName = "KOD", nullable = true)
-    var organizationalUnitLeading: OrganizationalUnit? = null,
+    val organizationalUnitLeading: OrganizationalUnit? = null,
 
     @Column(name = "USTAL_DATE_KONCA_STUDIOW", length = 1, nullable = false)
-    var setEndOfStudyDate: Char = 'D',
+    val setEndOfStudyDate: Char = 'D',
 
     @Column(name = "UID_POLON_DR", length = 128, nullable = true)
-    var polonUidDr: String? = null,
+    val polonUidDr: String? = null,
 
     @OneToMany(mappedBy = "programme", fetch = FetchType.LAZY)
-    val personProgrammes: MutableList<PersonProgramme>,
+    var personProgrammes: MutableList<PersonProgramme>,
 
     @OneToMany(mappedBy = "programme", fetch = FetchType.LAZY)
-    val programmeStages: MutableList<ProgrammeStage>
+    var programmeStages: MutableList<ProgrammeStage>
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

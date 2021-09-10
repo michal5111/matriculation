@@ -15,7 +15,8 @@ class ArchivePersonsStartConditions : IStartConditions {
             COMPLETED_WITH_ERRORS,
             ERROR,
             SEARCHING_UIDS,
-            SENDING_NOTIFICATIONS -> throw ImportStartException(import.id!!, "Zły stan importu.")
+            CHECKING_POTENTIAL_DUPLICATES,
+            SENDING_NOTIFICATIONS -> throw ImportStartException(import.id, "Zły stan importu.")
             COMPLETE -> return
         }
     }

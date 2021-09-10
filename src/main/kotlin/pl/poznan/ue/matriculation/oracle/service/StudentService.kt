@@ -20,7 +20,6 @@ class StudentService(
     private val didacticCycleRepository: DidacticCycleRepository,
     private val programmeStageRepository: ProgrammeStageRepository,
     private val studentRepository: StudentRepository,
-    private val entitlementDocumentRepository: EntitlementDocumentRepository,
     private val sourceOfFinancingRepository: SourceOfFinancingRepository,
     private val basisOfAdmissionRepository: BasisOfAdmissionRepository
 ) {
@@ -31,30 +30,30 @@ class StudentService(
 
     @LogExecutionTime
     fun createOrFindStudent(person: Person, indexPoolCode: String): Student {
-        val foundStudent =
-            studentRepository.findByPersonIdAndIndexTypeCodeOrderByIndexNumberAsc(person.id, indexPoolCode)
-        if (foundStudent.isNotEmpty()) {
-            return foundStudent.last()
+        person.students.findLast {
+            it.indexType.code == indexPoolCode
+        }?.let {
+            return it
         }
         val indexNumberDto = studentRepository.getNewIndexNumber(indexPoolCode)
-        val student = Student(
-            indexType = indexTypeRepository.getById(indexPoolCode),
-            organizationalUnit =
+        val organizationalUnit =
             if (indexNumberDto.organizationalUnitCode != null) organizationalUnitRepository.getById(indexNumberDto.organizationalUnitCode)
-            else organizationalUnitRepository.getById(defaultStudentOrganizationalUnitCode),
-            indexNumber = indexNumberDto.number,
-            mainIndex = if (indexNumberDto.organizationalUnitCode == defaultStudentOrganizationalUnitCode) 'T'
-            else 'N',
-            person = person
-        )
-        if (student.organizationalUnit.code == defaultStudentOrganizationalUnitCode) {
-            studentRepository.findByPersonIdAndMainIndex(person.id, 'T')?.apply {
-                mainIndex = 'N'
+            else organizationalUnitRepository.getById(defaultStudentOrganizationalUnitCode)
+        if (organizationalUnit.code == defaultStudentOrganizationalUnitCode) {
+            person.students.find {
+                it.mainIndex
             }?.let {
-                studentRepository.save(it)
+                studentRepository.setMainIndex(it.id ?: -1, false)
             }
         }
-        person.student.add(student)
+        val student = Student(
+            indexType = indexTypeRepository.getById(indexPoolCode),
+            organizationalUnit = organizationalUnit,
+            indexNumber = indexNumberDto.number,
+            mainIndex = indexNumberDto.organizationalUnitCode == defaultStudentOrganizationalUnitCode,
+            person = person
+        )
+        person.addStudent(student)
         return studentRepository.save(student)
     }
 
@@ -76,14 +75,13 @@ class StudentService(
             startDate = importDto.startDate,
             dateOfAddmision = importDto.dateOfAddmision,
             dateToNextPass = didacticCycle.dateTo,
-            isDefault = if (isDefault) 'T' else 'N',
-            entitlementDocument = getCertificate(certificate, person)?.first()
+            isDefault = isDefault,
+            entitlementDocument = getCertificate(certificate, person)
         )
         addSourceOfFinancing(sourceOfFinancing, personProgramme, importDto.dateOfAddmision)
         addBasisOfAdmission(basisOfAdmission, personProgramme, importDto.dateOfAddmision)
         addPersonStage(personProgramme, didacticCycle, programme, importDto.stageCode)
-        person.personProgrammes.add(personProgramme)
-        student.personProgrammes.add(personProgramme)
+        person.addPersonProgramme(personProgramme)
         return personProgramme
     }
 
@@ -91,11 +89,10 @@ class StudentService(
         certificate: Document?,
         person: Person
     ) = certificate?.let {
-        entitlementDocumentRepository.getByPersonIdAndTypeAndNumber(
-            person.id,
-            it.certificateUsosCode!!,
-            it.documentNumber
-        )
+        person.entitlementDocuments.find {
+            it.number == certificate.documentNumber
+                && it.type == certificate.certificateUsosCode
+        }
     }
 
 
@@ -104,7 +101,7 @@ class StudentService(
         didacticCycle: DidacticCycle,
         programme: Programme,
         stageCode: String
-    ) = personProgramme.personStages.add(
+    ) = personProgramme.addPersonStage(
         PersonStage(
             didacticCycle = didacticCycle,
             passStatus = 'X',
@@ -128,7 +125,7 @@ class StudentService(
         personProgramme: PersonProgramme,
         dateOfAddmision: Date
     ) = basisOfAdmission?.let {
-        personProgramme.personProgrammeBasisOfAdmission.add(
+        personProgramme.addPersonProgrammeBasisOfAdmission(
             PersonProgrammeBasisOfAdmission(
                 basisOfAdmission = basisOfAdmissionRepository.getById(it),
                 dateFrom = dateOfAddmision,
@@ -142,7 +139,7 @@ class StudentService(
         personProgramme: PersonProgramme,
         dateOfAddmision: Date
     ) = sourceOfFinancing?.let {
-        personProgramme.personProgrammeSourceOfFinancing.add(
+        personProgramme.addPersonProgrammeSourceOfFinancing(
             PersonProgrammeSourceOfFinancing(
                 sourceOfFinancing = sourceOfFinancingRepository.getById(it),
                 dateFrom = dateOfAddmision,

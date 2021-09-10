@@ -32,9 +32,17 @@ class SendNotificationsJob(
         if (ads !is INotificationSender) return
         processService.sendNotifications(importId = importId, ads)
         if (import.importProgress.saveErrors > 0) {
-            importService.setImportStatus(ImportStatus.COMPLETED_WITH_ERRORS, importId)
+            importService.getProgress(importId).apply {
+                importStatus = ImportStatus.COMPLETED_WITH_ERRORS
+            }.let {
+                importService.saveProgress(it)
+            }
         } else {
-            importService.setImportStatus(ImportStatus.COMPLETE, importId)
+            importService.getProgress(importId).apply {
+                importStatus = ImportStatus.COMPLETE
+            }.let {
+                importService.saveProgress(it)
+            }
         }
     }
 }

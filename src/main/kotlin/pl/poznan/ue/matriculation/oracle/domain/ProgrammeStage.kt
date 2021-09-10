@@ -1,8 +1,12 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
+import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_ETAPY_PROGRAMOW")
 class ProgrammeStage(
 
@@ -20,20 +24,22 @@ class ProgrammeStage(
     val stage: Stage,
 
     @Column(name = "NR_ROKU", length = 2, nullable = true)
-    var yearNumber: Int? = null,
+    val yearNumber: Int? = null,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "PIERWSZY_ETAP", length = 1, nullable = false)
-    var firstStage: Char = 'N',
+    val firstStage: Boolean = false,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TCDYD_KOD", referencedColumnName = "KOD", nullable = false)
-    var didacticCycleType: DidacticCycleType,
+    val didacticCycleType: DidacticCycleType,
 
     @Column(name = "LICZBA_WAR", length = 10, nullable = true)
-    var conditionCount: Int? = 1,
+    val conditionCount: Int? = 1,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_WYSWIETLAC", length = 1, nullable = false)
-    var display: Char = 'T',
+    val display: Boolean = true,
 
     @OneToMany(mappedBy = "programmeStage", fetch = FetchType.LAZY)
     var personStages: MutableList<PersonStage>

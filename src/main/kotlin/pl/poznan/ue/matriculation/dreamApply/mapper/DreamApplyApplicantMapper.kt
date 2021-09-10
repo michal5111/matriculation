@@ -4,6 +4,8 @@ import pl.poznan.ue.matriculation.dreamApply.dto.applicant.DreamApplyApplicantDt
 import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.EducationLevelType
 import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
+import pl.poznan.ue.matriculation.kotlinExtensions.trimPhoneNumber
+import pl.poznan.ue.matriculation.kotlinExtensions.trimPostalCode
 import pl.poznan.ue.matriculation.local.domain.applicants.*
 import pl.poznan.ue.matriculation.local.domain.const.BasicDataDatasourceType
 import pl.poznan.ue.matriculation.local.domain.const.IdentityDocumentType
@@ -41,35 +43,33 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 family = dreamApplyApplicantDto.name.family.nameCapitalize(),
                 maiden = null
             ),
-            email = dreamApplyApplicantDto.email,
+            email = dreamApplyApplicantDto.email.trim(),
             photo = dreamApplyApplicantDto.photo,
-            phone = dreamApplyApplicantDto.phone?.replace(" ", ""),
             citizenship = dreamApplyApplicantDto.citizenship,
             nationality = profile.nationality,
             photoPermission = PhotoPermissionType.NOBODY,
             password = null,
             modificationDate = dreamApplyApplicantDto.registered,
             basicData = BasicData(
-                cityOfBirth = profile.birth?.place,
+                cityOfBirth = profile.birth?.place?.trim(),
                 countryOfBirth = profile.birth?.country,
                 dateOfBirth = profile.birth?.date,
-                pesel = profile.nationalidcode?.polish,
+                pesel = profile.nationalidcode?.polish?.trim(),
                 sex = if (profile.gender == "M") 'M' else 'K',
                 dataSource = BasicDataDatasourceType.USER
             ),
             additionalData = AdditionalData(
                 mothersName = profile.family?.mother ?: application.extras?.find {
                     it.name == "Mother's name"
-                }?.value,
+                }?.value?.trim(),
                 fathersName = profile.family?.father ?: application.extras?.find {
                     it.name == "Father's name"
-                }?.value,
+                }?.value?.trim(),
                 wku = null,
                 militaryCategory = null,
                 militaryStatus = null
             ),
             indexNumber = null,
-            casPasswordOverride = null,
             educationData = EducationData(),
             applicantForeignerData = null
         ).apply {
@@ -102,14 +102,13 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 middle = applicant.name.middle?.nameCapitalize()
                 family = applicant.name.family.nameCapitalize()
             }
-            email = dreamApplyApplicantDto.email
+            email = dreamApplyApplicantDto.email.trim()
             photo = dreamApplyApplicantDto.photo
-            phone = dreamApplyApplicantDto.phone?.replace(" ", "")
             citizenship = dreamApplyApplicantDto.citizenship
             nationality = profile.nationality
             basicData.apply {
-                pesel = profile.nationalidcode?.polish
-                cityOfBirth = profile.birth?.place
+                pesel = profile.nationalidcode?.polish?.trim()
+                cityOfBirth = profile.birth?.place?.trim()
                 countryOfBirth = profile.birth?.country
                 dateOfBirth = profile.birth?.date
                 sex = if (profile.gender == "M") 'M' else 'K'
@@ -117,25 +116,21 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
             additionalData.apply {
                 mothersName = profile.family?.mother ?: application.extras?.find {
                     it.name == "Mother's name"
-                }?.value
+                }?.value?.trim()
                 fathersName = profile.family?.father ?: application.extras?.find {
                     it.name == "Father's name"
-                }?.value
+                }?.value?.trim()
             }
-            phoneNumbers.clear()
             createPhoneNumbers(
                 applicant = this,
-                day = application.contact?.telephone?.day,
-                evening = application.contact?.telephone?.evening,
-                mobile = application.contact?.telephone?.mobile,
-                fax = application.contact?.telephone?.fax,
-                emergency = application.contact?.emergency?.telephone
+                day = application.contact?.telephone?.day?.replace(" ", ""),
+                evening = application.contact?.telephone?.evening?.replace(" ", ""),
+                mobile = application.contact?.telephone?.mobile?.replace(" ", ""),
+                fax = application.contact?.telephone?.fax?.replace(" ", ""),
+                emergency = application.contact?.emergency?.telephone?.replace(" ", "")
             )
-            addresses.clear()
             addAddress(this, application)
-            applicant.educationData.documents.clear()
             createEducationData(applicant, application)
-            applicant.identityDocuments.clear()
             createIdentityDocuments(this, application)
             addBaseOfStay(this, application)
         }
@@ -144,7 +139,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
     private fun createIdentityDocuments(applicant: Applicant, applicationDto: DreamApplyApplicationDto) {
         applicationDto.profile?.passport?.let {
             it.idcard?.run {
-                applicant.identityDocuments.add(
+                applicant.addIdentityDocument(
                     IdentityDocument(
                         type = IdentityDocumentType.ID_CARD,
                         number = this.replace(" ", ""),
@@ -155,7 +150,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 )
             }
             it.number?.run {
-                applicant.identityDocuments.add(
+                applicant.addIdentityDocument(
                     IdentityDocument(
                         type = IdentityDocumentType.PASSPORT,
                         country = it.country,
@@ -173,8 +168,8 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
             applicationDto.education?.find {
                 it.level == EducationLevelType.SE
             }?.let {
-                highSchoolCity = it.city
-                highSchoolName = it.institution
+                highSchoolCity = it.city?.trim()
+                highSchoolName = it.institution?.trim()
             }
         }
 
@@ -186,20 +181,20 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 certificateType = it.level!!.levelName,
                 certificateTypeCode = it.level.toString(),
                 certificateUsosCode = it.level.usosCode ?: when {
-                    it.diploma!!.number!!.matches(maturaRegex) -> 'N'
+                    it.diploma!!.number!!.trim().matches(maturaRegex) -> 'N'
                     else -> 'Z'
                 },
                 comment = null,
-                documentNumber = it.diploma!!.number!!,
+                documentNumber = it.diploma!!.number!!.trim(),
                 documentYear = it.diploma.issue!!.date!!.let { date ->
                     val cal = Calendar.getInstance()
                     cal.time = date
                     cal.get(Calendar.YEAR)
                 },
-                issueCity = it.city,
-                issueCountry = it.country,
+                issueCity = it.city?.trim(),
+                issueCountry = it.country?.trim(),
                 issueDate = it.diploma.issue.date!!,
-                issueInstitution = it.institution,
+                issueInstitution = it.institution?.trim(),
                 issueInstitutionUsosCode = applicationDto.extras?.find { extraDto ->
                     extraDto.id == 212L && extraDto.name == "Please select your OKE"
                 }?.value?.let { okeName ->
@@ -215,21 +210,21 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 else null,
                 modificationDate = Date()
             )
-        }?.let {
-            applicant.educationData.documents.addAll(it)
+        }?.forEach {
+            applicant.educationData.addDocument(it)
         }
     }
 
     private fun createPhoneNumber(applicant: Applicant, number: String?, type: String, comment: String) {
-        if (!number.isNullOrBlank()) {
-            applicant.phoneNumbers.add(
-                PhoneNumber(
-                    number = number.replace(" ", ""),
-                    phoneNumberType = type,
-                    comment = comment,
-                    applicant = applicant
-                )
+        number?.trimPhoneNumber()?.let {
+            PhoneNumber(
+                number = it,
+                phoneNumberType = type,
+                comment = comment,
+                applicant = applicant
             )
+        }?.let {
+            applicant.addPhoneNumber(it)
         }
     }
 
@@ -279,32 +274,32 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 Address(
                     applicant = applicant,
                     addressType = AddressType.RESIDENCE,
-                    city = addressDto.city,
+                    city = addressDto.city?.trim(),
                     cityIsCity = false,
                     countryCode = addressDto.country,
-                    postalCode = addressDto.postalcode?.trim()?.replace("-", ""),
+                    postalCode = addressDto.postalcode?.trimPostalCode(),
                     street = addressDto.street?.replace("\n", " "),
-                    streetNumber = addressDto.house,
-                    flatNumber = addressDto.apartment
+                    streetNumber = addressDto.house?.trim(),
+                    flatNumber = addressDto.apartment?.trim()
                 ),
                 Address(
                     applicant = applicant,
                     addressType = AddressType.CORRESPONDENCE,
-                    city = addressDto.correspondence?.city,
+                    city = addressDto.correspondence?.city?.trim(),
                     cityIsCity = false,
                     countryCode = addressDto.correspondence?.country,
-                    postalCode = addressDto.correspondence?.postalcode,
+                    postalCode = addressDto.correspondence?.postalcode?.trimPostalCode(),
                     street = addressDto.correspondence?.street?.replace("\n", " "),
                     streetNumber = addressDto.correspondence?.house ?: dreamApplyApplication.extras?.find {
                         it.name == "House number"
                     }?.value,
-                    flatNumber = addressDto.correspondence?.apartment
+                    flatNumber = addressDto.correspondence?.apartment?.trim()
                 )
             ).filterNot {
                 it.city.isNullOrBlank() && it.countryCode.isNullOrBlank() && it.flatNumber.isNullOrBlank()
-                        && it.postalCode.isNullOrBlank() && it.street.isNullOrBlank() && it.streetNumber.isNullOrBlank()
-            }.let {
-                applicant.addresses.addAll(it)
+                    && it.postalCode.isNullOrBlank() && it.street.isNullOrBlank() && it.streetNumber.isNullOrBlank()
+            }.forEach {
+                applicant.addAddress(it)
             }
         }
     }
@@ -324,7 +319,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                     applicant = applicant
                 )
             } else {
-                applicant.applicantForeignerData!!.apply {
+                applicant.applicantForeignerData?.apply {
                     baseOfStay = "OKP"
                 }
             }

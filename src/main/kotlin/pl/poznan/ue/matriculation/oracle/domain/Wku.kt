@@ -1,8 +1,11 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_WKU")
 class Wku(
     @Id
@@ -13,7 +16,7 @@ class Wku(
     val name: String,
 
     @OneToMany(mappedBy = "wku", fetch = FetchType.LAZY)
-    val persons: Set<Person>,
+    val persons: List<Person>,
 
     @OneToMany(mappedBy = "wku", fetch = FetchType.LAZY)
     val addresses: List<Address>

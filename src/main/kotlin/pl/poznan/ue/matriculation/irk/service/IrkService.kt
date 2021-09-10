@@ -1,6 +1,6 @@
 package pl.poznan.ue.matriculation.irk.service
 
-import org.apache.commons.io.IOUtils
+import org.apache.poi.util.IOUtils
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.core.io.Resource
 import org.springframework.http.*
@@ -22,8 +22,8 @@ import pl.poznan.ue.matriculation.local.domain.registrations.Registration
 
 
 class IrkService(
-        val serviceUrl: String,
-        apiKey: String
+    val serviceUrl: String,
+    apiKey: String
 ) {
 
     private var apiUrl: String = "$serviceUrl/api/"
@@ -47,91 +47,91 @@ class IrkService(
 
     fun getApplicantById(id: Long): IrkApplicantDto? {
         val response: ResponseEntity<IrkApplicantDto> = restTemplate.exchange(
-                "${apiUrl}applicants/$id",
-                HttpMethod.GET,
-                httpEntity,
-                Applicant::javaClass
+            "${apiUrl}applicants/$id",
+            HttpMethod.GET,
+            httpEntity,
+            Applicant::javaClass
         )
         return response.body
     }
 
     fun getApplicantsByPesel(pesel: String): Page<IrkApplicantDto>? {
         val response: ResponseEntity<Page<IrkApplicantDto>> = restTemplate.exchange(
-                "${apiUrl}applicants/?pesel=$pesel",
-                HttpMethod.GET,
-                httpEntity,
-                PageOfApplicants()
+            "${apiUrl}applicants/?pesel=$pesel",
+            HttpMethod.GET,
+            httpEntity,
+            PageOfApplicants()
         )
         return response.body
     }
 
     fun getApplicantsBySurname(surname: String): Page<IrkApplicantDto>? {
         val response: ResponseEntity<Page<IrkApplicantDto>> = restTemplate.exchange(
-                "${apiUrl}applicants/?surname=$surname",
-                HttpMethod.GET,
-                httpEntity,
-                PageOfApplicants()
+            "${apiUrl}applicants/?surname=$surname",
+            HttpMethod.GET,
+            httpEntity,
+            PageOfApplicants()
         )
         return response.body
     }
 
     fun getApplicantsByEmail(email: String): Page<IrkApplicantDto>? {
         val response: ResponseEntity<Page<IrkApplicantDto>> = restTemplate.exchange(
-                "${apiUrl}applicants/?email=$email",
-                HttpMethod.GET,
-                httpEntity,
-                PageOfApplicants()
+            "${apiUrl}applicants/?email=$email",
+            HttpMethod.GET,
+            httpEntity,
+            PageOfApplicants()
         )
         return response.body
     }
 
     fun getRegistration(id: String): RegistrationDTO? {
         val response: ResponseEntity<RegistrationDTO> = restTemplate.exchange(
-                "${apiUrl}registrations/$id",
-                HttpMethod.GET,
-                httpEntity,
-                Registration::javaClass
+            "${apiUrl}registrations/$id",
+            HttpMethod.GET,
+            httpEntity,
+            Registration::javaClass
         )
         return response.body
     }
 
     fun getAvailableRegistrationsPage(pageNumber: Int): Page<RegistrationDTO>? {
         return restTemplate.exchange(
-                "${apiUrl}registrations/?page=$pageNumber",
-                HttpMethod.GET,
-                httpEntity,
-                PageOfRegistrations()
+            "${apiUrl}registrations/?page=$pageNumber",
+            HttpMethod.GET,
+            httpEntity,
+            PageOfRegistrations()
         ).body
     }
 
     fun getAvailableRegistrationProgrammes(registrationCode: String): List<String> {
         val response: ResponseEntity<RegistrationDTO> = restTemplate.exchange(
-                "${apiUrl}registrations/$registrationCode",
-                HttpMethod.GET,
-                httpEntity,
-                RegistrationDTO::javaClass
+            "${apiUrl}registrations/$registrationCode",
+            HttpMethod.GET,
+            httpEntity,
+            RegistrationDTO::javaClass
         )
         return response.body!!.programmes
     }
 
     fun getApplication(id: Long): IrkApplicationDTO? {
         val response: ResponseEntity<IrkApplicationDTO> = restTemplate.exchange(
-                "${apiUrl}applications/$id",
-                HttpMethod.GET,
-                httpEntity,
-                Application::javaClass
+            "${apiUrl}applications/$id",
+            HttpMethod.GET,
+            httpEntity,
+            Application::javaClass
         )
         return response.body
     }
 
     fun getApplications(
-            admitted: Boolean,
-            paid: Boolean,
-            programme: String?,
-            qualified: Boolean,
-            registration: String?,
-            pageNumber: Int?,
-            pageLength: Int?
+        admitted: Boolean,
+        paid: Boolean,
+        programme: String?,
+        qualified: Boolean,
+        registration: String?,
+        pageNumber: Int?,
+        pageLength: Int?
     ): Page<IrkApplicationDTO> {
         val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("${apiUrl}applications/")
         if (admitted) {
@@ -156,10 +156,10 @@ class IrkService(
             uriComponentBuilder.queryParam("page_length", pageLength)
         }
         val response: ResponseEntity<Page<IrkApplicationDTO>> = restTemplate.exchange(
-                uriComponentBuilder.build().toUri(),
-                HttpMethod.GET,
-                httpEntity,
-                PageOfApplications()
+            uriComponentBuilder.build().toUri(),
+            HttpMethod.GET,
+            httpEntity,
+            PageOfApplications()
         )
         return response.body!!
     }
@@ -180,10 +180,10 @@ class IrkService(
 
     fun getProgrammesGroups(id: String): ProgrammeGroupsDTO? {
         val response: ResponseEntity<ProgrammeGroupsDTO> = restTemplate.exchange(
-                "${apiUrl}programme-groups/$id",
-                HttpMethod.GET,
-                httpEntity,
-                ProgrammeGroups::javaClass
+            "${apiUrl}programme-groups/$id",
+            HttpMethod.GET,
+            httpEntity,
+            ProgrammeGroups::javaClass
         )
         return response.body
     }
@@ -204,16 +204,16 @@ class IrkService(
 
     fun completeImmatriculation(applicationId: Long): ResponseEntity<Map<String, String>> {
         return restTemplate.exchange(
-                "${apiUrl}matriculation/${applicationId}/complete/",
-                HttpMethod.POST,
-                httpEntity,
-                MapResult::class
+            "${apiUrl}matriculation/${applicationId}/complete/",
+            HttpMethod.POST,
+            httpEntity,
+            MapResult::class
         )
     }
 
     fun getMatriculationData(applicationId: Long): MatriculationDataDTO? {
         val response: ResponseEntity<MatriculationDataDTO> = restTemplate.exchange(
-                "${apiUrl}matriculation/${applicationId}/data/",
+            "${apiUrl}matriculation/${applicationId}/data/",
             HttpMethod.GET,
             httpEntity,
             MatriculationDataDTO::class

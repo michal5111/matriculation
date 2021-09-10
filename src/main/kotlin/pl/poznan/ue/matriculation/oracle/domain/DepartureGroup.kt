@@ -16,6 +16,6 @@ class DepartureGroup(
     @Column(name = "UWAGI", nullable = true, length = 2000)
     var comments: String?,
 
-    @OneToMany(mappedBy = "departureGroup")
-    var arrivals: List<Arrival>
+    @OneToMany(mappedBy = "departureGroup", fetch = FetchType.LAZY)
+    var arrivals: MutableList<Arrival>
 ) : BaseEntity()

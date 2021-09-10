@@ -1,8 +1,11 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_WOJEWODZTWA")
 class Voivodeship(
     @Id
@@ -10,10 +13,10 @@ class Voivodeship(
     val code: String,
 
     @Column(name = "OPIS", length = 100, nullable = false)
-    var description: String,
+    val description: String,
 
     @OneToMany(mappedBy = "voivodeship", fetch = FetchType.LAZY)
-    var county: List<County>
+    val county: List<County>
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -18,9 +18,7 @@ open class BaseEntity {
 //    val modificationOracleUser: String? = null
 
     @Version
-    //@Temporal(TemporalType.TIMESTAMP)
-    //@Source(SourceType.DB)
     @Type(type = "pl.poznan.ue.matriculation.oracle.customHibernateTypes.OracleDateType")
     @Column(name = "MOD_DATA", nullable = false, columnDefinition = "DATE DEFAULT sysdate NOT NULL ENABLE")
-    var modificationDate: DateTime? = null
+    open var modificationDate: DateTime = DateTime().secondOfDay().roundHalfEvenCopy()
 }

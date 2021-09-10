@@ -1,6 +1,7 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
 import java.io.Serializable
+import java.sql.Blob
 import javax.persistence.*
 
 @Entity
@@ -18,7 +19,7 @@ class PersonPhoto(
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "FOTO")
     @Lob
-    var photoBlob: ByteArray
+    var photoBlob: Blob
 ) : BaseEntity(), Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

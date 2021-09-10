@@ -3,6 +3,8 @@ import {HttpClient} from '@angular/common/http';
 import {Page} from '../../model/applications/page';
 import {Application} from '../../model/applications/application';
 import {APP_BASE_HREF} from '@angular/common';
+import {ApplicantUsosIdAndPotentialDuplicateStatusDto} from '../../model/dto/applicant-usos-id-and-potential-duplicate-status-dto';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,5 +18,15 @@ export class ApplicationsService {
 
   getPage() {
     return this.http.get<Page<Application>>(`${this.apiUrl}`);
+  }
+
+  updatePotentialDuplicateStatus(
+    applicationId: number,
+    potentialDuplicateStatusDto: ApplicantUsosIdAndPotentialDuplicateStatusDto
+  ): Observable<Application> {
+    return this.http.put<Application>(
+      `${this.baseHref}api/application/${applicationId}/potentialDuplicateStatus`,
+      potentialDuplicateStatusDto
+    );
   }
 }

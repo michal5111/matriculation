@@ -1,9 +1,12 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import java.util.*
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_BUDYNKI")
 class Building(
     @Id
@@ -11,42 +14,42 @@ class Building(
     val code: String,
 
     @Column(name = "NAZWA", length = 100, nullable = false)
-    var name: String,
+    val name: String,
 
     @Column(name = "SZEROKOSC_GEO", nullable = true)
-    var latitude: Number? = null,
+    val latitude: Int? = null,
 
     @Column(name = "DLUGOSC_GEO", nullable = true)
-    var longitude: Number? = null,
+    val longitude: Int? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "KAMP_KOD", referencedColumnName = "KOD")
-    var campus: Campus,
+    val campus: Campus,
 
     @Column(name = "NAZWA_ANG", length = 100, nullable = true)
-    var englishName: String? = null,
+    val englishName: String? = null,
 
     @Column(name = "CZY_WYSWIETLAC", length = 1, nullable = false)
-    var display: Char,
+    val display: Char,
 
     @Column(name = "KOD_ERP", length = 50, nullable = true)
-    var erpCode: String? = null,
+    val erpCode: String? = null,
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FOTO_BLOB_ID", referencedColumnName = "ID")
-    var photoBlob: Blob,
+    val photoBlob: Blob,
 
     @Column(name = "DATA_OD", nullable = true)
-    var dateFrom: Date? = null,
+    val dateFrom: Date? = null,
 
     @Column(name = "DATA_DO", nullable = true)
-    var dateTO: Date? = null,
+    val dateTO: Date? = null,
 
-    @OneToOne(mappedBy = "building")
-    var address: Address,
+    @OneToOne(mappedBy = "building", fetch = FetchType.LAZY)
+    val address: Address,
 
-    @OneToMany(mappedBy = "building")
-    var phoneNumbers: List<PhoneNumber>
+    @OneToMany(mappedBy = "building", fetch = FetchType.LAZY)
+    val phoneNumbers: List<PhoneNumber>
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

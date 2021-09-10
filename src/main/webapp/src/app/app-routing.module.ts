@@ -9,17 +9,22 @@ import {PersonsComponent} from './component/oracle/persons/persons.component';
 import {ImportComponent} from './component/import/import/import.component';
 import {ImportViewComponent} from './component/import/import-view/import-view.component';
 import {UserManagerComponent} from './component/user-manager/user-manager.component';
+import {UserService} from './service/user-service/user.service';
 
 const routes: Routes = [
-  {path: 'applicantsearch', component: ApplicantSearchComponent},
-  {path: 'applicant/:id', component: ApplicantComponent},
-  {path: 'applications', component: ApplicationsComponent},
-  {path: 'person/:id', component: PersonComponent},
-  {path: 'persons', component: PersonsComponent},
-  {path: 'import', component: ImportComponent},
-  {path: 'userManager', component: UserManagerComponent},
-  {path: 'import/:id', component: ImportViewComponent},
-  {path: '', component: HomeComponent}
+  {path: '', component: HomeComponent},
+  {path: 'applicantsearch', component: ApplicantSearchComponent, canActivate: [UserService]},
+  {path: 'applicant/:id', component: ApplicantComponent, canActivate: [UserService]},
+  {path: 'applications', component: ApplicationsComponent, canActivate: [UserService]},
+  {path: 'person/:id', component: PersonComponent, canActivate: [UserService]},
+  {path: 'persons', component: PersonsComponent, canActivate: [UserService]},
+  {path: 'import', component: ImportComponent, canActivate: [UserService]},
+  {
+    path: 'userManager', component: UserManagerComponent, canActivate: [UserService], data: {
+      authorities: ['ROLE_ADMIN']
+    }
+  },
+  {path: 'import/:id', component: ImportViewComponent, canActivate: [UserService]}
 ];
 
 @NgModule({

@@ -2,17 +2,24 @@ package pl.poznan.ue.matriculation.local.service
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import pl.poznan.ue.matriculation.exception.ApplicantCheckException
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.mapper.ApplicantToPersonMapper
+import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import java.util.*
 
 @Service
 class ApplicantService(
-        private val applicantToPersonMapper: ApplicantToPersonMapper
+    private val applicantToPersonMapper: ApplicantToPersonMapper,
+    private val applicantRepository: ApplicantRepository
 ) {
+
+    fun findById(applicantId: Long): Applicant? {
+        return applicantRepository.findByIdOrNull(applicantId)
+    }
 
     val logger: Logger = LoggerFactory.getLogger(ApplicationService::class.java)
 
@@ -43,11 +50,9 @@ class ApplicantService(
                 maiden = null
                 given = ""
             }
-            phone = null
             citizenship = ""
             photo = null
             photoPermission = null
-            casPasswordOverride = null
             modificationDate = Date()
             basicData.apply {
                 cityOfBirth = null

@@ -44,7 +44,7 @@ open class DreamApplyDataSourceImpl(
             val applicationOffers = dreamApplyService.getApplicationOffers(dreamApplyApplicationDto.offers)
             applicationOffers!!.any {
                 it.value.course == "/api/courses/$programmeForeignId"
-                        && it.value.type == status
+                    && it.value.type == status
             }
         }
         return object : IPage<DreamApplyApplicationDto> {
@@ -84,20 +84,20 @@ open class DreamApplyDataSourceImpl(
             it.code != null
         }.map {
             ProgrammeDto(
-                    id = it.id.toString(),
-                    name = "${it.code} ${it.name}",
-                    usosId = it.code!!
+                id = it.id.toString(),
+                name = "${it.code} ${it.name}",
+                usosId = it.code!!
             )
         }
     }
 
     override fun getAvailableRegistrations(): List<RegistrationDto> {
         val academicTermsMap = dreamApplyService.getAcademicTerms()
-                ?: throw IllegalStateException("Unable to download academic terms")
+            ?: throw IllegalStateException("Unable to download academic terms")
         return academicTermsMap.map {
             RegistrationDto(
-                    id = it.key.toString(),
-                    name = it.value.name
+                id = it.key.toString(),
+                name = it.value.name
             )
         }.sortedByDescending {
             it.id.toLong()

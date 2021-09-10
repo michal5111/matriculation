@@ -9,7 +9,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import pl.poznan.ue.matriculation.exception.exceptionHandler.AsyncExceptionHandler
 import java.util.concurrent.Executor
 
-
 @Configuration
 @EnableAsync
 class AsyncConfiguration(private val asyncExceptionHandler: AsyncExceptionHandler) : AsyncConfigurer {
@@ -18,13 +17,24 @@ class AsyncConfiguration(private val asyncExceptionHandler: AsyncExceptionHandle
         return asyncExceptionHandler
     }
 
-    @Bean
+    @Bean(name = ["defaultTaskExecutor"])
     fun taskExecutor(): Executor? {
         val executor = ThreadPoolTaskExecutor()
         executor.corePoolSize = 1
         executor.maxPoolSize = 1
         executor.setQueueCapacity(50)
         executor.setThreadNamePrefix("ASYNC-WORKER-")
+        executor.initialize()
+        return executor
+    }
+
+    @Bean(name = ["processTaskExecutor"])
+    fun processTaskExecutor(): Executor? {
+        val executor = ThreadPoolTaskExecutor()
+        executor.corePoolSize = 5
+        executor.maxPoolSize = 30
+        executor.setQueueCapacity(100)
+        executor.setThreadNamePrefix("PROCESS-ASYNC-WORKER-")
         executor.initialize()
         return executor
     }

@@ -2,14 +2,13 @@ package pl.poznan.ue.matriculation.oracle.service
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.configuration.LogExecutionTime
-import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
+import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
+import pl.poznan.ue.matriculation.kotlinExtensions.toSerialBlob
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.ApplicantForeignerData
 import pl.poznan.ue.matriculation.local.domain.applications.Application
@@ -17,6 +16,7 @@ import pl.poznan.ue.matriculation.local.dto.ImportDtoJpa
 import pl.poznan.ue.matriculation.local.service.ApplicantService
 import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
 import pl.poznan.ue.matriculation.oracle.domain.*
+import pl.poznan.ue.matriculation.oracle.entityRepresentations.PersonBasicData
 import pl.poznan.ue.matriculation.oracle.repo.*
 import java.util.*
 import javax.persistence.EntityNotFoundException
@@ -30,26 +30,16 @@ class PersonService(
     private val citizenshipRepository: CitizenshipRepository,
     private val schoolRepository: SchoolRepository,
     private val wkuRepository: WkuRepository,
-    private val addressTypeRepository: AddressTypeRepository,
-    private val addressRepository: AddressRepository,
     private val phoneNumberTypeRepository: PhoneNumberTypeRepository,
-    private val phoneNumberRepository: PhoneNumberRepository,
-    private val entitlementDocumentRepository: EntitlementDocumentRepository,
     private val applicantService: ApplicantService,
     private val addressService: AddressService,
-    private val irkApplicationRepository: IrkApplicationRepository,
-    private val personPreferenceRepository: PersonPreferenceRepository,
     private val documentTypeRepository: DocumentTypeRepository,
     private val ownedDocumentRepository: OwnedDocumentRepository,
-    private val personChangeHistoryRepository: PersonChangeHistoryRepository,
     private val applicationDataSourceFactory: ApplicationDataSourceFactory,
     private val didacticCycleRepository: DidacticCycleRepository,
     private val erasmusService: ErasmusService
 ) {
-    val logger: Logger = LoggerFactory.getLogger(PersonService::class.java)
-
-    @Autowired
-    private lateinit var _self: PersonService
+    private val logger: Logger = LoggerFactory.getLogger(PersonService::class.java)
 
     @Value("\${pl.poznan.ue.matriculation.defaultStudentOrganizationalUnit}")
     lateinit var defaultStudentOrganizationalUnitString: String
@@ -66,19 +56,26 @@ class PersonService(
     @LogExecutionTime
     @Transactional(
         rollbackFor = [java.lang.Exception::class, RuntimeException::class],
-        propagation = Propagation.MANDATORY,
+        propagation = Propagation.REQUIRED,
         transactionManager = "oracleTransactionManager"
     )
     fun update(applicant: Applicant, person: Person): Person {
-        val changeHistory = personChangeHistoryRepository.findByPersonIdAndChangeDate(person.id, Date())
-            ?: PersonChangeHistory(person = person)
+        val changeHistory = person.personChangeHistories.find { it.changeDate == Date() }
+            ?: PersonChangeHistory(person = null)
         person.apply {
+            logger.trace("Tworzę lub aktualizuję adresy")
             createOrUpdateAddresses(this, applicant)
+            logger.trace("Tworzę lub aktualizuję numery telefonów")
             createOrUpdatePhoneNumbers(this, applicant)
+            logger.trace("Tworzę lub aktualizuję dokumenty tożsamości")
             createOrUpdateIdentityDocument(this, applicant, changeHistory)
+            logger.trace("Tworzę lub aktualizuję dokumenty uprawniające do podjęcia studiów")
             createOrUpdateEntitlementDocument(person, applicant)
-            createOrUpdatePersonPhoto(person, applicant)
+            logger.trace("Tworzę lub aktualizuję dokumenty posiadane")
             createOrUpdateOwnedDocuments(person, applicant)
+            logger.trace("Tworzę lub aktualizuję zdjęcie")
+            createOrUpdatePersonPhoto(person, applicant)
+            logger.trace("Tworzę lub aktualizuję dane osobowe")
             if (applicant.email.endsWith(universityEmailSuffix)) {
                 email = applicant.email
             } else {
@@ -86,15 +83,15 @@ class PersonService(
             }
             if (name != applicant.name.given) {
                 changeHistory.name = name
-                name = applicant.name.given.nameCapitalize()
+                name = applicant.name.given
             }
             if (middleName != applicant.name.middle) {
                 changeHistory.middleName = middleName
-                middleName = applicant.name.middle?.nameCapitalize()
+                middleName = applicant.name.middle
             }
             if (surname != applicant.name.family) {
                 changeHistory.surname = surname
-                surname = applicant.name.family.nameCapitalize()
+                surname = applicant.name.family
             }
             if (citizenship?.code != applicant.citizenship) {
                 changeHistory.citizenship = citizenship
@@ -114,7 +111,7 @@ class PersonService(
                 sex = applicant.basicData.sex
             }
             if (nationality?.code != applicant.nationality && applicant.nationality != null) {
-                personChangeHistory.add(
+                personChangeHistories.add(
                     PersonChangeHistory(
                         person = person,
                         nationality = nationality
@@ -152,7 +149,7 @@ class PersonService(
                 || changeHistory.pesel != null
                 || changeHistory.sex != null
             ) {
-                person.personChangeHistory.add(changeHistory)
+                person.addPersonChangeHistory(changeHistory)
             }
         }
         if (person.externalDataStatus == 'O') {
@@ -173,10 +170,10 @@ class PersonService(
             }
         }
         var identityDocument = applicant.identityDocuments.find {
-            person.idNumber?.replace(" ", "") == it.number
+            person.idNumber == it.number
         }
         if (identityDocument == null && applicant.identityDocuments.size > 0) {
-            identityDocument = applicant.identityDocuments[0]
+            identityDocument = applicant.identityDocuments.first()
         }
         identityDocument?.number?.let {
             if (person.documentType != identityDocument.type) {
@@ -199,7 +196,7 @@ class PersonService(
         applicant.addresses.forEach {
             createOrUpdateAddress(
                 person = person,
-                addressType = addressTypeRepository.getById(it.addressType.usosValue),
+                addressTypeCode = it.addressType.usosValue,
                 city = it.city,
                 street = it.street,
                 houseNumber = it.streetNumber,
@@ -209,19 +206,18 @@ class PersonService(
                 countryCode = it.countryCode
             )
         }
-        val addressType = addressTypeRepository.getById("KOR")
-        if (!addressRepository.existsByPersonIdAndAddressType(person.id, addressType)) {
-            addressRepository.findByPersonIdAndAddressType(person.id, addressTypeRepository.getById("STA"))?.let {
+        if (person.addresses.none { it.addressType.code == "KOR" }) {
+            person.addresses.find { it.addressType.code == "STA" }?.let {
                 createOrUpdateAddress(
                     person = person,
-                    addressType = addressType,
+                    addressTypeCode = "KOR",
                     city = it.city,
                     street = it.street,
                     houseNumber = it.houseNumber,
-                    apartmentNumber = it.apartmentNumber,
+                    apartmentNumber = it.flatNumber,
                     zipCode = it.zipCode,
-                    cityIsCity = it.cityIsCity == 'T',
-                    countryCode = it.countryCode?.code
+                    cityIsCity = it.cityIsCity,
+                    countryCode = it.country?.code
                 )
             }
         }
@@ -229,16 +225,16 @@ class PersonService(
 
     private fun createOrUpdateAddress(
         person: Person,
-        addressType: AddressType,
+        addressTypeCode: String,
         city: String?,
         street: String?,
         houseNumber: String?,
         apartmentNumber: String?,
         zipCode: String?,
-        cityIsCity: Boolean,
+        cityIsCity: Boolean?,
         countryCode: String?
     ) {
-        val address = addressRepository.findByPersonIdAndAddressType(person.id, addressType)
+        val address = person.addresses.find { it.addressType.code == addressTypeCode }
         if (address != null) {
             addressService.update(
                 address = address,
@@ -251,10 +247,10 @@ class PersonService(
                 countryCode = countryCode
             )
         } else {
-            person.addresses.add(
+            person.addAddress(
                 addressService.create(
                     person = person,
-                    addressType = addressType,
+                    addressTypeCode = addressTypeCode,
                     city = city,
                     street = street,
                     houseNumber = houseNumber,
@@ -269,12 +265,14 @@ class PersonService(
 
     private fun createOrUpdatePhoneNumbers(person: Person, applicant: Applicant) {
         applicant.phoneNumbers.forEach { phoneNumber ->
-            val personPhoneNumber = phoneNumberRepository.findByPersonIdAndNumber(person.id, phoneNumber.number)
+            val personPhoneNumber = person.phoneNumbers.find {
+                phoneNumber.number == it.number && phoneNumber.phoneNumberType == it.phoneNumberType.code
+            }
             if (personPhoneNumber != null) {
                 personPhoneNumber.phoneNumberType = phoneNumberTypeRepository.getById(phoneNumber.phoneNumberType)
                 personPhoneNumber.comments = phoneNumber.comment
             } else {
-                person.phoneNumbers.add(
+                person.addPhoneNumber(
                     PhoneNumber(
                         person = person,
                         phoneNumberType = phoneNumberTypeRepository.getById(phoneNumber.phoneNumberType),
@@ -290,9 +288,12 @@ class PersonService(
         applicant.educationData.documents.filter {
             it.certificateUsosCode != null
         }.filterNot {
-            entitlementDocumentRepository.existsByPersonIdAndType(person.id, it.certificateUsosCode!!)
+            person.entitlementDocuments.any { entitlementDocument ->
+                it.certificateTypeCode == entitlementDocument.type.toString()
+            }
         }.forEach {
-            person.entitlementDocuments.add(
+            val certificateUsosCode = it.certificateUsosCode ?: '?'
+            person.addEntitlementDocument(
                 EntitlementDocument(
                     person = person,
                     issueDate = it.issueDate,
@@ -300,7 +301,7 @@ class PersonService(
                         it.issueInstitutionUsosCode == null
                     },
                     number = it.documentNumber,
-                    type = it.certificateUsosCode!!,
+                    type = certificateUsosCode,
                     school = it.issueInstitutionUsosCode?.let { schoolId ->
                         schoolRepository.getById(schoolId)
                     }
@@ -309,33 +310,31 @@ class PersonService(
         }
     }
 
-    private fun createOrUpdatePersonPhoto(person: Person, applicant: Applicant) = applicant.photoByteArray?.let {
-        if (person.personPhoto != null) {
-            person.personPhoto!!.photoBlob = it
-        } else {
-            person.personPhoto = PersonPhoto(
-                person = person,
-                photoBlob = it
-            )
+    private fun createOrUpdatePersonPhoto(person: Person, applicant: Applicant) =
+        applicant.photoByteArrayFuture?.get()?.let { photoByteArray ->
+            if (person.personPhoto != null) {
+                person.personPhoto?.photoBlob = photoByteArray.toSerialBlob()
+            } else {
+                person.personPhoto = PersonPhoto(
+                    person = person,
+                    photoBlob = photoByteArray.toSerialBlob()
+                )
+            }
+            val personPreference = person.personPreferences.find {
+                it.attribute == "photo_visibility"
+            }
+            if (personPreference != null) {
+                personPreference.value = applicant.photoPermission
+            } else {
+                person.addPersonPreference(
+                    PersonPreference(person, "photo_visibility", applicant.photoPermission)
+                )
+            }
         }
-        val personPreference = personPreferenceRepository.findByIdOrNull(
-            PersonPreferenceId(
-                person.id!!, "photo_visibility"
-            )
-        )
-        if (personPreference != null) {
-            personPreference.value = applicant.photoPermission
-        } else {
-            person.personPreferences.add(
-                PersonPreference(person, "photo_visibility", applicant.photoPermission)
-            )
-        }
-    }
 
     private fun createOrUpdateOwnedDocuments(person: Person, applicant: Applicant) {
-        when {
-            applicant.applicantForeignerData?.baseOfStay != null
-                    && applicant.applicantForeignerData?.baseOfStay == "OKP" -> createOrUpdateOkp(person, applicant)
+        when (applicant.applicantForeignerData?.baseOfStay) {
+            "OKP" -> createOrUpdateOkp(person, applicant)
         }
 
     }
@@ -357,18 +356,21 @@ class PersonService(
     private fun createOkp(
         person: Person,
         it: ApplicantForeignerData
-    ) = person.ownedDocuments.add(
-        OwnedDocument(
-            documentType = documentTypeRepository.getById(it.baseOfStay!!),
-            person = person,
-            issueDate = it.polishCardIssueDate,
-            issueCountry = it.polishCardIssueCountry?.let { countryCode ->
-                citizenshipRepository.getById(countryCode)
-            },
-            number = it.polishCardNumber,
-            expirationDate = it.polishCardValidTo
+    ) {
+        val baseOfStay = it.baseOfStay ?: return
+        person.addOwnedDocument(
+            OwnedDocument(
+                documentType = documentTypeRepository.getById(baseOfStay),
+                person = person,
+                issueDate = it.polishCardIssueDate,
+                issueCountry = it.polishCardIssueCountry?.let { countryCode ->
+                    citizenshipRepository.getById(countryCode)
+                },
+                number = it.polishCardNumber,
+                expirationDate = it.polishCardValidTo
+            )
         )
-    )
+    }
 
     private fun updateOkp(
         ownedDocument: OwnedDocument,
@@ -387,7 +389,7 @@ class PersonService(
     @LogExecutionTime
     @Transactional(
         rollbackFor = [java.lang.Exception::class, java.lang.RuntimeException::class],
-        propagation = Propagation.MANDATORY,
+        propagation = Propagation.REQUIRED,
         transactionManager = "oracleTransactionManager"
     )
     fun immatriculate(
@@ -397,22 +399,9 @@ class PersonService(
         application: Application
     ): Student {
         val student = studentService.createOrFindStudent(person, importDto.indexPoolCode)
-        logger.info("Wykonuję getDefaultPersonProgramme")
-        val startTime = System.nanoTime()
-        val isDefaultProgramme = personProgrammeRepository.getDefaultProgramme(person.id)?.let {
-            if (it.plannedDateOfCompletion == null || it.plannedDateOfCompletion!! <= importDto.dateOfAddmision || it.status != "STU") {
-                logger.info("Zmieniam na nie default")
-                //it.isDefault = 'N'
-                //personProgrammeRepository.saveAndFlush(it)
-                personProgrammeRepository.updateToNotDefault(it.id)
-                return@let 'N'
-            }
-            //it.isDefault
-            return@let 'T'
-        }
-        val stopTime = System.nanoTime()
-        val time = (stopTime - startTime) / 1000000
-        logger.info("Zakończyłem wykonywanie getDefaultPersonProgramme Time: $time ms")
+        val isDefaultProgramme = if (person.personProgrammes.any { it.isDefault == true }) {
+            personProgrammeRepository.updateToNotDefault(importDto.dateOfAddmision) == 1
+        } else true
         val personProgramme = studentService.createPersonProgramme(
             person = person,
             importDto = importDto,
@@ -420,19 +409,20 @@ class PersonService(
             certificate = application.certificate,
             sourceOfFinancing = application.applicationForeignerData?.sourceOfFinancing,
             basisOfAdmission = application.applicationForeignerData?.basisOfAdmission,
-            isDefault = isDefaultProgramme != 'T'
+            isDefault = isDefaultProgramme
         )
+        student.addPersonProgramme(personProgramme)
         irkApplication.personProgramme = personProgramme
         personProgramme.irkApplication = irkApplication
-        addPersonArrival(application, importDto.didacticCycleCode, person, personProgramme, importDto.startDate)
+        addPersonArrival(person, application, importDto.didacticCycleCode, personProgramme, importDto.startDate)
         personProgrammeRepository.save(personProgramme)
         return student
     }
 
     private fun addPersonArrival(
+        person: Person,
         application: Application,
         didacticCycleCode: String,
-        person: Person,
         personProgramme: PersonProgramme,
         startDate: Date
     ) = application.applicant?.erasmusData?.let {
@@ -441,17 +431,16 @@ class PersonService(
             didacticCycle.dateFrom,
             didacticCycle.dateTo
         ) ?: throw EntityNotFoundException("Nie można znaleźć cyklu dydaktycznego")
-        person.personArrivals.add(
-            erasmusService.createArrival(
-                person = person,
-                erasmusData = it,
-                didacticCycle = didacticCycle,
-                didacticCycleYear = didacticCycleYear,
-                didacticCycleCode = didacticCycleCode,
-                personProgramme = personProgramme,
-                startDate = startDate
-            )
+        val arrival = erasmusService.createArrival(
+            erasmusData = it,
+            didacticCycle = didacticCycle,
+            didacticCycleYear = didacticCycleYear,
+            didacticCycleCode = didacticCycleCode,
+            startDate = startDate
         )
+        personProgramme.addArrival(arrival)
+        person.addPersonArrivals(arrival)
+        arrival
     }
 
     @LogExecutionTime
@@ -463,55 +452,60 @@ class PersonService(
     fun process(
         application: Application, importDto: ImportDtoJpa, postMatriculation: (applicationId: Long) -> Int
     ): Pair<Person, Student> {
-        val person: Person = createOrUpdatePerson(application.applicant!!)
+        logger.trace("Tworzę lub aktualizuję osobę")
+        val applicant = application.applicant ?: throw ApplicantNotFoundException()
+        val person: Person = createOrUpdatePerson(applicant)
+        logger.trace("Tworzę potwierdzenie immatrykulacji")
+        val dataSourceId = application.dataSourceId
         val irkApplication = IrkApplication(
             applicationId = application.foreignId,
             confirmationStatus = 0,
-            irkInstance = applicationDataSourceFactory.getDataSource(application.dataSourceId!!).instanceUrl
+            irkInstance = dataSourceId?.let {
+                applicationDataSourceFactory.getDataSource(dataSourceId).instanceUrl
+            } ?: "Nieznany"
         )
-        val student = _self.immatriculate(
+        logger.trace("Tworzę lub wybieram studenta")
+        val student = immatriculate(
             person = person,
             importDto = importDto,
             irkApplication = irkApplication,
             application = application
         )
-        irkApplication.confirmationStatus = postMatriculation.invoke(application.foreignId)
-        irkApplicationRepository.save(irkApplication)
+        logger.trace("Wykonuję operacje poimmatrykulacyjne")
+        irkApplication.confirmationStatus = postMatriculation(application.foreignId)
         return Pair(person, student)
     }
 
     private fun createOrUpdatePerson(applicant: Applicant): Person {
-        var person: Person? = null
-        applicant.usosId?.let { usosId ->
-            person = personRepository.findByIdOrNull(usosId)
-        }
-        if (person == null) {
-            applicant.basicData.pesel?.let { pesel ->
-                person = personRepository.findOneByPesel(pesel.trim())
-            }
-        }
-        if (person == null) {
-            person = applicant.identityDocuments.filterNot {
+        logger.trace("Szukam osoby w bazie")
+        var person = personRepository.findOneByPeselOrIdNumberOrEmailOrPrivateEmail(
+            applicant.usosId,
+            applicant.basicData.pesel.orEmpty(),
+            applicant.identityDocuments.filterNot {
                 it.number.isNullOrBlank()
             }.map {
-                it.number!!.trim().uppercase(Locale.getDefault())
-            }.let {
-                personRepository.findByIdNumberIn(it)
-            }
-        }
-        if (person == null) {
-            person = personRepository.findOneByEmail(applicant.email)
-        }
-        if (person == null) {
-            person = personRepository.findOneByPrivateEmail(applicant.email)
-        }
-        logger.info("Person1: {} {}", person?.modificationDate, person)
-        if (person != null) {
-            person = _self.update(applicant, person!!)
+                it.number?.uppercase(Locale.getDefault()).orEmpty()
+            },
+            applicant.email.uppercase(),
+            applicant.email.uppercase()
+        )
+
+        person = if (person != null) {
+            logger.trace("Osoba istnieje. Aktualizuję")
+            update(applicant, person)
         } else {
-            person = _self.create(applicant)
+            logger.trace("Osoba nie istnieje. Tworzę")
+            create(applicant)
         }
-        logger.info("Person2: {} {}", person?.modificationDate, person)
-        return person!!
+        return person
+    }
+
+    fun findPotentialDuplicate(
+        name: String,
+        surname: String,
+        birthDate: Date,
+        idNumbers: List<String>
+    ): List<PersonBasicData> {
+        return personRepository.findPotentialDuplicate(name, surname, birthDate, idNumbers)
     }
 }

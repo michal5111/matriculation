@@ -15,7 +15,7 @@
       </ng-template>
       <span class="fill-remaining-space"></span>
       <ng-template [ngIf]="userService.isAuthenticated" [ngIfElse]="loggedOut">
-        <span>{{userService.user.casAssertion.principal.attributes.givenname}} {{userService.user.casAssertion.principal.attributes.lastname}}</span>
+        <span>{{userService.user?.casAssertion?.principal?.attributes?.givenname}} {{userService.user?.casAssertion?.principal?.attributes?.lastname}}</span>
         <a mat-stroked-button href="{{baseHref}}logout">Wyloguj</a>
       </ng-template>
       <ng-template #loggedOut>

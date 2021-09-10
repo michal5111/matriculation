@@ -1,0 +1,131 @@
+<mat-dialog-content>
+  <div>
+    Aplikant:
+  </div>
+  <ng-template [ngIf]="applicant" class="table">
+    <table mat-table [dataSource]="applicantDataSource">
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>id</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.id}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Imię</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.name.given}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="middleName">
+        <th mat-header-cell *matHeaderCellDef>Drugie imię</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.name.middle}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="surname">
+        <th mat-header-cell *matHeaderCellDef>Nazwisko</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.name.family}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="birthDate">
+        <th mat-header-cell *matHeaderCellDef>Data urodzenia</th>
+        <td mat-cell *matCellDef="let element"
+            class="mat-cell">{{element.basicData.dateOfBirth | date:'dd.MM.yyyy'}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="idNumber">
+        <th mat-header-cell *matHeaderCellDef>Numer dokumentów</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">
+          <ul>
+            <li *ngFor="let item of element.identityDocuments">{{item.number}}</li>
+          </ul>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="sex">
+        <th mat-header-cell *matHeaderCellDef>Płeć</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.basicData.sex}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.email}}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="applicantDisplayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: applicantDisplayedColumns;"></tr>
+    </table>
+  </ng-template>
+  <mat-divider class="separator"></mat-divider>
+  <div>
+    Potencjalne duplikaty:
+  </div>
+  <ng-template [ngIf]="getSelected().length > 1">
+    Wybierz maksymalnie jedną osobę!
+  </ng-template>
+  <ng-template [ngIf]="persons" class="table">
+    <table mat-table [dataSource]="dataSource">
+
+      <ng-container matColumnDef="checkbox">
+        <th mat-header-cell *matHeaderCellDef>Wybierz</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">
+          <mat-checkbox (change)="onCheckboxChange($event, element)"></mat-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>id</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.value.id}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Imię</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.value.name}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="middleName">
+        <th mat-header-cell *matHeaderCellDef>Drugie imię</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.value.middleName}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="surname">
+        <th mat-header-cell *matHeaderCellDef>Nazwisko</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.value.surname}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="birthDate">
+        <th mat-header-cell *matHeaderCellDef>Data urodzenia</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.value.birthDate | date:'dd.MM.yyyy'}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="idNumber">
+        <th mat-header-cell *matHeaderCellDef>Numer dokumentu</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.value.idNumber}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="sex">
+        <th mat-header-cell *matHeaderCellDef>Płeć</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.value.sex}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.value.email}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="privateEmail">
+        <th mat-header-cell *matHeaderCellDef>Prywatny email</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.value.privateEmail}}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </ng-template>
+</mat-dialog-content>
+<mat-dialog-actions *ngIf="dataSource.data">
+  <button mat-button [disabled]="getSelected().length !== 1" (click)="selectPerson(getSelected()[0].value)">
+    Wybierz
+  </button>
+  <button mat-button (click)="confirmNotDuplicate() ">
+    To nie jest duplikat
+  </button>
+</mat-dialog-actions>

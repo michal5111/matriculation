@@ -1,0 +1,61 @@
+app:
+    service:
+        security: ${pl.poznan.ue.matriculation.service.home}/login/cas
+cas:
+    service:
+        login: ${pl.poznan.ue.matriculation.cas.url}/login
+        logout: ${pl.poznan.ue.matriculation.cas.url}/logout
+    ticket:
+        validate:
+            url: ${pl.poznan.ue.matriculation.cas.url}/
+management:
+    endpoints:
+        web:
+            exposure:
+                include: httptrace
+    endpoint:
+        health:
+            show-details: when_authorized
+            roles: 'ROLE_ADMIN'
+            probes:
+                enabled: true
+server:
+    error:
+        include-message: always
+spring:
+    cache:
+        jcache:
+            config: classpath:ehcache.xml
+    jackson:
+        deserialization:
+            accept-empty-string-as-null-object: true
+    jpa:
+        #        open-in-view: false
+        database: default
+        generate-ddl: false
+        properties:
+            hibernate:
+                cache:
+                    region:
+                        factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+                    use_query_cache: true
+                    use_second_level_cache: true
+                javax:
+                    cache:
+                        missing_cache_strategy: create
+                jdbc:
+                    time_zone: CET
+                    batch_size: 100
+                    fetch_size: 400
+                order_inserts: true
+                order_updates: true
+                query:
+                    in_clause_parameter_padding: true
+            org:
+                hibernate:
+                    flushMode: COMMIT
+    profiles:
+        active: '@spring.profiles.active@'
+
+logging:
+    config: "classpath:log4j2-dev.xml"

@@ -27,7 +27,7 @@ class ApplicationForeignerData(
 
     override fun toString(): String {
         return "ApplicationForeignerData(baseOfStay=$baseOfStay, basisOfAdmission=$basisOfAdmission, " +
-                "sourceOfFinancing=$sourceOfFinancing)"
+            "sourceOfFinancing=$sourceOfFinancing)"
     }
 
     override fun equals(other: Any?): Boolean {

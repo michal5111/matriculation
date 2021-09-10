@@ -28,7 +28,7 @@ class BasicData(
 
     override fun toString(): String {
         return "BasicData(sex='$sex', pesel=$pesel, dateOfBirth=$dateOfBirth, cityOfBirth='$cityOfBirth', " +
-                "countryOfBirth='$countryOfBirth', dataSource='$dataSource')"
+            "countryOfBirth='$countryOfBirth', dataSource='$dataSource')"
     }
 
     override fun equals(other: Any?): Boolean {

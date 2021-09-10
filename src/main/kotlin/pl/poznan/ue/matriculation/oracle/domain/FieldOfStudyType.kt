@@ -1,8 +1,11 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_TYPY_KIERUNKOW")
 class FieldOfStudyType(
     @Id
@@ -10,25 +13,25 @@ class FieldOfStudyType(
     val code: String,
 
     @Column(name = "OPIS", length = 100, nullable = false)
-    var description: String,
+    val description: String,
 
     @Column(name = "DESCRIPTION", length = 100, nullable = false)
-    var descriptionEng: String,
+    val descriptionEng: String,
 
     @Column(name = "OPIS_NIE", length = 100, nullable = true)
-    var descriptionGer: String? = null,
+    val descriptionGer: String? = null,
 
     @Column(name = "OPIS_ROS", length = 100, nullable = true)
-    var descriptionRus: String? = null,
+    val descriptionRus: String? = null,
 
     @Column(name = "OPIS_HIS", length = 100, nullable = true)
-    var descriptionHis: String? = null,
+    val descriptionHis: String? = null,
 
     @Column(name = "OPIS_FRA", length = 100, nullable = true)
-    var descriptionFra: String? = null,
+    val descriptionFra: String? = null,
 
     @OneToMany(mappedBy = "fieldOfStudyType", fetch = FetchType.LAZY)
-    var fieldsOfStudy: MutableList<FieldOfStudy>
+    val fieldsOfStudy: MutableList<FieldOfStudy>
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

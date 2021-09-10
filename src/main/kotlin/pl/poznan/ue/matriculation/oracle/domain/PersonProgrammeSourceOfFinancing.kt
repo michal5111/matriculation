@@ -14,7 +14,7 @@ class PersonProgrammeSourceOfFinancing(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRGOS_ID", referencedColumnName = "ID")
-    val personProgramme: PersonProgramme,
+    var personProgramme: PersonProgramme,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TRYB_ODB_ST_KOD", referencedColumnName = "KOD")

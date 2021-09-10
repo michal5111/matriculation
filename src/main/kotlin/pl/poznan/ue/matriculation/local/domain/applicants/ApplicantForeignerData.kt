@@ -1,7 +1,5 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
-import org.hibernate.annotations.LazyCollection
-import org.hibernate.annotations.LazyCollectionOption
 import pl.poznan.ue.matriculation.local.domain.BaseEntityApplicantId
 import java.io.Serializable
 import java.util.*
@@ -13,9 +11,8 @@ class ApplicantForeignerData(
 
     var baseOfStay: String?,
 
-    @LazyCollection(LazyCollectionOption.FALSE)
-        @OneToMany(mappedBy = "applicantForeignerData", cascade = [CascadeType.ALL])
-    var foreignerStatus: MutableList<Status> = mutableListOf(),
+    @OneToMany(mappedBy = "applicantForeignerData", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    var foreignerStatus: MutableSet<Status> = HashSet(),
 
     var polishCardIssueCountry: String?,
 
@@ -32,8 +29,8 @@ class ApplicantForeignerData(
 
     override fun toString(): String {
         return "ApplicantForeignerData(baseOfStay=$baseOfStay, polishCardIssueCountry=$polishCardIssueCountry, " +
-                "polishCardIssueDate=$polishCardIssueDate, polishCardNumber=$polishCardNumber, " +
-                "polishCardValidTo=$polishCardValidTo)"
+            "polishCardIssueDate=$polishCardIssueDate, polishCardNumber=$polishCardNumber, " +
+            "polishCardValidTo=$polishCardValidTo)"
     }
 
     override fun equals(other: Any?): Boolean {

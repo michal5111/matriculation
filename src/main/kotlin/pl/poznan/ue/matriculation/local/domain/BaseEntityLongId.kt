@@ -9,5 +9,5 @@ import javax.persistence.MappedSuperclass
 open class BaseEntityLongId : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null
+    open var id: Long? = null
 }

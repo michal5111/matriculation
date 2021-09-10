@@ -11,14 +11,6 @@ class CasUserDetails(
     val usosId: Long?
 ) : UserDetails {
 
-    private val roles = ArrayList<String>()
-
-    init {
-        for (authority in authorities) {
-            this.roles.add(authority.authority)
-        }
-    }
-
     override fun getAuthorities(): Collection<GrantedAuthority> {
         return authorities
     }
@@ -48,6 +40,6 @@ class CasUserDetails(
     }
 
     override fun toString(): String {
-        return "CasUserDetails(userId='$userId', authorities=$authorities, usosId=$usosId, roles=$roles)"
+        return "CasUserDetails(userId='$userId', authorities=$authorities, usosId=$usosId)"
     }
 }

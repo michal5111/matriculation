@@ -5,6 +5,7 @@ import org.jasig.cas.client.validation.Cas30ServiceTicketValidator
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpMethod
 import org.springframework.security.cas.ServiceProperties
@@ -30,6 +31,7 @@ import pl.poznan.ue.matriculation.security.CustomUserDetailsService
 @Configuration
 @EnableWebSecurity
 @Order(2)
+@Profile("prod")
 class SecurityConfiguration(val userService: UserService) : WebSecurityConfigurerAdapter() {
     @Value("\${cas.service.login}")
     private lateinit var casUrlLogin: String
@@ -90,7 +92,6 @@ class SecurityConfiguration(val userService: UserService) : WebSecurityConfigure
     }
 
     @Bean
-    @Throws(Exception::class)
     fun casAuthenticationFilter(): CasAuthenticationFilter {
         val casAuthenticationFilter = CasAuthenticationFilter()
         casAuthenticationFilter.setAuthenticationManager(authenticationManager())
@@ -124,6 +125,7 @@ class SecurityConfiguration(val userService: UserService) : WebSecurityConfigure
     }
 
     override fun configure(http: HttpSecurity) {
+        http.httpBasic().disable()
         http
             .exceptionHandling()
             .authenticationEntryPoint(casAuthenticationEntryPoint())
@@ -140,10 +142,6 @@ class SecurityConfiguration(val userService: UserService) : WebSecurityConfigure
     override fun configure(web: WebSecurity) {
         web.ignoring()
             .antMatchers(HttpMethod.OPTIONS, "/**")
-            .antMatchers("/app/**/*.{js,html}")
-            .antMatchers("/i18n/**")
-            .antMatchers("/content/**")
             .antMatchers("/h2-console/**")
-            .antMatchers("/test/**")
     }
 }

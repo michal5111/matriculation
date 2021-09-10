@@ -10,17 +10,17 @@ import javax.persistence.*
 class ErasmusData(
 
     @Enumerated(EnumType.STRING)
-        var accommodationPreference: AccommodationPreference?,
+    var accommodationPreference: AccommodationPreference?,
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-        @JoinColumn(name = "home_institution_id", referencedColumnName = "id")
-        var homeInstitution: HomeInstitution?,
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "home_institution_id", referencedColumnName = "id")
+    var homeInstitution: HomeInstitution?,
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "coordinator_data_id", referencedColumnName = "id")
     var coordinatorData: CoordinatorData?,
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "course_id", referencedColumnName = "id")
     var courseData: CourseData?,
 

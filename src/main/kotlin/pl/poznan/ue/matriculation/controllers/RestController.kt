@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
+import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.domain.import.ImportProgress
@@ -16,10 +17,17 @@ import pl.poznan.ue.matriculation.local.dto.*
 import pl.poznan.ue.matriculation.local.job.JobType
 import pl.poznan.ue.matriculation.local.service.*
 import pl.poznan.ue.matriculation.oracle.dto.IndexTypeDto
+import pl.poznan.ue.matriculation.oracle.entityRepresentations.PersonBasicData
+import pl.poznan.ue.matriculation.oracle.repo.PersonRepository
 import pl.poznan.ue.matriculation.oracle.service.UsosService
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(
+    originPatterns = ["*"],
+    allowCredentials = "true",
+    methods = [RequestMethod.GET, RequestMethod.PATCH, RequestMethod.TRACE, RequestMethod.POST, RequestMethod.OPTIONS, RequestMethod.DELETE, RequestMethod.HEAD, RequestMethod.PUT]
+)
 class RestController(
     private val applicationDataSourceFactory: ApplicationDataSourceFactory,
     private val importService: ImportService,
@@ -27,7 +35,9 @@ class RestController(
     private val applicationService: ApplicationService,
     private val userService: UserService,
     private val roleService: RoleService,
-    private val jobService: JobService
+    private val jobService: JobService,
+    private val personRepository: PersonRepository,
+    private val applicantService: ApplicantService
 ) {
 
     @Value("\${pl.poznan.ue.matriculation.usos.url}")
@@ -59,7 +69,7 @@ class RestController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/import")
     fun createImport(
-            @RequestBody importDto: ImportDto
+        @RequestBody importDto: ImportDto
     ): Import = importService.create(
         programmeCode = importDto.programmeCode,
         programmeForeignId = importDto.programmeForeignId,
@@ -112,14 +122,15 @@ class RestController(
 
 
     @GetMapping("/usos/didacticCycle")
-    fun findDidacticCycleByCode(@RequestParam("code") didacticCycleCode: String): List<String> = usosService.findDidacticCycleCodes(didacticCycleCode, 10)
+    fun findDidacticCycleByCode(@RequestParam("code") didacticCycleCode: String): List<String> =
+        usosService.findDidacticCycleCodes(didacticCycleCode, 10)
 
 
     @PutMapping("/usos/person/{id}/indexNumber")
     fun updateIndexNumberByUsosIdAndIndexType(
-            @PathVariable("id") personId: Long,
-            @RequestParam("indexType") indexTypeCode: String,
-            @RequestParam("indexNumber") indexNumber: String
+        @PathVariable("id") personId: Long,
+        @RequestParam("indexType") indexTypeCode: String,
+        @RequestParam("indexNumber") indexNumber: String
     ) = usosService.updateIndexNumberByUsosIdAndIndexType(personId, indexTypeCode, indexNumber)
 
     @PutMapping("/import/{id}/archive")
@@ -151,6 +162,25 @@ class RestController(
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun sendNotifications(@PathVariable("id") importId: Long) = jobService.runJob(JobType.SEND_NOTIFICATIONS, importId)
 
+    @GetMapping("/import/{id}/checkForDuplicates")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun checkForDuplicates(@PathVariable("id") importId: Long) =
+        jobService.runJob(JobType.CHECK_FOR_POTENTIAL_DUPLICATES, importId)
+
+    @GetMapping("/applicant/{id}/potentialDuplicates")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun getPotentialDuplicates(@PathVariable("id") applicantId: Long): List<PersonBasicData> {
+        val applicant = applicantService.findById(applicantId) ?: throw ApplicantNotFoundException()
+        return personRepository.findPotentialDuplicate(
+            name = applicant.name.given,
+            surname = applicant.name.family,
+            applicant.basicData.dateOfBirth!!,
+            applicant.identityDocuments.map {
+                it.number!!
+            }
+        )
+    }
+
     @GetMapping("/role")
     fun getAllRoles(): List<Role> = roleService.getAll()
 
@@ -158,4 +188,12 @@ class RestController(
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun runJob(@PathVariable("id") importId: Long, @PathVariable("jobType") jobType: JobType) =
         jobService.runJob(jobType, importId)
+
+    @PutMapping("/application/{id}/potentialDuplicateStatus")
+    fun updatePotentialDuplicateStatus(
+        @PathVariable("id") applicationId: Long,
+        @RequestBody potentialDuplicateStatusDto: ApplicantUsosIdAndPotentialDuplicateStatusDto
+    ): Application {
+        return applicationService.updatePotentialDuplicateStatus(applicationId, potentialDuplicateStatusDto)
+    }
 }

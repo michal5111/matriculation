@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.configuration
 
+import org.hibernate.cfg.AvailableSettings
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -8,10 +9,13 @@ import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
+import org.springframework.context.support.AbstractApplicationContext
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
+import org.springframework.orm.hibernate5.SpringBeanContainer
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.transaction.annotation.EnableTransactionManagement
+import javax.annotation.Resource
 import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
@@ -19,9 +23,9 @@ import javax.sql.DataSource
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-        entityManagerFactoryRef = "entityManagerFactory",
-        basePackages = ["pl.poznan.ue.matriculation.local.repo"],
-        transactionManagerRef = "transactionManager"
+    entityManagerFactoryRef = "entityManagerFactory",
+    basePackages = ["pl.poznan.ue.matriculation.local.repo"],
+    transactionManagerRef = "transactionManager"
 )
 class LocalDbConfig {
 
@@ -40,39 +44,44 @@ class LocalDbConfig {
     @Value("\${spring.datasource.database-platform}")
     private lateinit var localDbHibernateDialect: String
 
+    @Resource
+    lateinit var context: AbstractApplicationContext
+
     @Primary
     @Bean(name = ["dataSource"])
     @ConfigurationProperties(prefix = "spring.datasource")
     fun dataSource(): DataSource? {
         return DataSourceBuilder.create()
-                .url(localDbUrl)
-                .username(localDbUsername)
-                .password(localDbPassword)
-                .driverClassName(localDbDriverClassName)
-                .build()
+            .url(localDbUrl)
+            .username(localDbUsername)
+            .password(localDbPassword)
+            .driverClassName(localDbDriverClassName)
+            .build()
     }
 
     @Primary
     @Bean(name = ["entityManagerFactory"])
     fun entityManagerFactory(
-            builder: EntityManagerFactoryBuilder,
-            @Qualifier("dataSource") dataSource: DataSource
-    ): LocalContainerEntityManagerFactoryBean? {
+        builder: EntityManagerFactoryBuilder,
+        @Qualifier("dataSource") dataSource: DataSource
+    ): LocalContainerEntityManagerFactoryBean {
         val properties: MutableMap<String, Any> = HashMap()
         properties["hibernate.hbm2ddl.auto"] = "update"
         properties["hibernate.dialect"] = localDbHibernateDialect
-        return builder
-                .dataSource(dataSource)
-                .packages("pl.poznan.ue.matriculation.local.domain")
-                .persistenceUnit("local")
-                .properties(properties)
-                .build()
+        val em = builder
+            .dataSource(dataSource)
+            .packages("pl.poznan.ue.matriculation.local.domain")
+            .persistenceUnit("local")
+            .properties(properties)
+            .build()
+        em.jpaPropertyMap[AvailableSettings.BEAN_CONTAINER] = SpringBeanContainer(context.beanFactory)
+        return em
     }
 
     @Primary
     @Bean(name = ["transactionManager"])
     fun transactionManager(
-            @Qualifier("entityManagerFactory") entityManagerFactory: EntityManagerFactory
+        @Qualifier("entityManagerFactory") entityManagerFactory: EntityManagerFactory
     ): JpaTransactionManager {
         return JpaTransactionManager(entityManagerFactory)
     }

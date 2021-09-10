@@ -6,8 +6,6 @@ import pl.poznan.ue.matriculation.local.domain.enum.AccommodationPreference
 import pl.poznan.ue.matriculation.local.domain.enum.DurationType
 import pl.poznan.ue.matriculation.oracle.domain.Arrival
 import pl.poznan.ue.matriculation.oracle.domain.DidacticCycle
-import pl.poznan.ue.matriculation.oracle.domain.Person
-import pl.poznan.ue.matriculation.oracle.domain.PersonProgramme
 import pl.poznan.ue.matriculation.oracle.repo.DidacticCycleRepository
 import pl.poznan.ue.matriculation.oracle.repo.SchoolRepository
 import java.util.*
@@ -19,19 +17,14 @@ class ErasmusService(
 ) {
 
     fun createArrival(
-        person: Person,
         erasmusData: ErasmusData,
         didacticCycleCode: String,
         didacticCycle: DidacticCycle,
         didacticCycleYear: DidacticCycle,
-        personProgramme: PersonProgramme,
         startDate: Date
     ): Arrival {
         return Arrival(
-            person = person,
-            wantAccommodation = if (erasmusData.accommodationPreference == AccommodationPreference.DORMITORY) 'T'
-            else 'N',
-            personProgramme = personProgramme,
+            wantAccommodation = erasmusData.accommodationPreference == AccommodationPreference.DORMITORY,
             didacticCycleAcademicYear = didacticCycleYear,
             startDate = startDate,
             financingDidacticCycleAcademicYear = didacticCycleYear,

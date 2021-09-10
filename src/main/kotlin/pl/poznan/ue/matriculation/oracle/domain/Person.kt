@@ -1,11 +1,59 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
 import java.util.*
 import javax.persistence.*
 
+@NamedEntityGraphs(
+    NamedEntityGraph(
+        name = "person.basicDataAndAddresses",
+        attributeNodes = [
+            NamedAttributeNode("nationality"),
+            NamedAttributeNode("citizenship"),
+            //NamedAttributeNode("organizationalUnit"),
+            //NamedAttributeNode("middleSchool"),
+            //NamedAttributeNode("birthCountry"),
+            NamedAttributeNode("identityDocumentIssuerCountry"),
+            NamedAttributeNode("addresses", subgraph = "subgraph.addressType"),
+        ],
+        subgraphs = [
+            NamedSubgraph(name = "subgraph.addressType", attributeNodes = [NamedAttributeNode("addressType")])
+        ]
+    ),
+    NamedEntityGraph(
+        name = "person.phoneNumbers",
+        attributeNodes = [NamedAttributeNode("phoneNumbers", subgraph = "subgraph.phoneNumberType")],
+        subgraphs = [
+            NamedSubgraph(name = "subgraph.phoneNumberType", attributeNodes = [NamedAttributeNode("phoneNumberType")])
+        ]
+    ),
+    NamedEntityGraph(
+        name = "person.entitlementDocuments",
+        attributeNodes = [NamedAttributeNode("entitlementDocuments")]
+    ),
+    NamedEntityGraph(
+        name = "person.personPreferences",
+        attributeNodes = [NamedAttributeNode("personPreferences")]
+    ),
+    NamedEntityGraph(
+        name = "person.student",
+        attributeNodes = [NamedAttributeNode("students")]
+    ),
+    NamedEntityGraph(
+        name = "person.personProgrammes",
+        attributeNodes = [NamedAttributeNode("personProgrammes")]
+    ),
+    NamedEntityGraph(
+        name = "person.ownedDocuments",
+        attributeNodes = [NamedAttributeNode("ownedDocuments")]
+    ),
+    NamedEntityGraph(
+        name = "person.personChangeHistory",
+        attributeNodes = [NamedAttributeNode("personChangeHistories")]
+    )
+)
+
 @Entity
-//@Cacheable
-//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "DZ_OSOBY")
 class Person(
     @Id
@@ -95,8 +143,9 @@ class Person(
     @JoinColumn(name = "TYTUL_PO", nullable = true)
     val titleSuffix: Title? = null,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_POLONIA", length = 1, nullable = true)
-    val isPolish: Char? = 'N',
+    val isPolish: Boolean? = false,
 
     @Column(name = "ZAMIEJSCOWA", length = 1, nullable = true)
     val nonresident: String? = null,
@@ -109,8 +158,9 @@ class Person(
     @JoinColumn(name = "US_ID", referencedColumnName = "ID", nullable = true)
     val taxOffice: TaxOffice? = null,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "AKAD_CZY_REZERWA", length = 1, nullable = false)
-    val dormitoryReserve: Char = 'N',
+    val dormitoryReserve: Boolean = false,
 
     @Column(name = "AKAD_WYKROCZENIA", length = 1000, nullable = true)
     val dormitoryOffense: String? = null,
@@ -159,56 +209,126 @@ class Person(
     @Column(name = "DATA_WAZNOSCI_DOWODU", nullable = true)
     var identityDocumentExpirationDate: Date? = null,
 
-    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var addresses: MutableList<Address>,
+    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    val addresses: MutableList<Address> = mutableListOf(),
 
-    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var phoneNumbers: MutableList<PhoneNumber>,
+    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val phoneNumbers: MutableList<PhoneNumber> = mutableListOf(),
 
-    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var entitlementDocuments: MutableList<EntitlementDocument>,
+    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val entitlementDocuments: MutableList<EntitlementDocument> = mutableListOf(),
 
-    @OneToOne(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var personPhoto: PersonPhoto? = null,
 
-    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var personPreferences: MutableList<PersonPreference> = mutableListOf(),
+    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val personPreferences: MutableList<PersonPreference> = mutableListOf(),
 
-    @OneToMany(mappedBy = "person", orphanRemoval = true, fetch = FetchType.LAZY)
-    var student: MutableList<Student> = mutableListOf(),
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
+    val students: MutableList<Student> = mutableListOf(),
 
-    @OneToMany(mappedBy = "person", orphanRemoval = true, fetch = FetchType.LAZY)
-    var personProgrammes: MutableList<PersonProgramme> = mutableListOf(),
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
+    val personProgrammes: MutableList<PersonProgramme> = mutableListOf(),
 
-    @OneToMany(mappedBy = "person", orphanRemoval = true, fetch = FetchType.LAZY)
-    var folders: MutableList<Folder> = mutableListOf(),
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
+    val folders: MutableList<Folder> = mutableListOf(),
 
-    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var documents: MutableList<PersonDocument> = mutableListOf(),
+    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val documents: MutableList<PersonDocument> = mutableListOf(),
 
-    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var ownedDocuments: MutableList<OwnedDocument> = mutableListOf(),
+    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val ownedDocuments: MutableList<OwnedDocument> = mutableListOf(),
 
-    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var personChangeHistory: MutableList<PersonChangeHistory> = mutableListOf(),
+    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val personChangeHistories: MutableList<PersonChangeHistory> = mutableListOf(),
 
-    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var personArrivals: MutableList<Arrival> = mutableListOf(),
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
+    val personArrivals: MutableList<Arrival> = mutableListOf(),
 
-    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var personContracts: MutableList<Contract> = mutableListOf(),
+    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val personContracts: MutableList<Contract> = mutableListOf(),
 
-    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var personEmployee: MutableList<Employee> = mutableListOf()
+    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val personEmployee: MutableList<Employee> = mutableListOf()
 ) : BaseEntity() {
+
 
     override fun toString(): String {
         return "Person(id=$id, pesel=$pesel, name='$name', middleName=$middleName, surname='$surname', birthDate=$birthDate, birthCity=$birthCity, fathersName=$fathersName, mothersName=$mothersName, mothersMaidenName=$mothersMaidenName, familyName=$familyName, school=$school, idNumber=$idNumber, nip=$nip, email=$email, sex=$sex, privateEmail=$privateEmail)"
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-    @PostUpdate
-    fun postUpdate() {
-        println("Modification date post: $modificationDate")
+        other as Person
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
+
+    fun addAddress(address: Address) {
+        addresses.add(address)
+        address.person = this
+    }
+
+    fun removeAddress(address: Address) {
+        addresses.remove(address)
+        address.person = null
+    }
+
+    fun addPhoneNumber(phoneNumber: PhoneNumber) {
+        phoneNumbers.add(phoneNumber)
+        phoneNumber.person = this
+    }
+
+    fun removePhoneNumber(phoneNumber: PhoneNumber) {
+        phoneNumbers.remove(phoneNumber)
+        phoneNumber.person = null
+    }
+
+    fun addEntitlementDocument(entitlementDocument: EntitlementDocument) {
+        entitlementDocuments.add(entitlementDocument)
+        entitlementDocument.person = this
+    }
+
+    fun removeEntitlementDocument(entitlementDocument: EntitlementDocument) {
+        entitlementDocuments.remove(entitlementDocument)
+        entitlementDocument.person = null
+    }
+
+    fun addPersonPreference(personPreference: PersonPreference) {
+        personPreferences.add(personPreference)
+        personPreference.person = this
+    }
+
+    fun addStudent(student: Student) {
+        students.add(student)
+        student.person = this
+    }
+
+    fun addOwnedDocument(ownedDocument: OwnedDocument) {
+        ownedDocuments.add(ownedDocument)
+        ownedDocument.person = this
+    }
+
+    fun addPersonChangeHistory(personChangeHistory: PersonChangeHistory) {
+        personChangeHistories.add(personChangeHistory)
+        personChangeHistory.person = this
+    }
+
+    fun addPersonArrivals(arrival: Arrival) {
+        personArrivals.add(arrival)
+        arrival.person = this
+    }
+
+    fun addPersonProgramme(personProgramme: PersonProgramme) {
+        personProgrammes.add(personProgramme)
+        personProgramme.person = this
     }
 }

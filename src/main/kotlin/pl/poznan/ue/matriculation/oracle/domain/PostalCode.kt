@@ -1,8 +1,12 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
+import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_KODY_POCZTOWE")
 class PostalCode(
     @Id
@@ -16,17 +20,18 @@ class PostalCode(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PW_KOD", referencedColumnName = "KOD", nullable = true)
-    var county: County? = null,
+    val county: County? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "GM_KOD", referencedColumnName = "KOD", nullable = true)
-    var commune: Commune? = null,
+    val commune: Commune? = null,
 
     @Column(name = "POCZTA", length = 100, nullable = true)
-    var post: String,
+    val post: String,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_MIASTO", length = 1, nullable = true)
-    var cityIsCity: Char?
+    val cityIsCity: Boolean?
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

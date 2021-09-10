@@ -23,7 +23,7 @@ class AdditionalData(
 
     override fun toString(): String {
         return "AdditionalData(fathersName=$fathersName, militaryCategory=$militaryCategory, " +
-                "militaryStatus=$militaryStatus, mothersName=$mothersName, wku=$wku)"
+            "militaryStatus=$militaryStatus, mothersName=$mothersName, wku=$wku)"
     }
 
     override fun equals(other: Any?): Boolean {

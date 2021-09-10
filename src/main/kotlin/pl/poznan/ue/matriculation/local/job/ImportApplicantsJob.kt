@@ -8,14 +8,12 @@ import pl.poznan.ue.matriculation.local.job.startConditions.IStartConditions
 import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
-import pl.poznan.ue.matriculation.local.service.ImportService
 import pl.poznan.ue.matriculation.local.service.ProcessService
 
 class ImportApplicantsJob(
     private val importRepository: ImportRepository,
     private val importProgressRepository: ImportProgressRepository,
     private val processService: ProcessService,
-    private val importService: ImportService,
     private val applicationDataSourceFactory: ApplicationDataSourceFactory,
     private val importId: Long
 ) : IJob {
@@ -62,9 +60,13 @@ class ImportApplicantsJob(
                 }
                 currentPage++
             }
-            importService.setImportStatus(ImportStatus.IMPORTED, importId)
+            importProgressRepository.getById(importId).apply {
+                importStatus = ImportStatus.IMPORTED
+            }.let {
+                importProgressRepository.save(it)
+            }
         } catch (e: Exception) {
-            throw ImportException(import.id!!, e.message, e)
+            throw ImportException(import.id, e.message, e)
         }
     }
 }

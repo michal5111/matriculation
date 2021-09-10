@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import java.io.Serializable
 import javax.persistence.Entity
@@ -10,6 +11,7 @@ import javax.persistence.ManyToOne
 @Entity
 class Status(
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicantForeignerData_id", referencedColumnName = "applicant_id")
     var applicantForeignerData: ApplicantForeignerData? = null,
@@ -23,17 +25,18 @@ class Status(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other !is Status) return false
 
-        other as Status
-
-        if (id != other.id) return false
+        if (applicantForeignerData != other.applicantForeignerData) return false
+        if (status != other.status) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return id?.hashCode() ?: 0
+        var result = applicantForeignerData?.hashCode() ?: 0
+        result = 31 * result + status.hashCode()
+        return result
     }
 
 

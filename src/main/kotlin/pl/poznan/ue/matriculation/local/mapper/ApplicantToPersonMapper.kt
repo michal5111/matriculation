@@ -2,6 +2,7 @@ package pl.poznan.ue.matriculation.local.mapper
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import pl.poznan.ue.matriculation.kotlinExtensions.toSerialBlob
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.oracle.domain.*
 import pl.poznan.ue.matriculation.oracle.repo.*
@@ -15,8 +16,7 @@ class ApplicantToPersonMapper(
     private val phoneNumberTypeRepository: PhoneNumberTypeRepository,
     private val wkuRepository: WkuRepository,
     private val addressService: AddressService,
-    private val documentTypeRepository: DocumentTypeRepository,
-    private val addressTypeRepository: AddressTypeRepository
+    private val documentTypeRepository: DocumentTypeRepository
 ) {
 
     @Value("\${pl.poznan.ue.matriculation.defaultStudentOrganizationalUnit}")
@@ -51,26 +51,7 @@ class ApplicantToPersonMapper(
             middleSchool = applicant.educationData.highSchoolUsosCode?.let {
                 schoolRepository.getById(it)
             },
-            addresses = applicant.addresses.map {
-                addressService.create(
-                    addressType = addressTypeRepository.getById(it.addressType.usosValue),
-                    city = it.city,
-                    street = it.street,
-                    houseNumber = it.streetNumber,
-                    apartmentNumber = it.flatNumber,
-                    zipCode = it.postalCode,
-                    cityIsCity = it.cityIsCity,
-                    countryCode = it.countryCode
-                )
-            }.toMutableList(),
-            phoneNumbers = applicant.phoneNumbers.map {
-                PhoneNumber(
-                    number = it.number,
-                    phoneNumberType = phoneNumberTypeRepository.getById(it.phoneNumberType),
-                    comments = it.comment
-                )
-            }.toMutableList(),
-            idNumber = applicant.identityDocuments.firstOrNull()?.number?.replace(" ", "")?.trim(),
+            idNumber = applicant.identityDocuments.firstOrNull()?.number,
             documentType = applicant.identityDocuments.firstOrNull()?.number?.let {
                 applicant.identityDocuments.firstOrNull()?.type
             },
@@ -83,7 +64,45 @@ class ApplicantToPersonMapper(
             wku = applicant.additionalData.wku?.let {
                 wkuRepository.getById(it)
             },
-            entitlementDocuments = applicant.educationData.documents.filter { document ->
+            militaryCategory = applicant.additionalData.militaryCategory,
+            militaryStatus = applicant.additionalData.militaryStatus,
+            personPhoto = applicant.photoByteArrayFuture?.get()?.let {
+                PersonPhoto(
+                    photoBlob = it.toSerialBlob()
+                )
+            }
+        ).apply {
+            applicant.addresses.map {
+                addressService.create(
+                    addressTypeCode = it.addressType.usosValue,
+                    city = it.city,
+                    street = it.street,
+                    houseNumber = it.streetNumber,
+                    apartmentNumber = it.flatNumber,
+                    zipCode = it.postalCode,
+                    cityIsCity = it.cityIsCity,
+                    countryCode = it.countryCode
+                )
+            }.forEach {
+                addAddress(it)
+            }
+            if (addresses.none { it.addressType.code == "KOR" }) {
+                addresses.find { it.addressType.code == "STA" }?.let {
+                    val ca = addressService.create(
+                        person = this,
+                        addressTypeCode = "KOR",
+                        city = it.city,
+                        street = it.street,
+                        houseNumber = it.houseNumber,
+                        apartmentNumber = it.flatNumber,
+                        zipCode = it.zipCode,
+                        cityIsCity = it.cityIsCity,
+                        countryCode = it.country?.code
+                    )
+                    addAddress(ca)
+                }
+            }
+            applicant.educationData.documents.filter { document ->
                 document.certificateUsosCode != null
             }.map {
                 EntitlementDocument(
@@ -97,46 +116,39 @@ class ApplicantToPersonMapper(
                         schoolRepository.getById(schoolId)
                     }
                 )
-            }.toMutableList(),
-            militaryCategory = applicant.additionalData.militaryCategory,
-            militaryStatus = applicant.additionalData.militaryStatus,
-            personPhoto = applicant.photoByteArray?.let {
-                PersonPhoto(
-                    photoBlob = it
+            }.forEach {
+                addEntitlementDocument(it)
+            }
+            applicant.phoneNumbers.map {
+                PhoneNumber(
+                    number = it.number,
+                    phoneNumberType = phoneNumberTypeRepository.getById(it.phoneNumberType),
+                    comments = it.comment
                 )
-            }
-        ).apply {
-            addresses.forEach {
-                it.person = this
-            }
-            phoneNumbers.forEach {
-                it.person = this
-            }
-            entitlementDocuments.forEach {
-                it.person = this
+            }.forEach {
+                addPhoneNumber(it)
             }
             personPhoto?.let {
                 it.person = this
-                personPreferences.add(
+                addPersonPreference(
                     PersonPreference(person = this, attribute = "photo_visibility", value = applicant.photoPermission)
                 )
             }
             applicant.applicantForeignerData?.let {
-                if (it.baseOfStay == null || it.baseOfStay != "OKP") {
+                if (it.baseOfStay != "OKP") {
                     return@let
                 }
-                ownedDocuments.add(
-                    OwnedDocument(
-                        documentType = documentTypeRepository.getById(it.baseOfStay!!),
-                        person = this,
-                        issueDate = it.polishCardIssueDate,
-                        issueCountry = it.polishCardIssueCountry?.let { countryCode ->
-                            citizenshipRepository.getById(countryCode)
-                        },
-                        number = it.polishCardNumber,
-                        expirationDate = it.polishCardValidTo
-                    )
+                val od = OwnedDocument(
+                    documentType = documentTypeRepository.getById(it.baseOfStay ?: return@let),
+                    person = this,
+                    issueDate = it.polishCardIssueDate,
+                    issueCountry = it.polishCardIssueCountry?.let { countryCode ->
+                        citizenshipRepository.getById(countryCode)
+                    },
+                    number = it.polishCardNumber,
+                    expirationDate = it.polishCardValidTo
                 )
+                addOwnedDocument(od)
             }
         }
     }

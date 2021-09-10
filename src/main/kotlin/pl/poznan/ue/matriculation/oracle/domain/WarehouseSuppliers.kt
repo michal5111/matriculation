@@ -1,8 +1,11 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_MAG_DOSTAWCY")
 class WarehouseSuppliers(
     @Id
@@ -12,16 +15,16 @@ class WarehouseSuppliers(
     val id: Long? = null,
 
     @Column(name = "NAZWA_SKROCONA", length = 40, nullable = false)
-    var shortName: String,
+    val shortName: String,
 
     @Column(name = "NAZWA_PELNA", length = 255, nullable = true)
-    var fullName: String? = null,
+    val fullName: String? = null,
 
     @Column(name = "NIP", length = 13, nullable = true)
-    var nip: String? = null,
+    val nip: String? = null,
 
     @Column(name = "KOMENTARZ", length = 2000, nullable = true)
-    var comment: String? = null,
+    val comment: String? = null,
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

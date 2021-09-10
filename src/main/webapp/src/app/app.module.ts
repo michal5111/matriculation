@@ -33,6 +33,12 @@ import {ProgressViewerComponent} from './component/progress-viewer/progress-view
 import {ImportStatusIndicatorComponent} from './component/import/import-status-indicator/import-status-indicator.component';
 import {AddUserDialogComponent} from './component/dialog/add-user-dialog/add-user-dialog.component';
 import {ExceptionHandler} from './exceptionHandler/exception-handler';
+import {SelectPersonDialogComponent} from './component/dialog/select-person-dialog/select-person-dialog.component';
+import {MyRxStompConfig} from './service/configConsts/my-rx-stomp-config';
+import {InjectableRxStompConfig, RxStompService, rxStompServiceFactory} from '@stomp/ng2-stompjs';
+import {WS_URL} from './injectableTokens/WS_URL';
+import {MAT_DATE_FORMATS} from '@angular/material/core';
+import {MY_DATE_FORMATS} from './service/configConsts/MY_DATE_FORMATS';
 
 @NgModule({
   declarations: [
@@ -56,7 +62,8 @@ import {ExceptionHandler} from './exceptionHandler/exception-handler';
     UserEditorComponent,
     ProgressViewerComponent,
     ImportStatusIndicatorComponent,
-    AddUserDialogComponent
+    AddUserDialogComponent,
+    SelectPersonDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -82,6 +89,29 @@ import {ExceptionHandler} from './exceptionHandler/exception-handler';
     {
       provide: ErrorHandler,
       useClass: ExceptionHandler
+    },
+    {
+      provide: WS_URL,
+      useFactory: (s: PlatformLocation, baseHref: string) =>
+        (s.protocol === 'http:' ? 'ws://' : 'wss://') + s.hostname + ':' + (s.port === '4200' ? '8081' : s.port) + baseHref + 'ws',
+      deps: [PlatformLocation, APP_BASE_HREF]
+    },
+    {
+      provide: InjectableRxStompConfig,
+      useFactory: (wsUrl: string) => {
+        MyRxStompConfig.brokerURL = wsUrl;
+        return MyRxStompConfig;
+      },
+      deps: [WS_URL]
+    },
+    {
+      provide: RxStompService,
+      useFactory: rxStompServiceFactory,
+      deps: [InjectableRxStompConfig]
+    },
+    {
+      provide: MAT_DATE_FORMATS,
+      useValue: MY_DATE_FORMATS
     }
   ],
   bootstrap: [AppComponent]

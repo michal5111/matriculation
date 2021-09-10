@@ -17,14 +17,12 @@ class LogAspect {
     //@Pointcut("within(pl.poznan.ue.matriculation..*)")
     //@Pointcut("execution(* pl.poznan.ue.matriculation.local.service.*(..))")
     fun logExecutionTime(joinPoint: ProceedingJoinPoint): Any? {
-        logger.info("Wykonuję ${joinPoint.signature.name} (${joinPoint.sourceLocation}) args: (${joinPoint.args.joinToString { "$it," }})")
+        logger.debug("Wykonuję ${joinPoint.signature.name} (${joinPoint.sourceLocation}) args: (${joinPoint.args.joinToString { "$it," }})")
         val startTime = System.nanoTime()
         val obj = joinPoint.proceed()
         val stopTime = System.nanoTime()
-        val time = (stopTime - startTime) / 1000000
-        logger.info("Zakończyłem wykonywanie ${joinPoint.signature.name} Time: $time ms")
-        //val signature: Signature = joinPoint.signature
-        //val returnType: Class<*> = (signature as MethodSignature).returnType
+        val time = stopTime - startTime
+        logger.debug("Zakończyłem wykonywanie ${joinPoint.signature.name} Time: $time nanoseconds (${time.toFloat() / 1000000.0f} ms)")
         return obj
     }
 }

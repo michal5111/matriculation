@@ -1,8 +1,11 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_FIRMY")
 class Company(
     @Id
@@ -13,35 +16,35 @@ class Company(
     val name: String,
 
     @Column(name = "NAZWA_ANG", length = 400, nullable = true)
-    var englishName: String? = null,
+    val englishName: String? = null,
 
     @Column(name = "NIP", length = 13, nullable = true)
-    var nip: String? = null,
+    val nip: String? = null,
 
     @Column(name = "MODUL", length = 10, nullable = true)
-    var module: String? = null,
+    val module: String? = null,
 
     @Column(name = "TYP_DZIALANOSCI", length = 1, nullable = true)
-    var typeOfActivity: Char? = null,
+    val typeOfActivity: Char? = null,
 
     @Column(name = "FORMA_PRAWNA", length = 3, nullable = true)
-    var legalForm: String? = null,
+    val legalForm: String? = null,
 
     @Column(name = "NUMER_KRS", length = 10, nullable = true)
-    var krsNumber: String? = null,
+    val krsNumber: String? = null,
 
     @Column(name = "REGON", length = 14, nullable = true)
-    var regon: String? = null,
+    val regon: String? = null,
 
     @Column(name = "ADRES_WWW", length = 200, nullable = true)
-    var website: String? = null,
+    val website: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FRM_KOD", referencedColumnName = "KOD", nullable = true)
-    var company: Company? = null,
+    val company: Company? = null,
 
-    @OneToMany(mappedBy = "company")
-    var phoneNumbers: List<PhoneNumber>
+    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+    val phoneNumbers: List<PhoneNumber>
 
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {

@@ -1,8 +1,11 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_URZEDY_SKARBOWE")
 class TaxOffice(
     @Id
@@ -18,7 +21,7 @@ class TaxOffice(
     val code: String,
 
     @OneToMany(mappedBy = "taxOffice", fetch = FetchType.LAZY)
-    val persons: Set<Person>,
+    var persons: MutableList<Person>,
 
     @OneToOne(mappedBy = "taxOffice", fetch = FetchType.LAZY)
     var address: Address

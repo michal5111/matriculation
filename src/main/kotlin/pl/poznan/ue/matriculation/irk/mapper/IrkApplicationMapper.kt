@@ -8,20 +8,20 @@ class IrkApplicationMapper {
 
     fun mapApplicationDtoToApplication(applicationDTO: IrkApplicationDTO): Application {
         return Application(
-                admitted = applicationDTO.admitted,
-                comment = applicationDTO.comment,
-                applicationForeignerData = applicationDTO.foreignerData?.let {
-                    ApplicationForeignerData(
-                            baseOfStay = it.baseOfStay,
-                            basisOfAdmission = it.basisOfAdmission,
-                            sourceOfFinancing = it.sourceOfFinancing
-                    )
-                },
-                foreignId = applicationDTO.id,
-                payment = applicationDTO.payment,
-                position = applicationDTO.position,
-                qualified = applicationDTO.qualified,
-                score = applicationDTO.score
+            admitted = applicationDTO.admitted,
+            comment = applicationDTO.comment,
+            applicationForeignerData = applicationDTO.foreignerData?.let {
+                ApplicationForeignerData(
+                    baseOfStay = it.baseOfStay,
+                    basisOfAdmission = it.basisOfAdmission,
+                    sourceOfFinancing = it.sourceOfFinancing
+                )
+            },
+            foreignId = applicationDTO.id,
+            payment = applicationDTO.payment,
+            position = applicationDTO.position,
+            qualified = applicationDTO.qualified,
+            score = applicationDTO.score
 //                turn = Turn(
 //                        dateFrom = applicationDTO.turn.dateFrom,
 //                        dateTo = applicationDTO.turn.dateTo,

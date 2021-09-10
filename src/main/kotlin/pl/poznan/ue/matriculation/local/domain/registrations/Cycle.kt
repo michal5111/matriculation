@@ -5,14 +5,14 @@ import pl.poznan.ue.matriculation.local.domain.Name
 import java.util.*
 import javax.persistence.Id
 
-class Cycle(
+open class Cycle(
 
-        @Id
-        val code: String,
+    @Id
+    val code: String,
 
-        val dateFrom: Date?,
+    val dateFrom: Date?,
 
-        val dateTo: Date?,
+    val dateTo: Date?,
 
-        val name: Name?
+    val name: Name?
 )

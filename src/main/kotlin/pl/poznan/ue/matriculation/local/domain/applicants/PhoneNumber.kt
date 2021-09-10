@@ -2,12 +2,17 @@ package pl.poznan.ue.matriculation.local.domain.applicants
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
-import javax.persistence.Entity
-import javax.persistence.FetchType
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
+import javax.persistence.*
 
 @Entity
+@Table(
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "phoneNumberUniqueConstraint",
+            columnNames = ["applicant_id", "number", "phoneNumberType"]
+        )
+    ]
+)
 class PhoneNumber(
 
     @JsonIgnore
@@ -23,16 +28,17 @@ class PhoneNumber(
 ) : BaseEntityLongId() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other !is PhoneNumber) return false
 
-        other as PhoneNumber
-
-        if (id != other.id) return false
+        if (number != other.number) return false
+        if (phoneNumberType != other.phoneNumberType) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return id?.hashCode() ?: 0
+        var result = number.hashCode()
+        result = 31 * result + phoneNumberType.hashCode()
+        return result
     }
 }

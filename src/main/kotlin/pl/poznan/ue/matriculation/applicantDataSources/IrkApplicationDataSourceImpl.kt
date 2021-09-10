@@ -1,6 +1,8 @@
 package pl.poznan.ue.matriculation.applicantDataSources
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.web.client.HttpStatusCodeException
 import pl.poznan.ue.matriculation.irk.dto.ErrorMessageDto
 import pl.poznan.ue.matriculation.irk.dto.NotificationDto
@@ -24,6 +26,8 @@ open class IrkApplicationDataSourceImpl(
     private val irkApplicantMapper: IrkApplicantMapper,
     private val irkApplicationMapper: IrkApplicationMapper
 ) : IApplicationDataSource<IrkApplicationDTO, IrkApplicantDto>, IPhotoDownloader, INotificationSender {
+
+    val logger: Logger = LoggerFactory.getLogger(IrkApplicationDataSourceImpl::class.java)
 
     override fun getApplicationsPage(
         import: Import,
@@ -77,9 +81,9 @@ open class IrkApplicationDataSourceImpl(
     override fun getAvailableRegistrationProgrammes(registration: String): List<ProgrammeDto> {
         return irkService.getAvailableRegistrationProgrammes(registration).map {
             ProgrammeDto(
-                    id = it,
-                    name = it,
-                    usosId = it
+                id = it,
+                name = it,
+                usosId = it
             )
         }
     }

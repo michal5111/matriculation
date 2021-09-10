@@ -1,14 +1,14 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {ImportService} from '../../../service/import-service/import.service';
 import {Page} from '../../../model/oracle/page/page';
-import {filter, map, switchMap, takeWhile, tap} from 'rxjs/operators';
+import {filter, map, switchMap, tap} from 'rxjs/operators';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, Sort} from '@angular/material/sort';
 import {Application} from '../../../model/applications/application';
 import {ActivatedRoute} from '@angular/router';
 import {ImportProgress} from '../../../model/import/import-progress';
-import {Observable, Subscription, timer} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {Import} from '../../../model/import/import';
 import {UserService} from '../../../service/user-service/user.service';
 import {Document} from '../../../model/applications/document';
@@ -20,6 +20,12 @@ import {ErrorDialogComponent} from '../../dialog/error-dialog/error-dialog.compo
 import {ErrorDialogData} from '../../../model/dialog/error-dialog-data';
 import {UrlDto} from '../../../model/import/urlDto';
 import {UsosService} from '../../../service/usos-service/usos.service';
+import {SelectPersonDialogComponent} from '../../dialog/select-person-dialog/select-person-dialog.component';
+import {ApplicationsService} from '../../../service/application-service/applications.service';
+import {MatCheckboxChange} from '@angular/material/checkbox';
+import {RxStompService} from '@stomp/ng2-stompjs';
+import {Message} from '@stomp/stompjs';
+import {WS_URL} from '../../../injectableTokens/WS_URL';
 
 @Component({
   selector: 'app-import-view',
@@ -38,52 +44,43 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   totalElements = 0;
   page: Page<Application>;
   dataSource = new MatTableDataSource<Application>();
-  sortString = 'id';
+  sortString = 'applicant.name.family';
   sortDirString = 'asc';
-  displayedColumns: string[] = [
-    'lp',
-    'id',
-    'foreignId',
-    'usosId',
-    'uid',
-    'names',
-    'birthDateAndPlace',
-    'pesel',
-    'secondarySchoolDocumentNumber',
-    'secondarySchoolDocumentIssueInstitution',
-    'secondarySchoolDocumentIssueDate',
-    'diplomaSchoolDocumentNumber',
-    'diplomaSchoolDocumentIssueDateAndPlace',
-    'diplomaSchoolDocumentIssueInstitution',
-    'indexNumber',
-    'applicationImportStatus',
-    'importError'
-  ];
+  displayedColumns: Map<string, boolean> = new Map<string, boolean>([
+    ['lp', true],
+    ['id', true],
+    ['foreignId', true],
+    ['usosId', true],
+    ['uid', true],
+    ['names', true],
+    ['birthDateAndPlace', true],
+    ['pesel', true],
+    ['secondarySchoolDocumentNumber', false],
+    ['secondarySchoolDocumentIssueInstitution', false],
+    ['secondarySchoolDocumentIssueDate', false],
+    ['diplomaSchoolDocumentNumber', false],
+    ['diplomaSchoolDocumentIssueDateAndPlace', false],
+    ['diplomaSchoolDocumentIssueInstitution', false],
+    ['indexNumber', true],
+    ['applicationImportStatus', true],
+    ['duplicateStatus', true],
+    ['importError', true]
+  ]);
   sortingMap: Map<string, string> = new Map<string, string>([
     ['id', 'id'],
     ['foreignId', 'foreignId'],
+    ['uid', 'applicant.uid'],
     ['usosId', 'applicant.usosId'],
     ['names', 'applicant.name.family'],
     ['birthDateAndPlace', 'applicant.basicData.dateOfBirth'],
     ['pesel', 'applicant.basicData.pesel'],
     ['indexNumber', 'applicant.assignedIndexNumber'],
     ['applicationImportStatus', 'importStatus'],
-    ['importError', 'importError']
+    ['importError', 'importError'],
+    ['duplicateStatus', 'applicant.potentialDuplicateStatus']
   ]);
 
-  workingStatuses = [
-    'STARTED',
-    'SAVING',
-    'SEARCHING_UIDS',
-    'SENDING_NOTIFICATIONS'
-  ];
-
-  $importProgressObservable = timer(0, 1000).pipe(
-    switchMap(() => this.importService.getImportProgress(this.importId)),
-    tap(result => this.importProgress = result),
-    switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString)),
-    takeWhile(() => this.workingStatuses.some(status => status === this.importProgress.importStatus))
-  );
+  importProgressObservable$: Observable<ImportProgress>;
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -93,7 +90,10 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     private usosService: UsosService,
     private route: ActivatedRoute,
     public userService: UserService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private applicationsService: ApplicationsService,
+    public rxStompService: RxStompService,
+    @Inject(WS_URL) private wsUrl: string
   ) {
   }
 
@@ -128,8 +128,15 @@ export class ImportViewComponent implements OnInit, OnDestroy {
         this.usosUrl = result;
       }
     );
+    this.importProgressObservable$ = this.rxStompService.watch(`/topic/importProgress/${this.importId}`).pipe(
+      map((message: Message) => JSON.parse(message.body)),
+      tap((importProgress: ImportProgress) => this.importProgress = importProgress)
+    );
     this.progressSubscription = this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).pipe(
-      switchMap(() => this.$importProgressObservable)
+      switchMap(() => this.importService.getImportProgress(this.importId)),
+      tap((importProgress: ImportProgress) => this.importProgress = importProgress),
+      switchMap(() => this.importProgressObservable$),
+      switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString))
     ).subscribe();
   }
 
@@ -146,17 +153,11 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   startImport(): void {
-    this.progressSubscription.unsubscribe();
-    this.progressSubscription = this.importService.startImport(this.importId).pipe(
-      switchMap(() => this.$importProgressObservable)
-    ).subscribe();
+    this.progressSubscription = this.importService.startImport(this.importId).subscribe();
   }
 
   savePersons(): void {
-    this.progressSubscription.unsubscribe();
-    this.progressSubscription = this.importService.savePersons(this.importId).pipe(
-      switchMap(() => this.$importProgressObservable)
-    ).subscribe();
+    this.progressSubscription = this.importService.savePersons(this.importId).subscribe();
   }
 
   getSecondarySchoolDocument(application: Application): Document {
@@ -198,8 +199,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().pipe(
       filter(result => result === true),
       switchMap((result) => this.importService.archiveImport(this.importId)),
-      switchMap(() => this.importService.getImportProgress(this.importId)),
-      switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString))
     ).subscribe();
   }
 
@@ -277,17 +276,11 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   onFindUidsClick() {
-    this.progressSubscription.unsubscribe();
-    this.progressSubscription = this.importService.findUids(this.importId).pipe(
-      switchMap(() => this.$importProgressObservable)
-    ).subscribe();
+    this.progressSubscription = this.importService.findUids(this.importId).subscribe();
   }
 
   onSendNotificationsClick() {
-    this.progressSubscription.unsubscribe();
-    this.progressSubscription = this.importService.sendNotifications(this.importId).pipe(
-      switchMap(() => this.$importProgressObservable)
-    ).subscribe();
+    this.progressSubscription = this.importService.sendNotifications(this.importId).subscribe();
   }
 
   isSendNotificationsDisabled(): boolean {
@@ -300,5 +293,50 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       default:
         return true;
     }
+  }
+
+  isCheckForDuplicatesDisabled(): boolean {
+    switch (this.importProgress.importStatus) {
+      case 'IMPORTED':
+        return false;
+      default:
+        return true;
+    }
+  }
+
+  onCheckForPotentialDuplicates() {
+    this.progressSubscription = this.importService.checkForPotentialDuplicates(this.importId).subscribe();
+  }
+
+  onPotentialDuplicateClick(application: Application) {
+    const dialogRef = this.dialog.open(SelectPersonDialogComponent, {
+      width: '1200px',
+      height: '500px',
+      data: {
+        application
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== undefined && result !== '') {
+        this.applicationsService.updatePotentialDuplicateStatus(application.id, {
+          usosId: (result.notDuplicate ? undefined : result.person.id),
+          potentialDuplicateStatus: (result.notDuplicate ? 'CONFIRMED_NOT_DUPLICATE' : 'OK')
+        }).subscribe(updatedApplication => {
+          this.importProgress.potentialDuplicates--;
+          application.applicant.potentialDuplicateStatus = updatedApplication.applicant.potentialDuplicateStatus;
+          application.applicant.usosId = updatedApplication.applicant.usosId;
+        });
+      }
+    });
+  }
+
+  getDisplayedColumns(): string[] {
+    return [...this.displayedColumns.entries()]
+      .filter(column => column[1])
+      .map(column => column[0]);
+  }
+
+  onColumnCheckboxChange(event: MatCheckboxChange, ...columnIds: string[]) {
+    columnIds.forEach(id => this.displayedColumns.set(id, event.checked));
   }
 }

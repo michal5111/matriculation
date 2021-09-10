@@ -3,6 +3,8 @@ package pl.poznan.ue.matriculation.local.service
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.OptimisticLockingFailureException
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.stereotype.Service
@@ -13,13 +15,18 @@ import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
 import pl.poznan.ue.matriculation.applicantDataSources.INotificationSender
 import pl.poznan.ue.matriculation.applicantDataSources.IPhotoDownloader
 import pl.poznan.ue.matriculation.configuration.LogExecutionTime
+import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
+import pl.poznan.ue.matriculation.exception.ApplicationNotFoundException
 import pl.poznan.ue.matriculation.exception.ImportException
+import pl.poznan.ue.matriculation.exception.ImportNotFoundException
 import pl.poznan.ue.matriculation.exception.exceptionHandler.ISaveExceptionHandler
 import pl.poznan.ue.matriculation.irk.dto.NotificationDto
+import pl.poznan.ue.matriculation.kotlinExtensions.retry
 import pl.poznan.ue.matriculation.ldap.repo.LdapUserRepository
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
+import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
@@ -42,7 +49,8 @@ class ProcessService(
     private val personService: PersonService,
     private val importProgressRepository: ImportProgressRepository,
     private val ldapUserRepository: LdapUserRepository,
-    private val saveExceptionHandler: ISaveExceptionHandler
+    private val saveExceptionHandler: ISaveExceptionHandler,
+    private val asyncService: AsyncService
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(ProcessService::class.java)
@@ -77,8 +85,8 @@ class ProcessService(
             applicationDto = applicationDto,
             import = import
         )
-        applicationRepository.save(application)
         application.import = import
+        applicationRepository.save(application)
         import.importProgress.importedApplications++
         return application
     }
@@ -135,33 +143,41 @@ class ProcessService(
         importDto: ImportDtoJpa,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
     ): Person {
-        logger.info("------------------------------------------------Przetwarzam ${application.id}---------------------------------------------")
-        if (!TransactionSynchronizationManager.isActualTransactionActive()) {
-            throw IllegalStateException("Nie ma aktywnej transakcji")
-        }
-        applicantService.check(application.applicant!!)
+        logger.trace("------------------------------------------------Przetwarzam ${application.id}---------------------------------------------")
+        val applicant = application.applicant ?: throw ApplicantNotFoundException()
+        logger.trace("Sprawdzam aplikanta")
+        applicantService.check(applicant)
+        logger.trace("Pobieram progres importu")
         val importProgress = importProgressRepository.getById(importId)
+        logger.trace("Sprawdzam czy źródło danych implementuje pobieranie zdjęć")
         if (applicationDtoDataSource is IPhotoDownloader) {
-            application.applicant!!.photo?.let {
-                application.applicant!!.photoByteArray = applicationDtoDataSource.getPhoto(it)
+            applicant.photo?.let {
+                logger.trace("Pobieram zdjęcie")
+                applicant.photoByteArrayFuture = asyncService.doAsync {
+                    applicationDtoDataSource.getPhoto(it)
+                }
             }
         }
+        logger.trace("Przetwarzam pobranego aplikanta")
         val personAndStudent = personService.process(
             application = application,
             importDto = importDto,
             postMatriculation = applicationDtoDataSource::postMatriculation
         )
+        logger.trace("Przypisuje aplikantowi nadany numer indeksu i usosId")
         application.apply {
-            applicant!!.usosId = personAndStudent.first.id
-            applicant!!.assignedIndexNumber = personAndStudent.second.indexNumber
+            applicant.usosId = personAndStudent.first.id
+            applicant.assignedIndexNumber = personAndStudent.second.indexNumber
             importError = null
             stackTrace = null
             importStatus = ApplicationImportStatus.IMPORTED
         }
-        applicantRepository.save(application.applicant!!)
+        logger.trace("Zapisuję aplikanta")
+        applicantRepository.save(applicant)
+        logger.trace("Zapisuję zgłoszenie")
         applicationRepository.save(application)
         importProgress.savedApplicants++
-        logger.info("------------------------------------------------koniec ${application.id}---------------------------------------------")
+        logger.trace("------------------------------------------------koniec ${application.id}---------------------------------------------")
         return personAndStudent.first
     }
 
@@ -173,31 +189,39 @@ class ProcessService(
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
     ): Int {
         var errorCount = 0
-        val applicationsPage: Stream<Application> =
-            applicationRepository.getAllByImportIdAndApplicationImportStatus(importId)
-        applicationsPage.use {
-            it.forEach { application ->
+        logger.trace("Pobieram strumień zgłoszeń ze statusem nie zaimportowany i błąd")
+        val applicationsPage: Stream<Application> = applicationRepository.getAllByImportIdAndImportStatusIn(
+            importId,
+            listOf(ApplicationImportStatus.NOT_IMPORTED, ApplicationImportStatus.ERROR),
+            Sort.by(
+                Sort.Order.asc("applicant.name.family"),
+                Sort.Order.asc("applicant.name.given"),
+                Sort.Order.asc("applicant.name.middle")
+            )
+        )
+        applicationsPage.use { stream ->
+            stream.forEach { application ->
                 try {
-                    var retryCount = 0
-                    val maxRetry = 3
-                    while (true) {
-                        try {
-                            self.processApplication(
-                                importId = importId,
-                                application = application,
-                                importDto = importDto,
-                                applicationDtoDataSource = applicationDtoDataSource
-                            )
-                            break
-                        } catch (e: OptimisticLockException) {
-                            logger.warn("Optimistic lock exception on $retryCount try", e)
-                            if (++retryCount == maxRetry) throw e
-                        } catch (e: ObjectOptimisticLockingFailureException) {
-                            logger.warn("Optimistic lock exception on $retryCount try", e)
-                            if (++retryCount == maxRetry) throw e
-                        }
+                    var person: Person? = null
+                    retry(
+                        maxRetry = 5,
+                        retryOn = arrayOf(
+                            OptimisticLockException::class.java,
+                            OptimisticLockingFailureException::class.java,
+                            ObjectOptimisticLockingFailureException::class.java,
+                        )
+                    ) {
+                        logger.trace("Próbuję stworzyć/zaktualizować osobę. Próba: {}", it)
+                        person = self.processApplication(
+                            importId = importId,
+                            application = application,
+                            importDto = importDto,
+                            applicationDtoDataSource = applicationDtoDataSource
+                        )
                     }
+                    logger.trace("Stworzyłem/zaktualizowałem osobę")
                 } catch (e: Exception) {
+                    logger.error("Błąd przy tworzeniu lub aktualizowaniu osoby. ", e)
                     errorCount++
                     saveExceptionHandler.handle(e, application, importId)
                 }
@@ -216,24 +240,26 @@ class ProcessService(
         val applicationStream = applicationRepository.findAllByImportId(importId)
         applicationStream.use {
             it.filter { application ->
-                application.applicant!!.applications.none { applicantApplication ->
+                val applicant = application.applicant ?: throw ApplicantNotFoundException()
+                applicant.applications.none { applicantApplication ->
                     applicantApplication != application
-                            && applicantApplication.import?.importProgress?.importStatus != ImportStatus.ARCHIVED
+                        && applicantApplication.import?.importProgress?.importStatus != ImportStatus.ARCHIVED
                 }
             }.forEach { application ->
-                applicantService.clearPersonalData(application.applicant!!)
+                val applicant = application.applicant ?: throw ApplicationNotFoundException()
+                applicantService.clearPersonalData(applicant)
             }
         }
         import.importProgress.importStatus = ImportStatus.ARCHIVED
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     fun getUids(importId: Long) {
         val applicationStream = applicationRepository.findAllByImportIdStream(importId)
         applicationStream.use {
             it.forEach { application ->
                 application.applicant?.let { applicant ->
-                    getUid(applicant, importId)
+                    self.getUid(applicant, importId)
                 }
             }
         }
@@ -246,7 +272,7 @@ class ProcessService(
     )
     fun getUid(applicant: Applicant, importId: Long) {
         try {
-            val importProgress = importProgressRepository.findByIdOrNull(importId)
+            val importProgress = importProgressRepository.findByIdOrNull(importId) ?: throw ImportNotFoundException()
             logger.info("Searching for ldap user for usosId {}", applicant.usosId)
             val ldapUser = applicant.usosId?.let {
                 ldapUserRepository.findByUsosId(it)
@@ -255,7 +281,7 @@ class ProcessService(
             applicant.uid = ldapUser.uid
             logger.info("Apllicant uid is {}", applicant.uid)
             applicantRepository.save(applicant)
-            importProgress!!.importedUids++
+            importProgress.importedUids++
         } catch (e: Exception) {
             throw ImportException(importId, "Błąd przy pobieraniu uidów", e)
         }
@@ -272,7 +298,7 @@ class ProcessService(
         applicationStream.use {
             it.forEach { application ->
                 application.applicant?.let { applicant ->
-                    sendNotification(applicant, importId, notificationSender)
+                    self.sendNotification(applicant, importId, notificationSender)
                 }
             }
         }
@@ -289,17 +315,19 @@ class ProcessService(
         notificationSender: INotificationSender
     ) {
         try {
-            val importProgress = importProgressRepository.findByIdOrNull(importId)
+            val importProgress = importProgressRepository.findByIdOrNull(importId) ?: throw ImportNotFoundException()
             val notificationDto = NotificationDto(
                 header = "Twoje konto USOS zostało utworzone. / Your USOS account has been created.",
                 message = """
             Dzień dobry,
-            
+
             Twój numer użytkownika – UID (NIU) za pomocą, którego będziesz się logował do systemów uczelnianych takich jak np. USOSweb, poczta uczelniana, to: ${applicant.uid}
 
             Twoje hasło startowe to numer PESEL połaczony z numerem dokumentu tożsamości podanym podczas rekrutacji na studia w systemie IRK USOS (np. numer dowodu osobistego, paszportu) wpisane łącznie, np. dla osoby o numerze PESEL: 900215222787 i nr dowodu AB425632 początkowe hasło to: 900215222787AB425632
 
-            (w przypadku braku numeru PESEL hasłem startowym jest sam numer dokumentu tożsamości podany podczas rekrutacji na studia w systemie IRK USOS (np. numer paszportu).
+            (w przypadku braku numeru PESEL hasłem startowym jest sam numer dokumentu tożsamości podany podczas rekrutacji na studia w systemie IRK USOS (np. numer paszportu)).
+
+            (w przypadku nieuzupełnionego numeru dokumentu tożsamości w systemie IRK hasłem startowym jest sam numer PESEL).
 
             Podczas pierwszego logowania do systemu USOSweb system poprosi Cię o zmianę hasła. Zachowaj tę wiadomość bądź zapamiętaj swój numer UID (NIU).
 
@@ -310,7 +338,7 @@ class ProcessService(
             Pozdrawiamy!
 
             Zespół Centrum Informatyki UEP
-            
+
             Dear Student,
 
             Your login number (called UID or NIU) used to register to PUEB IT systems is: ${applicant.uid}
@@ -329,9 +357,54 @@ class ProcessService(
                 """.trimIndent()
             )
             notificationSender.sendNotification(applicant.foreignId, notificationDto)
-            importProgress!!.notificationsSend++
+            importProgress.notificationsSend++
         } catch (e: Exception) {
             throw ImportException(importId, "Błąd przy wysyłaniu powiadomień", e)
+        }
+    }
+
+    @Transactional(
+        rollbackFor = [Exception::class, RuntimeException::class],
+        propagation = Propagation.REQUIRES_NEW,
+        transactionManager = "transactionManager"
+    )
+    fun findPotentialDuplicate(applicant: Applicant, importId: Long) {
+        val importProgress = importProgressRepository.findByIdOrNull(importId) ?: throw ImportNotFoundException()
+        val dateOfBirth = applicant.basicData.dateOfBirth ?: throw IllegalArgumentException("Date of birth is null")
+        val potentialDuplicatesList = personService.findPotentialDuplicate(
+            name = applicant.name.given,
+            surname = applicant.name.family,
+            birthDate = dateOfBirth,
+            idNumbers = applicant.identityDocuments.map {
+                it.number ?: throw IllegalArgumentException("Identity document number is null")
+            }
+        )
+        if (potentialDuplicatesList.isNotEmpty()) {
+            logger.warn("Wykryto potencjalny duplikat!")
+            applicant.potentialDuplicateStatus = DuplicateStatus.POTENTIAL_DUPLICATE
+            importProgress.potentialDuplicates++
+        } else {
+            applicant.potentialDuplicateStatus = DuplicateStatus.OK
+        }
+    }
+
+    @Transactional(
+        rollbackFor = [Exception::class, RuntimeException::class],
+        propagation = Propagation.REQUIRED,
+        transactionManager = "transactionManager",
+        readOnly = true
+    )
+    fun findPotentialDuplicates(importId: Long) {
+        val applicationsStream =
+            applicationRepository.findAllByImportIdStreamAndApplicantPotentialDuplicateStatus(
+                importId,
+                mutableListOf(DuplicateStatus.NOT_CHECKED, DuplicateStatus.POTENTIAL_DUPLICATE)
+            )
+        applicationsStream.use { stream ->
+            stream.forEach {
+                val applicant = it.applicant ?: throw ApplicantNotFoundException()
+                self.findPotentialDuplicate(applicant, importId)
+            }
         }
     }
 }

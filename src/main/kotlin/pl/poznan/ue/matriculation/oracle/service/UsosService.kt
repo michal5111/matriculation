@@ -44,7 +44,7 @@ class UsosService(
             applicantRepository.save(applicant)
         } catch (e: Exception) {
             var t: Throwable? = e
-            while (t!!.cause != null) {
+            while (t != null) {
                 if (t is GenericJDBCException) {
                     throw IndexChangeException("${t.sqlException} ${t.message}", e)
                 }

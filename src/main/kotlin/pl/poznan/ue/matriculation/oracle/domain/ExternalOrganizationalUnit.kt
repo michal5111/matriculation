@@ -1,26 +1,29 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_JEDNOSTKI_ORGANIZACYJNE_ZEW")
 class ExternalOrganizationalUnit(
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_JED_ORG_ZEW_SEQ")
-        @SequenceGenerator(sequenceName = "DZ_JED_ORG_ZEW_SEQ", allocationSize = 1, name = "DZ_JED_ORG_ZEW_SEQ")
-        @Column(name = "ID", nullable = false, updatable = false, length = 10)
-        val id: Long? = null,
+    @SequenceGenerator(sequenceName = "DZ_JED_ORG_ZEW_SEQ", allocationSize = 1, name = "DZ_JED_ORG_ZEW_SEQ")
+    @Column(name = "ID", nullable = false, updatable = false, length = 10)
+    val id: Long? = null,
 
     @Column(name = "NAZWA", nullable = false, length = 200)
-        val name: String,
+    val name: String,
 
     @Column(name = "ADRES_WWW", nullable = true, length = 200)
-        val url: String,
+    val url: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SZK_ID", referencedColumnName = "ID", nullable = true)
-        var school: School? = null,
+    val school: School? = null,
 
     @Column(name = "UWAGI")
     val comments: String?,
@@ -40,6 +43,6 @@ class ExternalOrganizationalUnit(
     @Column(name = "ID_EWP")
     val ewpID: String?,
 
-    @OneToMany(mappedBy = "externalOrganizationalUnit")
+    @OneToMany(mappedBy = "externalOrganizationalUnit", fetch = FetchType.LAZY)
     val externalPersons: Set<ExternalPerson>
 ) : BaseEntity()

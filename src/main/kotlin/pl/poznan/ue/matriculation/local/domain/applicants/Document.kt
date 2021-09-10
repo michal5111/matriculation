@@ -9,11 +9,14 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-//@Table(
-//        indexes = [
-//            Index(name = "educationDataCertificateType", columnList = "education_data_id,certificateType", unique = false)
-//        ]
-//)
+@Table(
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "DocumentUniqueConstraint",
+            columnNames = ["education_data_id", "documentNumber", "certificateTypeCode"]
+        )
+    ]
+)
 class Document(
 
     @JsonIgnore
@@ -27,6 +30,7 @@ class Document(
 
     val certificateUsosCode: Char?,
 
+    @Basic(fetch = FetchType.LAZY)
     @Lob
     var comment: String?,
 
@@ -55,25 +59,26 @@ class Document(
 
     override fun toString(): String {
         return "Document(id=$id, certificateType='$certificateType', certificateTypeCode='$certificateTypeCode" +
-                "', certificateUsosCode=$certificateUsosCode, comment=$comment, documentNumber=$documentNumber, " +
-                "documentYear=$documentYear, issueCity=$issueCity, issueCountry=$issueCountry, " +
-                "issueDate=$issueDate, issueInstitution=$issueInstitution, " +
-                "issueInstitutionUsosCode=$issueInstitutionUsosCode, modificationDate=$modificationDate)"
+            "', certificateUsosCode=$certificateUsosCode, comment=$comment, documentNumber=$documentNumber, " +
+            "documentYear=$documentYear, issueCity=$issueCity, issueCountry=$issueCountry, " +
+            "issueDate=$issueDate, issueInstitution=$issueInstitution, " +
+            "issueInstitutionUsosCode=$issueInstitutionUsosCode, modificationDate=$modificationDate)"
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other !is Document) return false
 
-        other as Document
-
-        if (id != other.id) return false
+        if (certificateUsosCode != other.certificateUsosCode) return false
+        if (documentNumber != other.documentNumber) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return id?.hashCode() ?: 0
+        var result = certificateUsosCode?.hashCode() ?: 0
+        result = 31 * result + documentNumber.hashCode()
+        return result
     }
 
 

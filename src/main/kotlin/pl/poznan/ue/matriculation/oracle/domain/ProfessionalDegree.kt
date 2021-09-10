@@ -1,8 +1,11 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_STOPNIE_ZAWODOWE")
 class ProfessionalDegree(
     @Id
@@ -15,19 +18,19 @@ class ProfessionalDegree(
     val code: String,
 
     @Column(name = "NAZWA", length = 100, nullable = false)
-    var name: String,
+    val name: String,
 
     @Column(name = "NAZWA_W_DOPELNIACZU", length = 100, nullable = true)
-    var genitiveName: String? = null,
+    val genitiveName: String? = null,
 
     @Column(name = "KOD_POLON", length = 50, nullable = false)
-    var polonCode: String,
+    val polonCode: String,
 
     @OneToMany(mappedBy = "professionalDegree", fetch = FetchType.LAZY)
     val fieldOfStudyPermissions: MutableList<FieldOfStudyPermission>,
 
     @OneToMany(mappedBy = "professionalDegree", fetch = FetchType.LAZY)
-    val conductedFieldOfStudy: MutableList<ConductedFieldOfStudy>
+    var conductedFieldOfStudy: MutableList<ConductedFieldOfStudy>
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

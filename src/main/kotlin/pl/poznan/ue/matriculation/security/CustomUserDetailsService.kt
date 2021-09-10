@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.security
 
+
 import org.slf4j.LoggerFactory
 import org.springframework.security.cas.authentication.CasAssertionAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
@@ -11,8 +12,8 @@ import pl.poznan.ue.matriculation.local.service.UserService
 import java.util.*
 
 internal class CustomUserDetailsService(
-        private val admins: Set<String>,
-        private val userService: UserService
+    private val admins: Set<String>,
+    private val userService: UserService
 ) : AuthenticationUserDetailsService<CasAssertionAuthenticationToken> {
 
     private val log = LoggerFactory.getLogger(CustomUserDetailsService::class.java)
@@ -21,10 +22,8 @@ internal class CustomUserDetailsService(
     override fun loadUserDetails(token: CasAssertionAuthenticationToken): UserDetails {
         val login = token.principal.toString()
         val lowercaseLogin = login.lowercase(Locale.getDefault())
-
         log.debug("Authenticating '{}'", login)
         val grantedAuthorities = ArrayList<GrantedAuthority>()
-
         val user = userService.getByUsosId(lowercaseLogin.toLong())
             ?: throw UsernameNotFoundException("No user with usos_id $lowercaseLogin")
 

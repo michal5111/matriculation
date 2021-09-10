@@ -54,7 +54,7 @@ class IncomingDataSourceImpl(
             val applicationFlags = dreamApplyService.getApplicationFlags(dreamApplyApplicationDto.flags)
             applicationOffers!!.any {
                 it.value.course == "/api/courses/$programmeId"
-                        && it.value.type == status
+                    && it.value.type == status
             } && applicationFlags!!.any {
                 it.key == semesterFlagId
             }
@@ -84,12 +84,12 @@ class IncomingDataSourceImpl(
         }
         val programmeList = mutableListOf<ProgrammeDto>()
         courses.values.forEach { courseDto ->
-            flags.forEach { flagMapEntry ->
+            flags.forEach { (key, value) ->
                 programmeList.add(
                     ProgrammeDto(
-                        id = "${courseDto.id};${flagMapEntry.key}",
-                        name = "${courseDto.name} ${flagMapEntry.value.name}",
-                        usosId = flagMapEntry.value.name
+                        id = "${courseDto.id};${key}",
+                        name = "${courseDto.name} ${value.name}",
+                        usosId = value.name
                     )
                 )
             }

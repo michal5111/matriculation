@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
 import javax.persistence.*
 
 @Entity
@@ -15,8 +16,9 @@ class BasisOfAdmission(
     @Column(name = "OPIS_ANG", length = 200, nullable = true)
     val descriptionEng: String? = null,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_AKTUALNA", length = 1, nullable = false)
-    val isCurrent: Char = 'T',
+    val isCurrent: Boolean = true,
 
     @OneToMany(mappedBy = "basisOfAdmission", fetch = FetchType.LAZY)
     val personProgrammeBasisOfAdmission: MutableList<PersonProgrammeBasisOfAdmission>,

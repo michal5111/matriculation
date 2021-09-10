@@ -7,13 +7,13 @@ import pl.poznan.ue.matriculation.local.domain.Name
 import pl.poznan.ue.matriculation.local.domain.registrations.Cycle
 
 data class RegistrationDTO(
-        val code: String,
-        val cycle: Cycle,
-        @JsonProperty("employees_only")
-        val employeesOnly: Boolean,
-        val name: Name,
-        val programmes: List<String>,
-        val status: String,
-        val tag: String?,
-        val turn: List<TurnDTO>?
+    val code: String,
+    val cycle: Cycle,
+    @JsonProperty("employees_only")
+    val employeesOnly: Boolean,
+    val name: Name,
+    val programmes: List<String>,
+    val status: String,
+    val tag: String?,
+    val turn: List<TurnDTO>?
 )

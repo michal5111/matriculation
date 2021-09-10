@@ -9,6 +9,7 @@ import {Registration} from '../../model/applications/registration';
 import {APP_BASE_HREF} from '@angular/common';
 import {DataSource} from '../../model/import/dataSource';
 import {Programme} from '../../model/applications/programme';
+import {Person} from '../../model/oracle/Person';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -93,5 +94,13 @@ export class ImportService {
 
   sendNotifications(importId: number): Observable<void> {
     return this.http.get<void>(`${this.apiUrl}/import/${importId}/notifications`);
+  }
+
+  checkForPotentialDuplicates(importId: number): Observable<void> {
+    return this.http.get<void>(`${this.apiUrl}/import/${importId}/checkForDuplicates`);
+  }
+
+  getPotentialDuplicates(applicantId: number): Observable<Array<Person>> {
+    return this.http.get<[Person]>(`${this.apiUrl}/applicant/${applicantId}/potentialDuplicates`);
   }
 }

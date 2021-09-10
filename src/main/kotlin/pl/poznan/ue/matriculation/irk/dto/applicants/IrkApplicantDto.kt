@@ -11,7 +11,7 @@ data class IrkApplicantDto(
     val email: String,
 
     @JsonProperty("index_number")
-        val indexNumber: String?,
+    val indexNumber: String?,
 
     val password: String,
 
@@ -24,16 +24,16 @@ data class IrkApplicantDto(
     val photo: String?,
 
     @JsonProperty("photo_permission")
-        val photoPermission: String?,
+    val photoPermission: String?,
 
     @JsonProperty("cas_password_override")
-        val casPasswordOverride: String?,
+    val casPasswordOverride: String?,
 
     @JsonProperty("modification_date")
-        val modificationDate: Date,
+    val modificationDate: Date,
 
     @JsonProperty("basic_data")
-        val basicData: BasicDataDTO,
+    val basicData: BasicDataDTO,
 
     @JsonProperty("contact_data")
     val contactData: ContactDataDTO,

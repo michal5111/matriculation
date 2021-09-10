@@ -33,7 +33,7 @@ class EntitlementDocument(
     var description: String? = null,
 
     @OneToMany(mappedBy = "entitlementDocument", fetch = FetchType.LAZY)
-    val personProgrammeS: MutableList<PersonProgramme> = mutableListOf(),
+    val personProgrammes: MutableList<PersonProgramme> = mutableListOf(),
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

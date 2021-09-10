@@ -1,8 +1,11 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_KODY_SOKRATES")
 class ErasmusCode(
 
@@ -17,8 +20,8 @@ class ErasmusCode(
     val descriptionEng: String?,
 
     @Column(name = "KOD_ISCED", nullable = true, length = 5)
-    var iscedCode: String,
+    val iscedCode: String,
 
-    @OneToMany(mappedBy = "erasmusCode")
-    var arrivals: List<Arrival>
+    @OneToMany(mappedBy = "erasmusCode", fetch = FetchType.LAZY)
+    val arrivals: List<Arrival>
 ) : BaseEntity()

@@ -10,7 +10,7 @@ class IrkApplication(
     val id: Long? = null,
 
     @MapsId
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRGOS_ID", referencedColumnName = "ID")
     var personProgramme: PersonProgramme? = null,
 

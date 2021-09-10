@@ -1,18 +1,21 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_PROWADZONE_KIERUNKI")
 class ConductedFieldOfStudy(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_PROW_KIER_SEQ")
     @SequenceGenerator(sequenceName = "DZ_PROW_KIER_SEQ", allocationSize = 1, name = "DZ_PROW_KIER_SEQ")
     @Column(name = "ID", length = 10)
-    var id: Long? = null,
+    val id: Long? = null,
 
     @Column(name = "KOD_POLON", length = 20, nullable = false)
-    var polonCode: String,
+    val polonCode: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "JED_ORG_KOD", referencedColumnName = "KOD", nullable = false)
@@ -20,44 +23,44 @@ class ConductedFieldOfStudy(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "KRSTD_KOD", referencedColumnName = "KOD", nullable = false)
-    var fieldOfStudy: FieldOfStudy,
+    val fieldOfStudy: FieldOfStudy,
 
     @Column(name = "STOPIEN_STUDIOW", length = 1, nullable = false)
-    var degreeOfStudy: Int,
+    val degreeOfStudy: Int,
 
     @Column(name = "FORMA_STUDIOW", length = 2, nullable = false)
-    var formOfStudy: String = "SN",
+    val formOfStudy: String = "SN",
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UPR_KIER_ID", referencedColumnName = "ID", nullable = false)
-    var fieldOfStudyPermission: FieldOfStudyPermission,
+    val fieldOfStudyPermission: FieldOfStudyPermission,
 
     @Column(name = "PROFIL", length = 2, nullable = false)
-    var profile: String,
+    val profile: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "KRSTD_KOD_SPEC", referencedColumnName = "KOD", nullable = true)
-    var fieldOfStudySpeciality: FieldOfStudy,
+    val fieldOfStudySpeciality: FieldOfStudy,
 
     @Column(name = "UID_POLON", length = 128, nullable = true)
-    var polonUID: String? = null,
+    val polonUID: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "JZK_KOD_KSZT", referencedColumnName = "KOD", nullable = true)
-    var language: Language,
+    val language: Language,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STOP_ZAW_ID", referencedColumnName = "ID", nullable = true)
-    var professionalDegree: ProfessionalDegree,
+    val professionalDegree: ProfessionalDegree,
 
     @Column(name = "LICZBA_SEMESTROW", length = 2, nullable = true)
-    var numberOfSemesters: Int? = null,
+    val numberOfSemesters: Int? = null,
 
     @Column(name = "PUNKTY_ECTS", length = 13, nullable = true)
-    var EctsPoints: Double?,
+    val EctsPoints: Double?,
 
-    @OneToMany(mappedBy = "conductedFieldOfStudy")
-    var programmes: MutableList<Programme>,
+    @OneToMany(mappedBy = "conductedFieldOfStudy", fetch = FetchType.LAZY)
+    val programmes: MutableList<Programme>,
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

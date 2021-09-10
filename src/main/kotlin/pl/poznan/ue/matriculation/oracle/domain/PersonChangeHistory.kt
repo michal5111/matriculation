@@ -14,7 +14,7 @@ class PersonChangeHistory(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OS_ID", referencedColumnName = "ID", nullable = false, unique = false)
-    var person: Person,
+    var person: Person?,
 
     @Column(name = "PESEL", length = 11, nullable = true)
     var pesel: String? = null,
@@ -54,7 +54,7 @@ class PersonChangeHistory(
     val taxOffice: TaxOffice? = null,
 
     @Column(name = "KOMENTARZ", length = 1000, nullable = true)
-    var comment: String? = "Dane zmienione w trakcie immatrykulacji przez IRK",
+    var comment: String? = "Dane zmienione w trakcie immatrykulacji przez Immatrykulator 5000",
 
     @Column(name = "DATA_ZMIANY", nullable = false)
     var changeDate: Date = Date(),

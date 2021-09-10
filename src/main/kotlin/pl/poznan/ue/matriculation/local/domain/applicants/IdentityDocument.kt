@@ -6,12 +6,20 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
+@Table(
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "IdentityDocumentUniqueConstraint",
+            columnNames = ["number", "type"]
+        )
+    ]
+)
 class IdentityDocument(
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", referencedColumnName = "id")
-    val applicant: Applicant? = null,
+    var applicant: Applicant? = null,
 
     var country: String?,
 
@@ -30,12 +38,8 @@ class IdentityDocument(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other !is IdentityDocument) return false
 
-        other as IdentityDocument
-
-        if (country != other.country) return false
-        if (expDate != other.expDate) return false
         if (number != other.number) return false
         if (type != other.type) return false
 
@@ -43,9 +47,7 @@ class IdentityDocument(
     }
 
     override fun hashCode(): Int {
-        var result = country?.hashCode() ?: 0
-        result = 31 * result + (expDate?.hashCode() ?: 0)
-        result = 31 * result + (number?.hashCode() ?: 0)
+        var result = number?.hashCode() ?: 0
         result = 31 * result + (type?.hashCode() ?: 0)
         return result
     }

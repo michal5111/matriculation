@@ -1,8 +1,12 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.CacheConcurrencyStrategy
+import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_KIERUNKI_STUDIOW")
 class FieldOfStudy(
 
@@ -15,38 +19,39 @@ class FieldOfStudy(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "NADRZEDNY_KOD", referencedColumnName = "KOD", nullable = false)
-    var fieldOfStudy: FieldOfStudy? = null,
+    val fieldOfStudy: FieldOfStudy? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TYP_KIERUNKU_KOD", referencedColumnName = "KOD", nullable = false)
-    var fieldOfStudyType: FieldOfStudyType,
+    val fieldOfStudyType: FieldOfStudyType,
 
+    @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_WYSWIETLAC", length = 1, nullable = false)
-    var display: Char = 'T',
+    val display: Boolean = true,
 
     @Column(name = "DESCRIPTION", length = 200, nullable = false)
-    var descriptionEng: String? = null,
+    val descriptionEng: String? = null,
 
     @Column(name = "OPIS_NIE", length = 200, nullable = true)
-    var descriptionGer: String? = null,
+    val descriptionGer: String? = null,
 
     @Column(name = "OPIS_ROS", length = 200, nullable = true)
-    var descriptionRus: String? = null,
+    val descriptionRus: String? = null,
 
     @Column(name = "OPIS_HIS", length = 200, nullable = true)
-    var descriptionHis: String? = null,
+    val descriptionHis: String? = null,
 
     @Column(name = "OPIS_FRA", length = 200, nullable = true)
-    var descriptionFra: String? = null,
+    val descriptionFra: String? = null,
 
     @Column(name = "KOD_POLON", length = 20, nullable = false)
-    var polonCode: String,
+    val polonCode: String,
 
     @OneToMany(mappedBy = "fieldOfStudy", fetch = FetchType.LAZY)
-    var conductedFieldOfStudy: MutableList<ConductedFieldOfStudy>,
+    val conductedFieldOfStudy: MutableList<ConductedFieldOfStudy>,
 
     @OneToMany(mappedBy = "fieldOfStudySpeciality", fetch = FetchType.LAZY)
-    var conductedFieldOfStudySpeciality: MutableList<ConductedFieldOfStudy>
+    val conductedFieldOfStudySpeciality: MutableList<ConductedFieldOfStudy>
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

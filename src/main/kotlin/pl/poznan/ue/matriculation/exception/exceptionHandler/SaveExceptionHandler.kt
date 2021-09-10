@@ -4,6 +4,7 @@ import org.hibernate.JDBCException
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.kotlinExtensions.stackTraceToString
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
@@ -34,8 +35,8 @@ class SaveExceptionHandler(
             }
             if (e is JDBCException) {
                 application.importError += "${e.javaClass.simpleName}: ${e.message} Error code: ${e.errorCode} " +
-                        "Sql: ${e.sql} " +
-                        "Sql state: ${e.sqlState} "
+                    "Sql: ${e.sql} " +
+                    "Sql state: ${e.sqlState} "
             } else {
                 application.importError += "${e?.javaClass?.simpleName}: ${e?.message} "
             }
@@ -44,7 +45,8 @@ class SaveExceptionHandler(
         application.importStatus = ApplicationImportStatus.ERROR
         application.stackTrace = exception.stackTraceToString()
         importProgress.saveErrors++
-        applicantRepository.save(application.applicant!!)
+        val applicant = application.applicant ?: throw ApplicantNotFoundException()
+        applicantRepository.save(applicant)
         applicationRepository.save(application)
     }
 }

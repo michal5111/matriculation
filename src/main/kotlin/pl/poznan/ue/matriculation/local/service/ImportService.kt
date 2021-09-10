@@ -17,10 +17,10 @@ import java.util.*
 
 @Service
 class ImportService(
-        private val importRepository: ImportRepository,
-        private val programmeRepository: ProgrammeRepository,
-        private val importProgressRepository: ImportProgressRepository,
-        private val didacticCycleRepository: DidacticCycleRepository
+    private val importRepository: ImportRepository,
+    private val programmeRepository: ProgrammeRepository,
+    private val importProgressRepository: ImportProgressRepository,
+    private val didacticCycleRepository: DidacticCycleRepository
 ) {
 
     private val logger = LoggerFactory.getLogger(ImportService::class.java)
@@ -37,7 +37,12 @@ class ImportService(
         dataSourceType: String,
         dataFile: String? = null
     ): Import {
-        if (importRepository.existsByProgrammeForeignIdAndRegistrationAndStageCode(programmeForeignId, registration, stageCode)) {
+        if (importRepository.existsByProgrammeForeignIdAndRegistrationAndStageCode(
+                programmeForeignId,
+                registration,
+                stageCode
+            )
+        ) {
             throw ImportCreationException("Import tego programu już istnieje.")
         }
         if (!programmeRepository.existsById(programmeCode)) {
@@ -63,10 +68,6 @@ class ImportService(
         return importRepository.save(import)
     }
 
-    fun setImportStatus(importStatus: ImportStatus, importId: Long) {
-        importProgressRepository.setStatus(importStatus, importId)
-    }
-
     fun get(importId: Long): Import {
         return importRepository.findByIdOrNull(importId)
             ?: throw ImportNotFoundException("Nie znaleziono imoportu.")
@@ -75,10 +76,6 @@ class ImportService(
     fun getProgress(importId: Long): ImportProgress {
         return importProgressRepository.findByIdOrNull(importId)
             ?: throw ImportNotFoundException("Nie znaleziono importu.")
-    }
-
-    fun setError(importId: Long, errorMessage: String) {
-        importProgressRepository.setError(errorMessage, importId)
     }
 
     fun getAll(pageable: org.springframework.data.domain.Pageable): Page<Import> {
@@ -107,6 +104,7 @@ class ImportService(
                 ImportStatus.COMPLETE,
                 ImportStatus.COMPLETED_WITH_ERRORS,
                 ImportStatus.SENDING_NOTIFICATIONS,
+                ImportStatus.CHECKING_POTENTIAL_DUPLICATES,
                 ImportStatus.SEARCHING_UIDS -> throw ImportStartException(importId, "Zły stan importu.")
                 ImportStatus.ERROR,
                 ImportStatus.PENDING -> {
@@ -125,5 +123,21 @@ class ImportService(
 
     fun save(import: Import): Import {
         return importRepository.save(import)
+    }
+
+    fun saveProgress(importProgress: ImportProgress): ImportProgress {
+        return importProgressRepository.save(importProgress)
+    }
+
+    fun setError(importId: Long, s: String) = importProgressRepository.getById(importId).apply {
+        error = s
+    }.also {
+        importProgressRepository.save(it)
+    }
+
+    fun setImportStatus(importStatus: ImportStatus, importId: Long) = importProgressRepository.getById(importId).apply {
+        this.importStatus = importStatus
+    }.also {
+        importProgressRepository.save(it)
     }
 }

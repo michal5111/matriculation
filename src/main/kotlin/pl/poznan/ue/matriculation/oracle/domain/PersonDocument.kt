@@ -33,6 +33,7 @@ class PersonDocument(
     @Column(name = "OPIS", length = 1000, nullable = true)
     var description: String? = null,
 
+    @Basic(fetch = FetchType.LAZY)
     @Lob
     @Column(name = "DOKUMENT", nullable = true)
     var document: ByteArray? = null,
@@ -50,8 +51,8 @@ class PersonDocument(
     @Column(name = "FORMAT", length = 4, nullable = false)
     var format: String,
 
-    @OneToMany(mappedBy = "personDocument")
-    var arrivals: MutableList<Arrival>
+    @OneToMany(mappedBy = "personDocument", fetch = FetchType.LAZY)
+    val arrivals: MutableList<Arrival>
 
     //Todo Add ELS_CERT_ID
 ) : BaseEntity() {

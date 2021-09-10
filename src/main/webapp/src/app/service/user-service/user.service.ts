@@ -1,11 +1,12 @@
 import {Inject, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {UserDetails} from '../../model/user/userDetails';
-import {tap} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 import {APP_BASE_HREF} from '@angular/common';
 import {User} from '../../model/user/user';
 import {Observable} from 'rxjs';
 import {Page} from '../../model/oracle/page/page';
+import {ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot, UrlTree} from '@angular/router';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -16,7 +17,7 @@ const httpOptions = {
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class UserService implements CanActivate {
 
   userUrl = `${this.baseHref}api/user`;
   user: UserDetails;
@@ -28,7 +29,7 @@ export class UserService {
   getUser() {
     return this.http.get<UserDetails>(this.userUrl, httpOptions).pipe(
       tap(user => this.user = user),
-      tap(user => this.isAuthenticated = !!user.casAssertion)
+      tap(user => this.isAuthenticated = user?.authorities?.length > 0)
     );
   }
 
@@ -56,5 +57,26 @@ export class UserService {
       return false;
     }
     return this.user.authorities.find(x => x.authority === role) !== undefined;
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    for (const role of roles) {
+      if (this.hasRole(role)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    const authorities = route.data?.authorities;
+    if (!authorities || authorities.length === 0 || this.hasAnyRole(authorities)) {
+      return this.getUser().pipe(
+        map(user => user.authorities.length > 0)
+      );
+    }
+    return false;
   }
 }

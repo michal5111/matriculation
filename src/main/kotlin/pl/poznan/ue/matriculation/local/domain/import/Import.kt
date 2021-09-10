@@ -1,12 +1,15 @@
 package pl.poznan.ue.matriculation.local.domain.import
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import org.hibernate.annotations.CacheConcurrencyStrategy
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import java.util.*
 import javax.persistence.*
 
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 class Import(
     val programmeCode: String,
 
@@ -26,12 +29,14 @@ class Import(
 
     val dataSourceId: String,
 
+    @get:JsonIgnore
+    @Basic(fetch = FetchType.LAZY)
     @Lob
     val dataFile: ByteArray?,
 
     @JsonIgnore
     @OneToMany(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
-    val applications: MutableSet<Application> = mutableSetOf()
+    val applications: MutableSet<Application> = HashSet()
 ) : BaseEntityLongId() {
 
     @OneToOne(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.REMOVE])
@@ -58,7 +63,7 @@ class Import(
         if (dataSourceId != other.dataSourceId) return false
         if (dataFile != null) {
             if (other.dataFile == null) return false
-            if (!dataFile.contentEquals(other.dataFile)) return false
+            if (!dataFile!!.contentEquals(other.dataFile)) return false
         } else if (other.dataFile != null) return false
 
         return true
@@ -74,7 +79,7 @@ class Import(
         result = 31 * result + dateOfAddmision.hashCode()
         result = 31 * result + didacticCycleCode.hashCode()
         result = 31 * result + dataSourceId.hashCode()
-        result = 31 * result + (dataFile?.contentHashCode() ?: 0)
+        result = 31 * result + (dataFile?.hashCode() ?: 0)
         return result
     }
 

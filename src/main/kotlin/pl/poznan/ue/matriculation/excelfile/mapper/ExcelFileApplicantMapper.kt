@@ -1,6 +1,9 @@
 package pl.poznan.ue.matriculation.excelfile.mapper
 
 import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicantDto
+import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
+import pl.poznan.ue.matriculation.kotlinExtensions.trimPhoneNumber
+import pl.poznan.ue.matriculation.kotlinExtensions.trimPostalCode
 import pl.poznan.ue.matriculation.local.domain.applicants.*
 import pl.poznan.ue.matriculation.local.domain.enum.AddressType
 import java.util.*
@@ -35,10 +38,8 @@ class ExcelFileApplicantMapper {
             citizenship = excelFileApplicant.citizenship,
             applicantForeignerData = null,
             educationData = EducationData(),
-            casPasswordOverride = null,
             indexNumber = null,
             modificationDate = Date(),
-            phone = excelFileApplicant.phoneNumber,
             password = null,
             photo = null,
             photoPermission = null
@@ -72,7 +73,7 @@ class ExcelFileApplicantMapper {
                     street = excelFileApplicant.address.street,
                     streetNumber = excelFileApplicant.address.streetNumber,
                     flatNumber = excelFileApplicant.address.flatNumber,
-                    postalCode = excelFileApplicant.address.postalCode
+                    postalCode = excelFileApplicant.address.postalCode?.trimPostalCode()
                 )
             )
             name.applicant = this
@@ -88,30 +89,26 @@ class ExcelFileApplicantMapper {
     ): Applicant {
         return applicant.apply {
             name.apply {
-                given = excelFileApplicant.given
-                middle = excelFileApplicant.middle
-                family = excelFileApplicant.family
+                given = excelFileApplicant.given.nameCapitalize()
+                middle = excelFileApplicant.middle?.nameCapitalize()
+                family = excelFileApplicant.family.nameCapitalize()
             }
-            email = excelFileApplicant.email
+            email = excelFileApplicant.email.trim()
             basicData.apply {
-                cityOfBirth = excelFileApplicant.birthPlace
+                cityOfBirth = excelFileApplicant.birthPlace.trim()
                 countryOfBirth = null
                 dataSource = "User"
                 dateOfBirth = excelFileApplicant.birthDate
-                pesel = excelFileApplicant.pesel
+                pesel = excelFileApplicant.pesel?.trim()
                 sex = excelFileApplicant.sex
             }
             additionalData.apply {
-                fathersName = excelFileApplicant.fathersName
-                mothersName = excelFileApplicant.mothersName
+                fathersName = excelFileApplicant.fathersName?.nameCapitalize()
+                mothersName = excelFileApplicant.mothersName?.nameCapitalize()
             }
-            citizenship = excelFileApplicant.citizenship
+            citizenship = excelFileApplicant.citizenship.trim()
             modificationDate = Date()
-            phone = excelFileApplicant.phoneNumber
-            phoneNumbers.clear()
-            identityDocuments.clear()
-            addresses.clear()
-            excelFileApplicant.phoneNumber?.let {
+            excelFileApplicant.phoneNumber?.trimPhoneNumber()?.let {
                 phoneNumbers += PhoneNumber(
                     comment = "Podstawowy numer telefonu",
                     phoneNumberType = "KOM",
@@ -131,13 +128,13 @@ class ExcelFileApplicantMapper {
             addresses.add(
                 Address(
                     addressType = AddressType.PERMANENT,
-                    city = excelFileApplicant.address.city,
+                    city = excelFileApplicant.address.city?.trim(),
                     cityIsCity = false,
-                    countryCode = excelFileApplicant.address.countryCode,
-                    street = excelFileApplicant.address.street,
-                    streetNumber = excelFileApplicant.address.streetNumber,
-                    flatNumber = excelFileApplicant.address.flatNumber,
-                    postalCode = excelFileApplicant.address.postalCode
+                    countryCode = excelFileApplicant.address.countryCode?.trim(),
+                    street = excelFileApplicant.address.street?.trim(),
+                    streetNumber = excelFileApplicant.address.streetNumber?.trim(),
+                    flatNumber = excelFileApplicant.address.flatNumber?.trim(),
+                    postalCode = excelFileApplicant.address.postalCode?.trimPostalCode()
                 )
             )
         }

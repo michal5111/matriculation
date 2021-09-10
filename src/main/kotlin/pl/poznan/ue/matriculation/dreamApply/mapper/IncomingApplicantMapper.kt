@@ -12,7 +12,7 @@ class IncomingApplicantMapper(schoolRepository: SchoolRepository) : DreamApplyAp
     override fun map(dreamApplyApplicantDto: DreamApplyApplicantDto): Applicant {
         return super.map(dreamApplyApplicantDto).also {
             val homeData = dreamApplyApplicantDto.dreamApplyApplication?.home
-            it.erasmusData = createErasmusData(homeData!!, it, dreamApplyApplicantDto)
+            it.erasmusData = createErasmusData(homeData ?: return@also, it, dreamApplyApplicantDto)
         }
     }
 
@@ -26,20 +26,20 @@ class IncomingApplicantMapper(schoolRepository: SchoolRepository) : DreamApplyAp
                 it.erasmusData!!.apply {
                     this.accommodationPreference = accommodationPreference
                     coordinatorData = CoordinatorData(
-                            email = homeData.contact?.email,
-                            name = homeData.contact?.name,
-                            phone = homeData.contact?.telephone?.fixed
+                        email = homeData.contact?.email,
+                        name = homeData.contact?.name,
+                        phone = homeData.contact?.telephone?.fixed
                     )
                     courseData = CourseData(
-                            level = homeData.course?.level,
-                            name = homeData.course?.name,
-                            term = homeData.course?.term
+                        level = homeData.course?.level,
+                        name = homeData.course?.name,
+                        term = homeData.course?.term
                     )
                     homeInstitution = HomeInstitution(
-                            address = homeData.institution?.address,
-                            country = homeData.institution?.country,
-                            departmentName = homeData.institution?.department?.name,
-                            erasmusCode = homeData.institution?.erasmus
+                        address = homeData.institution?.address,
+                        country = homeData.institution?.country,
+                        departmentName = homeData.institution?.department?.name,
+                        erasmusCode = homeData.institution?.erasmus
                     )
                     type = dreamApplyApplicantDto.dreamApplyApplication!!.courseType
                     duration = when (dreamApplyApplicantDto.dreamApplyApplication?.duration) {
@@ -52,8 +52,8 @@ class IncomingApplicantMapper(schoolRepository: SchoolRepository) : DreamApplyAp
     }
 
     private fun getAccommodationPreference(dreamApplyApplicantDto: DreamApplyApplicantDto): AccommodationPreference {
-        return dreamApplyApplicantDto.dreamApplyApplication?.extras?.find { extraDto ->
-            extraDto.name == "Accommodation preference"
+        return dreamApplyApplicantDto.dreamApplyApplication?.extras?.find { (name) ->
+            name == "Accommodation preference"
         }.let { extraDto ->
             return@let when (extraDto?.name) {
                 "I will book a private accommodation" -> AccommodationPreference.PRIVATE
@@ -63,32 +63,36 @@ class IncomingApplicantMapper(schoolRepository: SchoolRepository) : DreamApplyAp
         }
     }
 
-    private fun createErasmusData(homeDto: HomeDto, applicant: Applicant, dreamApplyApplicantDto: DreamApplyApplicantDto): ErasmusData {
+    private fun createErasmusData(
+        homeDto: HomeDto,
+        applicant: Applicant,
+        dreamApplyApplicantDto: DreamApplyApplicantDto
+    ): ErasmusData {
         val accommodationPreference = getAccommodationPreference(dreamApplyApplicantDto)
         val erasmusData = ErasmusData(
-                applicant = applicant,
-                accommodationPreference = accommodationPreference,
-                coordinatorData = CoordinatorData(
-                        email = homeDto.contact?.email,
-                        name = homeDto.contact?.name,
-                        phone = homeDto.contact?.telephone?.fixed
-                ),
-                courseData = CourseData(
-                        level = homeDto.course?.level,
-                        name = homeDto.course?.name,
-                        term = homeDto.course?.term
-                ),
-                homeInstitution = HomeInstitution(
-                        address = homeDto.institution?.address,
-                        country = homeDto.institution?.country,
-                        departmentName = homeDto.institution?.department?.name,
-                        erasmusCode = homeDto.institution?.erasmus
-                ),
-                type = dreamApplyApplicantDto.dreamApplyApplication?.courseType,
-                duration = when (dreamApplyApplicantDto.dreamApplyApplication?.duration) {
-                    "2 semesters" -> DurationType.TWO_SEMESTERS
-                    else -> DurationType.ONE_SEMESTER
-                }
+            applicant = applicant,
+            accommodationPreference = accommodationPreference,
+            coordinatorData = CoordinatorData(
+                email = homeDto.contact?.email,
+                name = homeDto.contact?.name,
+                phone = homeDto.contact?.telephone?.fixed
+            ),
+            courseData = CourseData(
+                level = homeDto.course?.level,
+                name = homeDto.course?.name,
+                term = homeDto.course?.term
+            ),
+            homeInstitution = HomeInstitution(
+                address = homeDto.institution?.address,
+                country = homeDto.institution?.country,
+                departmentName = homeDto.institution?.department?.name,
+                erasmusCode = homeDto.institution?.erasmus
+            ),
+            type = dreamApplyApplicantDto.dreamApplyApplication?.courseType,
+            duration = when (dreamApplyApplicantDto.dreamApplyApplication?.duration) {
+                "2 semesters" -> DurationType.TWO_SEMESTERS
+                else -> DurationType.ONE_SEMESTER
+            }
         )
         erasmusData.coordinatorData?.erasmusData = applicant.erasmusData
         erasmusData.courseData?.erasmusData = applicant.erasmusData

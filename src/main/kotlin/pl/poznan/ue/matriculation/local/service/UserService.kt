@@ -32,8 +32,8 @@ class UserService(
     fun save(userDto: UserDto): User {
         val ldapUser = ldapUserRepository.findByUid(userDto.uid) ?: throw UidNotFoundException()
         val user = User(uid = userDto.uid, usosId = ldapUser.usosId).apply {
-            userDto.roles.map { roleDto ->
-                UserRole(this, roleService.getOne(roleDto.code))
+            userDto.roles.map { (code) ->
+                UserRole(this, roleService.getOne(code))
             }.let {
                 roles.addAll(it)
             }
@@ -46,8 +46,8 @@ class UserService(
         val id = userDto.id ?: throw IllegalArgumentException("User id is null")
         val user = userRepository.findByIdOrNull(id) ?: throw EntityNotFoundException("User not found")
         user.roles.removeIf {
-            userDto.roles.none { roleDto ->
-                it.role.code == roleDto.code
+            userDto.roles.none { (code) ->
+                it.role.code == code
             }
         }
         userDto.roles.filter {

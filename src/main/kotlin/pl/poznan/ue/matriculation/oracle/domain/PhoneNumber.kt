@@ -1,15 +1,21 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.GenericGenerator
+import org.hibernate.annotations.Parameter
 import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_TELEFONY")
 class PhoneNumber(
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_TEL_SEQ")
-    @SequenceGenerator(sequenceName = "DZ_TEL_SEQ", allocationSize = 1, name = "DZ_TEL_SEQ")
+    @GeneratedValue(generator = "phoneNumberIdGenerator")
+    @GenericGenerator(
+        name = "phoneNumberIdGenerator",
+        parameters = [Parameter(name = "sequenceId", value = "DZ_TEL_SEQ")],
+        strategy = "pl.poznan.ue.matriculation.oracle.customKeyGenerator.SequenceStringKeyGenerator"
+    )
     @Column(name = "ID", length = 10)
-    val id: Long? = null,
+    val id: String? = null,
 
     @Column(name = "NUMER", length = 50, nullable = false)
     var number: String,
