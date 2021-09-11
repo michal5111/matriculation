@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {ForbiddenDialogComponent} from './forbidden-dialog.component';
 
@@ -6,11 +6,11 @@ describe('ForbiddenDialogComponent', () => {
   let component: ForbiddenDialogComponent;
   let fixture: ComponentFixture<ForbiddenDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ForbiddenDialogComponent ]
+      declarations: [ForbiddenDialogComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

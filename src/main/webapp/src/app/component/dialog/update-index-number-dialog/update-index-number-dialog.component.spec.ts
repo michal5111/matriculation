@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {UpdateIndexNumberDialogComponent} from './update-index-number-dialog.component';
 
@@ -6,11 +6,11 @@ describe('UpdateIndexNumberDialogComponent', () => {
   let component: UpdateIndexNumberDialogComponent;
   let fixture: ComponentFixture<UpdateIndexNumberDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ UpdateIndexNumberDialogComponent ]
+      declarations: [UpdateIndexNumberDialogComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
