@@ -28,6 +28,7 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {NgxMatFileInputModule} from '@angular-material-components/file-input';
+import {MatMomentDateModule} from '@angular/material-moment-adapter';
 
 @NgModule({
   declarations: [],
@@ -60,7 +61,8 @@ import {NgxMatFileInputModule} from '@angular-material-components/file-input';
     MatSidenavModule,
     MatTooltipModule,
     NgxMatFileInputModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatMomentDateModule
   ],
   exports: [
     MatToolbarModule,
@@ -90,7 +92,8 @@ import {NgxMatFileInputModule} from '@angular-material-components/file-input';
     MatSidenavModule,
     MatTooltipModule,
     NgxMatFileInputModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatMomentDateModule
   ]
 })
 export class MaterialModule {

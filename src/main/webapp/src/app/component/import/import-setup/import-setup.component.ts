@@ -12,6 +12,9 @@ import {MatSelectChange} from '@angular/material/select';
 import {DataSource} from '../../../model/import/dataSource';
 import {Programme} from '../../../model/applications/programme';
 import {UsosService} from '../../../service/usos-service/usos.service';
+import * as _moment from 'moment';
+
+const moment = _moment;
 
 @Component({
   selector: 'app-import-setup',
