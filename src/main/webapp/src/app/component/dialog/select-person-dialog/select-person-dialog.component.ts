@@ -53,7 +53,7 @@ export class SelectPersonDialogComponent implements OnInit {
   ngOnInit(): void {
     this.applicant = this.data.application.applicant;
     this.applicantDataSource.data = [this.applicant];
-    this.importService.getPotentialDuplicates(this.data.application.id).subscribe(persons => {
+    this.importService.getPotentialDuplicates(this.data.application.applicant.id).subscribe(persons => {
       this.persons = persons;
       this.dataSource.data = persons.map(person => {
         return new Selectable(person, false);

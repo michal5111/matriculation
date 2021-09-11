@@ -32,7 +32,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
     open fun map(dreamApplyApplicantDto: DreamApplyApplicantDto): Applicant {
         val application = dreamApplyApplicantDto.dreamApplyApplication
             ?: throw java.lang.IllegalStateException("Application is null")
-        val profile = application.profile ?: throw java.lang.IllegalStateException("Profile is null")
+        val profile = application.profile ?: throw IllegalStateException("Profile is null")
         return Applicant(
             foreignId = dreamApplyApplicantDto.id,
             name = Name(
@@ -142,7 +142,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 applicant.addIdentityDocument(
                     IdentityDocument(
                         type = IdentityDocumentType.ID_CARD,
-                        number = this.replace(" ", ""),
+                        number = this.replace("[^a-zA-Z0-9]+", ""),
                         country = null,
                         expDate = null,
                         applicant = applicant
@@ -156,7 +156,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                         country = it.country,
                         expDate = it.expiry,
                         applicant = applicant,
-                        number = this.replace(" ", "")
+                        number = this.replace("[^a-zA-Z0-9]+", "")
                     )
                 )
             }

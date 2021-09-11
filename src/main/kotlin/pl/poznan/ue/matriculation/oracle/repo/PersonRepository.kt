@@ -59,8 +59,8 @@ interface PersonRepository : JpaRepository<Person, Long> {
         from Person p
         where p.id = :personId
         or p.pesel = :pesel
-        or UPPER(p.idNumber) in (:idNumbers)
-        or p.id = (select distinct h.person.id from PersonChangeHistory h where UPPER(h.idNumber) in (:idNumbers))
+        or UPPER(FUNCTION('REGEXP_REPLACE',p.idNumber,'[^a-zA-Z0-9]+','')) in (:idNumbers)
+        or p.id = (select distinct h.person.id from PersonChangeHistory h where UPPER(FUNCTION('REGEXP_REPLACE',h.idNumber,'[^a-zA-Z0-9]+','')) in (:idNumbers))
         or UPPER(FUNCTION('REPLACE',p.email,' ','')) = UPPER(:email)
         or UPPER(FUNCTION('REPLACE',p.privateEmail,' ','')) = UPPER(:privateEmail)
     """
@@ -81,13 +81,17 @@ interface PersonRepository : JpaRepository<Person, Long> {
         and p.surname = :surname
         and p.pesel is null
         and p.birthDate = :birthDate
-        and (p.idNumber is null or p.idNumber not in (:idNumbers))
+        and UPPER(FUNCTION('REPLACE',p.email,' ','')) <> UPPER(:email)
+        and UPPER(FUNCTION('REPLACE',p.privateEmail,' ','')) <> UPPER(:privateEmail)
+        and (p.idNumber is null or UPPER(FUNCTION('REGEXP_REPLACE',p.idNumber,'[^a-zA-Z0-9]+','')) not in (:idNumbers))
     """
     )
     fun findPotentialDuplicate(
         name: String,
         surname: String,
         birthDate: Date,
+        email: String,
+        privateEmail: String,
         idNumbers: List<String>
     ): List<PersonBasicData>
 }

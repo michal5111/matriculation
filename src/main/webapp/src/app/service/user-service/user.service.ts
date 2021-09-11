@@ -74,7 +74,7 @@ export class UserService implements CanActivate {
     const authorities = route.data?.authorities;
     if (!authorities || authorities.length === 0 || this.hasAnyRole(authorities)) {
       return this.getUser().pipe(
-        map(user => user.authorities.length > 0)
+        map(user => user.authorities?.length > 0)
       );
     }
     return false;

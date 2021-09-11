@@ -18,8 +18,10 @@ pl.poznan.ue.matriculation:
     defaultStudentOrganizationalUnit: UEP
     dreamApplyApiKey: rcbogew2JePfxpx4seYWssCzTsVu4qCL
     dreamApplyInstance: https://apply.ue.poznan.pl
+    dreamApplyStatus: "Positive feedback"
     incomingApiKey: YFS9hdk4BodcwLAqujNp8s6AJLnFppbS
     incomingInstance: https://incoming.ue.poznan.pl
+    incomingStatus: "Accepted"
     ldap:
         base: DC=ue,DC=poznan
         dn: CN=72846,OU=Pracownik,OU=all,DC=ue,DC=poznan

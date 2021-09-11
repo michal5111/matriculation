@@ -176,7 +176,7 @@ class IrkApplicantMapper {
                 IdentityDocument(
                     country = it.documentCountry,
                     expDate = it.documentExpDate,
-                    number = it.documentNumber?.replace(" ", ""),
+                    number = it.documentNumber?.replace("[^a-zA-Z0-9]+", ""),
                     type = it.documentType,
                     applicant = applicant
                 )

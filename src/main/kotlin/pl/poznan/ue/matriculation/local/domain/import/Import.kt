@@ -30,7 +30,6 @@ class Import(
     val dataSourceId: String,
 
     @get:JsonIgnore
-    @Basic(fetch = FetchType.LAZY)
     @Lob
     val dataFile: ByteArray?,
 
@@ -63,7 +62,7 @@ class Import(
         if (dataSourceId != other.dataSourceId) return false
         if (dataFile != null) {
             if (other.dataFile == null) return false
-            if (!dataFile!!.contentEquals(other.dataFile)) return false
+            if (!dataFile.contentEquals(other.dataFile)) return false
         } else if (other.dataFile != null) return false
 
         return true

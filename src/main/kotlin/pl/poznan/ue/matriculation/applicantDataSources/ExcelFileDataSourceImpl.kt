@@ -30,6 +30,30 @@ class ExcelFileDataSourceImpl(
 
     private var lastPage: IPage<ExcelFileApplicationDto>? = null
 
+    companion object {
+        const val NAME_CELL = 0
+        const val MIDDLE_NAME_CELL = 1
+        const val SURNAME_CELL = 2
+        const val SEX_CELL = 3
+        const val EMAIL_CELL = 4
+        const val PESEL_CELL = 5
+        const val PASSPORT_NUMBER_CELL = 6
+        const val PASSPORT_COUNTRY = 7
+        const val PASSPORT_VALID_DATE_CELL = 8
+        const val BIRTH_DATE_CELL = 9
+        const val BIRTH_PLACE_CELL = 10
+        const val FATHERS_NAME_CELL = 11
+        const val MOTHERS_NAME_CELL = 12
+        const val CITIZENSHIP_CELL = 13
+        const val ADDRESS_COUNTRY_CELL = 14
+        const val CITY_CELL = 15
+        const val STREET_CELL = 16
+        const val STREET_NUMBER_CELL = 17
+        const val FLAT_NUMBER_CELL = 18
+        const val POSTAL_CODE_CELL = 19
+        const val PHONE_NUMBER_CELL = 20
+    }
+
     override fun getApplicationsPage(
         import: Import,
         registrationCode: String,
@@ -37,9 +61,7 @@ class ExcelFileDataSourceImpl(
         pageNumber: Int
     ): IPage<ExcelFileApplicationDto> {
         val excelFileApplicationDtoList: MutableList<ExcelFileApplicationDto> = mutableListOf()
-        if (import.dataFile == null) {
-            throw IllegalStateException("Data file is null")
-        }
+        import.dataFile ?: throw IllegalStateException("Data file is null")
         val dataFile = XSSFWorkbook(import.dataFile?.inputStream())
         val sheet = dataFile.getSheet("Arkusz1")
         val rows = sheet.iterator()
@@ -145,75 +167,89 @@ class ExcelFileDataSourceImpl(
     private fun mapExcelRowToDto(row: Row, fileHashCode: Int): ExcelFileApplicationDto {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
         return ExcelFileApplicationDto(
-            id = if (row.getCell(5)?.stringCellValue != null)
-                row.getCell(5).stringCellValue.replace(" ", "").hashCode().toLong() + fileHashCode
+            id = if (row.getCell(PESEL_CELL)?.stringCellValue != null)
+                row.getCell(PESEL_CELL).stringCellValue.replace(" ", "").hashCode().toLong() + fileHashCode
             else
                 row.getCell(6)?.stringCellValue?.replace(" ", "").hashCode().toLong() + fileHashCode,
             applicant = ExcelFileApplicantDto(
-                id = if (row.getCell(5)?.stringCellValue != null)
-                    row.getCell(5)?.stringCellValue?.replace(" ", "").hashCode().toLong()
+                id = if (row.getCell(PESEL_CELL)?.stringCellValue != null)
+                    row.getCell(PESEL_CELL)?.stringCellValue?.replace(" ", "").hashCode().toLong()
                 else
-                    row.getCell(6)?.stringCellValue?.replace(" ", "").hashCode().toLong(),
-                given = row.getCell(0).stringCellValue.nameCapitalize(),
-                middle = row.getCell(1).stringCellValue.nameCapitalize(),
-                family = row.getCell(2).stringCellValue.nameCapitalize(),
-                sex = row.getCell(3).stringCellValue.trim().first(),
-                email = row.getCell(4).stringCellValue.trim(),
-                pesel = row.getCell(5)?.stringCellValue?.trim(),
-                passport = row.getCell(6)?.stringCellValue?.trim(),
-                issueCountry = row.getCell(7)?.stringCellValue?.trim(),
-                issueDate = if (row.getCell(8)?.cellType == CellType.NUMERIC) row.getCell(8)?.dateCellValue
-                else row.getCell(8)?.stringCellValue?.let {
-                    simpleDateFormat.parse(row.getCell(8)?.stringCellValue)
+                    row.getCell(PASSPORT_NUMBER_CELL)?.stringCellValue?.replace(" ", "").hashCode().toLong(),
+                given = row.getCell(NAME_CELL).stringCellValue.nameCapitalize(),
+                middle = row.getCell(MIDDLE_NAME_CELL).stringCellValue.nameCapitalize(),
+                family = row.getCell(SURNAME_CELL).stringCellValue.nameCapitalize(),
+                sex = row.getCell(SEX_CELL).stringCellValue.trim().first(),
+                email = row.getCell(EMAIL_CELL).stringCellValue.trim(),
+                pesel = row.getCell(PESEL_CELL)?.stringCellValue?.trim(),
+                passport = row.getCell(PASSPORT_NUMBER_CELL)?.stringCellValue?.trim(),
+                issueCountry = row.getCell(PASSPORT_COUNTRY)?.stringCellValue?.trim(),
+                issueDate = if (row.getCell(PASSPORT_VALID_DATE_CELL)?.cellType == CellType.NUMERIC) row.getCell(
+                    PASSPORT_VALID_DATE_CELL
+                )?.dateCellValue
+                else row.getCell(PASSPORT_VALID_DATE_CELL)?.stringCellValue?.let {
+                    simpleDateFormat.parse(row.getCell(PASSPORT_VALID_DATE_CELL)?.stringCellValue)
                 },
-                birthDate = if (row.getCell(9)?.cellType == CellType.NUMERIC) row.getCell(9).dateCellValue
-                else simpleDateFormat.parse(row.getCell(9)?.stringCellValue),
-                birthPlace = row.getCell(10).stringCellValue.trim(),
-                fathersName = row.getCell(11)?.stringCellValue?.nameCapitalize(),
-                mothersName = row.getCell(12)?.stringCellValue?.nameCapitalize(),
-                citizenship = row.getCell(13).stringCellValue.trim(),
+                birthDate = if (row.getCell(BIRTH_DATE_CELL)?.cellType == CellType.NUMERIC) row.getCell(BIRTH_DATE_CELL).dateCellValue
+                else simpleDateFormat.parse(row.getCell(BIRTH_DATE_CELL)?.stringCellValue),
+                birthPlace = row.getCell(BIRTH_PLACE_CELL).stringCellValue.trim(),
+                fathersName = row.getCell(FATHERS_NAME_CELL)?.stringCellValue?.nameCapitalize(),
+                mothersName = row.getCell(MOTHERS_NAME_CELL)?.stringCellValue?.nameCapitalize(),
+                citizenship = row.getCell(CITIZENSHIP_CELL).stringCellValue.trim(),
                 address = Address(
-                    countryCode = row.getCell(14)?.stringCellValue?.trim(),
-                    city = row.getCell(15)?.stringCellValue?.trim(),
-                    street = row.getCell(16)?.stringCellValue?.trim(),
-                    streetNumber = row.getCell(17)?.let {
-                        row.getCell(17)?.stringCellValue?.trim()
+                    countryCode = row.getCell(ADDRESS_COUNTRY_CELL)?.stringCellValue?.trim(),
+                    city = row.getCell(CITY_CELL)?.stringCellValue?.trim(),
+                    street = row.getCell(STREET_CELL)?.stringCellValue?.trim(),
+                    streetNumber = row.getCell(STREET_NUMBER_CELL)?.let {
+                        row.getCell(STREET_NUMBER_CELL)?.stringCellValue?.trim()
                     },
-                    flatNumber = row.getCell(18)?.let {
+                    flatNumber = row.getCell(FLAT_NUMBER_CELL)?.let {
                         it.stringCellValue?.trim()
                     },
-                    postalCode = row.getCell(19)?.let {
+                    postalCode = row.getCell(POSTAL_CODE_CELL)?.let {
                         it.stringCellValue?.trimPostalCode()
                     }
                 ),
-                phoneNumber = row.getCell(20)?.stringCellValue?.trimPhoneNumber()
+                phoneNumber = row.getCell(PHONE_NUMBER_CELL)?.stringCellValue?.trimPhoneNumber()
             )
         )
     }
 
     private fun checkSpreadsheet(headerRow: Row): Boolean {
-        return headerRow.getCell(0).stringCellValue.trim().uppercase(Locale.getDefault()) == "IMIĘ"
-            && headerRow.getCell(1).stringCellValue.trim().uppercase(Locale.getDefault()) == "DRUGIE IMIĘ"
-            && headerRow.getCell(2).stringCellValue.trim().uppercase(Locale.getDefault()) == "NAZWISKO"
-            && headerRow.getCell(3).stringCellValue.trim().uppercase(Locale.getDefault()) == "PŁEĆ"
-            && headerRow.getCell(4).stringCellValue.trim().uppercase(Locale.getDefault()) == "EMAIL"
-            && headerRow.getCell(5).stringCellValue.trim().uppercase(Locale.getDefault()) == "PESEL"
-            && headerRow.getCell(6).stringCellValue.trim().uppercase(Locale.getDefault()) == "NR PASZPORTU"
-            && headerRow.getCell(7).stringCellValue.trim().uppercase(Locale.getDefault()) == "KRAJ WYDANIA"
-            && headerRow.getCell(8).stringCellValue.trim().uppercase(Locale.getDefault()) == "DATA WAŻNOŚCI"
-            && headerRow.getCell(9).stringCellValue.trim().uppercase(Locale.getDefault()) == "DATA URODZENIA"
-            && headerRow.getCell(10).stringCellValue.trim().uppercase(Locale.getDefault()) == "MIEJSCE URODZENIA"
-            && headerRow.getCell(11).stringCellValue.trim().uppercase(Locale.getDefault()) == "IMIĘ OJCA"
-            && headerRow.getCell(12).stringCellValue.trim().uppercase(Locale.getDefault()) == "IMIĘ MATKI"
-            && headerRow.getCell(13).stringCellValue.trim().uppercase(Locale.getDefault()) == "KOD OBYWATELSTWA"
-            && headerRow.getCell(14).stringCellValue.trim()
+        return headerRow.getCell(NAME_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "IMIĘ"
+            && headerRow.getCell(MIDDLE_NAME_CELL).stringCellValue.trim()
+            .uppercase(Locale.getDefault()) == "DRUGIE IMIĘ"
+            && headerRow.getCell(SURNAME_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "NAZWISKO"
+            && headerRow.getCell(SEX_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "PŁEĆ"
+            && headerRow.getCell(EMAIL_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "EMAIL"
+            && headerRow.getCell(PESEL_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "PESEL"
+            && headerRow.getCell(PASSPORT_NUMBER_CELL).stringCellValue.trim()
+            .uppercase(Locale.getDefault()) == "NR PASZPORTU"
+            && headerRow.getCell(PASSPORT_COUNTRY).stringCellValue.trim()
+            .uppercase(Locale.getDefault()) == "KRAJ WYDANIA"
+            && headerRow.getCell(PASSPORT_VALID_DATE_CELL).stringCellValue.trim()
+            .uppercase(Locale.getDefault()) == "DATA WAŻNOŚCI"
+            && headerRow.getCell(BIRTH_DATE_CELL).stringCellValue.trim()
+            .uppercase(Locale.getDefault()) == "DATA URODZENIA"
+            && headerRow.getCell(BIRTH_PLACE_CELL).stringCellValue.trim()
+            .uppercase(Locale.getDefault()) == "MIEJSCE URODZENIA"
+            && headerRow.getCell(FATHERS_NAME_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "IMIĘ OJCA"
+            && headerRow.getCell(MOTHERS_NAME_CELL).stringCellValue.trim()
+            .uppercase(Locale.getDefault()) == "IMIĘ MATKI"
+            && headerRow.getCell(CITIZENSHIP_CELL).stringCellValue.trim()
+            .uppercase(Locale.getDefault()) == "KOD OBYWATELSTWA"
+            && headerRow.getCell(ADDRESS_COUNTRY_CELL).stringCellValue.trim()
             .uppercase(Locale.getDefault()) == "KOD KRAJU ISO 3166-1 ALFA-2"
-            && headerRow.getCell(15).stringCellValue.trim().uppercase(Locale.getDefault()) == "MIASTO"
-            && headerRow.getCell(16).stringCellValue.trim().uppercase(Locale.getDefault()) == "ULICA"
-            && headerRow.getCell(17).stringCellValue.trim().uppercase(Locale.getDefault()) == "NUMER ULICY"
-            && headerRow.getCell(18).stringCellValue.trim().uppercase(Locale.getDefault()) == "NUMER MIESZKANIA"
-            && headerRow.getCell(19).stringCellValue.trim().uppercase(Locale.getDefault()) == "KOD POCZTOWY"
-            && headerRow.getCell(20).stringCellValue.trim().uppercase(Locale.getDefault()) == "NR TELEFONU"
+            && headerRow.getCell(CITY_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "MIASTO"
+            && headerRow.getCell(STREET_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "ULICA"
+            && headerRow.getCell(STREET_NUMBER_CELL).stringCellValue.trim()
+            .uppercase(Locale.getDefault()) == "NUMER ULICY"
+            && headerRow.getCell(FLAT_NUMBER_CELL).stringCellValue.trim()
+            .uppercase(Locale.getDefault()) == "NUMER MIESZKANIA"
+            && headerRow.getCell(POSTAL_CODE_CELL).stringCellValue.trim()
+            .uppercase(Locale.getDefault()) == "KOD POCZTOWY"
+            && headerRow.getCell(PHONE_NUMBER_CELL).stringCellValue.trim()
+            .uppercase(Locale.getDefault()) == "NR TELEFONU"
     }
 
     override fun preprocess(applicationDto: ExcelFileApplicationDto, applicantDto: ExcelFileApplicantDto) {

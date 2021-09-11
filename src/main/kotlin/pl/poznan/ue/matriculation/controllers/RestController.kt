@@ -174,10 +174,12 @@ class RestController(
         return personRepository.findPotentialDuplicate(
             name = applicant.name.given,
             surname = applicant.name.family,
-            applicant.basicData.dateOfBirth!!,
-            applicant.identityDocuments.map {
+            birthDate = applicant.basicData.dateOfBirth!!,
+            idNumbers = applicant.identityDocuments.map {
                 it.number!!
-            }
+            },
+            privateEmail = applicant.email,
+            email = applicant.email
         )
     }
 

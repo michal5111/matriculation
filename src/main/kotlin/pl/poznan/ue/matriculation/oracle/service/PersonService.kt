@@ -504,8 +504,10 @@ class PersonService(
         name: String,
         surname: String,
         birthDate: Date,
+        email: String,
+        privateEmail: String,
         idNumbers: List<String>
     ): List<PersonBasicData> {
-        return personRepository.findPotentialDuplicate(name, surname, birthDate, idNumbers)
+        return personRepository.findPotentialDuplicate(name, surname, birthDate, email, privateEmail, idNumbers)
     }
 }

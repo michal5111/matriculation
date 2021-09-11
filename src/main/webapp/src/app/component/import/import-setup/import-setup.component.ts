@@ -60,9 +60,8 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.importCreationFormGroup.controls.dataFile.valueChanges.subscribe((fileInput: any) => {
       const reader = new FileReader();
 
-      if (fileInput && fileInput.files[0]) {
-        const file = fileInput.files[0];
-        reader.readAsDataURL(file);
+      if (fileInput) {
+        reader.readAsDataURL(fileInput);
         reader.onload = () => {
           this.import.dataFile = reader.result.toString().replace(/^data:(.*,)?/, '');
           this.cd.markForCheck();

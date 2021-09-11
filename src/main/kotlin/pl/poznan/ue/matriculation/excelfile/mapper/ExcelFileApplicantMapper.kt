@@ -119,7 +119,7 @@ class ExcelFileApplicantMapper {
                 identityDocuments.add(
                     IdentityDocument(
                         type = 'P',
-                        number = it,
+                        number = it.replace("[^a-zA-Z0-9]+", ""),
                         country = "PL",
                         expDate = Date()
                     )

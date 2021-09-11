@@ -48,6 +48,9 @@ class ApplicationDataSourceConfiguration {
     @Value("\${pl.poznan.ue.matriculation.dreamApplyInstance}")
     private lateinit var dreamApplyInstanceUrl: String
 
+    @Value("\${pl.poznan.ue.matriculation.dreamApplyStatus}")
+    private lateinit var dreamApplyStatus: String
+
     @Value("\${pl.poznan.ue.matriculation.dreamApplyApiKey}")
     private lateinit var dreamApplyApiKey: String
 
@@ -56,6 +59,9 @@ class ApplicationDataSourceConfiguration {
 
     @Value("\${pl.poznan.ue.matriculation.incomingApiKey}")
     private lateinit var incomingApiKey: String
+
+    @Value("\${pl.poznan.ue.matriculation.incomingStatus}")
+    private lateinit var incomingStatus: String
 
     @Bean(name = ["IncomingService"])
     fun incomingService(): DreamApplyService {
@@ -76,7 +82,7 @@ class ApplicationDataSourceConfiguration {
             id = "INCOMING",
             applicantMapper = IncomingApplicantMapper(schoolRepository),
             applicationMapper = DreamApplyApplicationMapper(),
-            status = "Accepted"
+            status = incomingStatus
         )
     }
 
@@ -99,7 +105,7 @@ class ApplicationDataSourceConfiguration {
             id = "DREAM_APPLY",
             applicantMapper = DreamApplyApplicantMapper(schoolRepository),
             applicationMapper = DreamApplyApplicationMapper(),
-            status = "Everything OK"
+            status = dreamApplyStatus
         )
     }
 

@@ -26,8 +26,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {MaterialFileInputModule} from 'ngx-material-file-input';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import {NgxMatFileInputModule} from '@angular-material-components/file-input';
 
 @NgModule({
   declarations: [],
@@ -59,7 +59,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
     MatDialogModule,
     MatSidenavModule,
     MatTooltipModule,
-    MaterialFileInputModule,
+    NgxMatFileInputModule,
     MatCheckboxModule
   ],
   exports: [
@@ -89,7 +89,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
     MatDialogModule,
     MatSidenavModule,
     MatTooltipModule,
-    MaterialFileInputModule,
+    NgxMatFileInputModule,
     MatCheckboxModule
   ]
 })

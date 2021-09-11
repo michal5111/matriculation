@@ -377,7 +377,9 @@ class ProcessService(
             birthDate = dateOfBirth,
             idNumbers = applicant.identityDocuments.map {
                 it.number ?: throw IllegalArgumentException("Identity document number is null")
-            }
+            },
+            email = applicant.email,
+            privateEmail = applicant.email
         )
         if (potentialDuplicatesList.isNotEmpty()) {
             logger.warn("Wykryto potencjalny duplikat!")
@@ -386,6 +388,7 @@ class ProcessService(
         } else {
             applicant.potentialDuplicateStatus = DuplicateStatus.OK
         }
+        applicantRepository.save(applicant)
     }
 
     @Transactional(
@@ -395,16 +398,20 @@ class ProcessService(
         readOnly = true
     )
     fun findPotentialDuplicates(importId: Long) {
-        val applicationsStream =
-            applicationRepository.findAllByImportIdStreamAndApplicantPotentialDuplicateStatus(
-                importId,
-                mutableListOf(DuplicateStatus.NOT_CHECKED, DuplicateStatus.POTENTIAL_DUPLICATE)
-            )
-        applicationsStream.use { stream ->
-            stream.forEach {
-                val applicant = it.applicant ?: throw ApplicantNotFoundException()
-                self.findPotentialDuplicate(applicant, importId)
+        try {
+            val applicationsStream =
+                applicationRepository.findAllByImportIdStreamAndApplicantPotentialDuplicateStatus(
+                    importId,
+                    listOf(DuplicateStatus.NOT_CHECKED, DuplicateStatus.POTENTIAL_DUPLICATE)
+                )
+            applicationsStream.use { stream ->
+                stream.forEach {
+                    val applicant = it.applicant ?: throw ApplicantNotFoundException()
+                    self.findPotentialDuplicate(applicant, importId)
+                }
             }
+        } catch (e: Exception) {
+            throw ImportException(importId, "Błąd przy wyszukiwaniu duplikatów", e)
         }
     }
 }
