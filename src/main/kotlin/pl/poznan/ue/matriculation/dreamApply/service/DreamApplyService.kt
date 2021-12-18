@@ -28,14 +28,6 @@ class DreamApplyService(
 
     private val httpEntity: HttpEntity<Any>
 
-    private class LongApplicationMapResult : ParameterizedTypeReference<Map<Long, DreamApplyApplicationDto>>()
-    private class LongAcademicTermMapResult : ParameterizedTypeReference<Map<Long, AcademicTermDto>>()
-    private class LongCourseMapResult : ParameterizedTypeReference<Map<Long, CourseDto>>()
-    private class LongOfferDtoResult : ParameterizedTypeReference<Map<Long, OfferDto>>()
-    private class LongFlagDtoResult : ParameterizedTypeReference<Map<Long, FlagDto>>()
-    private class LongFlagInfoDtoResult : ParameterizedTypeReference<Map<Long, FlagInfoDto>>()
-    private class LongApplicantCourseDtoResult : ParameterizedTypeReference<Map<Long, ApplicationCourseDto>>()
-
     init {
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set("Authorization", "DREAM apikey=\"$apiKey\"")
@@ -88,7 +80,7 @@ class DreamApplyService(
             uriComponentBuilder.build().toUri(),
             HttpMethod.GET,
             httpEntity,
-            LongApplicationMapResult()
+            object : ParameterizedTypeReference<Map<Long, DreamApplyApplicationDto>>() {}
         )
         return response.body
     }
@@ -132,7 +124,7 @@ class DreamApplyService(
             "${apiUrl}academic-terms",
             HttpMethod.GET,
             httpEntity,
-            LongAcademicTermMapResult()
+            object : ParameterizedTypeReference<Map<Long, AcademicTermDto>>() {}
         )
         return responseEntity.body
     }
@@ -162,7 +154,7 @@ class DreamApplyService(
             uriComponentBuilder.build().toUri(),
             HttpMethod.GET,
             httpEntity,
-            LongCourseMapResult()
+            object : ParameterizedTypeReference<Map<Long, CourseDto>>() {}
         )
         return response.body
     }
@@ -173,7 +165,7 @@ class DreamApplyService(
             uriComponentBuilder.build().toUri(),
             HttpMethod.GET,
             httpEntity,
-            LongOfferDtoResult()
+            object : ParameterizedTypeReference<Map<Long, OfferDto>>() {}
         )
         return response.body
     }
@@ -184,7 +176,7 @@ class DreamApplyService(
             uriComponentBuilder.build().toUri(),
             HttpMethod.GET,
             httpEntity,
-            LongFlagDtoResult()
+            object : ParameterizedTypeReference<Map<Long, FlagDto>>() {}
         )
         return response.body
     }
@@ -195,7 +187,7 @@ class DreamApplyService(
             uriComponentBuilder.build().toUri(),
             HttpMethod.GET,
             httpEntity,
-            LongFlagInfoDtoResult()
+            object : ParameterizedTypeReference<Map<Long, FlagInfoDto>>() {}
         )
         return response.body
     }
@@ -206,7 +198,7 @@ class DreamApplyService(
             uriComponentBuilder.build().toUri(),
             HttpMethod.GET,
             httpEntity,
-            LongApplicantCourseDtoResult()
+            object : ParameterizedTypeReference<Map<Long, ApplicationCourseDto>>() {}
         )
         return response.body
     }

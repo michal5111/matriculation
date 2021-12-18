@@ -87,20 +87,21 @@ class ApplicantToPersonMapper(
                 addAddress(it)
             }
             if (addresses.none { it.addressType.code == "KOR" }) {
-                addresses.find { it.addressType.code == "STA" }?.let {
-                    val ca = addressService.create(
-                        person = this,
-                        addressTypeCode = "KOR",
-                        city = it.city,
-                        street = it.street,
-                        houseNumber = it.houseNumber,
-                        apartmentNumber = it.flatNumber,
-                        zipCode = it.zipCode,
-                        cityIsCity = it.cityIsCity,
-                        countryCode = it.country?.code
-                    )
-                    addAddress(ca)
-                }
+                addresses.find { it.addressType.code == "POB" } ?: addresses.find { it.addressType.code == "STA" }
+                    ?.let {
+                        val ca = addressService.create(
+                            person = this,
+                            addressTypeCode = "KOR",
+                            city = it.city,
+                            street = it.street,
+                            houseNumber = it.houseNumber,
+                            apartmentNumber = it.flatNumber,
+                            zipCode = it.zipCode,
+                            cityIsCity = it.cityIsCity,
+                            countryCode = it.country?.code
+                        )
+                        addAddress(ca)
+                    }
             }
             applicant.educationData.documents.filter { document ->
                 document.certificateUsosCode != null

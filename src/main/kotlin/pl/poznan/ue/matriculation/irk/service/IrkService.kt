@@ -34,11 +34,6 @@ class IrkService(
 
     private val httpEntity: HttpEntity<Any>
 
-    private class PageOfApplicants : ParameterizedTypeReference<Page<IrkApplicantDto>>()
-    private class PageOfApplications : ParameterizedTypeReference<Page<IrkApplicationDTO>>()
-    private class PageOfRegistrations : ParameterizedTypeReference<Page<RegistrationDTO>>()
-    private class MapResult : ParameterizedTypeReference<Map<String, String>>()
-
     init {
         httpHeaders.contentType = MediaType.APPLICATION_JSON
         httpHeaders.set("Authorization", "Token $apiKey")
@@ -60,7 +55,7 @@ class IrkService(
             "${apiUrl}applicants/?pesel=$pesel",
             HttpMethod.GET,
             httpEntity,
-            PageOfApplicants()
+            object : ParameterizedTypeReference<Page<IrkApplicantDto>>() {}
         )
         return response.body
     }
@@ -70,7 +65,7 @@ class IrkService(
             "${apiUrl}applicants/?surname=$surname",
             HttpMethod.GET,
             httpEntity,
-            PageOfApplicants()
+            object : ParameterizedTypeReference<Page<IrkApplicantDto>>() {}
         )
         return response.body
     }
@@ -80,7 +75,7 @@ class IrkService(
             "${apiUrl}applicants/?email=$email",
             HttpMethod.GET,
             httpEntity,
-            PageOfApplicants()
+            object : ParameterizedTypeReference<Page<IrkApplicantDto>>() {}
         )
         return response.body
     }
@@ -100,7 +95,7 @@ class IrkService(
             "${apiUrl}registrations/?page=$pageNumber",
             HttpMethod.GET,
             httpEntity,
-            PageOfRegistrations()
+            object : ParameterizedTypeReference<Page<RegistrationDTO>>() {}
         ).body
     }
 
@@ -159,7 +154,7 @@ class IrkService(
             uriComponentBuilder.build().toUri(),
             HttpMethod.GET,
             httpEntity,
-            PageOfApplications()
+            object : ParameterizedTypeReference<Page<IrkApplicationDTO>>() {}
         )
         return response.body!!
     }
@@ -207,7 +202,7 @@ class IrkService(
             "${apiUrl}matriculation/${applicationId}/complete/",
             HttpMethod.POST,
             httpEntity,
-            MapResult::class
+            object : ParameterizedTypeReference<Map<String, String>>() {}
         )
     }
 
@@ -231,7 +226,7 @@ class IrkService(
             "${apiUrl}uep/user/${userId}/notify/",
             HttpMethod.POST,
             request,
-            MapResult::class
+            object : ParameterizedTypeReference<Map<String, String>>() {}
         )
     }
 }

@@ -84,7 +84,7 @@
         <ng-container matColumnDef="selectImport">
           <th mat-header-cell *matHeaderCellDef> Wybierz</th>
           <td mat-cell *matCellDef="let element">
-            <button mat-stroked-button routerLink="/import/{{element.id}}">
+            <button mat-stroked-button [routerLink]="['/import', element.id]">
               <mat-icon>arrow_right_alt</mat-icon>
               Wybierz
             </button>

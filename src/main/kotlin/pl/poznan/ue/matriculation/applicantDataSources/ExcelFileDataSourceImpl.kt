@@ -8,6 +8,7 @@ import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicantDto
 import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicationDto
 import pl.poznan.ue.matriculation.excelfile.mapper.ExcelFileApplicantMapper
 import pl.poznan.ue.matriculation.excelfile.mapper.ExcelFileApplicationMapper
+import pl.poznan.ue.matriculation.exception.ImportException
 import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPhoneNumber
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPostalCode
@@ -19,7 +20,6 @@ import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
 import pl.poznan.ue.matriculation.oracle.repo.ProgrammeRepository
 import java.text.SimpleDateFormat
-import java.util.*
 
 
 class ExcelFileDataSourceImpl(
@@ -30,7 +30,35 @@ class ExcelFileDataSourceImpl(
 
     private var lastPage: IPage<ExcelFileApplicationDto>? = null
 
+    data class CellInfo(
+        val number: Int,
+        val name: String
+    )
+
     companion object {
+        val cellsInfo = arrayOf(
+            CellInfo(0, "IMIĘ"),
+            CellInfo(1, "DRUGIE IMIĘ"),
+            CellInfo(2, "NAZWISKO"),
+            CellInfo(3, "PŁEĆ"),
+            CellInfo(4, "EMAIL"),
+            CellInfo(5, "PESEL"),
+            CellInfo(6, "NR PASZPORTU"),
+            CellInfo(7, "KRAJ WYDANIA"),
+            CellInfo(8, "DATA WAŻNOŚCI"),
+            CellInfo(9, "DATA URODZENIA"),
+            CellInfo(10, "MIEJSCE URODZENIA"),
+            CellInfo(11, "IMIĘ OJCA"),
+            CellInfo(12, "IMIĘ MATKI"),
+            CellInfo(13, "KOD OBYWATELSTWA ISO 3166-1 ALFA-2"),
+            CellInfo(14, "KOD KRAJU ISO 3166-1 ALFA-2"),
+            CellInfo(15, "MIASTO"),
+            CellInfo(16, "ULICA"),
+            CellInfo(17, "NUMER ULICY"),
+            CellInfo(18, "NUMER MIESZKANIA"),
+            CellInfo(19, "KOD POCZTOWY"),
+            CellInfo(20, "NR TELEFONU")
+        )
         const val NAME_CELL = 0
         const val MIDDLE_NAME_CELL = 1
         const val SURNAME_CELL = 2
@@ -66,9 +94,7 @@ class ExcelFileDataSourceImpl(
         val sheet = dataFile.getSheet("Arkusz1")
         val rows = sheet.iterator()
         val header = rows.next()
-        if (!checkSpreadsheet(header)) {
-            throw IllegalArgumentException("Plik nie pasuje do szablonu")
-        }
+        checkSpreadsheet(import.id, header)
         val fileHashCode = import.dataFile.hashCode()
         while (rows.hasNext()) {
             val currentRow = rows.next()
@@ -215,41 +241,16 @@ class ExcelFileDataSourceImpl(
         )
     }
 
-    private fun checkSpreadsheet(headerRow: Row): Boolean {
-        return headerRow.getCell(NAME_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "IMIĘ"
-            && headerRow.getCell(MIDDLE_NAME_CELL).stringCellValue.trim()
-            .uppercase(Locale.getDefault()) == "DRUGIE IMIĘ"
-            && headerRow.getCell(SURNAME_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "NAZWISKO"
-            && headerRow.getCell(SEX_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "PŁEĆ"
-            && headerRow.getCell(EMAIL_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "EMAIL"
-            && headerRow.getCell(PESEL_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "PESEL"
-            && headerRow.getCell(PASSPORT_NUMBER_CELL).stringCellValue.trim()
-            .uppercase(Locale.getDefault()) == "NR PASZPORTU"
-            && headerRow.getCell(PASSPORT_COUNTRY).stringCellValue.trim()
-            .uppercase(Locale.getDefault()) == "KRAJ WYDANIA"
-            && headerRow.getCell(PASSPORT_VALID_DATE_CELL).stringCellValue.trim()
-            .uppercase(Locale.getDefault()) == "DATA WAŻNOŚCI"
-            && headerRow.getCell(BIRTH_DATE_CELL).stringCellValue.trim()
-            .uppercase(Locale.getDefault()) == "DATA URODZENIA"
-            && headerRow.getCell(BIRTH_PLACE_CELL).stringCellValue.trim()
-            .uppercase(Locale.getDefault()) == "MIEJSCE URODZENIA"
-            && headerRow.getCell(FATHERS_NAME_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "IMIĘ OJCA"
-            && headerRow.getCell(MOTHERS_NAME_CELL).stringCellValue.trim()
-            .uppercase(Locale.getDefault()) == "IMIĘ MATKI"
-            && headerRow.getCell(CITIZENSHIP_CELL).stringCellValue.trim()
-            .uppercase(Locale.getDefault()) == "KOD OBYWATELSTWA"
-            && headerRow.getCell(ADDRESS_COUNTRY_CELL).stringCellValue.trim()
-            .uppercase(Locale.getDefault()) == "KOD KRAJU ISO 3166-1 ALFA-2"
-            && headerRow.getCell(CITY_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "MIASTO"
-            && headerRow.getCell(STREET_CELL).stringCellValue.trim().uppercase(Locale.getDefault()) == "ULICA"
-            && headerRow.getCell(STREET_NUMBER_CELL).stringCellValue.trim()
-            .uppercase(Locale.getDefault()) == "NUMER ULICY"
-            && headerRow.getCell(FLAT_NUMBER_CELL).stringCellValue.trim()
-            .uppercase(Locale.getDefault()) == "NUMER MIESZKANIA"
-            && headerRow.getCell(POSTAL_CODE_CELL).stringCellValue.trim()
-            .uppercase(Locale.getDefault()) == "KOD POCZTOWY"
-            && headerRow.getCell(PHONE_NUMBER_CELL).stringCellValue.trim()
-            .uppercase(Locale.getDefault()) == "NR TELEFONU"
+    private fun checkSpreadsheet(importId: Long?, headerRow: Row) {
+        cellsInfo.forEach {
+            val value = headerRow.getCell(it.number)?.stringCellValue?.uppercase()
+            if (value != it.name) {
+                throw ImportException(
+                    importId,
+                    "Plik nie zgadza się z szablonem. W nagłówku kolumny ${it.number + 1} powinno być \"${it.name}\", a jest \"${value}\""
+                )
+            }
+        }
     }
 
     override fun preprocess(applicationDto: ExcelFileApplicationDto, applicantDto: ExcelFileApplicantDto) {

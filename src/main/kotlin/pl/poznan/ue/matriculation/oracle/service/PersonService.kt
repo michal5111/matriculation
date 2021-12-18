@@ -61,14 +61,29 @@ class PersonService(
     )
     fun update(applicant: Applicant, person: Person): Person {
         val changeHistory = person.personChangeHistories.find { it.changeDate == Date() }
-            ?: PersonChangeHistory(person = null)
+            ?: PersonChangeHistory(
+                person = null,
+                pesel = person.pesel,
+                name = person.name,
+                middleName = person.middleName,
+                surname = person.surname,
+                idNumber = person.idNumber,
+                nip = person.nip,
+                nationality = person.nationality,
+                citizenship = person.citizenship,
+                documentType = person.documentType,
+                identityDocumentIssuerCountry = person.identityDocumentIssuerCountry,
+                taxOffice = person.taxOffice,
+                sex = person.sex
+            )
+        var changed = false
         person.apply {
             logger.trace("Tworzę lub aktualizuję adresy")
             createOrUpdateAddresses(this, applicant)
             logger.trace("Tworzę lub aktualizuję numery telefonów")
             createOrUpdatePhoneNumbers(this, applicant)
             logger.trace("Tworzę lub aktualizuję dokumenty tożsamości")
-            createOrUpdateIdentityDocument(this, applicant, changeHistory)
+            changed = createOrUpdateIdentityDocument(this, applicant)
             logger.trace("Tworzę lub aktualizuję dokumenty uprawniające do podjęcia studiów")
             createOrUpdateEntitlementDocument(person, applicant)
             logger.trace("Tworzę lub aktualizuję dokumenty posiadane")
@@ -82,19 +97,19 @@ class PersonService(
                 privateEmail = applicant.email
             }
             if (name != applicant.name.given) {
-                changeHistory.name = name
+                changed = true
                 name = applicant.name.given
             }
-            if (middleName != applicant.name.middle) {
-                changeHistory.middleName = middleName
+            if (middleName != applicant.name.middle && applicant.name.middle != null) {
+                changed = true
                 middleName = applicant.name.middle
             }
             if (surname != applicant.name.family) {
-                changeHistory.surname = surname
+                changed = true
                 surname = applicant.name.family
             }
             if (citizenship?.code != applicant.citizenship) {
-                changeHistory.citizenship = citizenship
+                changed = true
                 citizenship = citizenshipRepository.getById(applicant.citizenship)
             }
             applicant.basicData.dateOfBirth?.let {
@@ -103,25 +118,19 @@ class PersonService(
             applicant.basicData.cityOfBirth?.let {
                 birthCity = applicant.basicData.cityOfBirth
             }
-            birthCountry = applicant.basicData.countryOfBirth?.let {
-                citizenshipRepository.getById(it)
+            applicant.basicData.countryOfBirth?.let {
+                birthCountry = citizenshipRepository.getById(it)
             }
             if (sex != applicant.basicData.sex) {
-                changeHistory.sex = sex
+                changed = true
                 sex = applicant.basicData.sex
             }
             if (nationality?.code != applicant.nationality && applicant.nationality != null) {
-                personChangeHistories.add(
-                    PersonChangeHistory(
-                        person = person,
-                        nationality = nationality
-                    )
-                )
+                changed = true
                 nationality = citizenshipRepository.getById(applicant.nationality!!)
             }
-            organizationalUnit = organizationalUnitRepository.getById(defaultStudentOrganizationalUnitString)
-            middleSchool = applicant.educationData.highSchoolUsosCode?.let {
-                schoolRepository.getById(it)
+            applicant.educationData.highSchoolUsosCode?.let {
+                middleSchool = schoolRepository.getById(it)
             }
 
             applicant.additionalData.mothersName?.let {
@@ -130,8 +139,8 @@ class PersonService(
             applicant.additionalData.fathersName?.let {
                 fathersName = applicant.additionalData.fathersName
             }
-            wku = applicant.additionalData.wku?.let {
-                wkuRepository.getById(it)
+            applicant.additionalData.wku?.let {
+                wku = wkuRepository.getById(it)
             }
             applicant.additionalData.militaryCategory?.let {
                 militaryCategory = applicant.additionalData.militaryCategory
@@ -139,33 +148,24 @@ class PersonService(
             applicant.additionalData.militaryStatus?.let {
                 militaryStatus = applicant.additionalData.militaryStatus
             }
-            if (
-                changeHistory.name != null
-                || changeHistory.middleName != null
-                || changeHistory.surname != null
-                || changeHistory.citizenship != null
-                || changeHistory.idNumber != null
-                || changeHistory.documentType != null
-                || changeHistory.pesel != null
-                || changeHistory.sex != null
-            ) {
+            if (changed) {
                 person.addPersonChangeHistory(changeHistory)
             }
-        }
-        if (person.externalDataStatus == 'O') {
-            person.externalDataStatus = 'U'
+            if (externalDataStatus == 'O') {
+                externalDataStatus = 'U'
+            }
         }
         return person
     }
 
     private fun createOrUpdateIdentityDocument(
         person: Person,
-        applicant: Applicant,
-        changeHistory: PersonChangeHistory
-    ) {
+        applicant: Applicant
+    ): Boolean {
+        var changed = false
         applicant.basicData.pesel?.let {
             if (person.pesel != it) {
-                changeHistory.pesel = person.pesel
+                changed = true
                 person.pesel = it
             }
         }
@@ -177,11 +177,11 @@ class PersonService(
         }
         identityDocument?.number?.let {
             if (person.documentType != identityDocument.type) {
-                changeHistory.documentType = person.documentType
+                changed = true
                 person.documentType = identityDocument.type
             }
             if (person.idNumber != it) {
-                changeHistory.idNumber = person.idNumber
+                changed = true
                 person.idNumber = it
             }
             person.documentType = identityDocument.type
@@ -190,6 +190,7 @@ class PersonService(
                 citizenshipRepository.getById(documentCountry)
             }
         }
+        return changed
     }
 
     private fun createOrUpdateAddresses(person: Person, applicant: Applicant) {
@@ -207,19 +208,20 @@ class PersonService(
             )
         }
         if (person.addresses.none { it.addressType.code == "KOR" }) {
-            person.addresses.find { it.addressType.code == "STA" }?.let {
-                createOrUpdateAddress(
-                    person = person,
-                    addressTypeCode = "KOR",
-                    city = it.city,
-                    street = it.street,
-                    houseNumber = it.houseNumber,
-                    apartmentNumber = it.flatNumber,
-                    zipCode = it.zipCode,
-                    cityIsCity = it.cityIsCity,
-                    countryCode = it.country?.code
-                )
-            }
+            person.addresses.find { it.addressType.code == "POB" }
+                ?: person.addresses.find { it.addressType.code == "STA" }?.let {
+                    createOrUpdateAddress(
+                        person = person,
+                        addressTypeCode = "KOR",
+                        city = it.city,
+                        street = it.street,
+                        houseNumber = it.houseNumber,
+                        apartmentNumber = it.flatNumber,
+                        zipCode = it.zipCode,
+                        cityIsCity = it.cityIsCity,
+                        countryCode = it.country?.code
+                    )
+                }
         }
     }
 
@@ -289,7 +291,7 @@ class PersonService(
             it.certificateUsosCode != null
         }.filterNot {
             person.entitlementDocuments.any { entitlementDocument ->
-                it.certificateTypeCode == entitlementDocument.type.toString()
+                it.certificateUsosCode == entitlementDocument.type
             }
         }.forEach {
             val certificateUsosCode = it.certificateUsosCode ?: '?'

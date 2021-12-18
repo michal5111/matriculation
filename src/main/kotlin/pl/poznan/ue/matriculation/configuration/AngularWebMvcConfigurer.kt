@@ -19,7 +19,7 @@ class AngularWebMvcConfigurer : WebMvcConfigurer {
     private lateinit var appServiceHome: String
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
-        registry.addResourceHandler("/**/*")
+        registry.addResourceHandler("/**")
             .addResourceLocations("classpath:/static/")
             .resourceChain(true)
             .addResolver(object : PathResourceResolver() {

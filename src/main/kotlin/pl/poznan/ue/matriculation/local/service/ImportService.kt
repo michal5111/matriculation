@@ -37,10 +37,11 @@ class ImportService(
         dataSourceType: String,
         dataFile: String? = null
     ): Import {
-        if (importRepository.existsByProgrammeForeignIdAndRegistrationAndStageCode(
+        if (importRepository.existsByProgrammeForeignIdAndRegistrationAndStageCodeAndDidacticCycleCode(
                 programmeForeignId,
                 registration,
-                stageCode
+                stageCode,
+                didacticCycleCode
             )
         ) {
             throw ImportCreationException("Import tego programu już istnieje.")

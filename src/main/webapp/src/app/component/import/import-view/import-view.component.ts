@@ -6,14 +6,16 @@ import {filter, map, switchMap, tap} from 'rxjs/operators';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, Sort} from '@angular/material/sort';
 import {Application} from '../../../model/applications/application';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {ImportProgress} from '../../../model/import/import-progress';
 import {Observable, Subscription} from 'rxjs';
 import {Import} from '../../../model/import/import';
 import {UserService} from '../../../service/user-service/user.service';
 import {Document} from '../../../model/applications/document';
 import {MatDialog} from '@angular/material/dialog';
-import {UpdateIndexNumberDialogComponent} from '../../dialog/update-index-number-dialog/update-index-number-dialog.component';
+import {
+  UpdateIndexNumberDialogComponent
+} from '../../dialog/update-index-number-dialog/update-index-number-dialog.component';
 import {ConfirmationDialogComponent} from '../../dialog/confirmation-dialog/confirmation-dialog.component';
 import {ConfirmationDialogData} from '../../../model/dialog/confirmation-dialog-data';
 import {ErrorDialogComponent} from '../../dialog/error-dialog/error-dialog.component';
@@ -39,7 +41,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   importProgress: ImportProgress;
   progressSubscription: Subscription;
   usosUrl: UrlDto;
-  pageSize = 5;
+  pageSize = parseInt(localStorage.getItem('importViewPageSize'), 10) ?? 5;
   pageNumber = 0;
   totalElements = 0;
   page: Page<Application>;
@@ -89,6 +91,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     private importService: ImportService,
     private usosService: UsosService,
     private route: ActivatedRoute,
+    private router: Router,
     public userService: UserService,
     private dialog: MatDialog,
     private applicationsService: ApplicationsService,
@@ -128,6 +131,14 @@ export class ImportViewComponent implements OnInit, OnDestroy {
         this.usosUrl = result;
       }
     );
+    this.route.queryParams.pipe(
+      tap(params => {
+        this.pageNumber = +params.page;
+        this.sortString = this.sortingMap.get(params.sort);
+        this.sortDirString = params.dir;
+      }),
+      switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString))
+    ).subscribe();
     this.importProgressObservable$ = this.rxStompService.watch(`/topic/importProgress/${this.importId}`).pipe(
       map((message: Message) => JSON.parse(message.body)),
       tap((importProgress: ImportProgress) => this.importProgress = importProgress)
@@ -141,15 +152,40 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   switchPage(pageEvent: PageEvent): void {
-    this.pageNumber = pageEvent.pageIndex;
-    this.pageSize = pageEvent.pageSize;
-    this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe();
+    // this.pageNumber = pageEvent.pageIndex;
+    // this.pageSize = pageEvent.pageSize;
+    localStorage.setItem('importViewPageSize', pageEvent.pageSize.toString());
+    this.router.navigate(
+      [],
+      {
+        relativeTo: this.route,
+        queryParams: {
+          page: pageEvent.pageIndex,
+          sort: this.route.params,
+          dir: this.sortDirString,
+          pageSize: pageEvent.pageSize
+        }
+      }
+    );
+    // this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe();
   }
 
   sortEvent(sortEvent: Sort): void {
-    this.sortString = this.sortingMap.get(sortEvent.active);
-    this.sortDirString = sortEvent.direction;
-    this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe();
+    // this.sortString = this.sortingMap.get(sortEvent.active);
+    // this.sortDirString = sortEvent.direction;
+    this.router.navigate(
+      [],
+      {
+        relativeTo: this.route,
+        queryParams: {
+          page: this.pageNumber,
+          sort: this.sortingMap.get(sortEvent.active),
+          dir: sortEvent.direction,
+          pageSize: this.pageSize
+        }
+      }
+    );
+    // this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe();
   }
 
   startImport(): void {
