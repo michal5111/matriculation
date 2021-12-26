@@ -123,7 +123,7 @@ export class ImportComponent implements OnInit, OnDestroy {
   // }
 
   isDeleteButtonDisabled(importObject: Import): boolean {
-    switch (importObject.importProgress.importStatus) {
+    switch (importObject.importStatus) {
       case 'STARTED':
       case 'SAVING':
       case 'COMPLETE':
@@ -133,7 +133,7 @@ export class ImportComponent implements OnInit, OnDestroy {
       case 'IMPORTED':
       case 'ERROR':
       case 'PENDING':
-        return importObject.importProgress.importedApplications > 0;
+        return importObject.importedApplications > 0;
       default:
         return true;
     }

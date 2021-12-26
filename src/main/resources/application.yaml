@@ -26,13 +26,11 @@ spring:
     cache:
         jcache:
             config: classpath:ehcache.xml
-    jackson:
-        deserialization:
-            accept-empty-string-as-null-object: true
     jpa:
         #        open-in-view: false
-        database: default
         generate-ddl: false
+        #        repositories:
+        #            bootstrap-mode: lazy
         properties:
             hibernate:
                 cache:

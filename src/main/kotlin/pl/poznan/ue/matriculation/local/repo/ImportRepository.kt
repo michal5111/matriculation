@@ -2,38 +2,26 @@ package pl.poznan.ue.matriculation.local.repo
 
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.PagingAndSortingRepository
-import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
+import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
-import pl.poznan.ue.matriculation.local.dto.ImportDtoJpa
-import java.util.*
+import pl.poznan.ue.matriculation.local.domain.import.ImportProgress
 
 @Repository
 interface ImportRepository : JpaRepository<Import, Long>, PagingAndSortingRepository<Import, Long> {
 
-    @Query(
-        """
-        select
-            new pl.poznan.ue.matriculation.local.dto.ImportDtoJpa(
-                i.programmeCode,
-                i.programmeForeignId,
-                i.registration,
-                i.indexPoolCode,
-                i.startDate,
-                i.dateOfAddmision,
-                i.stageCode,
-                i.didacticCycleCode,
-                i.dataSourceId
-            ) from Import i
-            where i.id = :id
-    """
-    )
-    fun getDtoById(@Param("id") importId: Long): ImportDtoJpa
+    @EntityGraph(attributePaths = ["error", "importStatus"])
+    fun getErrorAndStatusById(id: Long): Import
 
-    @EntityGraph("import.importProgress")
-    override fun findById(id: Long): Optional<Import>
+    @EntityGraph(attributePaths = ["error"])
+    fun getWithErrorById(id: Long): Import
+
+    @EntityGraph(attributePaths = ["ImportStatus"])
+    fun getWithImportStatusById(id: Long): Import
 
     fun existsByProgrammeForeignIdAndRegistrationAndStageCodeAndDidacticCycleCode(
         programmeForeignId: String,
@@ -41,5 +29,17 @@ interface ImportRepository : JpaRepository<Import, Long>, PagingAndSortingReposi
         stageCode: String,
         didacticCycleCode: String,
     ): Boolean
+
+    @Modifying
+    @Transactional(transactionManager = "transactionManager")
+    @Query("update Import ip set ip.error = :error where ip.id = :importId")
+    fun setError(error: String, importId: Long)
+
+    @Modifying
+    @Transactional(transactionManager = "transactionManager")
+    @Query("update Import ip set ip.importStatus = :importStatus where ip.id = :importId")
+    fun setStatus(importStatus: ImportStatus, importId: Long)
+
+    fun findProgressById(id: Long): ImportProgress?
 
 }

@@ -5,14 +5,12 @@ import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.job.startConditions.ApplicantsImportStartCondition
 import pl.poznan.ue.matriculation.local.job.startConditions.IStartConditions
-import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
-import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
+import pl.poznan.ue.matriculation.local.service.ImportService
 import pl.poznan.ue.matriculation.local.service.ProcessService
 
 class ImportApplicantsJob(
-    private val importRepository: ImportRepository,
-    private val importProgressRepository: ImportProgressRepository,
+    private val importService: ImportService,
     private val processService: ProcessService,
     private val applicationDataSourceFactory: ApplicationDataSourceFactory,
     private val importId: Long
@@ -23,13 +21,13 @@ class ImportApplicantsJob(
         get() = ApplicantsImportStartCondition()
 
     override fun prepare(import: Import) {
-        import.importProgress.importStatus = ImportStatus.STARTED
-        import.importProgress.importedApplications = 0
+        import.importStatus = ImportStatus.STARTED
+        import.importedApplications = 0
     }
 
     override fun doWork() {
-        val import = importRepository.getById(importId)
-        import.importProgress.error = null
+        val import = importService.get(importId)
+        import.error = null
         val applicantDataSource = applicationDataSourceFactory.getDataSource(import.dataSourceId)
         var currentPage = 1
         try {
@@ -39,8 +37,8 @@ class ImportApplicantsJob(
                 pageNumber = currentPage,
                 import = import
             )
-            import.importProgress.totalCount = page.getSize()
-            importProgressRepository.save(import.importProgress)
+            import.totalCount = page.getSize()
+            importService.save(import)
             if (page.getSize() == 0) {
                 throw IllegalStateException("Liczba kandydatów wynosi 0!")
             }
@@ -60,10 +58,10 @@ class ImportApplicantsJob(
                 }
                 currentPage++
             }
-            importProgressRepository.getById(importId).apply {
+            importService.get(importId).apply {
                 importStatus = ImportStatus.IMPORTED
             }.let {
-                importProgressRepository.save(it)
+                importService.save(it)
             }
         } catch (e: Exception) {
             throw ImportException(import.id, e.message, e)

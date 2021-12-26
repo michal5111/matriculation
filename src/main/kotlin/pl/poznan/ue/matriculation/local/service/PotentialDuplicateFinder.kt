@@ -10,12 +10,12 @@ import pl.poznan.ue.matriculation.exception.ImportNotFoundException
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
-import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
+import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.oracle.service.PersonService
 
 @Component
 class PotentialDuplicateFinder(
-    private val importProgressRepository: ImportProgressRepository,
+    private val importRepository: ImportRepository,
     private val personService: PersonService,
     private val applicantRepository: ApplicantRepository
 ) {
@@ -28,7 +28,7 @@ class PotentialDuplicateFinder(
         transactionManager = "transactionManager"
     )
     fun findPotentialDuplicate(applicant: Applicant, importId: Long) {
-        val importProgress = importProgressRepository.findByIdOrNull(importId) ?: throw ImportNotFoundException()
+        val importProgress = importRepository.findByIdOrNull(importId) ?: throw ImportNotFoundException()
         val dateOfBirth = applicant.basicData.dateOfBirth ?: throw IllegalArgumentException("Date of birth is null")
         val potentialDuplicatesList = personService.findPotentialDuplicate(
             name = applicant.name.given,

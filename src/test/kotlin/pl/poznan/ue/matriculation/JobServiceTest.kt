@@ -126,6 +126,6 @@ class JobServiceTest {
                 )
             )
         }
-        assertEquals(ImportStatus.COMPLETE, import.importProgress.importStatus)
+        assertEquals(ImportStatus.COMPLETE, import.importStatus)
     }
 }

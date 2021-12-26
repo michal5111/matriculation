@@ -6,7 +6,7 @@ import pl.poznan.ue.matriculation.local.domain.import.Import
 
 class ArchivePersonsStartConditions : IStartConditions {
     override fun canStart(import: Import) {
-        when (import.importProgress.importStatus) {
+        when (import.importStatus) {
             PENDING,
             STARTED,
             IMPORTED,

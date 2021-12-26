@@ -6,7 +6,7 @@ import pl.poznan.ue.matriculation.local.domain.import.Import
 
 class ApplicantsImportStartCondition : IStartConditions {
     override fun canStart(import: Import) {
-        when (import.importProgress.importStatus) {
+        when (import.importStatus) {
             ImportStatus.ARCHIVED -> throw ImportException(import.id, "Import został zarchiwizowany.")
             ImportStatus.STARTED,
             ImportStatus.SAVING,
@@ -20,7 +20,7 @@ class ApplicantsImportStartCondition : IStartConditions {
             ImportStatus.IMPORTED,
             ImportStatus.PENDING,
             ImportStatus.COMPLETED_WITH_ERRORS,
-            ImportStatus.ERROR -> if (import.importProgress.savedApplicants == import.importProgress.totalCount) {
+            ImportStatus.ERROR -> if (import.savedApplicants == import.totalCount) {
                 throw ImportException(import.id, "Wszyscy są już zapisani")
             }
         }

@@ -238,7 +238,7 @@
         <td mat-cell *matCellDef="let element" class="mat-cell">
           <div *ngIf="element.applicant.assignedIndexNumber">
             <button mat-button (click)="updateIndexNumber(element)"
-                    [disabled]="import.importProgress.importStatus === 'ARCHIVED'
+                    [disabled]="import.importStatus === 'ARCHIVED'
                     || !(userService.hasRole('ROLE_IMPORT_CHANGE_INDEX') || userService.hasRole('ROLE_ADMIN'))">
               {{element.applicant.assignedIndexNumber}}
             </button>

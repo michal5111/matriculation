@@ -20,7 +20,7 @@ class PhoneNumber(
     @JoinColumn(name = "applicant_id", referencedColumnName = "id")
     var applicant: Applicant? = null,
 
-    val number: String,
+    var number: String,
 
     var phoneNumberType: String,
 

@@ -16,7 +16,7 @@ class Status(
     @JoinColumn(name = "applicantForeignerData_id", referencedColumnName = "applicant_id")
     var applicantForeignerData: ApplicantForeignerData? = null,
 
-    val status: String
+    var status: String
 ) : BaseEntityLongId(), Serializable {
 
     override fun toString(): String {

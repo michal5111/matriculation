@@ -10,11 +10,11 @@ import pl.poznan.ue.matriculation.exception.ImportException
 import pl.poznan.ue.matriculation.exception.ImportNotFoundException
 import pl.poznan.ue.matriculation.irk.dto.NotificationDto
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
-import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
+import pl.poznan.ue.matriculation.local.repo.ImportRepository
 
 @Service
 class NotificationService(
-    private val importProgressRepository: ImportProgressRepository
+    private val importRepository: ImportRepository
 ) {
     @Transactional(
         rollbackFor = [Exception::class, RuntimeException::class],
@@ -27,7 +27,7 @@ class NotificationService(
         notificationSender: INotificationSender
     ) {
         try {
-            val importProgress = importProgressRepository.findByIdOrNull(importId) ?: throw ImportNotFoundException()
+            val importProgress = importRepository.findByIdOrNull(importId) ?: throw ImportNotFoundException()
             val template = ClassPathResource("notificationEmailTemplate.txt").file
 
             val notificationDto = NotificationDto(

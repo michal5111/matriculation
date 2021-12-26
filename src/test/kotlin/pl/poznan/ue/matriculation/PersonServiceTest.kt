@@ -88,7 +88,7 @@ class PersonServiceTest {
             dataSourceType = "IRK_TEST",
             programmeForeignId = "S1-E"
         )
-        val importDto = import.id?.let { importRepository.getDtoById(it) }!!
+        val importDto = import.id?.let { importRepository.getById(it) }!!
 //        val irkApplication = irkService.getApplication(2159)!!
 //        //val irkApplication = irkService.getApplication(1757)!!
 //        val irkApplicant = irkService.getApplicantById(irkApplication.foreignApplicantId)

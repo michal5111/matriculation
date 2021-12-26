@@ -4,13 +4,13 @@ import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.job.startConditions.CheckForPotentialDuplicatesStartConditions
 import pl.poznan.ue.matriculation.local.job.startConditions.IStartConditions
-import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
+import pl.poznan.ue.matriculation.local.service.ImportService
 import pl.poznan.ue.matriculation.local.service.ProcessService
 
 class CheckForPotentialDuplicatesJob(
     private val processService: ProcessService,
     private val importId: Long,
-    private val importProgressRepository: ImportProgressRepository
+    private val importService: ImportService
 ) : IJob {
     override var status: JobStatus = JobStatus.PENDING
 
@@ -18,13 +18,13 @@ class CheckForPotentialDuplicatesJob(
         get() = CheckForPotentialDuplicatesStartConditions()
 
     override fun prepare(import: Import) {
-        import.importProgress.potentialDuplicates = 0
-        import.importProgress.importStatus = ImportStatus.CHECKING_POTENTIAL_DUPLICATES
-        importProgressRepository.save(import.importProgress)
+        import.potentialDuplicates = 0
+        import.importStatus = ImportStatus.CHECKING_POTENTIAL_DUPLICATES
+        importService.save(import)
     }
 
     override fun doWork() {
         processService.findPotentialDuplicates(importId)
-        importProgressRepository.setStatus(ImportStatus.IMPORTED, importId)
+        importService.setImportStatus(ImportStatus.IMPORTED, importId)
     }
 }

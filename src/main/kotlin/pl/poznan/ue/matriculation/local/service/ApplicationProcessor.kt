@@ -11,19 +11,19 @@ import pl.poznan.ue.matriculation.configuration.LogExecutionTime
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
+import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
-import pl.poznan.ue.matriculation.local.dto.ImportDtoJpa
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
 import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
-import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
+import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.service.PersonService
 
 @Component
 class ApplicationProcessor(
     private val applicantService: ApplicantService,
-    private val importProgressRepository: ImportProgressRepository,
+    private val importRepository: ImportRepository,
     private val asyncService: AsyncService,
     private val personService: PersonService,
     private val applicantRepository: ApplicantRepository,
@@ -41,7 +41,7 @@ class ApplicationProcessor(
     fun processApplication(
         importId: Long,
         application: Application,
-        importDto: ImportDtoJpa,
+        importDto: Import,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
     ): Person {
         logger.trace("------------------------------------------------Przetwarzam ${application.id}---------------------------------------------")
@@ -49,7 +49,7 @@ class ApplicationProcessor(
         logger.trace("Sprawdzam aplikanta")
         applicantService.check(applicant)
         logger.trace("Pobieram progres importu")
-        val importProgress = importProgressRepository.getById(importId)
+        val importProgress = importRepository.getById(importId)
         logger.trace("Sprawdzam czy źródło danych implementuje pobieranie zdjęć")
         if (applicationDtoDataSource is IPhotoDownloader) {
             applicant.photo?.let {

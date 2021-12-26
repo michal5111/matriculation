@@ -37,3 +37,4 @@ build/
 ### Matriculation ###
 application.properties
 /src/main/webapp/node/
+/application.yaml

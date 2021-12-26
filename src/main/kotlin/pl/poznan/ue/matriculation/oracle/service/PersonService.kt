@@ -12,7 +12,7 @@ import pl.poznan.ue.matriculation.kotlinExtensions.toSerialBlob
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.ApplicantForeignerData
 import pl.poznan.ue.matriculation.local.domain.applications.Application
-import pl.poznan.ue.matriculation.local.dto.ImportDtoJpa
+import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.service.ApplicantService
 import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
 import pl.poznan.ue.matriculation.oracle.domain.*
@@ -396,7 +396,7 @@ class PersonService(
     )
     fun immatriculate(
         person: Person,
-        importDto: ImportDtoJpa,
+        importDto: Import,
         irkApplication: IrkApplication,
         application: Application
     ): Student {
@@ -452,7 +452,7 @@ class PersonService(
         transactionManager = "oracleTransactionManager"
     )
     fun process(
-        application: Application, importDto: ImportDtoJpa, postMatriculation: (applicationId: Long) -> Int
+        application: Application, importDto: Import, postMatriculation: (applicationId: Long) -> Int
     ): Pair<Person, Student> {
         logger.trace("Tworzę lub aktualizuję osobę")
         val applicant = application.applicant ?: throw ApplicantNotFoundException()

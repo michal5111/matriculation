@@ -18,18 +18,18 @@ class GetUidsJob(
         get() = UidSearchStartConditions()
 
     override fun prepare(import: Import) {
-        import.importProgress.importedUids = 0
-        import.importProgress.importStatus = ImportStatus.SEARCHING_UIDS
+        import.importedUids = 0
+        import.importStatus = ImportStatus.SEARCHING_UIDS
     }
 
     override fun doWork() {
         processService.getUids(importId)
-        val importProgress = importService.getProgress(importId)
-        if (importProgress.saveErrors > 0) {
-            importProgress.importStatus = ImportStatus.COMPLETED_WITH_ERRORS
+        val import = importService.get(importId)
+        if (import.saveErrors > 0) {
+            import.importStatus = ImportStatus.COMPLETED_WITH_ERRORS
         } else {
-            importProgress.importStatus = ImportStatus.COMPLETE
+            import.importStatus = ImportStatus.COMPLETE
         }
-        importService.saveProgress(importProgress)
+        importService.save(import)
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import pl.poznan.ue.matriculation.configuration.LogExecutionTime
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
-import pl.poznan.ue.matriculation.local.dto.ImportDtoJpa
+import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.oracle.domain.*
 import pl.poznan.ue.matriculation.oracle.repo.*
 import java.util.*
@@ -59,7 +59,7 @@ class StudentService(
 
     fun createPersonProgramme(
         person: Person,
-        importDto: ImportDtoJpa,
+        importDto: Import,
         student: Student,
         certificate: Document?,
         sourceOfFinancing: String?,

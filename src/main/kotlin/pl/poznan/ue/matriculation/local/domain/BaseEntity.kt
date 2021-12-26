@@ -7,5 +7,5 @@ import javax.persistence.Version
 open class BaseEntity {
 
     @Version
-    open var version: Long = 1
+    open var version: Long? = 1
 }

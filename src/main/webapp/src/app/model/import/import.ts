@@ -1,4 +1,4 @@
-import {ImportProgress} from './import-progress';
+import {ImportStatus} from './import-status.enum';
 
 export class Import {
 
@@ -11,7 +11,15 @@ export class Import {
   startDate: Date;
   dateOfAddmision: Date;
   didacticCycleCode: string;
-  importProgress: ImportProgress;
   dataSourceId: string;
   dataFile: string;
+  importedApplications: number;
+  saveErrors: number;
+  savedApplicants: number;
+  totalCount: number;
+  importStatus: ImportStatus;
+  importedUids: number;
+  notificationsSend: number;
+  potentialDuplicates: number;
+  error: string;
 }

@@ -39,7 +39,7 @@ class ApplicantService(
         }
     }
 
-    fun clearPersonalData(applicant: Applicant): Applicant {
+    fun anonymize(applicant: Applicant): Applicant {
         applicant.apply {
             email = ""
             indexNumber = null
@@ -62,8 +62,18 @@ class ApplicantService(
                 pesel = null
                 sex = 'M'
             }
-            applicant.addresses.clear()
-            phoneNumbers.clear()
+            applicant.addresses.forEach {
+                it.city = null
+                it.countryCode = null
+                it.flatNumber = null
+                it.postalCode = null
+                it.street = null
+                it.streetNumber = null
+            }
+            phoneNumbers.forEach {
+                it.number = ""
+                it.comment = ""
+            }
             applicant.additionalData.apply {
                 fathersName = null
                 militaryCategory = null
@@ -73,7 +83,9 @@ class ApplicantService(
             }
             applicant.applicantForeignerData?.apply {
                 baseOfStay = null
-                foreignerStatus.clear()
+                foreignerStatus.forEach {
+                    it.status = ""
+                }
                 polishCardIssueCountry = null
                 polishCardIssueDate = null
                 polishCardNumber = null
@@ -105,7 +117,11 @@ class ApplicantService(
                     term = null
                 }
             }
-            applicant.identityDocuments.clear()
+            applicant.identityDocuments.forEach {
+                it.number = null
+                it.country = null
+                it.expDate = null
+            }
         }
         return applicant
     }

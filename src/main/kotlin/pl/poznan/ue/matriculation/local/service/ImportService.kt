@@ -2,13 +2,13 @@ package pl.poznan.ue.matriculation.local.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import pl.poznan.ue.matriculation.exception.*
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.domain.import.ImportProgress
-import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.oracle.repo.DidacticCycleRepository
 import pl.poznan.ue.matriculation.oracle.repo.ProgrammeRepository
@@ -16,10 +16,10 @@ import java.util.*
 
 
 @Service
+@Transactional
 class ImportService(
     private val importRepository: ImportRepository,
     private val programmeRepository: ProgrammeRepository,
-    private val importProgressRepository: ImportProgressRepository,
     private val didacticCycleRepository: DidacticCycleRepository
 ) {
 
@@ -70,12 +70,14 @@ class ImportService(
     }
 
     fun get(importId: Long): Import {
-        return importRepository.findByIdOrNull(importId)
-            ?: throw ImportNotFoundException("Nie znaleziono imoportu.")
+        if (TransactionSynchronizationManager.isActualTransactionActive().not()) {
+            throw IllegalStateException("No active transaction")
+        }
+        return importRepository.getErrorAndStatusById(importId)
     }
 
     fun getProgress(importId: Long): ImportProgress {
-        return importProgressRepository.findByIdOrNull(importId)
+        return importRepository.findProgressById(importId)
             ?: throw ImportNotFoundException("Nie znaleziono importu.")
     }
 
@@ -97,7 +99,7 @@ class ImportService(
 //        }
         try {
             val import = importRepository.getById(importId)
-            when (import.importProgress.importStatus) {
+            when (import.importStatus) {
                 ImportStatus.ARCHIVED -> throw ImportException(importId, "Import został zarchiwizowany.")
                 ImportStatus.STARTED,
                 ImportStatus.SAVING,
@@ -109,7 +111,7 @@ class ImportService(
                 ImportStatus.SEARCHING_UIDS -> throw ImportStartException(importId, "Zły stan importu.")
                 ImportStatus.ERROR,
                 ImportStatus.PENDING -> {
-                    if (import.importProgress.importedApplications != 0) {
+                    if (import.importedApplications != 0) {
                         throw IllegalStateException("Liczba kandydatów jest większa od 0")
                     }
                     importRepository.deleteById(importId)
@@ -126,19 +128,16 @@ class ImportService(
         return importRepository.save(import)
     }
 
-    fun saveProgress(importProgress: ImportProgress): ImportProgress {
-        return importProgressRepository.save(importProgress)
-    }
-
-    fun setError(importId: Long, s: String) = importProgressRepository.getById(importId).apply {
+    fun setError(importId: Long, s: String) = importRepository.getWithErrorById(importId).apply {
         error = s
     }.also {
-        importProgressRepository.save(it)
+        importRepository.save(it)
     }
 
-    fun setImportStatus(importStatus: ImportStatus, importId: Long) = importProgressRepository.getById(importId).apply {
-        this.importStatus = importStatus
-    }.also {
-        importProgressRepository.save(it)
-    }
+    fun setImportStatus(importStatus: ImportStatus, importId: Long) =
+        importRepository.getWithImportStatusById(importId).apply {
+            this.importStatus = importStatus
+        }.also {
+            importRepository.save(it)
+        }
 }

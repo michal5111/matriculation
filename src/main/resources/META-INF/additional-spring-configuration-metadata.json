@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "app.service.security",
+      "type": "java.lang.String",
+      "description": "Description for app.service.security."
+    },
+    {
+      "name": "cas.service.login",
+      "type": "java.lang.String",
+      "description": "Description for cas.service.login."
+    },
+    {
+      "name": "cas.service.logout",
+      "type": "java.lang.String",
+      "description": "Description for cas.service.logout."
+    },
+    {
+      "name": "cas.ticket.validate.url",
+      "type": "java.lang.String",
+      "description": "Description for cas.ticket.validate.url."
+    }
+  ]
+}

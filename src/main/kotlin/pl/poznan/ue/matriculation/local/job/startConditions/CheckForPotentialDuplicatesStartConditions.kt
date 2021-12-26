@@ -7,7 +7,7 @@ import pl.poznan.ue.matriculation.local.domain.import.Import
 
 class CheckForPotentialDuplicatesStartConditions : IStartConditions {
     override fun canStart(import: Import) {
-        when (import.importProgress.importStatus) {
+        when (import.importStatus) {
             ImportStatus.ARCHIVED -> throw ImportException(import.id, "Import został zarchiwizowany.")
             ImportStatus.PENDING,
             ImportStatus.STARTED,
@@ -19,12 +19,12 @@ class CheckForPotentialDuplicatesStartConditions : IStartConditions {
             ImportStatus.SEARCHING_UIDS,
             ImportStatus.CHECKING_POTENTIAL_DUPLICATES -> throw ImportStartException(
                 import.id,
-                "Zły stan importu. ${import.importProgress.importStatus}"
+                "Zły stan importu. ${import.importStatus}"
             )
             ImportStatus.IMPORTED -> {
-                val totalCount = import.importProgress.totalCount
+                val totalCount = import.totalCount
                     ?: throw ImportStartException(import.id, "Liczba aplikantów to null")
-                if (totalCount < 1 || totalCount == import.importProgress.savedApplicants) {
+                if (totalCount < 1 || totalCount == import.savedApplicants) {
                     throw ImportStartException(import.id, "Liczba aplikantów wynosi 0 lub wszyscy są już zapisani")
                 }
             }

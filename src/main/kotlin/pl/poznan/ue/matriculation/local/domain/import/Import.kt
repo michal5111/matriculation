@@ -4,12 +4,37 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applications.Application
+import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
+import pl.poznan.ue.matriculation.local.entityListeners.MessageAfterUpdateListener
 import java.util.*
 import javax.persistence.*
 
 @Entity
+@EntityListeners(MessageAfterUpdateListener::class)
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@NamedEntityGraphs(
+    NamedEntityGraph(
+        name = "import.error",
+        attributeNodes = [
+            NamedAttributeNode("error")
+        ]
+    ),
+    NamedEntityGraph(
+        name = "import.importStatus",
+        attributeNodes = [
+            NamedAttributeNode("importStatus")
+        ]
+    ),
+    NamedEntityGraph(
+        name = "import.all",
+        attributeNodes = [
+            NamedAttributeNode("importStatus"),
+            NamedAttributeNode("error"),
+            NamedAttributeNode("dataSourceId")
+        ]
+    )
+)
 class Import(
     val programmeCode: String,
 
@@ -33,17 +58,30 @@ class Import(
     @Lob
     val dataFile: ByteArray?,
 
+    var importedApplications: Int = 0,
+
+    var saveErrors: Int = 0,
+
+    var savedApplicants: Int = 0,
+
+    var totalCount: Int? = null,
+
+    var importedUids: Int = 0,
+
+    var notificationsSend: Int = 0,
+
+    var potentialDuplicates: Int = 0,
+
+    @Enumerated(EnumType.STRING)
+    var importStatus: ImportStatus = ImportStatus.PENDING,
+
+    @Lob
+    var error: String? = null,
+
     @JsonIgnore
     @OneToMany(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
     val applications: MutableSet<Application> = HashSet()
 ) : BaseEntityLongId() {
-
-    @OneToOne(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.REMOVE])
-    var importProgress: ImportProgress = ImportProgress(import = this)
-
-    override fun toString(): String {
-        return "Import(id=$id, programmeCode='$programmeCode', programmeForeignId='$programmeForeignId', stageCode='$stageCode', registration='$registration', indexPoolCode='$indexPoolCode', startDate=$startDate, dateOfAddmision=$dateOfAddmision, didacticCycleCode='$didacticCycleCode', dataSourceId='$dataSourceId')"
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -82,5 +120,26 @@ class Import(
         return result
     }
 
-
+    override fun toString(): String {
+        return "Import(" +
+            "programmeCode='$programmeCode', " +
+            "programmeForeignId='$programmeForeignId', " +
+            "stageCode='$stageCode', " +
+            "registration='$registration', " +
+            "indexPoolCode='$indexPoolCode', " +
+            "startDate=$startDate, " +
+            "dateOfAddmision=$dateOfAddmision, " +
+            "didacticCycleCode='$didacticCycleCode', " +
+            "dataSourceId='$dataSourceId', " +
+            "dataFile=${dataFile?.contentToString()}, " +
+            "importedApplications=$importedApplications, " +
+            "saveErrors=$saveErrors, " +
+            "savedApplicants=$savedApplicants, " +
+            "totalCount=$totalCount, " +
+            "importedUids=$importedUids, " +
+            "notificationsSend=$notificationsSend, " +
+            "potentialDuplicates=$potentialDuplicates, " +
+            "importStatus=$importStatus, " +
+            "error=$error)"
+    }
 }

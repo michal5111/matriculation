@@ -23,12 +23,11 @@ import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
+import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
-import pl.poznan.ue.matriculation.local.dto.ImportDtoJpa
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
 import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
-import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import java.util.stream.Stream
@@ -40,9 +39,7 @@ class ProcessService(
     private val applicationRepository: ApplicationRepository,
     private val applicantRepository: ApplicantRepository,
     private val applicantService: ApplicantService,
-    private val importProgressRepository: ImportProgressRepository,
     private val saveExceptionHandler: ISaveExceptionHandler,
-    private val asyncService: AsyncService,
     private val uidService: UidService,
     private val notificationService: NotificationService,
     private val potentialDuplicateFinder: PotentialDuplicateFinder,
@@ -67,9 +64,9 @@ class ProcessService(
         val import = importRepository.getById(importId)
         val applicantDto = applicationDtoDataSource.getApplicantById(applicationDto.foreignApplicantId)
         applicationDtoDataSource.preprocess(applicationDto, applicantDto)
-        val application = createOrUpdateApplication(applicationDto, applicationDtoDataSource)
-        val applicant = createOrUpdateApplicant(applicantDto, applicationDtoDataSource)
-        applicantRepository.save(applicant)
+        var application = createOrUpdateApplication(applicationDto, applicationDtoDataSource)
+        var applicant = createOrUpdateApplicant(applicantDto, applicationDtoDataSource)
+        applicant = applicantRepository.save(applicant)
         application.applicant = applicant
         application.certificate = applicationDtoDataSource.getPrimaryCertificate(
             applicant = applicant,
@@ -79,8 +76,8 @@ class ProcessService(
             import = import
         )
         application.import = import
-        applicationRepository.save(application)
-        import.importProgress.importedApplications++
+        application = applicationRepository.save(application)
+        import.importedApplications++
         return application
     }
 
@@ -128,7 +125,7 @@ class ProcessService(
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     fun processApplications(
         importId: Long,
-        importDto: ImportDtoJpa,
+        importDto: Import,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
     ): Int {
         var errorCount = 0
@@ -186,14 +183,14 @@ class ProcessService(
                 val applicant = application.applicant ?: throw ApplicantNotFoundException()
                 applicant.applications.none { applicantApplication ->
                     applicantApplication != application
-                        && applicantApplication.import?.importProgress?.importStatus != ImportStatus.ARCHIVED
+                        && applicantApplication.import?.importStatus != ImportStatus.ARCHIVED
                 }
             }.forEach { application ->
                 val applicant = application.applicant ?: throw ApplicationNotFoundException()
-                applicantService.clearPersonalData(applicant)
+                applicantService.anonymize(applicant)
             }
         }
-        import.importProgress.importStatus = ImportStatus.ARCHIVED
+        import.importStatus = ImportStatus.ARCHIVED
     }
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
@@ -214,7 +211,7 @@ class ProcessService(
         notificationSender: INotificationSender
     ) {
         val applicationStream = applicationRepository.findAllByImportIdStream(importId)
-        val importProgress = importProgressRepository.findByIdOrNull(importId)
+        val importProgress = importRepository.findByIdOrNull(importId)
         importProgress?.notificationsSend = 0
         applicationStream.use {
             it.forEach { application ->

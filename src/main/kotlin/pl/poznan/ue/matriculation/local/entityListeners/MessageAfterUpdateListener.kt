@@ -4,7 +4,7 @@ package pl.poznan.ue.matriculation.local.entityListeners
 
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Component
-import pl.poznan.ue.matriculation.local.domain.import.ImportProgress
+import pl.poznan.ue.matriculation.local.domain.import.Import
 import javax.persistence.PreUpdate
 
 @Component
@@ -13,7 +13,7 @@ class MessageAfterUpdateListener(
 ) {
 
     @PreUpdate
-    fun beforeUpdate(entity: ImportProgress) {
+    fun beforeUpdate(entity: Import) {
         simpMessagingTemplate.convertAndSend("/topic/importProgress/${entity.id}", entity)
     }
 }

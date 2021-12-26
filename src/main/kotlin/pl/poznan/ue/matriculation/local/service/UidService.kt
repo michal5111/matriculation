@@ -11,11 +11,11 @@ import pl.poznan.ue.matriculation.exception.ImportNotFoundException
 import pl.poznan.ue.matriculation.ldap.repo.LdapUserRepository
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
-import pl.poznan.ue.matriculation.local.repo.ImportProgressRepository
+import pl.poznan.ue.matriculation.local.repo.ImportRepository
 
 @Service
 class UidService(
-    private val importProgressRepository: ImportProgressRepository,
+    private val importRepository: ImportRepository,
     private val ldapUserRepository: LdapUserRepository,
     private val applicantRepository: ApplicantRepository
 ) {
@@ -29,7 +29,7 @@ class UidService(
     )
     fun get(applicant: Applicant, importId: Long) {
         try {
-            val importProgress = importProgressRepository.findByIdOrNull(importId) ?: throw ImportNotFoundException()
+            val importProgress = importRepository.findByIdOrNull(importId) ?: throw ImportNotFoundException()
             logger.info("Searching for ldap user for usosId {}", applicant.usosId)
             val ldapUser = applicant.usosId?.let {
                 ldapUserRepository.findByUsosId(it)

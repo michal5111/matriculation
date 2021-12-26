@@ -32,7 +32,7 @@ class ApplicationService(
         applicant.potentialDuplicateStatus = potentialDuplicateStatusDto.potentialDuplicateStatus
         applicant.usosId = potentialDuplicateStatusDto.usosId
         val import = application.import ?: throw ImportNotFoundException()
-        import.importProgress.potentialDuplicates--
+        import.potentialDuplicates--
         return application
     }
 }
