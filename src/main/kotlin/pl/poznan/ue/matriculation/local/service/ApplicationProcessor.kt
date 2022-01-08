@@ -17,7 +17,6 @@ import pl.poznan.ue.matriculation.local.dto.IApplicationDto
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
 import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
-import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.service.PersonService
 
 @Component
@@ -43,7 +42,7 @@ class ApplicationProcessor(
         application: Application,
         importDto: Import,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
-    ): Person {
+    ) {
         logger.trace("------------------------------------------------Przetwarzam ${application.id}---------------------------------------------")
         val applicant = application.applicant ?: throw ApplicantNotFoundException()
         logger.trace("Sprawdzam aplikanta")
@@ -79,6 +78,5 @@ class ApplicationProcessor(
         applicationRepository.save(application)
         importProgress.savedApplicants++
         logger.trace("------------------------------------------------koniec ${application.id}---------------------------------------------")
-        return personAndStudent.first
     }
 }

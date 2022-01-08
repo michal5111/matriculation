@@ -1,11 +1,16 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
 import org.hibernate.annotations.CacheConcurrencyStrategy
-import javax.persistence.*
+import org.springframework.cache.annotation.Cacheable
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.Table
 
 @Entity
+//@Immutable
 @Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "DZ_TYPY_ADRESOW")
 class AddressType(
     @Id

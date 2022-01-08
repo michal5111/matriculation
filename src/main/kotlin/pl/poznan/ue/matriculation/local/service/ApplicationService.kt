@@ -2,7 +2,6 @@ package pl.poznan.ue.matriculation.local.service
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,7 +16,6 @@ import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
 class ApplicationService(
     private val applicationRepository: ApplicationRepository
 ) {
-    @EntityGraph("application.applicant")
     fun findAllApplicationsByImportId(pageable: Pageable, importId: Long): Page<Application> {
         return applicationRepository.findAllByImportId(pageable, importId)
     }

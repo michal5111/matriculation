@@ -27,18 +27,17 @@ class SaveExceptionHandler(
     )
     override fun handle(exception: Exception, application: Application, importId: Long) {
         val importProgress = importRepository.getById(importId)
-        application.importError = ""
+        application.importError = null
         var e: Throwable? = exception
         do {
-            if (e is UndeclaredThrowableException) {
-                e = e.cause
-            }
-            if (e is JDBCException) {
-                application.importError += "${e.javaClass.simpleName}: ${e.message} Error code: ${e.errorCode} " +
-                    "Sql: ${e.sql} " +
-                    "Sql state: ${e.sqlState} "
-            } else {
-                application.importError += "${e?.javaClass?.simpleName}: ${e?.message} "
+            when (e) {
+                is UndeclaredThrowableException -> e = e.cause
+                is JDBCException -> {
+                    application.importError += "${e.javaClass.simpleName}: ${e.message.orEmpty()} Error code: ${e.errorCode} " +
+                        "Sql: ${e.sql} " +
+                        "Sql state: ${e.sqlState} "
+                }
+                else -> application.importError += "${e?.javaClass?.simpleName}: ${e?.message.orEmpty()}"
             }
             e = e?.cause
         } while (e != null)

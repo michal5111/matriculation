@@ -110,11 +110,18 @@
                       (change)="onColumnCheckboxChange($event, 'uid')">uid
         </mat-checkbox>
         <mat-checkbox class="card-centered" [checked]="displayedColumns.get('secondarySchoolDocumentNumber')"
-                      (change)="onColumnCheckboxChange($event, 'secondarySchoolDocumentNumber', 'secondarySchoolDocumentIssueInstitution', 'secondarySchoolDocumentIssueDate')">
+                      (change)="onColumnCheckboxChange
+                      ($event,
+                      'secondarySchoolDocumentNumber',
+                      'secondarySchoolDocumentIssueInstitution',
+                      'secondarySchoolDocumentIssueDate')">
           świadectwo dojrzałości
         </mat-checkbox>
         <mat-checkbox class="card-centered" [checked]="displayedColumns.get('diplomaSchoolDocumentNumber')"
-                      (change)="onColumnCheckboxChange($event, 'diplomaSchoolDocumentNumber', 'diplomaSchoolDocumentIssueDateAndPlace', 'diplomaSchoolDocumentIssueInstitution')">
+                      (change)="onColumnCheckboxChange($event,
+                      'diplomaSchoolDocumentNumber',
+                      'diplomaSchoolDocumentIssueDateAndPlace',
+                      'diplomaSchoolDocumentIssueInstitution')">
           dyplom
         </mat-checkbox>
         <mat-checkbox class="card-centered" [checked]="displayedColumns.get('importError')"
@@ -164,14 +171,14 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Nazwisko i imię/imiona</th>
         <td mat-cell
             *matCellDef="let element"
-            class="mat-cell">{{element.applicant.name.family}} {{element.applicant.name.given}} {{element.applicant.name.middle}}</td>
+            class="mat-cell">{{element.applicant.family}} {{element.applicant.given}} {{element.applicant.middle}}</td>
       </ng-container>
 
       <ng-container matColumnDef="birthDateAndPlace">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Data urodzenia Miejsce urodzenia</th>
         <td mat-cell
             *matCellDef="let element"
-            class="mat-cell">{{element.applicant.basicData.dateOfBirth | date:'dd.MM.yyyy'}} {{element.applicant.basicData.cityOfBirth}}</td>
+            class="mat-cell">{{element.applicant.dateOfBirth | date:'dd.MM.yyyy'}} {{element.applicant.cityOfBirth}}</td>
       </ng-container>
 
       <ng-container matColumnDef="pesel">

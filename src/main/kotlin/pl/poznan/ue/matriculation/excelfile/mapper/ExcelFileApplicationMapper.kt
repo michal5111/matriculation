@@ -7,7 +7,10 @@ class ExcelFileApplicationMapper {
 
     fun mapExcelFileApplicationDtoToApplication(excelFileApplicationDto: ExcelFileApplicationDto): Application {
         return Application(
-            foreignId = excelFileApplicationDto.foreignId
+            foreignId = excelFileApplicationDto.foreignId,
+            baseOfStay = null,
+            basisOfAdmission = null,
+            sourceOfFinancing = null
         )
     }
 

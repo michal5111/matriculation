@@ -14,20 +14,15 @@ class DreamApplyApplicationMapper {
             position = null,
             qualified = "qualified",
             score = null,
-            applicationForeignerData = null
+            baseOfStay = null,
+            basisOfAdmission = null,
+            sourceOfFinancing = null
         )
     }
 
     fun update(application: Application, dreamApplyApplicationDto: DreamApplyApplicationDto): Application {
-        application.apply {
+        return application.apply {
             admitted = dreamApplyApplicationDto.status
-            payment = "paid"
-            comment = null
-            position = null
-            qualified = "qualified"
-            score = null
-            applicationForeignerData
         }
-        return application
     }
 }

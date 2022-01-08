@@ -6,8 +6,6 @@ import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import pl.poznan.ue.matriculation.exception.ImportException
-import pl.poznan.ue.matriculation.exception.ImportStartException
-import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.service.ImportService
 import java.lang.reflect.Method
 import java.sql.SQLException
@@ -25,20 +23,20 @@ class AsyncExceptionHandler : AsyncUncaughtExceptionHandler {
         do {
             if (e is ImportException) {
                 val importId = e.importId ?: continue
-                if (e.cause is SQLException) {
-                    importService.setError(importId, (e.cause as SQLException).sqlState + "\n" + e.message.toString())
-                } else {
-                    importService.setError(importId, e.message.toString())
+                when (e.cause) {
+                    is SQLException -> {
+                        val sqlException = e.cause as SQLException
+                        importService.setError(
+                            importId,
+                            "${sqlException.sqlState.orEmpty()}\n${e.message ?: "Unknown error"}"
+                        )
+                    }
+                    else -> importService.setError(importId, e.message ?: "Unknown error")
                 }
-                importService.setImportStatus(ImportStatus.ERROR, importId)
-            }
-            if (e is ImportStartException) {
-                val importId = e.importId ?: continue
-                importService.setError(importId, e.message.toString())
-                importService.setImportStatus(ImportStatus.ERROR, importId)
             }
             e = e?.cause
         } while (e != null)
+        logger.error("Objects: ${objects.joinToString { it.toString() }}")
         logger.error("Exception message - " + throwable.message)
         logger.error("Cause " + throwable.cause?.message)
         logger.error("Method name - " + method.name)

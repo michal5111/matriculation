@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.local.job
 
+import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.job.startConditions.ArchivePersonsStartConditions
 import pl.poznan.ue.matriculation.local.job.startConditions.IStartConditions
@@ -18,7 +19,15 @@ class ArchiveApplicationsJob(
         TODO("Not yet implemented")
     }
 
-    override fun doWork() {
-        processService.archivePersons(importId)
+    override fun doWork(import: Import): Import {
+        return processService.archivePersons(importId)
+    }
+
+    override fun getCompletionStatus(import: Import): ImportStatus {
+        return ImportStatus.ARCHIVED
+    }
+
+    override fun getInProgressStatus(): ImportStatus {
+        return ImportStatus.STARTED
     }
 }

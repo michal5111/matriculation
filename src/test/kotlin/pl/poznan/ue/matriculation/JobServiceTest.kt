@@ -95,7 +95,9 @@ class JobServiceTest {
             stageCode = stageCode,
             startDate = Date(),
             dataSourceType = dataSourceType,
-            programmeForeignId = programmeForeignId
+            programmeForeignId = programmeForeignId,
+            programmeForeignName = registration,
+            indexPoolName = "Centralna"
         )
         jobService.runJob(JobType.IMPORT, import.id!!)
         jobService.runJob(JobType.IMPORT, import.id!!)

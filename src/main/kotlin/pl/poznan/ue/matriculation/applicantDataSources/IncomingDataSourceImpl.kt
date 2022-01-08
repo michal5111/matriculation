@@ -24,7 +24,7 @@ class IncomingDataSourceImpl(
     id = id
 ) {
 
-    val programmePattern = "^([SNsn])([123])-\\w*".toRegex()
+    private val programmePattern = "^([SN])([123])-\\w*".toRegex()
 
     override fun getApplicationsPage(
         import: Import,
@@ -75,7 +75,7 @@ class IncomingDataSourceImpl(
     }
 
     override fun getAvailableRegistrationProgrammes(registration: String): List<ProgrammeDto> {
-        val courses = dreamApplyService.getCourses(statuses = "Online")
+        val courses = dreamApplyService.getCourses(statuses = "Online", types = "Studies", modes = "FT")
             ?: throw IllegalStateException("Unable to get courses list.")
         var flags = dreamApplyService.getAllFlags()
             ?: throw java.lang.IllegalStateException("Unable to get flags list.")

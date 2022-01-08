@@ -36,13 +36,9 @@ open class IrkApplicationDataSourceImpl(
         pageNumber: Int
     ): IPage<IrkApplicationDTO> {
         val page = irkService.getApplications(
-            admitted = true,
-            paid = true,
-            qualified = true,
             registration = registrationCode,
             programme = programmeForeignId,
-            pageNumber = pageNumber,
-            pageLength = 20
+            pageNumber = pageNumber
         )
         return object : IPage<IrkApplicationDTO> {
             override fun getSize(): Int {
@@ -138,7 +134,7 @@ open class IrkApplicationDataSourceImpl(
         import: Import
     ): Document? {
         val pc = irkService.getPrimaryCertificate(applicationDto.id) ?: return null
-        return applicant.educationData.documents.find {
+        return applicant.documents.find {
             it.documentNumber == pc.documentNumber && it.certificateTypeCode == pc.certificateTypeCode
         }
     }

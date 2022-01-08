@@ -15,6 +15,7 @@ import pl.poznan.ue.matriculation.local.domain.user.Role
 import pl.poznan.ue.matriculation.local.domain.user.User
 import pl.poznan.ue.matriculation.local.dto.*
 import pl.poznan.ue.matriculation.local.job.JobType
+import pl.poznan.ue.matriculation.local.mapper.ApplicationToApplicationDTOMapper
 import pl.poznan.ue.matriculation.local.service.*
 import pl.poznan.ue.matriculation.oracle.dto.IndexTypeDto
 import pl.poznan.ue.matriculation.oracle.entityRepresentations.PersonBasicData
@@ -39,6 +40,8 @@ class RestController(
     private val personRepository: PersonRepository,
     private val applicantService: ApplicantService
 ) {
+
+    private val applicantToApplicationDTOMapper = ApplicationToApplicationDTOMapper()
 
     @Value("\${pl.poznan.ue.matriculation.usos.url}")
     private lateinit var usosUrl: String
@@ -80,7 +83,9 @@ class RestController(
         stageCode = importDto.stageCode,
         didacticCycleCode = importDto.didacticCycleCode,
         dataSourceType = importDto.dataSourceId,
-        dataFile = importDto.dataFile
+        dataFile = importDto.dataFile,
+        programmeForeignName = importDto.programmeForeignName,
+        indexPoolName = importDto.indexPoolName
     )
 
     @PutMapping("/import/{id}")
@@ -172,9 +177,9 @@ class RestController(
     fun getPotentialDuplicates(@PathVariable("id") applicantId: Long): List<PersonBasicData> {
         val applicant = applicantService.findById(applicantId) ?: throw ApplicantNotFoundException()
         return personRepository.findPotentialDuplicate(
-            name = applicant.name.given,
-            surname = applicant.name.family,
-            birthDate = applicant.basicData.dateOfBirth!!,
+            name = applicant.given,
+            surname = applicant.family,
+            birthDate = applicant.dateOfBirth!!,
             idNumbers = applicant.identityDocuments.map {
                 it.number!!
             },

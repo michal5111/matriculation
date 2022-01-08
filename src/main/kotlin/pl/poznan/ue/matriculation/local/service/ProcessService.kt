@@ -29,7 +29,6 @@ import pl.poznan.ue.matriculation.local.dto.IApplicationDto
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
 import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
-import pl.poznan.ue.matriculation.oracle.domain.Person
 import java.util.stream.Stream
 import javax.persistence.OptimisticLockException
 
@@ -127,22 +126,20 @@ class ProcessService(
         importId: Long,
         importDto: Import,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
-    ): Int {
-        var errorCount = 0
+    ) {
         logger.trace("Pobieram strumień zgłoszeń ze statusem nie zaimportowany i błąd")
         val applicationsPage: Stream<Application> = applicationRepository.getAllByImportIdAndImportStatusIn(
             importId,
             listOf(ApplicationImportStatus.NOT_IMPORTED, ApplicationImportStatus.ERROR),
             Sort.by(
-                Sort.Order.asc("applicant.name.family"),
-                Sort.Order.asc("applicant.name.given"),
-                Sort.Order.asc("applicant.name.middle")
+                Sort.Order.asc("applicant.family"),
+                Sort.Order.asc("applicant.given"),
+                Sort.Order.asc("applicant.middle")
             )
         )
         applicationsPage.use { stream ->
             stream.forEach { application ->
                 try {
-                    var person: Person? = null
                     retry(
                         maxRetry = 5,
                         retryOn = arrayOf(
@@ -152,7 +149,7 @@ class ProcessService(
                         )
                     ) {
                         logger.trace("Próbuję stworzyć/zaktualizować osobę. Próba: {}", it)
-                        person = applicationProcessor.processApplication(
+                        applicationProcessor.processApplication(
                             importId = importId,
                             application = application,
                             importDto = importDto,
@@ -161,13 +158,11 @@ class ProcessService(
                     }
                     logger.trace("Stworzyłem/zaktualizowałem osobę")
                 } catch (e: Exception) {
-                    logger.error("Błąd przy tworzeniu lub aktualizowaniu osoby. ", e)
-                    errorCount++
+                    logger.error("Błąd przy tworzeniu lub aktualizowaniu osoby.", e)
                     saveExceptionHandler.handle(e, application, importId)
                 }
             }
         }
-        return errorCount
     }
 
     @Transactional(
@@ -175,7 +170,7 @@ class ProcessService(
         propagation = Propagation.REQUIRED,
         transactionManager = "transactionManager"
     )
-    fun archivePersons(importId: Long) {
+    fun archivePersons(importId: Long): Import {
         val import = importRepository.getById(importId)
         val applicationStream = applicationRepository.findAllByImportId(importId)
         applicationStream.use {
@@ -191,11 +186,12 @@ class ProcessService(
             }
         }
         import.importStatus = ImportStatus.ARCHIVED
+        return import
     }
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     fun getUids(importId: Long) {
-        val applicationStream = applicationRepository.findAllByImportIdStream(importId)
+        val applicationStream = applicationRepository.findAllStreamByImportId(importId)
         applicationStream.use {
             it.forEach { application ->
                 application.applicant?.let { applicant ->
@@ -210,7 +206,7 @@ class ProcessService(
         importId: Long,
         notificationSender: INotificationSender
     ) {
-        val applicationStream = applicationRepository.findAllByImportIdStream(importId)
+        val applicationStream = applicationRepository.findAllStreamByImportId(importId)
         val importProgress = importRepository.findByIdOrNull(importId)
         importProgress?.notificationsSend = 0
         applicationStream.use {
@@ -231,7 +227,7 @@ class ProcessService(
     fun findPotentialDuplicates(importId: Long) {
         try {
             val applicationsStream =
-                applicationRepository.findAllByImportIdStreamAndApplicantPotentialDuplicateStatus(
+                applicationRepository.findAllStreamByImportIdAndApplicantPotentialDuplicateStatusIn(
                     importId,
                     listOf(DuplicateStatus.NOT_CHECKED, DuplicateStatus.POTENTIAL_DUPLICATE)
                 )

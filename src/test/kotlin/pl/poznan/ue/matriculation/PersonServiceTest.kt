@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.irk.service.IrkService
 import pl.poznan.ue.matriculation.local.domain.applicants.*
 import pl.poznan.ue.matriculation.local.domain.applications.Application
-import pl.poznan.ue.matriculation.local.domain.applications.ApplicationForeignerData
 import pl.poznan.ue.matriculation.local.domain.enum.AccommodationPreference
 import pl.poznan.ue.matriculation.local.domain.enum.AddressType
 import pl.poznan.ue.matriculation.local.domain.enum.DurationType
@@ -86,7 +85,9 @@ class PersonServiceTest {
             stageCode = "s1-S1-E",
             startDate = Date(),
             dataSourceType = "IRK_TEST",
-            programmeForeignId = "S1-E"
+            programmeForeignId = "S1-E",
+            programmeForeignName = "S1_PL_SZ_202021",
+            indexPoolName = "Centralna"
         )
         val importDto = import.id?.let { importRepository.getById(it) }!!
 //        val irkApplication = irkService.getApplication(2159)!!
@@ -104,11 +105,9 @@ class PersonServiceTest {
             dataSourceId = "IRK_TEST",
             admitted = "addmited",
             comment = "comment",
-            applicationForeignerData = ApplicationForeignerData(
-                baseOfStay = "l",
-                basisOfAdmission = "PDAR",
-                sourceOfFinancing = "SAM"
-            ),
+            baseOfStay = "l",
+            basisOfAdmission = "PDAR",
+            sourceOfFinancing = "SAM",
             payment = "paid",
             position = "1",
             qualified = "qualified",
@@ -121,32 +120,25 @@ class PersonServiceTest {
                 email = "mk@email.com",
                 indexNumber = "12345",
                 password = "",
-                name = Name(
-                    given = "Michał",
-                    family = "Kubiak",
-                    maiden = null,
-                    middle = null
-                ),
+                given = "Michał",
+                family = "Kubiak",
+                maiden = null,
+                middle = null,
                 citizenship = "PL",
                 nationality = "PL",
                 photo = null,
                 photoPermission = "nobody",
-                basicData = BasicData(
-                    sex = 'M',
-                    pesel = "71041311152",
-                    dateOfBirth = df.parse("13.04.1971"),
-                    cityOfBirth = "Poznań",
-                    countryOfBirth = "PL",
-                    dataSource = "user"
-                ),
+                sex = 'M',
+                pesel = "71041311152",
+                dateOfBirth = df.parse("13.04.1971"),
+                cityOfBirth = "Poznań",
+                countryOfBirth = "PL",
                 modificationDate = testDate,
-                additionalData = AdditionalData(
-                    fathersName = "Jan",
-                    militaryCategory = "A",
-                    militaryStatus = "REZERWA",
-                    mothersName = "Janina",
-                    wku = "Poznań"
-                ),
+                fathersName = "Jan",
+                militaryCategory = "A",
+                militaryStatus = "REZERWA",
+                mothersName = "Janina",
+                wku = "Poznań",
                 applicantForeignerData = ApplicantForeignerData(
                     baseOfStay = "OKP",
                     foreignerStatus = HashSet(),
@@ -155,7 +147,6 @@ class PersonServiceTest {
                     polishCardNumber = "123456",
                     polishCardValidTo = testDate
                 ),
-                educationData = EducationData(),
                 addresses = mutableSetOf(
                     Address(
                         addressType = AddressType.PERMANENT,
@@ -203,7 +194,7 @@ class PersonServiceTest {
                 )
             )
         ).apply {
-            applicant?.educationData?.addDocument(
+            applicant?.addDocument(
                 Document(
                     certificateType = "M",
                     certificateTypeCode = "M",
@@ -221,18 +212,14 @@ class PersonServiceTest {
             )
             applicant?.applications?.add(this)
             applicant?.apply {
-                name.applicant = this
-                basicData.applicant = this
-                additionalData.applicant = this
                 applicantForeignerData?.applicant = this
-                educationData.applicant = this
                 erasmusData?.applicant = this
                 erasmusData?.apply {
                     homeInstitution?.erasmusData = this
                     coordinatorData?.erasmusData = this
                     courseData?.erasmusData = this
                 }
-                certificate = educationData.documents.first()
+                certificate = documents.first()
             }
         }
         //when

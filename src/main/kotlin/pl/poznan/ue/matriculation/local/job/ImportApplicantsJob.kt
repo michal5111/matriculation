@@ -21,11 +21,10 @@ class ImportApplicantsJob(
         get() = ApplicantsImportStartCondition()
 
     override fun prepare(import: Import) {
-        import.importStatus = ImportStatus.STARTED
         import.importedApplications = 0
     }
 
-    override fun doWork() {
+    override fun doWork(import: Import): Import {
         val import = importService.get(importId)
         import.error = null
         val applicantDataSource = applicationDataSourceFactory.getDataSource(import.dataSourceId)
@@ -58,13 +57,17 @@ class ImportApplicantsJob(
                 }
                 currentPage++
             }
-            importService.get(importId).apply {
-                importStatus = ImportStatus.IMPORTED
-            }.let {
-                importService.save(it)
-            }
         } catch (e: Exception) {
             throw ImportException(import.id, e.message, e)
         }
+        return import
+    }
+
+    override fun getCompletionStatus(import: Import): ImportStatus {
+        return ImportStatus.IMPORTED
+    }
+
+    override fun getInProgressStatus(): ImportStatus {
+        return ImportStatus.STARTED
     }
 }

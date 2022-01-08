@@ -40,11 +40,15 @@ class Import(
 
     val programmeForeignId: String,
 
+    val programmeForeignName: String,
+
     val stageCode: String,
 
     val registration: String,
 
     val indexPoolCode: String,
+
+    val indexPoolName: String,
 
     val startDate: Date,
 

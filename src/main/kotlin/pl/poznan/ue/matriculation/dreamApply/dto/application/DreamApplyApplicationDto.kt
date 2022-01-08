@@ -27,7 +27,7 @@ data class DreamApplyApplicationDto(
     val activities: List<ActivityDto>?,
     val residences: List<ResidenceDto>?,
     //val motivation: List<MotivationDto>?,
-    val misc: List<MiscDto>?,
+    //val misc: List<MiscDto>?,
     val extras: List<ExtraDto>?,
     val home: HomeDto?,
     var courseType: String?,

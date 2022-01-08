@@ -5,8 +5,10 @@ import java.util.*
 class ImportDto(
     val programmeCode: String,
     val programmeForeignId: String,
+    val programmeForeignName: String,
     val registration: String,
     val indexPoolCode: String,
+    val indexPoolName: String,
     val startDate: Date,
     val dateOfAddmision: Date,
     val stageCode: String,

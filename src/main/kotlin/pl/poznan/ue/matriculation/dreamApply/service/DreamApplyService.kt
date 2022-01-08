@@ -61,7 +61,10 @@ class DreamApplyService(
     fun getApplicationsByFilter(
         academicTermID: String? = null,
         academicYear: String? = null,
-        additionalFilters: Map<String, String>? = null
+        additionalFilters: Map<String, String>? = null,
+        limit: Int? = null,
+        expandApplicant: Boolean = false,
+        expandOffer: Boolean = false
     ): Map<Long, DreamApplyApplicationDto>? {
         if (academicTermID == null && academicYear == null) {
             throw IllegalArgumentException("AcademicTerm adn academicYear are null")
@@ -75,6 +78,19 @@ class DreamApplyService(
         }
         additionalFilters?.forEach { (filterName, filterValue) ->
             uriComponentBuilder.queryParam(filterName, filterValue)
+        }
+        limit?.let {
+            uriComponentBuilder.queryParam("limit", limit)
+        }
+        val expandList: MutableList<String> = mutableListOf()
+        if (expandApplicant) {
+            expandList.add("applicant")
+        }
+        if (expandOffer) {
+            expandList.add("offer")
+        }
+        if (expandList.size > 0) {
+            uriComponentBuilder.queryParam("expand", expandList.joinToString(separator = ","))
         }
         val response: ResponseEntity<Map<Long, DreamApplyApplicationDto>> = restTemplate.exchange(
             uriComponentBuilder.build().toUri(),

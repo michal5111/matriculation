@@ -1,6 +1,7 @@
 package pl.poznan.ue.matriculation.local.service
 
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -68,7 +69,7 @@ class UserService(
         return userRepository.delete(user)
     }
 
-    fun getAll(pageable: org.springframework.data.domain.Pageable): Page<User> {
+    fun getAll(pageable: Pageable): Page<User> {
         return userRepository.findAll(pageable)
     }
 }

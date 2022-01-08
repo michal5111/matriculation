@@ -1,7 +1,6 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.hibernate.Hibernate
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
@@ -12,20 +11,8 @@ import javax.persistence.*
 @NamedEntityGraph(
     name = "applicant.data",
     attributeNodes = [
-        NamedAttributeNode("name"),
-        NamedAttributeNode("basicData"),
-        NamedAttributeNode("additionalData"),
-        NamedAttributeNode("educationData"),
         NamedAttributeNode("applicantForeignerData"),
-        NamedAttributeNode("educationData", subgraph = "subgraph.documents")
-    ],
-    subgraphs = [
-        NamedSubgraph(
-            name = "subgraph.documents",
-            attributeNodes = [
-                NamedAttributeNode("documents")
-            ]
-        )
+        NamedAttributeNode("documents")
     ]
 )
 @Entity
@@ -41,7 +28,7 @@ import javax.persistence.*
 )
 class Applicant(
 
-    @Column(name = "foreignId")
+    @Column(name = "foreignId", nullable = false)
     val foreignId: Long,
 
     @Column(name = "datasourceId", nullable = false)
@@ -52,9 +39,6 @@ class Applicant(
     var indexNumber: String?,
 
     var password: String?,
-
-    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val name: Name,
 
     var citizenship: String,
 
@@ -70,30 +54,22 @@ class Applicant(
 
     var modificationDate: Date,
 
-    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    var basicData: BasicData,
-
-//        @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-//        var contactData: ContactData,
-
-    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val additionalData: AdditionalData,
-
+    @JsonIgnore
     @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var applicantForeignerData: ApplicantForeignerData?,
 
-    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val educationData: EducationData,
-
+    @JsonIgnore
     @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val phoneNumbers: MutableSet<PhoneNumber> = HashSet(),
 
+    @JsonIgnore
     @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val addresses: MutableSet<Address> = HashSet(),
 
     @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var identityDocuments: MutableSet<IdentityDocument> = HashSet(),
 
+    @JsonIgnore
     @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var erasmusData: ErasmusData? = null,
 
@@ -108,7 +84,48 @@ class Applicant(
     @OneToMany(mappedBy = "applicant", fetch = FetchType.LAZY)
     var applications: MutableSet<Application> = HashSet(),
 
-    var uid: String? = null
+    var uid: String? = null,
+
+    var fathersName: String?,
+
+    var militaryCategory: String?,
+
+    var militaryStatus: String?,
+
+    var mothersName: String?,
+
+    var wku: String?,
+
+    var sex: Char,
+
+    var pesel: String?,
+
+    @Temporal(TemporalType.DATE)
+    var dateOfBirth: Date?,
+
+    var cityOfBirth: String?,
+
+    var countryOfBirth: String?,
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val documents: MutableSet<Document> = HashSet(),
+
+    var highSchoolCity: String? = null,
+
+    var highSchoolName: String? = null,
+
+    var highSchoolType: String? = null,
+
+    var highSchoolUsosCode: Long? = null,
+
+    var middle: String?,
+
+    var family: String,
+
+    var given: String,
+
+    var maiden: String?
 ) : BaseEntityLongId() {
 
     fun addPhoneNumber(phoneNumber: PhoneNumber) {
@@ -141,20 +158,62 @@ class Applicant(
         identityDocument.applicant = null
     }
 
+    fun addDocument(document: Document) {
+        documents.add(document)
+        document.applicant = this
+    }
+
+    fun removeDocument(document: Document) {
+        documents.remove(document)
+        document.applicant = null
+    }
+
     override fun toString(): String {
-        return "Applicant(id=$id, irkId=$foreignId, email='$email', indexNumber=$indexNumber, " +
-            "password='$password', name=$name, citizenship=$citizenship, " +
-            "photo=$photo, photoPermission=$photoPermission, " +
-            "modificationDate=$modificationDate, usosId=$usosId)"
+        return "Applicant(" +
+            "foreignId=$foreignId, " +
+            "dataSourceId=$dataSourceId, " +
+            "email='$email', " +
+            "indexNumber=$indexNumber, " +
+            "citizenship='$citizenship', " +
+            "nationality=$nationality, " +
+            "photo=$photo, " +
+            "photoPermission=$photoPermission, " +
+            "usosId=$usosId, " +
+            "assignedIndexNumber=$assignedIndexNumber, " +
+            "uid=$uid, " +
+            "fathersName=$fathersName, " +
+            "militaryCategory=$militaryCategory, " +
+            "militaryStatus=$militaryStatus, " +
+            "mothersName=$mothersName, " +
+            "wku=$wku, " +
+            "sex=$sex, " +
+            "pesel=$pesel, " +
+            "dateOfBirth=$dateOfBirth, " +
+            "cityOfBirth=$cityOfBirth, " +
+            "countryOfBirth=$countryOfBirth, " +
+            "highSchoolCity=$highSchoolCity, " +
+            "highSchoolName=$highSchoolName, " +
+            "highSchoolType=$highSchoolType, " +
+            "highSchoolUsosCode=$highSchoolUsosCode, " +
+            "middle=$middle, " +
+            "family='$family', " +
+            "given='$given', " +
+            "maiden=$maiden)"
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-        other as Applicant
+        if (other !is Applicant) return false
 
-        return id != null && id == other.id
+        if (foreignId != other.foreignId) return false
+        if (dataSourceId != other.dataSourceId) return false
+
+        return true
     }
 
-    override fun hashCode(): Int = 0
+    override fun hashCode(): Int {
+        var result = foreignId.hashCode()
+        result = 31 * result + (dataSourceId?.hashCode() ?: 0)
+        return result
+    }
 }

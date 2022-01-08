@@ -70,7 +70,7 @@
         <mat-select formControlName="indexPoolCode" required="true">
           <mat-option
             *ngFor="let indexPool of $indexPoolsObservable | async"
-            [value]="indexPool.code">{{indexPool.description}}
+            [value]="indexPool">{{indexPool.description}}
           </mat-option>
         </mat-select>
       </mat-form-field>

@@ -1,21 +1,21 @@
 {
   "/api": {
-    "target": "http://mkubiak.it:8081",
+    "target": "http://localhost:8081",
     "secure": false,
     "changeOrigin": true
   },
   "/login": {
-    "target": "http://mkubiak.it:8081",
+    "target": "http://localhost:8081",
     "secure": false,
     "changeOrigin": true
   },
   "/ws": {
-    "target": "ws://mkubiak.it:8081",
+    "target": "ws://localhost:8081",
     "secure": false,
     "changeOrigin": true
   },
   "sockjs-node": {
-    "target": "http://mkubiak.it:8081",
+    "target": "http:/localhost:8081",
     "secure": false,
     "changeOrigin": true
   }

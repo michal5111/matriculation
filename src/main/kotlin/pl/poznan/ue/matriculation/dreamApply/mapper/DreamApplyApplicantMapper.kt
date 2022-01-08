@@ -7,7 +7,6 @@ import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPhoneNumber
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPostalCode
 import pl.poznan.ue.matriculation.local.domain.applicants.*
-import pl.poznan.ue.matriculation.local.domain.const.BasicDataDatasourceType
 import pl.poznan.ue.matriculation.local.domain.const.IdentityDocumentType
 import pl.poznan.ue.matriculation.local.domain.const.PhoneNumberType
 import pl.poznan.ue.matriculation.local.domain.const.PhotoPermissionType
@@ -35,14 +34,12 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
         val profile = application.profile ?: throw IllegalStateException("Profile is null")
         return Applicant(
             foreignId = dreamApplyApplicantDto.id,
-            name = Name(
-                given = dreamApplyApplicantDto.name.given.nameCapitalize(),
-                middle = dreamApplyApplicantDto.name.middle.takeUnless {
-                    it.isNullOrBlank()
-                }?.nameCapitalize(),
-                family = dreamApplyApplicantDto.name.family.nameCapitalize(),
-                maiden = null
-            ),
+            given = dreamApplyApplicantDto.name.given.nameCapitalize(),
+            middle = dreamApplyApplicantDto.name.middle.takeUnless {
+                it.isNullOrBlank()
+            }?.nameCapitalize(),
+            family = dreamApplyApplicantDto.name.family.nameCapitalize(),
+            maiden = null,
             email = dreamApplyApplicantDto.email.trim(),
             photo = dreamApplyApplicantDto.photo,
             citizenship = dreamApplyApplicantDto.citizenship,
@@ -50,33 +47,24 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
             photoPermission = PhotoPermissionType.NOBODY,
             password = null,
             modificationDate = dreamApplyApplicantDto.registered,
-            basicData = BasicData(
-                cityOfBirth = profile.birth?.place?.trim(),
-                countryOfBirth = profile.birth?.country,
-                dateOfBirth = profile.birth?.date,
-                pesel = profile.nationalidcode?.polish?.trim(),
-                sex = if (profile.gender == "M") 'M' else 'K',
-                dataSource = BasicDataDatasourceType.USER
-            ),
-            additionalData = AdditionalData(
-                mothersName = profile.family?.mother ?: application.extras?.find {
-                    it.name == "Mother's name"
-                }?.value?.trim(),
-                fathersName = profile.family?.father ?: application.extras?.find {
-                    it.name == "Father's name"
-                }?.value?.trim(),
-                wku = null,
-                militaryCategory = null,
-                militaryStatus = null
-            ),
+
+            cityOfBirth = profile.birth?.place?.trim(),
+            countryOfBirth = profile.birth?.country,
+            dateOfBirth = profile.birth?.date,
+            pesel = profile.nationalidcode?.polish?.trim(),
+            sex = if (profile.gender == "M") 'M' else 'K',
+            mothersName = profile.family?.mother ?: application.extras?.find {
+                it.name == "Mother's name"
+            }?.value?.trim(),
+            fathersName = profile.family?.father ?: application.extras?.find {
+                it.name == "Father's name"
+            }?.value?.trim(),
+            wku = null,
+            militaryCategory = null,
+            militaryStatus = null,
             indexNumber = null,
-            educationData = EducationData(),
             applicantForeignerData = null
         ).apply {
-            educationData.applicant = this
-            additionalData.applicant = this
-            basicData.applicant = this
-            name.applicant = this
             addAddress(this, application)
             createPhoneNumbers(
                 applicant = this,
@@ -97,30 +85,30 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
             ?: throw IllegalStateException("Application is null")
         val profile = application.profile ?: throw java.lang.IllegalStateException("Profile is null")
         return applicant.apply {
-            name.apply {
-                given = applicant.name.given.nameCapitalize()
-                middle = applicant.name.middle?.nameCapitalize()
-                family = applicant.name.family.nameCapitalize()
-            }
+
+            given = applicant.given.nameCapitalize()
+            middle = applicant.middle?.nameCapitalize()
+            family = applicant.family.nameCapitalize()
+
             email = dreamApplyApplicantDto.email.trim()
             photo = dreamApplyApplicantDto.photo
             citizenship = dreamApplyApplicantDto.citizenship
             nationality = profile.nationality
-            basicData.apply {
-                pesel = profile.nationalidcode?.polish?.trim()
-                cityOfBirth = profile.birth?.place?.trim()
-                countryOfBirth = profile.birth?.country
-                dateOfBirth = profile.birth?.date
-                sex = if (profile.gender == "M") 'M' else 'K'
-            }
-            additionalData.apply {
-                mothersName = profile.family?.mother ?: application.extras?.find {
-                    it.name == "Mother's name"
-                }?.value?.trim()
-                fathersName = profile.family?.father ?: application.extras?.find {
-                    it.name == "Father's name"
-                }?.value?.trim()
-            }
+
+            pesel = profile.nationalidcode?.polish?.trim()
+            cityOfBirth = profile.birth?.place?.trim()
+            countryOfBirth = profile.birth?.country
+            dateOfBirth = profile.birth?.date
+            sex = if (profile.gender == "M") 'M' else 'K'
+
+
+            mothersName = profile.family?.mother ?: application.extras?.find {
+                it.name == "Mother's name"
+            }?.value?.trim()
+            fathersName = profile.family?.father ?: application.extras?.find {
+                it.name == "Father's name"
+            }?.value?.trim()
+
             createPhoneNumbers(
                 applicant = this,
                 day = application.contact?.telephone?.day?.replace(" ", ""),
@@ -164,7 +152,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
     }
 
     private fun createEducationData(applicant: Applicant, applicationDto: DreamApplyApplicationDto) {
-        applicant.educationData.apply {
+        applicant.apply {
             applicationDto.education?.find {
                 it.level == EducationLevelType.SE
             }?.let {
@@ -177,7 +165,6 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
             !it.diploma?.number.isNullOrBlank() && it.level != null && it.diploma?.issue?.date != null
         }?.map {
             Document(
-                educationData = applicant.educationData,
                 certificateType = it.level!!.levelName,
                 certificateTypeCode = it.level.toString(),
                 certificateUsosCode = it.level.usosCode ?: when {
@@ -211,7 +198,7 @@ open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
                 modificationDate = Date()
             )
         }?.forEach {
-            applicant.educationData.addDocument(it)
+            applicant.addDocument(it)
         }
     }
 

@@ -143,7 +143,7 @@ open class DreamApplyDataSourceImpl(
         val levelType = EducationLevelType.values().find {
             it.programmeLevel == programmeLevel
         }
-        return applicant.educationData.documents.find {
+        return applicant.documents.find {
             it.certificateUsosCode == levelType?.usosCode
         }
     }

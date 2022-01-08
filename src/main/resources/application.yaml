@@ -27,7 +27,7 @@ spring:
         jcache:
             config: classpath:ehcache.xml
     jpa:
-        #        open-in-view: false
+        open-in-view: false
         generate-ddl: false
         #        repositories:
         #            bootstrap-mode: lazy
@@ -56,4 +56,4 @@ spring:
         active: '@spring.profiles.active@'
 
 logging:
-    config: "classpath:log4j2-dev.xml"
+    config: "classpath:logback-spring.xml"

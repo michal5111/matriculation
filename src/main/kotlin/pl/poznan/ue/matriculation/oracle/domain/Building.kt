@@ -1,10 +1,12 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
 import org.hibernate.annotations.CacheConcurrencyStrategy
+import org.hibernate.annotations.Immutable
 import java.util.*
 import javax.persistence.*
 
 @Entity
+@Immutable
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "DZ_BUDYNKI")

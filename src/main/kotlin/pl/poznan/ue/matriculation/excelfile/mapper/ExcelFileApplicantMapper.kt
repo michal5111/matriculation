@@ -4,7 +4,10 @@ import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicantDto
 import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPhoneNumber
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPostalCode
-import pl.poznan.ue.matriculation.local.domain.applicants.*
+import pl.poznan.ue.matriculation.local.domain.applicants.Address
+import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
+import pl.poznan.ue.matriculation.local.domain.applicants.IdentityDocument
+import pl.poznan.ue.matriculation.local.domain.applicants.PhoneNumber
 import pl.poznan.ue.matriculation.local.domain.enum.AddressType
 import java.util.*
 
@@ -13,31 +16,23 @@ class ExcelFileApplicantMapper {
     fun mapExcelFileApplicantToApplicant(excelFileApplicant: ExcelFileApplicantDto): Applicant {
         return Applicant(
             foreignId = excelFileApplicant.id,
-            name = Name(
-                given = excelFileApplicant.given,
-                middle = excelFileApplicant.middle,
-                family = excelFileApplicant.family,
-                maiden = null
-            ),
+            given = excelFileApplicant.given,
+            middle = excelFileApplicant.middle,
+            family = excelFileApplicant.family,
+            maiden = null,
             email = excelFileApplicant.email,
-            basicData = BasicData(
-                cityOfBirth = excelFileApplicant.birthPlace,
-                countryOfBirth = null,
-                dataSource = "User",
-                dateOfBirth = excelFileApplicant.birthDate,
-                pesel = excelFileApplicant.pesel,
-                sex = excelFileApplicant.sex
-            ),
-            additionalData = AdditionalData(
-                fathersName = excelFileApplicant.fathersName,
-                mothersName = excelFileApplicant.mothersName,
-                militaryCategory = null,
-                militaryStatus = null,
-                wku = null
-            ),
+            cityOfBirth = excelFileApplicant.birthPlace,
+            countryOfBirth = null,
+            dateOfBirth = excelFileApplicant.birthDate,
+            pesel = excelFileApplicant.pesel,
+            sex = excelFileApplicant.sex,
+            fathersName = excelFileApplicant.fathersName,
+            mothersName = excelFileApplicant.mothersName,
+            militaryCategory = null,
+            militaryStatus = null,
+            wku = null,
             citizenship = excelFileApplicant.citizenship,
             applicantForeignerData = null,
-            educationData = EducationData(),
             indexNumber = null,
             modificationDate = Date(),
             password = null,
@@ -76,10 +71,6 @@ class ExcelFileApplicantMapper {
                     postalCode = excelFileApplicant.address.postalCode?.trimPostalCode()
                 )
             )
-            name.applicant = this
-            additionalData.applicant = this
-            basicData.applicant = this
-            educationData.applicant = this
         }
     }
 
@@ -88,24 +79,17 @@ class ExcelFileApplicantMapper {
         excelFileApplicant: ExcelFileApplicantDto
     ): Applicant {
         return applicant.apply {
-            name.apply {
-                given = excelFileApplicant.given.nameCapitalize()
-                middle = excelFileApplicant.middle?.nameCapitalize()
-                family = excelFileApplicant.family.nameCapitalize()
-            }
+            given = excelFileApplicant.given.nameCapitalize()
+            middle = excelFileApplicant.middle?.nameCapitalize()
+            family = excelFileApplicant.family.nameCapitalize()
             email = excelFileApplicant.email.trim()
-            basicData.apply {
-                cityOfBirth = excelFileApplicant.birthPlace.trim()
-                countryOfBirth = null
-                dataSource = "User"
-                dateOfBirth = excelFileApplicant.birthDate
-                pesel = excelFileApplicant.pesel?.trim()
-                sex = excelFileApplicant.sex
-            }
-            additionalData.apply {
-                fathersName = excelFileApplicant.fathersName?.nameCapitalize()
-                mothersName = excelFileApplicant.mothersName?.nameCapitalize()
-            }
+            cityOfBirth = excelFileApplicant.birthPlace.trim()
+            countryOfBirth = null
+            dateOfBirth = excelFileApplicant.birthDate
+            pesel = excelFileApplicant.pesel?.trim()
+            sex = excelFileApplicant.sex
+            fathersName = excelFileApplicant.fathersName?.nameCapitalize()
+            mothersName = excelFileApplicant.mothersName?.nameCapitalize()
             citizenship = excelFileApplicant.citizenship.trim()
             modificationDate = Date()
             excelFileApplicant.phoneNumber?.trimPhoneNumber()?.let {

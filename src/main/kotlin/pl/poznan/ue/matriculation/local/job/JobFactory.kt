@@ -28,7 +28,6 @@ class JobFactory(
             )
             FIND_UIDS -> GetUidsJob(
                 processService = processService,
-                importService = importService,
                 importId = importId
             )
             ARCHIVE -> ArchiveApplicationsJob(
@@ -43,8 +42,7 @@ class JobFactory(
             )
             CHECK_FOR_POTENTIAL_DUPLICATES -> CheckForPotentialDuplicatesJob(
                 processService = processService,
-                importId = importId,
-                importService = importService
+                importId = importId
             )
         }
     }

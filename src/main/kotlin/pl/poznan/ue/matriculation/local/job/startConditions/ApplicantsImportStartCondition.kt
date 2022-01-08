@@ -20,7 +20,7 @@ class ApplicantsImportStartCondition : IStartConditions {
             ImportStatus.IMPORTED,
             ImportStatus.PENDING,
             ImportStatus.COMPLETED_WITH_ERRORS,
-            ImportStatus.ERROR -> if (import.savedApplicants == import.totalCount) {
+            ImportStatus.ERROR -> if (import.savedApplicants == import.totalCount && (import.totalCount ?: 0) > 0) {
                 throw ImportException(import.id, "Wszyscy są już zapisani")
             }
         }

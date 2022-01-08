@@ -21,28 +21,27 @@ class SavePersonsJob(
 
     override fun prepare(import: Import) {
         import.saveErrors = 0
-        import.importStatus = ImportStatus.SAVING
     }
 
-    override fun doWork() {
+    override fun doWork(import: Import): Import {
         val importDto = importService.get(importId)
-        val errorsCount = processService.processApplications(
+        processService.processApplications(
             importId = importId,
             importDto = importDto,
             applicationDtoDataSource = applicationDataSourceFactory.getDataSource(importDto.dataSourceId)
         )
-        if (errorsCount > 0) {
-            importService.get(importId).apply {
-                importStatus = ImportStatus.COMPLETED_WITH_ERRORS
-            }.let {
-                importService.save(it)
-            }
+        return importService.get(importId)
+    }
+
+    override fun getCompletionStatus(import: Import): ImportStatus {
+        return if (import.saveErrors > 0) {
+            ImportStatus.COMPLETED_WITH_ERRORS
         } else {
-            importService.get(importId).apply {
-                importStatus = ImportStatus.COMPLETE
-            }.let {
-                importService.save(it)
-            }
+            ImportStatus.COMPLETE
         }
+    }
+
+    override fun getInProgressStatus(): ImportStatus {
+        return ImportStatus.SAVING
     }
 }

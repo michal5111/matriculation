@@ -14,20 +14,15 @@ import javax.persistence.*
     name = "application.applicant",
     attributeNodes = [
         NamedAttributeNode("applicant", subgraph = "subgraph.data"),
-        NamedAttributeNode("applicationForeignerData"),
         NamedAttributeNode("certificate")
     ],
     subgraphs = [
         NamedSubgraph(
             name = "subgraph.data",
             attributeNodes = [
-                NamedAttributeNode("name"),
-                NamedAttributeNode("basicData"),
-                NamedAttributeNode("additionalData"),
-                NamedAttributeNode("educationData"),
-                NamedAttributeNode("applicantForeignerData"),
-                NamedAttributeNode("educationData"),
-                NamedAttributeNode("identityDocuments")
+                NamedAttributeNode("identityDocuments"),
+                NamedAttributeNode("foreignId"),
+                NamedAttributeNode("documents")
             ]
         )
     ]
@@ -44,6 +39,7 @@ import javax.persistence.*
 )
 class Application(
 
+    @Basic(fetch = FetchType.EAGER)
     @Column(nullable = false, name = "foreignId")
     val foreignId: Long,
 
@@ -54,9 +50,6 @@ class Application(
 
     @Column(length = 500)
     var comment: String? = null,
-
-    @OneToOne(mappedBy = "application", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    val applicationForeignerData: ApplicationForeignerData? = null,
 
     var payment: String? = null,
 
@@ -91,7 +84,13 @@ class Application(
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "import_id", referencedColumnName = "id")
-    var import: Import? = null
+    var import: Import? = null,
+
+    var baseOfStay: String?,
+
+    var basisOfAdmission: String?,
+
+    var sourceOfFinancing: String?
 ) : BaseEntityLongId(), Serializable {
 
     override fun toString(): String {

@@ -8,6 +8,6 @@ import javax.persistence.MappedSuperclass
 @MappedSuperclass
 open class BaseEntityLongId : BaseEntity() {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     open var id: Long? = null
 }

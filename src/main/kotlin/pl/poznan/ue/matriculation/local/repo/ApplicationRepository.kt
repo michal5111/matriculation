@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.EntityGraph
-import org.springframework.data.jpa.repository.Query
 import org.springframework.data.jpa.repository.QueryHints
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.data.repository.query.Param
@@ -21,7 +20,7 @@ import javax.persistence.QueryHint
 @Repository
 interface ApplicationRepository : PagingAndSortingRepository<Application, Long> {
 
-    @Query("SELECT a FROM Application a WHERE a.import.id = :importId")
+    @EntityGraph("application.applicant")
     fun findAllByImportId(pageable: Pageable, @Param("importId") importId: Long): Page<Application>
 
     @QueryHints(
@@ -31,8 +30,7 @@ interface ApplicationRepository : PagingAndSortingRepository<Application, Long> 
             QueryHint(name = READ_ONLY, value = "true")
         ]
     )
-    @Query("SELECT a FROM Application a WHERE a.import.id = :importId")
-    fun findAllByImportIdStream(@Param("importId") importId: Long): Stream<Application>
+    fun findAllStreamByImportId(@Param("importId") importId: Long): Stream<Application>
 
     fun findByForeignIdAndDataSourceId(foreignId: Long, foreignIdType: String): Application?
 
@@ -42,8 +40,10 @@ interface ApplicationRepository : PagingAndSortingRepository<Application, Long> 
         value = [
             QueryHint(name = HINT_FETCH_SIZE, value = "50"),
             QueryHint(name = HINT_CACHEABLE, value = "false"),
-            QueryHint(name = READ_ONLY, value = "true")
-        ]
+            QueryHint(name = READ_ONLY, value = "true"),
+            QueryHint(name = "hibernate.query.followOnLocking", value = "false")
+        ],
+        forCounting = false
     )
     fun getAllByImportIdAndImportStatusIn(
         importId: Long,
@@ -62,15 +62,7 @@ interface ApplicationRepository : PagingAndSortingRepository<Application, Long> 
             QueryHint(name = READ_ONLY, value = "true")
         ]
     )
-    @Query(
-        """
-        SELECT a
-        FROM Application a
-        WHERE a.import.id = :importId
-        AND a.applicant.potentialDuplicateStatus in (:statuses)
-    """
-    )
-    fun findAllByImportIdStreamAndApplicantPotentialDuplicateStatus(
+    fun findAllStreamByImportIdAndApplicantPotentialDuplicateStatusIn(
         @Param("importId") importId: Long,
         @Param("statuses") statuses: List<DuplicateStatus>
     ): Stream<Application>

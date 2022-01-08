@@ -34,7 +34,7 @@ class ApplicantService(
 //                logger.warn("Brak daty lub numeru dokumentu uprawniającego do podjęcia studiów. Pomijam dodawnie Tego dokumentu. ApplicantId: ${it.educationData?.applicantId}")
 //            }
 //        }
-        if (applicant.basicData.pesel.isNullOrBlank() && !applicant.identityDocuments.any { it.number != null }) {
+        if (applicant.pesel.isNullOrBlank() && !applicant.identityDocuments.any { it.number != null }) {
             throw ApplicantCheckException("Brak peselu lub dokumentu tożsamości")
         }
     }
@@ -44,24 +44,23 @@ class ApplicantService(
             email = ""
             indexNumber = null
             password = null
-            name.apply {
-                middle = null
-                family = ""
-                maiden = null
-                given = ""
-            }
+
+            middle = null
+            family = ""
+            maiden = null
+            given = ""
+
             citizenship = ""
             photo = null
             photoPermission = null
             modificationDate = Date()
-            basicData.apply {
-                cityOfBirth = null
-                countryOfBirth = null
-                dataSource = ""
-                dateOfBirth = null
-                pesel = null
-                sex = 'M'
-            }
+
+            cityOfBirth = null
+            countryOfBirth = null
+            dateOfBirth = null
+            pesel = null
+            sex = 'M'
+
             applicant.addresses.forEach {
                 it.city = null
                 it.countryCode = null
@@ -74,13 +73,11 @@ class ApplicantService(
                 it.number = ""
                 it.comment = ""
             }
-            applicant.additionalData.apply {
-                fathersName = null
-                militaryCategory = null
-                militaryStatus = null
-                mothersName = null
-                wku = null
-            }
+            fathersName = null
+            militaryCategory = null
+            militaryStatus = null
+            mothersName = null
+            wku = null
             applicant.applicantForeignerData?.apply {
                 baseOfStay = null
                 foreignerStatus.forEach {
@@ -91,13 +88,11 @@ class ApplicantService(
                 polishCardNumber = null
                 polishCardValidTo = null
             }
-            applicant.educationData.apply {
-                documents.clear()
-                highSchoolCity = null
-                highSchoolName = null
-                highSchoolType = null
-                highSchoolUsosCode = null
-            }
+            documents.clear()
+            highSchoolCity = null
+            highSchoolName = null
+            highSchoolType = null
+            highSchoolUsosCode = null
             applicant.erasmusData?.apply {
                 accommodationPreference = null
                 homeInstitution?.apply {

@@ -1,8 +1,7 @@
 package pl.poznan.ue.matriculation.local.domain.user
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.annotation.JsonIgnore
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
-import pl.poznan.ue.matriculation.local.serializer.CustomRolesSerializer
 import javax.persistence.*
 
 @Entity
@@ -15,7 +14,8 @@ class User(
     @Column(unique = true)
     val uid: String,
 
-    @JsonSerialize(using = CustomRolesSerializer::class)
+    //@JsonSerialize(using = CustomRolesSerializer::class)
+    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     var roles: MutableSet<UserRole> = HashSet(),
 

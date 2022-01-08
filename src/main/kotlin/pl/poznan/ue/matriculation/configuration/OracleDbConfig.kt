@@ -29,22 +29,6 @@ import javax.sql.DataSource
 class OracleDbConfig(
     private val oracleDBProperties: OracleDBProperties
 ) {
-
-//    @Value("\${oracle.datasource.url}")
-//    private lateinit var oracleDbUrl: String
-//
-//    @Value("\${oracle.datasource.username}")
-//    private lateinit var oracleDbUsername: String
-//
-//    @Value("\${oracle.datasource.password}")
-//    private lateinit var oracleDbPassword: String
-//
-//    @Value("\${oracle.datasource.driverClassName}")
-//    private lateinit var oracleDbDriverClassName: String
-//
-//    @Value("\${oracle.datasource.database-platform}")
-//    private lateinit var oracleDbHibernateDialect: String
-
     @Resource
     lateinit var context: AbstractApplicationContext
 

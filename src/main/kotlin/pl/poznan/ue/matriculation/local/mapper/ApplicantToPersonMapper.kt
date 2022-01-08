@@ -33,22 +33,22 @@ class ApplicantToPersonMapper(
             privateEmail = applicant.email.takeUnless {
                 it.endsWith(universityEmailSuffix)
             },
-            name = applicant.name.given,
-            middleName = applicant.name.middle,
-            surname = applicant.name.family,
+            name = applicant.given,
+            middleName = applicant.middle,
+            surname = applicant.family,
             citizenship = citizenshipRepository.getById(applicant.citizenship),
-            birthDate = applicant.basicData.dateOfBirth,
-            birthCity = applicant.basicData.cityOfBirth,
-            birthCountry = applicant.basicData.countryOfBirth?.let {
+            birthDate = applicant.dateOfBirth,
+            birthCity = applicant.cityOfBirth,
+            birthCountry = applicant.countryOfBirth?.let {
                 citizenshipRepository.getById(it)
             },
-            pesel = applicant.basicData.pesel,
-            sex = applicant.basicData.sex,
+            pesel = applicant.pesel,
+            sex = applicant.sex,
             nationality = applicant.nationality?.let {
                 citizenshipRepository.getById(it)
             },
             organizationalUnit = organizationalUnitRepository.getById(defaultStudentOrganizationalUnitString),
-            middleSchool = applicant.educationData.highSchoolUsosCode?.let {
+            middleSchool = applicant.highSchoolUsosCode?.let {
                 schoolRepository.getById(it)
             },
             idNumber = applicant.identityDocuments.firstOrNull()?.number,
@@ -59,13 +59,13 @@ class ApplicantToPersonMapper(
             identityDocumentIssuerCountry = applicant.identityDocuments.firstOrNull()?.country?.let {
                 citizenshipRepository.getById(it)
             },
-            mothersName = applicant.additionalData.mothersName,
-            fathersName = applicant.additionalData.fathersName,
-            wku = applicant.additionalData.wku?.let {
+            mothersName = applicant.mothersName,
+            fathersName = applicant.fathersName,
+            wku = applicant.wku?.let {
                 wkuRepository.getById(it)
             },
-            militaryCategory = applicant.additionalData.militaryCategory,
-            militaryStatus = applicant.additionalData.militaryStatus,
+            militaryCategory = applicant.militaryCategory,
+            militaryStatus = applicant.militaryStatus,
             personPhoto = applicant.photoByteArrayFuture?.get()?.let {
                 PersonPhoto(
                     photoBlob = it.toSerialBlob()
@@ -87,23 +87,24 @@ class ApplicantToPersonMapper(
                 addAddress(it)
             }
             if (addresses.none { it.addressType.code == "KOR" }) {
-                addresses.find { it.addressType.code == "POB" } ?: addresses.find { it.addressType.code == "STA" }
-                    ?.let {
-                        val ca = addressService.create(
-                            person = this,
-                            addressTypeCode = "KOR",
-                            city = it.city,
-                            street = it.street,
-                            houseNumber = it.houseNumber,
-                            apartmentNumber = it.flatNumber,
-                            zipCode = it.zipCode,
-                            cityIsCity = it.cityIsCity,
-                            countryCode = it.country?.code
-                        )
-                        addAddress(ca)
-                    }
+                val foundAddress = addresses.find { it.addressType.code == "POB" }
+                    ?: addresses.find { it.addressType.code == "STA" }
+                foundAddress?.let {
+                    val ca = addressService.create(
+                        person = this,
+                        addressTypeCode = "KOR",
+                        city = it.city,
+                        street = it.street,
+                        houseNumber = it.houseNumber,
+                        apartmentNumber = it.flatNumber,
+                        zipCode = it.zipCode,
+                        cityIsCity = it.cityIsCity,
+                        countryCode = it.country?.code
+                    )
+                    addAddress(ca)
+                }
             }
-            applicant.educationData.documents.filter { document ->
+            applicant.documents.filter { document ->
                 document.certificateUsosCode != null
             }.map {
                 EntitlementDocument(

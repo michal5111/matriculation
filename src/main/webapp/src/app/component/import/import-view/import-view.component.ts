@@ -46,7 +46,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   totalElements = 0;
   page: Page<Application>;
   dataSource = new MatTableDataSource<Application>();
-  sortString = 'applicant.name.family';
+  sortString = 'applicant.family';
   sortDirString = 'asc';
   displayedColumns: Map<string, boolean> = new Map<string, boolean>([
     ['lp', true],
@@ -73,9 +73,9 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['foreignId', 'foreignId'],
     ['uid', 'applicant.uid'],
     ['usosId', 'applicant.usosId'],
-    ['names', 'applicant.name.family'],
-    ['birthDateAndPlace', 'applicant.basicData.dateOfBirth'],
-    ['pesel', 'applicant.basicData.pesel'],
+    ['names', 'applicant.family'],
+    ['birthDateAndPlace', 'applicant.dateOfBirth'],
+    ['pesel', 'applicant.pesel'],
     ['indexNumber', 'applicant.assignedIndexNumber'],
     ['applicationImportStatus', 'importStatus'],
     ['importError', 'importError'],
@@ -101,15 +101,14 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   getPage(page: number, size: number, sort?: string, sortDir?: string) {
-    return this.importService.findAllApplicationsByImportId(this.importId, page, size, sort, sortDir)
-      .pipe(
-        tap(applicationsPage => {
-          this.page = applicationsPage;
-          this.totalElements = applicationsPage.totalElements;
-        }),
-        map(applicationsPage => applicationsPage.content),
-        tap(content => this.dataSource.data = content)
-      );
+    return this.importService.findAllApplicationsByImportId(this.importId, page, size, sort, sortDir).pipe(
+      tap(applicationsPage => {
+        this.page = applicationsPage;
+        this.totalElements = applicationsPage.totalElements;
+      }),
+      map(applicationsPage => applicationsPage.content),
+      tap(content => this.dataSource.data = content)
+    );
   }
 
   getImport(importId: number): Observable<Import> {
@@ -133,18 +132,22 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     );
     this.route.queryParams.pipe(
       tap(params => {
-        this.pageNumber = +params.page;
+        this.pageNumber = params.page ?? this.pageNumber;
         this.sortString = this.sortingMap.get(params.sort);
         this.sortDirString = params.dir;
       }),
-      switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString))
+      switchMap(params => this.getPage(
+        params.page ?? this.pageNumber,
+        this.pageSize,
+        this.sortingMap.get(params.sort),
+        params.dir
+      ))
     ).subscribe();
     this.importProgressObservable$ = this.rxStompService.watch(`/topic/importProgress/${this.importId}`).pipe(
       map((message: Message) => JSON.parse(message.body)),
       tap((importProgress: ImportProgress) => this.importProgress = importProgress)
     );
-    this.progressSubscription = this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).pipe(
-      switchMap(() => this.importService.getImportProgress(this.importId)),
+    this.progressSubscription = this.importService.getImportProgress(this.importId).pipe(
       tap((importProgress: ImportProgress) => this.importProgress = importProgress),
       switchMap(() => this.importProgressObservable$),
       switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString))
@@ -152,8 +155,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   switchPage(pageEvent: PageEvent): void {
-    // this.pageNumber = pageEvent.pageIndex;
-    // this.pageSize = pageEvent.pageSize;
     localStorage.setItem('importViewPageSize', pageEvent.pageSize.toString());
     this.router.navigate(
       [],
@@ -161,18 +162,15 @@ export class ImportViewComponent implements OnInit, OnDestroy {
         relativeTo: this.route,
         queryParams: {
           page: pageEvent.pageIndex,
-          sort: this.route.params,
+          sort: this.sortString,
           dir: this.sortDirString,
           pageSize: pageEvent.pageSize
         }
       }
     );
-    // this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe();
   }
 
   sortEvent(sortEvent: Sort): void {
-    // this.sortString = this.sortingMap.get(sortEvent.active);
-    // this.sortDirString = sortEvent.direction;
     this.router.navigate(
       [],
       {
@@ -185,7 +183,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
         }
       }
     );
-    // this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe();
   }
 
   startImport(): void {
@@ -197,12 +194,12 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   getSecondarySchoolDocument(application: Application): Document {
-    return application.applicant.educationData.documents
+    return application.applicant.documents
       .find(document => ['D', 'N', 'E', 'Z'].some(code => document.certificateUsosCode === code));
   }
 
   getDiplomaDocument(application: Application): Document {
-    return application.applicant.educationData.documents
+    return application.applicant.documents
       .find(document => ['L', 'I'].some(code => document.certificateUsosCode === code));
   }
 
@@ -234,7 +231,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().pipe(
       filter(result => result === true),
-      switchMap((result) => this.importService.archiveImport(this.importId)),
+      switchMap((result) => this.importService.archiveImport(this.importId))
     ).subscribe();
   }
 
@@ -262,8 +259,8 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   getPeselOrIdNumber(application: Application) {
-    if (application.applicant.basicData.pesel != null) {
-      return application.applicant.basicData.pesel;
+    if (application.applicant.pesel != null) {
+      return application.applicant.pesel;
     } else {
       return application.applicant.identityDocuments[0].number;
     }
@@ -279,7 +276,8 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       case 'SENDING_NOTIFICATIONS':
         return true;
       case 'ERROR':
-        return this.importProgress.savedApplicants === this.importProgress.totalCount;
+        return this.importProgress.savedApplicants === this.importProgress.totalCount
+          && this.importProgress.totalCount > 0;
       default:
         return false;
     }

@@ -21,26 +21,25 @@ class SendNotificationsJob(
 
     override fun prepare(import: Import) {
         import.notificationsSend = 0
-        import.importStatus = ImportStatus.SENDING_NOTIFICATIONS
     }
 
-    override fun doWork() {
+    override fun doWork(import: Import): Import {
         val import = importService.get(importId)
         val ads = applicationDataSourceFactory.getDataSource(import.dataSourceId)
-        if (ads !is INotificationSender) return
+        if (ads !is INotificationSender) return import
         processService.sendNotifications(importId = importId, ads)
-        if (import.saveErrors > 0) {
-            importService.get(importId).apply {
-                importStatus = ImportStatus.COMPLETED_WITH_ERRORS
-            }.let {
-                importService.save(it)
-            }
+        return import
+    }
+
+    override fun getCompletionStatus(import: Import): ImportStatus {
+        return if (import.saveErrors > 0) {
+            ImportStatus.COMPLETED_WITH_ERRORS
         } else {
-            importService.get(importId).apply {
-                importStatus = ImportStatus.COMPLETE
-            }.let {
-                importService.save(it)
-            }
+            ImportStatus.COMPLETE
         }
+    }
+
+    override fun getInProgressStatus(): ImportStatus {
+        return ImportStatus.SENDING_NOTIFICATIONS
     }
 }

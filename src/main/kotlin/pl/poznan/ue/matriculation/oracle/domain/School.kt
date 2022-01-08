@@ -4,8 +4,9 @@ import org.hibernate.annotations.CacheConcurrencyStrategy
 import javax.persistence.*
 
 @Entity
+//@Immutable
 @Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "DZ_SZKOLY")
 class School(
     @Id

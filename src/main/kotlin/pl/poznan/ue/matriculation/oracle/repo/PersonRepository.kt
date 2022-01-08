@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.oracle.repo
 
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Lock
@@ -12,6 +13,8 @@ import javax.persistence.LockModeType
 
 @Repository
 interface PersonRepository : JpaRepository<Person, Long> {
+
+    fun findAll(specification: Specification<Person>): Person?
 
     @EntityGraph("person.basicDataAndAddresses")
     @Lock(LockModeType.OPTIMISTIC)

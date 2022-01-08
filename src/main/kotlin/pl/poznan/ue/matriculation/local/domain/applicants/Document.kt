@@ -13,7 +13,7 @@ import javax.persistence.*
     uniqueConstraints = [
         UniqueConstraint(
             name = "DocumentUniqueConstraint",
-            columnNames = ["education_data_id", "documentNumber", "certificateTypeCode"]
+            columnNames = ["applicant_id", "documentNumber", "certificateTypeCode"]
         )
     ]
 )
@@ -21,8 +21,8 @@ class Document(
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "education_data_id", referencedColumnName = "applicant_id", nullable = false)
-    var educationData: EducationData? = null,
+    @JoinColumn(name = "applicant_id", referencedColumnName = "id")
+    var applicant: Applicant? = null,
 
     val certificateType: String,
 
@@ -30,6 +30,7 @@ class Document(
 
     val certificateUsosCode: Char?,
 
+    @JsonIgnore
     @Basic(fetch = FetchType.LAZY)
     @Lob
     var comment: String?,

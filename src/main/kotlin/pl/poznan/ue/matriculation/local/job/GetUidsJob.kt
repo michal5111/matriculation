@@ -4,12 +4,10 @@ import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.job.startConditions.IStartConditions
 import pl.poznan.ue.matriculation.local.job.startConditions.UidSearchStartConditions
-import pl.poznan.ue.matriculation.local.service.ImportService
 import pl.poznan.ue.matriculation.local.service.ProcessService
 
 class GetUidsJob(
     private val processService: ProcessService,
-    private val importService: ImportService,
     private val importId: Long
 ) : IJob {
     override var status: JobStatus = JobStatus.PENDING
@@ -19,17 +17,22 @@ class GetUidsJob(
 
     override fun prepare(import: Import) {
         import.importedUids = 0
-        import.importStatus = ImportStatus.SEARCHING_UIDS
     }
 
-    override fun doWork() {
+    override fun doWork(import: Import): Import {
         processService.getUids(importId)
-        val import = importService.get(importId)
-        if (import.saveErrors > 0) {
-            import.importStatus = ImportStatus.COMPLETED_WITH_ERRORS
+        return import
+    }
+
+    override fun getCompletionStatus(import: Import): ImportStatus {
+        return if (import.saveErrors > 0) {
+            ImportStatus.COMPLETED_WITH_ERRORS
         } else {
-            import.importStatus = ImportStatus.COMPLETE
+            ImportStatus.COMPLETE
         }
-        importService.save(import)
+    }
+
+    override fun getInProgressStatus(): ImportStatus {
+        return ImportStatus.SEARCHING_UIDS
     }
 }

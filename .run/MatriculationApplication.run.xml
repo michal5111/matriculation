@@ -7,12 +7,6 @@
         <option name="ACTIVE_PROFILES" value="dev"/>
         <option name="ALTERNATIVE_JRE_PATH"/>
         <option name="UPDATE_ACTION_UPDATE_POLICY" value="UpdateClassesAndTriggerFile"/>
-        <additionalParameters>
-            <param>
-                <option name="name" value="spring.output.ansi.enabled"/>
-                <option name="value" value="ALWAYS"/>
-            </param>
-        </additionalParameters>
         <method v="2">
             <option name="Maven.BeforeRunTask" enabled="true" file="$PROJECT_DIR$/pom.xml" goal="test"/>
         </method>

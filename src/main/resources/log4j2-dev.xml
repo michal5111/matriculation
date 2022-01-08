@@ -30,45 +30,45 @@
             <AppenderRef ref="RollingFile"/>
         </Root>
 
-        <Logger name="org.hibernate.SQL" level="trace" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Logger>
+        <!--        <Logger name="org.hibernate.SQL" level="trace" additivity="false">-->
+        <!--            <AppenderRef ref="Console"/>-->
+        <!--            <AppenderRef ref="RollingFile"/>-->
+        <!--        </Logger>-->
 
-        <Logger name="org.hibernate.type.descriptor.sql" level="trace" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Logger>
+        <!--        <Logger name="org.hibernate.type.descriptor.sql" level="trace" additivity="false">-->
+        <!--            <AppenderRef ref="Console"/>-->
+        <!--            <AppenderRef ref="RollingFile"/>-->
+        <!--        </Logger>-->
         <Logger name="pl.ue.poznan.matriculation" level="trace" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
         </Logger>
 
-        <Logger name="org.springframework.web.socket.config.WebSocketMessageBrokerStats" level="trace"
-                additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Logger>
+        <!--        <Logger name="org.springframework.web.socket.config.WebSocketMessageBrokerStats" level="trace"-->
+        <!--                additivity="false">-->
+        <!--            <AppenderRef ref="Console"/>-->
+        <!--            <AppenderRef ref="RollingFile"/>-->
+        <!--        </Logger>-->
 
-        <Logger name="pl.poznan.ue.matriculation.configuration.LogAspect" level="trace" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Logger>
+        <!--        <Logger name="pl.poznan.ue.matriculation.configuration.LogAspect" level="trace" additivity="false">-->
+        <!--            <AppenderRef ref="Console"/>-->
+        <!--            <AppenderRef ref="RollingFile"/>-->
+        <!--        </Logger>-->
 
-        <Logger name="jdbc.sqlonly" level="trace" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Logger>
+        <!--        <Logger name="jdbc.sqlonly" level="trace" additivity="false">-->
+        <!--            <AppenderRef ref="Console"/>-->
+        <!--            <AppenderRef ref="RollingFile"/>-->
+        <!--        </Logger>-->
 
-        <Logger name="jdbc.sqltiming" level="trace" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Logger>
+        <!--        <Logger name="jdbc.sqltiming" level="trace" additivity="false">-->
+        <!--            <AppenderRef ref="Console"/>-->
+        <!--            <AppenderRef ref="RollingFile"/>-->
+        <!--        </Logger>-->
 
-        <Logger name="jdbc.connection" level="trace" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Logger>
+        <!--        <Logger name="jdbc.connection" level="trace" additivity="false">-->
+        <!--            <AppenderRef ref="Console"/>-->
+        <!--            <AppenderRef ref="RollingFile"/>-->
+        <!--        </Logger>-->
     </Loggers>
 
 </Configuration>

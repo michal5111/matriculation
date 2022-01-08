@@ -9,54 +9,27 @@
     <div>
 
     </div>
-    <mat-card-title>{{applicant.name.given}} {{applicant.name.middle}} {{applicant.name.maiden}} {{applicant.name.family}}</mat-card-title>
+    <mat-card-title>{{applicant.given}} {{applicant.middle}} {{applicant.maiden}} {{applicant.family}}</mat-card-title>
     <mat-card-subtitle>{{applicant.email}} </mat-card-subtitle>
     <mat-card-content>
       <p>Numer telefonu: {{applicant.phone}}</p>
       <p>Obywatelstwo: {{applicant.citizenship}}</p>
       <p>Data ostatniej modyfikacji: {{applicant.modification_date}}</p>
-      <mat-expansion-panel [disabled]="!applicant.basicData">
+      <mat-expansion-panel [disabled]="!applicant">
         <mat-expansion-panel-header>
           <mat-panel-title>Dane podstawowe</mat-panel-title>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
           <mat-list>
-            <mat-list-item> Płeć: {{applicant.basicData.sex}}</mat-list-item>
-            <mat-list-item> PESEL: {{applicant.basicData.pesel}}</mat-list-item>
-            <mat-list-item> Data urodzenia: {{applicant.basicData.dateOfBirth}}</mat-list-item>
-            <mat-list-item> Miasto urodzenia: {{applicant.basicData.cityOfBirth}}</mat-list-item>
-            <mat-list-item> Kraj urodzenia: {{applicant.basicData.countryOfBirth}}</mat-list-item>
-            <mat-list-item> Źródło danych: {{applicant.basicData.dataSource}}</mat-list-item>
+            <mat-list-item> Płeć: {{applicant.sex}}</mat-list-item>
+            <mat-list-item> PESEL: {{applicant.pesel}}</mat-list-item>
+            <mat-list-item> Data urodzenia: {{applicant.dateOfBirth}}</mat-list-item>
+            <mat-list-item> Miasto urodzenia: {{applicant.cityOfBirth}}</mat-list-item>
+            <mat-list-item> Kraj urodzenia: {{applicant.countryOfBirth}}</mat-list-item>
+            <mat-list-item> Źródło danych: {{applicant.dataSource}}</mat-list-item>
           </mat-list>
         </ng-template>
       </mat-expansion-panel>
-      <!--      <mat-expansion-panel [disabled]="!applicant.contactData">-->
-      <!--        <mat-expansion-panel-header>-->
-      <!--          <mat-panel-title>Dane kontaktowe</mat-panel-title>-->
-      <!--        </mat-expansion-panel-header>-->
-      <!--        <ng-template matExpansionPanelContent>-->
-      <!--          <mat-list>-->
-      <!--            <mat-list-item>Numer telefonu: {{applicant.contactData.phoneNumber}}</mat-list-item>-->
-      <!--            <mat-list-item>Typ numeru telefonu: {{applicant.contactData.phoneNumberType}}</mat-list-item>-->
-      <!--            <mat-list-item>Drugi numer telefonu: {{applicant.contactData.phoneNumber2}}</mat-list-item>-->
-      <!--            <mat-list-item>Typ drugiego numeru telefonu: {{applicant.contactData.phoneNumber2Type}}</mat-list-item>-->
-      <!--            <mat-list-item>Nazwa ulicy zameldowania: {{applicant.contactData.officialStreet}}</mat-list-item>-->
-      <!--            <mat-list-item>Numer ulicy zameldowania: {{applicant.contactData.officialStreetNumber}}</mat-list-item>-->
-      <!--            <mat-list-item>Numer mieszkania zameldowania: {{applicant.contactData.officialFlatNumber}}</mat-list-item>-->
-      <!--            <mat-list-item>Kod pocztowy zameldowania: {{applicant.contactData.officialPostCode}}</mat-list-item>-->
-      <!--            <mat-list-item>Nazwa miejsca zameldowania: {{applicant.contactData.officialCity}}</mat-list-item>-->
-      <!--            <mat-list-item>-->
-      <!--              Czy miasto:-->
-      <!--              <div *ngIf="applicant.contactData.officialCityIsCity">-->
-      <!--                Tak-->
-      <!--              </div>-->
-      <!--              <div *ngIf="!applicant.contactData.officialCityIsCity">-->
-      <!--                Nie-->
-      <!--              </div>-->
-      <!--            </mat-list-item>-->
-      <!--          </mat-list>-->
-      <!--        </ng-template>-->
-      <!--      </mat-expansion-panel>-->
     </mat-card-content>
     <mat-card-actions></mat-card-actions>
   </mat-card>

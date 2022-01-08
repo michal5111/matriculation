@@ -28,8 +28,10 @@ class ImportService(
     fun create(
         programmeCode: String,
         programmeForeignId: String,
+        programmeForeignName: String,
         registration: String,
         indexPoolCode: String,
+        indexPoolName: String,
         startDate: Date,
         dateOfAddmision: Date,
         stageCode: String,
@@ -56,15 +58,17 @@ class ImportService(
             dateOfAddmision = dateOfAddmision,
             didacticCycleCode = didacticCycleCode,
             indexPoolCode = indexPoolCode,
+            indexPoolName = indexPoolName,
             programmeCode = programmeCode,
             programmeForeignId = programmeForeignId,
+            programmeForeignName = programmeForeignName,
             registration = registration,
             startDate = startDate,
             stageCode = stageCode,
             dataSourceId = dataSourceType,
             dataFile = dataFile?.let {
                 Base64.getDecoder().decode(dataFile)
-            }
+            },
         )
         return importRepository.save(import)
     }
@@ -128,16 +132,13 @@ class ImportService(
         return importRepository.save(import)
     }
 
-    fun setError(importId: Long, s: String) = importRepository.getWithErrorById(importId).apply {
+    fun setError(importId: Long, s: String) = importRepository.getErrorAndStatusById(importId).apply {
         error = s
-    }.also {
-        importRepository.save(it)
+        importStatus = ImportStatus.ERROR
     }
 
     fun setImportStatus(importStatus: ImportStatus, importId: Long) =
-        importRepository.getWithImportStatusById(importId).apply {
+        importRepository.getById(importId).apply {
             this.importStatus = importStatus
-        }.also {
-            importRepository.save(it)
         }
 }

@@ -12,9 +12,6 @@ import {MatSelectChange} from '@angular/material/select';
 import {DataSource} from '../../../model/import/dataSource';
 import {Programme} from '../../../model/applications/programme';
 import {UsosService} from '../../../service/usos-service/usos.service';
-import * as _moment from 'moment';
-
-const moment = _moment;
 
 @Component({
   selector: 'app-import-setup',
@@ -108,14 +105,16 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.import.registration = this.importCreationFormGroup.value.registration;
     this.import.programmeCode = this.importCreationFormGroup.value.registrationProgramme.usosId;
     this.import.programmeForeignId = this.importCreationFormGroup.value.registrationProgramme.id;
+    this.import.programmeForeignName = this.importCreationFormGroup.value.registrationProgramme.name;
     this.import.didacticCycleCode = this.importCreationFormGroup.value.didacticCycle;
     this.import.dateOfAddmision = this.importCreationFormGroup.value.dateOfAddmision;
     this.import.startDate = this.importCreationFormGroup.value.startDate;
-    this.import.indexPoolCode = this.importCreationFormGroup.value.indexPoolCode;
+    this.import.indexPoolCode = this.importCreationFormGroup.value.indexPoolCode.code;
+    this.import.indexPoolName = this.importCreationFormGroup.value.indexPoolCode.description;
     this.import.stageCode = this.importCreationFormGroup.value.stage;
     this.import.dataSourceId = this.importCreationFormGroup.value.dataSource;
     this.importService.createImport(this.import).subscribe(
-      importObject => this.onImportCreated(importObject),
+      importObject => this.onImportCreated(importObject)
       // error => this.onError('Błąd przy tworzeniu importu', error)
     );
   }

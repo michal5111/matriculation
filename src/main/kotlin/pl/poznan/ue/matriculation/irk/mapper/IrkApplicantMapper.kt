@@ -18,33 +18,24 @@ class IrkApplicantMapper {
             email = applicantDto.email.trim(),
             indexNumber = applicantDto.indexNumber?.trim(),
             password = applicantDto.password,
-            name = Name(
-                middle = applicantDto.name.middle?.nameCapitalize(),
-                family = applicantDto.name.family.nameCapitalize(),
-                maiden = applicantDto.name.maiden?.nameCapitalize(),
-                given = applicantDto.name.given.nameCapitalize()
-            ),
+            middle = applicantDto.name.middle?.nameCapitalize(),
+            family = applicantDto.name.family.nameCapitalize(),
+            maiden = applicantDto.name.maiden?.nameCapitalize(),
+            given = applicantDto.name.given.nameCapitalize(),
             citizenship = applicantDto.citizenship,
             photo = applicantDto.photo,
             photoPermission = applicantDto.photoPermission,
             modificationDate = applicantDto.modificationDate,
-            basicData = BasicData(
-                cityOfBirth = applicantDto.basicData.cityOfBirth?.trim(),
-                countryOfBirth = applicantDto.basicData.countryOfBirth,
-                dataSource = applicantDto.basicData.dataSource,
-                dateOfBirth = applicantDto.basicData.dateOfBirth,
-                pesel = applicantDto.basicData.pesel?.trim(),
-                sex = applicantDto.basicData.sex
-            ),
-            additionalData = applicantDto.additionalData.let {
-                AdditionalData(
-                    fathersName = it.fathersName?.trim(),
-                    militaryCategory = it.militaryCategory,
-                    militaryStatus = it.militaryStatus,
-                    mothersName = it.mothersName?.trim(),
-                    wku = it.wku
-                )
-            },
+            cityOfBirth = applicantDto.basicData.cityOfBirth?.trim(),
+            countryOfBirth = applicantDto.basicData.countryOfBirth,
+            dateOfBirth = applicantDto.basicData.dateOfBirth,
+            pesel = applicantDto.basicData.pesel?.trim(),
+            sex = applicantDto.basicData.sex,
+            fathersName = applicantDto.additionalData.fathersName?.trim(),
+            militaryCategory = applicantDto.additionalData.militaryCategory,
+            militaryStatus = applicantDto.additionalData.militaryStatus,
+            mothersName = applicantDto.additionalData.mothersName?.trim(),
+            wku = applicantDto.additionalData.wku,
             applicantForeignerData = applicantDto.foreignerData?.let {
                 ApplicantForeignerData(
                     baseOfStay = it.baseOfStay,
@@ -59,28 +50,20 @@ class IrkApplicantMapper {
                     polishCardValidTo = it.polishCardValidTo
                 )
             },
-            educationData = applicantDto.educationData.let {
-                EducationData(
-                    highSchoolCity = it.highSchoolCity?.trim(),
-                    highSchoolName = it.highSchoolName?.trim(),
-                    highSchoolType = it.highSchoolType,
-                    highSchoolUsosCode = it.highSchoolUsosCode
-                )
-            }
+            highSchoolCity = applicantDto.educationData.highSchoolCity?.trim(),
+            highSchoolName = applicantDto.educationData.highSchoolName?.trim(),
+            highSchoolType = applicantDto.educationData.highSchoolType,
+            highSchoolUsosCode = applicantDto.educationData.highSchoolUsosCode
         ).apply {
-            addDocuments(applicantDto, educationData)
-            additionalData.applicant = this
-            basicData.applicant = this
-            educationData.applicant = this
+            addDocuments(this, applicantDto)
             applicantForeignerData?.applicant = this
-            name.applicant = this
             addPhoneNumbers(this, applicantDto.contactData)
             addAddresses(this, applicantDto.contactData)
             addIdentityDocuments(this, applicantDto.additionalData)
         }
     }
 
-    private fun addDocuments(applicantDto: IrkApplicantDto, educationData: EducationData) {
+    private fun addDocuments(applicant: Applicant, applicantDto: IrkApplicantDto) {
         applicantDto.educationData.documents.filter { document ->
             document.issueDate != null && !document.documentNumber.isNullOrBlank()
         }.map { documentDTO ->
@@ -102,7 +85,7 @@ class IrkApplicantMapper {
                 modificationDate = documentDTO.modificationDate
             )
         }.forEach {
-            educationData.addDocument(it)
+            applicant.addDocument(it)
         }
     }
 
@@ -111,37 +94,28 @@ class IrkApplicantMapper {
             email = applicantDto.email
             indexNumber = applicantDto.indexNumber
             password = applicantDto.password
-            name.apply {
-                middle = applicantDto.name.middle?.nameCapitalize()
-                family = applicantDto.name.family.nameCapitalize()
-                maiden = applicantDto.name.maiden?.nameCapitalize()
-                given = applicantDto.name.given.nameCapitalize()
-            }
+            middle = applicantDto.name.middle?.nameCapitalize()
+            family = applicantDto.name.family.nameCapitalize()
+            maiden = applicantDto.name.maiden?.nameCapitalize()
+            given = applicantDto.name.given.nameCapitalize()
             citizenship = applicantDto.citizenship
             photo = applicantDto.photo
             photoPermission = applicantDto.photoPermission
             modificationDate = applicantDto.modificationDate
-            basicData.apply {
-                cityOfBirth = applicantDto.basicData.cityOfBirth?.trim()
-                countryOfBirth = applicantDto.basicData.countryOfBirth
-                dataSource = applicantDto.basicData.dataSource
-                dateOfBirth = applicantDto.basicData.dateOfBirth
-                pesel = applicantDto.basicData.pesel?.trim()
-                sex = applicantDto.basicData.sex
-            }
+            cityOfBirth = applicantDto.basicData.cityOfBirth?.trim()
+            countryOfBirth = applicantDto.basicData.countryOfBirth
+            dateOfBirth = applicantDto.basicData.dateOfBirth
+            pesel = applicantDto.basicData.pesel?.trim()
+            sex = applicantDto.basicData.sex
             applicantDto.contactData.let {
                 addAddresses(applicant, it)
                 addPhoneNumbers(applicant, it)
             }
-            applicantDto.additionalData.let {
-                applicant.additionalData.apply {
-                    fathersName = it.fathersName?.trim()
-                    militaryCategory = it.militaryCategory
-                    militaryStatus = it.militaryStatus
-                    mothersName = it.mothersName?.trim()
-                    wku = it.wku
-                }
-            }
+            fathersName = applicantDto.additionalData.fathersName?.trim()
+            militaryCategory = applicantDto.additionalData.militaryCategory
+            militaryStatus = applicantDto.additionalData.militaryStatus
+            mothersName = applicantDto.additionalData.mothersName?.trim()
+            wku = applicantDto.additionalData.wku
             applicantDto.foreignerData?.let {
                 applicant.applicantForeignerData?.apply {
                     baseOfStay = it.baseOfStay
@@ -157,16 +131,14 @@ class IrkApplicantMapper {
                 }
             }
             applicantDto.educationData.let {
-                applicant.educationData.apply {
-                    addDocuments(applicantDto, educationData)
-                    highSchoolCity = it.highSchoolCity?.trim()
-                    highSchoolName = it.highSchoolName?.trim()
-                    highSchoolType = it.highSchoolType
-                    highSchoolUsosCode = it.highSchoolUsosCode
-                }
+                addDocuments(this, applicantDto)
+                highSchoolCity = it.highSchoolCity?.trim()
+                highSchoolName = it.highSchoolName?.trim()
+                highSchoolType = it.highSchoolType
+                highSchoolUsosCode = it.highSchoolUsosCode
             }
-            addIdentityDocuments(applicant, applicantDto.additionalData)
         }
+        addIdentityDocuments(applicant, applicantDto.additionalData)
         return applicant
     }
 

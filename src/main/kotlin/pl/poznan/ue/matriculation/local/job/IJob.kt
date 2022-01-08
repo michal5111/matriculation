@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.local.job
 
+import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.job.startConditions.IStartConditions
 
@@ -11,5 +12,9 @@ interface IJob {
 
     fun prepare(import: Import)
 
-    fun doWork()
+    fun doWork(import: Import): Import
+
+    fun getCompletionStatus(import: Import): ImportStatus
+
+    fun getInProgressStatus(): ImportStatus
 }

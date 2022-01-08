@@ -26,7 +26,6 @@ class PersonService(
     private val personRepository: PersonRepository,
     private val studentService: StudentService,
     private val personProgrammeRepository: PersonProgrammeRepository,
-    private val organizationalUnitRepository: OrganizationalUnitRepository,
     private val citizenshipRepository: CitizenshipRepository,
     private val schoolRepository: SchoolRepository,
     private val wkuRepository: WkuRepository,
@@ -40,9 +39,6 @@ class PersonService(
     private val erasmusService: ErasmusService
 ) {
     private val logger: Logger = LoggerFactory.getLogger(PersonService::class.java)
-
-    @Value("\${pl.poznan.ue.matriculation.defaultStudentOrganizationalUnit}")
-    lateinit var defaultStudentOrganizationalUnitString: String
 
     @Value("\${pl.poznan.ue.matriculation.universityEmailSuffix}")
     lateinit var universityEmailSuffix: String
@@ -76,7 +72,7 @@ class PersonService(
                 taxOffice = person.taxOffice,
                 sex = person.sex
             )
-        var changed = false
+        var changed: Boolean
         person.apply {
             logger.trace("Tworzę lub aktualizuję adresy")
             createOrUpdateAddresses(this, applicant)
@@ -96,57 +92,56 @@ class PersonService(
             } else {
                 privateEmail = applicant.email
             }
-            if (name != applicant.name.given) {
+            if (name != applicant.given) {
                 changed = true
-                name = applicant.name.given
+                name = applicant.given
             }
-            if (middleName != applicant.name.middle && applicant.name.middle != null) {
+            if (middleName != applicant.middle && applicant.middle != null) {
                 changed = true
-                middleName = applicant.name.middle
+                middleName = applicant.middle
             }
-            if (surname != applicant.name.family) {
+            if (surname != applicant.family) {
                 changed = true
-                surname = applicant.name.family
+                surname = applicant.family
             }
             if (citizenship?.code != applicant.citizenship) {
                 changed = true
                 citizenship = citizenshipRepository.getById(applicant.citizenship)
             }
-            applicant.basicData.dateOfBirth?.let {
-                birthDate = applicant.basicData.dateOfBirth
+            applicant.dateOfBirth?.let {
+                birthDate = applicant.dateOfBirth
             }
-            applicant.basicData.cityOfBirth?.let {
-                birthCity = applicant.basicData.cityOfBirth
+            applicant.cityOfBirth?.let {
+                birthCity = applicant.cityOfBirth
             }
-            applicant.basicData.countryOfBirth?.let {
+            applicant.countryOfBirth?.let {
                 birthCountry = citizenshipRepository.getById(it)
             }
-            if (sex != applicant.basicData.sex) {
+            if (sex != applicant.sex) {
                 changed = true
-                sex = applicant.basicData.sex
+                sex = applicant.sex
             }
             if (nationality?.code != applicant.nationality && applicant.nationality != null) {
                 changed = true
                 nationality = citizenshipRepository.getById(applicant.nationality!!)
             }
-            applicant.educationData.highSchoolUsosCode?.let {
+            applicant.highSchoolUsosCode?.let {
                 middleSchool = schoolRepository.getById(it)
             }
-
-            applicant.additionalData.mothersName?.let {
-                mothersName = applicant.additionalData.mothersName
+            applicant.mothersName?.let {
+                mothersName = applicant.mothersName
             }
-            applicant.additionalData.fathersName?.let {
-                fathersName = applicant.additionalData.fathersName
+            applicant.fathersName?.let {
+                fathersName = applicant.fathersName
             }
-            applicant.additionalData.wku?.let {
+            applicant.wku?.let {
                 wku = wkuRepository.getById(it)
             }
-            applicant.additionalData.militaryCategory?.let {
-                militaryCategory = applicant.additionalData.militaryCategory
+            applicant.militaryCategory?.let {
+                militaryCategory = applicant.militaryCategory
             }
-            applicant.additionalData.militaryStatus?.let {
-                militaryStatus = applicant.additionalData.militaryStatus
+            applicant.militaryStatus?.let {
+                militaryStatus = applicant.militaryStatus
             }
             if (changed) {
                 person.addPersonChangeHistory(changeHistory)
@@ -163,7 +158,7 @@ class PersonService(
         applicant: Applicant
     ): Boolean {
         var changed = false
-        applicant.basicData.pesel?.let {
+        applicant.pesel?.let {
             if (person.pesel != it) {
                 changed = true
                 person.pesel = it
@@ -208,20 +203,21 @@ class PersonService(
             )
         }
         if (person.addresses.none { it.addressType.code == "KOR" }) {
-            person.addresses.find { it.addressType.code == "POB" }
-                ?: person.addresses.find { it.addressType.code == "STA" }?.let {
-                    createOrUpdateAddress(
-                        person = person,
-                        addressTypeCode = "KOR",
-                        city = it.city,
-                        street = it.street,
-                        houseNumber = it.houseNumber,
-                        apartmentNumber = it.flatNumber,
-                        zipCode = it.zipCode,
-                        cityIsCity = it.cityIsCity,
-                        countryCode = it.country?.code
-                    )
-                }
+            val foundAddress = person.addresses.find { it.addressType.code == "POB" }
+                ?: person.addresses.find { it.addressType.code == "STA" }
+            foundAddress?.let {
+                createOrUpdateAddress(
+                    person = person,
+                    addressTypeCode = "KOR",
+                    city = it.city,
+                    street = it.street,
+                    houseNumber = it.houseNumber,
+                    apartmentNumber = it.flatNumber,
+                    zipCode = it.zipCode,
+                    cityIsCity = it.cityIsCity,
+                    countryCode = it.country?.code
+                )
+            }
         }
     }
 
@@ -287,7 +283,7 @@ class PersonService(
     }
 
     private fun createOrUpdateEntitlementDocument(person: Person, applicant: Applicant) {
-        applicant.educationData.documents.filter {
+        applicant.documents.filter {
             it.certificateUsosCode != null
         }.filterNot {
             person.entitlementDocuments.any { entitlementDocument ->
@@ -409,8 +405,8 @@ class PersonService(
             importDto = importDto,
             student = student,
             certificate = application.certificate,
-            sourceOfFinancing = application.applicationForeignerData?.sourceOfFinancing,
-            basisOfAdmission = application.applicationForeignerData?.basisOfAdmission,
+            sourceOfFinancing = application.sourceOfFinancing,
+            basisOfAdmission = application.basisOfAdmission,
             isDefault = isDefaultProgramme
         )
         student.addPersonProgramme(personProgramme)
@@ -431,7 +427,7 @@ class PersonService(
         val didacticCycle = didacticCycleRepository.getById(didacticCycleCode)
         val didacticCycleYear = didacticCycleRepository.findDidacticCycleYearBySemesterDates(
             didacticCycle.dateFrom,
-            didacticCycle.dateTo
+            didacticCycle.endDate
         ) ?: throw EntityNotFoundException("Nie można znaleźć cyklu dydaktycznego")
         val arrival = erasmusService.createArrival(
             erasmusData = it,
@@ -482,7 +478,7 @@ class PersonService(
         logger.trace("Szukam osoby w bazie")
         var person = personRepository.findOneByPeselOrIdNumberOrEmailOrPrivateEmail(
             applicant.usosId,
-            applicant.basicData.pesel.orEmpty(),
+            applicant.pesel.orEmpty(),
             applicant.identityDocuments.filterNot {
                 it.number.isNullOrBlank()
             }.map {

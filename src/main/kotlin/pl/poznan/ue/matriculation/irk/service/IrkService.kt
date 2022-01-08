@@ -120,13 +120,13 @@ class IrkService(
     }
 
     fun getApplications(
-        admitted: Boolean,
-        paid: Boolean,
+        admitted: Boolean = true,
+        paid: Boolean = true,
         programme: String?,
-        qualified: Boolean,
+        qualified: Boolean = true,
         registration: String?,
         pageNumber: Int?,
-        pageLength: Int?
+        pageLength: Int? = 20
     ): Page<IrkApplicationDTO> {
         val uriComponentBuilder: UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("${apiUrl}applications/")
         if (admitted) {

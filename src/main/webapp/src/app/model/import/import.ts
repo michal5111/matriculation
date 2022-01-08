@@ -5,9 +5,11 @@ export class Import {
   id: number;
   programmeCode: string;
   programmeForeignId: string;
+  programmeForeignName: string;
   stageCode: string;
   registration: string;
   indexPoolCode: string;
+  indexPoolName: string;
   startDate: Date;
   dateOfAddmision: Date;
   didacticCycleCode: string;

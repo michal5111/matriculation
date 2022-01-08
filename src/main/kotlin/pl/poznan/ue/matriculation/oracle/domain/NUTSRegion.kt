@@ -1,8 +1,10 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import org.hibernate.annotations.Immutable
 import javax.persistence.*
 
 @Entity
+@Immutable
 @Table(name = "DZ_REGIONY_NUTS")
 class NUTSRegion(
     @Id
