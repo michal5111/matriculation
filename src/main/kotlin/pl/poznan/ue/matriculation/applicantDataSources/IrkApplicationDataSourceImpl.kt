@@ -13,6 +13,7 @@ import pl.poznan.ue.matriculation.irk.mapper.IrkApplicationMapper
 import pl.poznan.ue.matriculation.irk.service.IrkService
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
+import pl.poznan.ue.matriculation.local.domain.applicants.IdentityDocument
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
@@ -144,5 +145,15 @@ open class IrkApplicationDataSourceImpl(
     }
 
     override fun preprocess(applicationDto: IrkApplicationDTO, applicantDto: IrkApplicantDto) {
+    }
+
+    override fun getPrimaryIdentityDocument(
+        application: Application,
+        applicationDto: IrkApplicationDTO,
+        applicant: Applicant,
+        applicantDto: IrkApplicantDto,
+        import: Import
+    ): IdentityDocument? {
+        return applicant.identityDocuments.firstOrNull()
     }
 }

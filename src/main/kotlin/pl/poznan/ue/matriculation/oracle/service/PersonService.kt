@@ -168,7 +168,7 @@ class PersonService(
             person.idNumber == it.number
         }
         if (identityDocument == null && applicant.identityDocuments.size > 0) {
-            identityDocument = applicant.identityDocuments.first()
+            identityDocument = applicant.primaryIdentityDocument
         }
         identityDocument?.number?.let {
             if (person.documentType != identityDocument.type) {

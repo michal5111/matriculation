@@ -6,7 +6,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
@@ -22,17 +21,13 @@ import pl.poznan.ue.matriculation.local.domain.enum.DurationType
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.local.service.ImportService
 import pl.poznan.ue.matriculation.oracle.domain.Person
-import pl.poznan.ue.matriculation.oracle.repo.IndexTypeRepository
-import pl.poznan.ue.matriculation.oracle.repo.OrganizationalUnitRepository
 import pl.poznan.ue.matriculation.oracle.repo.PersonRepository
-import pl.poznan.ue.matriculation.oracle.repo.StudentRepository
 import pl.poznan.ue.matriculation.oracle.service.PersonService
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executor
 
-@SpringBootTest
-class PersonServiceTest {
+class PersonServiceTest : AbstractIT() {
 
     val logger: Logger = LoggerFactory.getLogger(PersonServiceTest::class.java)
 
@@ -51,15 +46,6 @@ class PersonServiceTest {
 
     @Autowired
     lateinit var personRepository: PersonRepository
-
-    @Autowired
-    lateinit var organizationalUnitRepository: OrganizationalUnitRepository
-
-    @Autowired
-    lateinit var indexTypeRepository: IndexTypeRepository
-
-    @Autowired
-    lateinit var studentRepository: StudentRepository
 
     val df = SimpleDateFormat("dd.MM.yyyy")
 

@@ -2,6 +2,7 @@ package pl.poznan.ue.matriculation.applicantDataSources
 
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
+import pl.poznan.ue.matriculation.local.domain.applicants.IdentityDocument
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
@@ -48,6 +49,14 @@ interface IApplicationDataSource<applicationDTO : IApplicationDto, applicantDTO 
         applicantDto: applicantDTO,
         import: Import
     ): Document?
+
+    fun getPrimaryIdentityDocument(
+        application: Application,
+        applicationDto: applicationDTO,
+        applicant: Applicant,
+        applicantDto: applicantDTO,
+        import: Import
+    ): IdentityDocument?
 
     fun getApplicationEditUrl(applicationId: Long): String
 

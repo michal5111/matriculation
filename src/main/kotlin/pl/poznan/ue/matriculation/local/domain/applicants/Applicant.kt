@@ -66,6 +66,7 @@ class Applicant(
     @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val addresses: MutableSet<Address> = HashSet(),
 
+    @JsonIgnore
     @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var identityDocuments: MutableSet<IdentityDocument> = HashSet(),
 
@@ -125,7 +126,11 @@ class Applicant(
 
     var given: String,
 
-    var maiden: String?
+    var maiden: String?,
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "primary_id_document_id", referencedColumnName = "id")
+    var primaryIdentityDocument: IdentityDocument? = null
 ) : BaseEntityLongId() {
 
     fun addPhoneNumber(phoneNumber: PhoneNumber) {

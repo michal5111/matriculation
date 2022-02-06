@@ -76,7 +76,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.dataSource.paginator = this.paginator;
     this.pageSubscription = this.$importProgressObservable.subscribe(
       () => {
-      }// , error => this.onError('Błąd przy pobieraniu strony', error)
+      }
     );
   }
 
@@ -85,7 +85,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.pageIndex = pageEvent.pageIndex;
     this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe(
       () => {
-      }// , error => this.onError('Błąd przy pobieraniu strony', error)
+      }
     );
   }
 
@@ -94,7 +94,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.sortDirString = sortEvent.direction;
     this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe(
       () => {
-      }// , error => this.onError('Błąd przy pobieraniu strony', error)
+      }
     );
   }
 
@@ -102,30 +102,17 @@ export class ImportComponent implements OnInit, OnDestroy {
     // this.importCreateExpansionPanel.close();
     this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe(
       () => {
-      }// , error => this.onError('Błąd przy pobieraniu strony', error)
+      }
     );
   }
 
-  onDeleteImportClick(importId: number): void {
-    this.importService.deleteImport(importId).pipe(
-      switchMap(() => this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString))
+  onDeleteImportClick(importObj: Import): void {
+    this.importService.deleteImport(importObj.id).pipe(
+      // switchMap(() => this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString))
     ).subscribe(
-      () => {
-      }// , error => this.onError('Błąd przy pobieraniu strony', error)
+      () => this.dataSource.data = this.dataSource.data.filter(i => i !== importObj)
     );
   }
-
-  // onError(title: string, error): void {
-  //   if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
-  //     return;
-  //   }
-  //   if (this.dialog.openDialogs.length > 0) {
-  //     return;
-  //   }
-  //   this.dialog.open(ErrorDialogComponent, {
-  //     data: new ErrorDialogData(title, error)
-  //   });
-  // }
 
   isDeleteButtonDisabled(importObject: Import): boolean {
     switch (importObject.importStatus) {

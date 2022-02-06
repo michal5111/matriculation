@@ -11,6 +11,7 @@ import pl.poznan.ue.matriculation.dreamApply.service.DreamApplyService
 import pl.poznan.ue.matriculation.irk.dto.NotificationDto
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
+import pl.poznan.ue.matriculation.local.domain.applicants.IdentityDocument
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
@@ -154,5 +155,15 @@ open class DreamApplyDataSourceImpl(
             message = notificationDto.message
         )
         dreamApplyService.sendEmail(foreignApplicantId, emailDto)
+    }
+
+    override fun getPrimaryIdentityDocument(
+        application: Application,
+        applicationDto: DreamApplyApplicationDto,
+        applicant: Applicant,
+        applicantDto: DreamApplyApplicantDto,
+        import: Import
+    ): IdentityDocument? {
+        return applicant.identityDocuments.firstOrNull()
     }
 }

@@ -10,7 +10,7 @@ import java.net.URI
 
 
 @Controller
-class IndexController {
+class AuthController {
 
     @GetMapping("/login")
     fun login(@RequestParam service: String): ResponseEntity<String> {

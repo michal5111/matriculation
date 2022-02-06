@@ -65,6 +65,13 @@ class ProcessService(
         applicationDtoDataSource.preprocess(applicationDto, applicantDto)
         var application = createOrUpdateApplication(applicationDto, applicationDtoDataSource)
         var applicant = createOrUpdateApplicant(applicantDto, applicationDtoDataSource)
+        applicant.primaryIdentityDocument = applicationDtoDataSource.getPrimaryIdentityDocument(
+            applicant = applicant,
+            application = application,
+            applicantDto = applicantDto,
+            applicationDto = applicationDto,
+            import = import
+        )
         applicant = applicantRepository.save(applicant)
         application.applicant = applicant
         application.certificate = applicationDtoDataSource.getPrimaryCertificate(

@@ -3,7 +3,7 @@ package pl.poznan.ue.matriculation.local.domain.import
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 
 interface ImportProgress {
-    var id: Long?
+    fun getId(): Long?
 
     var importedApplications: Int
 

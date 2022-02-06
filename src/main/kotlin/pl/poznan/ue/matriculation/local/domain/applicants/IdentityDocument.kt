@@ -28,7 +28,11 @@ class IdentityDocument(
 
     var number: String?,
 
-    var type: Char?
+    var type: Char?,
+
+    @JsonIgnore
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "primaryIdentityDocument")
+    var primary_id_applicant: Applicant? = null
 ) : BaseEntityLongId() {
 
 

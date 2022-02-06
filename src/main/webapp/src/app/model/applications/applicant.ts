@@ -53,6 +53,7 @@ export class Applicant {
   highSchoolCity: string;
   documents: Document[];
   identityDocuments: IdentityDocument[];
+  primaryIdentityDocument: IdentityDocument;
   usosId: number;
   assignedIndexNumber: number;
   dataSourceId: number;

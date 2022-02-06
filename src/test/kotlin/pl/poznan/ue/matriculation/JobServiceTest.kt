@@ -7,7 +7,6 @@ import org.junit.jupiter.params.provider.CsvSource
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
@@ -24,12 +23,12 @@ import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
 import pl.poznan.ue.matriculation.local.service.ImportService
 import pl.poznan.ue.matriculation.local.service.JobService
 import pl.poznan.ue.matriculation.oracle.repo.PersonRepository
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executor
 import kotlin.test.assertTrue
 
-@SpringBootTest
-class JobServiceTest {
+class JobServiceTest : AbstractIT() {
 
     val logger: Logger = LoggerFactory.getLogger(JobServiceTest::class.java)
 
@@ -47,6 +46,8 @@ class JobServiceTest {
 
     @Autowired
     lateinit var dataSourceFactory: ApplicationDataSourceFactory
+
+    val df = SimpleDateFormat("dd.MM.yyyy")
 
     @TestConfiguration
     class TestConfig {
@@ -104,7 +105,7 @@ class JobServiceTest {
         logger.info("-------------------------------------------------------Koniec importu. Zapisywanie-----------")
         jobService.runJob(JobType.SAVE, import.id!!)
         import = importService.get(import.id!!)
-        applicationRepository.findAll().forEach { application ->
+        applicationRepository.findAllByImportId(import.id!!).forEach { application ->
             logger.info(application.id.toString())
             logger.info(application.stackTrace.orEmpty())
             assertEquals(null, application.importError)

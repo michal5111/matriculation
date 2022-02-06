@@ -100,7 +100,7 @@
         <ng-container matColumnDef="deleteImport">
           <th mat-header-cell *matHeaderCellDef> Usuń</th>
           <td mat-cell *matCellDef="let element">
-            <button mat-button (click)="onDeleteImportClick(element.id)" [disabled]="isDeleteButtonDisabled(element)">
+            <button mat-button (click)="onDeleteImportClick(element)" [disabled]="isDeleteButtonDisabled(element)">
               <mat-icon>delete</mat-icon>
             </button>
           </td>

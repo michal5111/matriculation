@@ -14,6 +14,7 @@ import pl.poznan.ue.matriculation.kotlinExtensions.trimPhoneNumber
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPostalCode
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
+import pl.poznan.ue.matriculation.local.domain.applicants.IdentityDocument
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
@@ -254,5 +255,15 @@ class ExcelFileDataSourceImpl(
     }
 
     override fun preprocess(applicationDto: ExcelFileApplicationDto, applicantDto: ExcelFileApplicantDto) {
+    }
+
+    override fun getPrimaryIdentityDocument(
+        application: Application,
+        applicationDto: ExcelFileApplicationDto,
+        applicant: Applicant,
+        applicantDto: ExcelFileApplicantDto,
+        import: Import
+    ): IdentityDocument? {
+        return applicant.identityDocuments.firstOrNull()
     }
 }

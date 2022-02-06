@@ -29,27 +29,30 @@ import javax.sql.DataSource
 )
 class LocalDbConfig {
 
-    @Value("\${spring.datasource.url}")
+    @Value("\${local.datasource.url}")
     private lateinit var localDbUrl: String
 
-    @Value("\${spring.datasource.username}")
+    @Value("\${local.datasource.username}")
     private lateinit var localDbUsername: String
 
-    @Value("\${spring.datasource.password}")
+    @Value("\${local.datasource.password}")
     private lateinit var localDbPassword: String
 
-    @Value("\${spring.datasource.driverClassName}")
+    @Value("\${local.datasource.driverClassName}")
     private lateinit var localDbDriverClassName: String
 
-    @Value("\${spring.datasource.database-platform}")
+    @Value("\${local.datasource.database-platform}")
     private lateinit var localDbHibernateDialect: String
+
+    @Value("\${local.datasource.ddl-auto}")
+    private lateinit var localDbHibernateDdlAuto: String
 
     @Resource
     lateinit var context: AbstractApplicationContext
 
     @Primary
     @Bean(name = ["dataSource"])
-    @ConfigurationProperties(prefix = "spring.datasource")
+    @ConfigurationProperties(prefix = "local.datasource")
     fun dataSource(): DataSource? {
         return DataSourceBuilder.create()
             .url(localDbUrl)
@@ -66,7 +69,7 @@ class LocalDbConfig {
         @Qualifier("dataSource") dataSource: DataSource
     ): LocalContainerEntityManagerFactoryBean {
         val properties: MutableMap<String, Any> = HashMap()
-        properties["hibernate.hbm2ddl.auto"] = "update"
+        properties["hibernate.hbm2ddl.auto"] = localDbHibernateDdlAuto
         properties["hibernate.dialect"] = localDbHibernateDialect
         val em = builder
             .dataSource(dataSource)

@@ -11,7 +11,6 @@ import {ImportProgress} from '../../../model/import/import-progress';
 import {Observable, Subscription} from 'rxjs';
 import {Import} from '../../../model/import/import';
 import {UserService} from '../../../service/user-service/user.service';
-import {Document} from '../../../model/applications/document';
 import {MatDialog} from '@angular/material/dialog';
 import {
   UpdateIndexNumberDialogComponent
@@ -57,12 +56,15 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['names', true],
     ['birthDateAndPlace', true],
     ['pesel', true],
-    ['secondarySchoolDocumentNumber', false],
-    ['secondarySchoolDocumentIssueInstitution', false],
-    ['secondarySchoolDocumentIssueDate', false],
-    ['diplomaSchoolDocumentNumber', false],
-    ['diplomaSchoolDocumentIssueDateAndPlace', false],
-    ['diplomaSchoolDocumentIssueInstitution', false],
+    // ['secondarySchoolDocumentNumber', false],
+    // ['secondarySchoolDocumentIssueInstitution', false],
+    // ['secondarySchoolDocumentIssueDate', false],
+    // ['diplomaSchoolDocumentNumber', false],
+    // ['diplomaSchoolDocumentIssueDateAndPlace', false],
+    // ['diplomaSchoolDocumentIssueInstitution', false],
+    ['certificateDocumentNumber', false],
+    ['certificateDocumentIssueDateAndPlace', false],
+    ['certificateDocumentIssueInstitution', false],
     ['indexNumber', true],
     ['applicationImportStatus', true],
     ['duplicateStatus', true],
@@ -133,14 +135,15 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     this.route.queryParams.pipe(
       tap(params => {
         this.pageNumber = params.page ?? this.pageNumber;
-        this.sortString = this.sortingMap.get(params.sort);
-        this.sortDirString = params.dir;
+        this.sortString = params.sort ?? this.sortString;
+        this.sortDirString = params.dir ?? this.sortDirString;
+        this.pageSize = params.pageSize ?? this.pageSize;
       }),
       switchMap(params => this.getPage(
         params.page ?? this.pageNumber,
         this.pageSize,
-        this.sortingMap.get(params.sort),
-        params.dir
+        this.sortString,
+        this.sortDirString
       ))
     ).subscribe();
     this.importProgressObservable$ = this.rxStompService.watch(`/topic/importProgress/${this.importId}`).pipe(
@@ -193,15 +196,15 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     this.progressSubscription = this.importService.savePersons(this.importId).subscribe();
   }
 
-  getSecondarySchoolDocument(application: Application): Document {
-    return application.applicant.documents
-      .find(document => ['D', 'N', 'E', 'Z'].some(code => document.certificateUsosCode === code));
-  }
+  // getSecondarySchoolDocument(application: Application): Document {
+  //   return application.applicant.documents
+  //     .find(document => ['D', 'N', 'E', 'Z'].some(code => document.certificateUsosCode === code));
+  // }
 
-  getDiplomaDocument(application: Application): Document {
-    return application.applicant.documents
-      .find(document => ['L', 'I'].some(code => document.certificateUsosCode === code));
-  }
+  // getDiplomaDocument(application: Application): Document {
+  //   return application.applicant.documents
+  //     .find(document => ['L', 'I'].some(code => document.certificateUsosCode === code));
+  // }
 
   updateIndexNumber(application: Application): void {
     const dialogRef = this.dialog.open(UpdateIndexNumberDialogComponent, {
@@ -262,7 +265,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     if (application.applicant.pesel != null) {
       return application.applicant.pesel;
     } else {
-      return application.applicant.identityDocuments[0].number;
+      return application.applicant.primaryIdentityDocument.number;
     }
   }
 

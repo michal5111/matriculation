@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.local.domain.applications
 
 
-import com.fasterxml.jackson.annotation.*
+import com.fasterxml.jackson.annotation.JsonIgnore
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
@@ -20,9 +20,10 @@ import javax.persistence.*
         NamedSubgraph(
             name = "subgraph.data",
             attributeNodes = [
-                NamedAttributeNode("identityDocuments"),
+                //NamedAttributeNode("identityDocuments"),
                 NamedAttributeNode("foreignId"),
-                NamedAttributeNode("documents")
+                NamedAttributeNode("primaryIdentityDocument")
+                //NamedAttributeNode("documents")
             ]
         )
     ]
@@ -61,9 +62,9 @@ class Application(
 
     var editUrl: String? = null,
 
-    @JsonProperty("certificateId")
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
+    //@JsonProperty("certificateId")
+    //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
+    //@JsonIdentityReference(alwaysAsId = true)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "certificate_id", referencedColumnName = "id")
     var certificate: Document? = null,

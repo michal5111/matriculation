@@ -15,7 +15,6 @@ import pl.poznan.ue.matriculation.local.domain.user.Role
 import pl.poznan.ue.matriculation.local.domain.user.User
 import pl.poznan.ue.matriculation.local.dto.*
 import pl.poznan.ue.matriculation.local.job.JobType
-import pl.poznan.ue.matriculation.local.mapper.ApplicationToApplicationDTOMapper
 import pl.poznan.ue.matriculation.local.service.*
 import pl.poznan.ue.matriculation.oracle.dto.IndexTypeDto
 import pl.poznan.ue.matriculation.oracle.entityRepresentations.PersonBasicData
@@ -40,8 +39,6 @@ class RestController(
     private val personRepository: PersonRepository,
     private val applicantService: ApplicantService
 ) {
-
-    private val applicantToApplicationDTOMapper = ApplicationToApplicationDTOMapper()
 
     @Value("\${pl.poznan.ue.matriculation.usos.url}")
     private lateinit var usosUrl: String
