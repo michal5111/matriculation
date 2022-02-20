@@ -18,7 +18,7 @@ import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.AccommodationPreference
 import pl.poznan.ue.matriculation.local.domain.enum.AddressType
 import pl.poznan.ue.matriculation.local.domain.enum.DurationType
-import pl.poznan.ue.matriculation.local.repo.ImportRepository
+import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.service.ImportService
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.repo.PersonRepository
@@ -33,9 +33,6 @@ class PersonServiceTest : AbstractIT() {
 
     @Autowired
     lateinit var importService: ImportService
-
-    @Autowired
-    lateinit var importRepository: ImportRepository
 
     @Qualifier("TestIrkService")
     @Autowired
@@ -62,7 +59,7 @@ class PersonServiceTest : AbstractIT() {
     @Test
     fun test() {
         //given
-        val import = importService.create(
+        val import = Import(
             dateOfAddmision = Date(),
             didacticCycleCode = "202021/SL",
             indexPoolCode = "C",
@@ -70,21 +67,12 @@ class PersonServiceTest : AbstractIT() {
             registration = "S1_PL_SZ_202021",
             stageCode = "s1-S1-E",
             startDate = Date(),
-            dataSourceType = "IRK_TEST",
+            dataSourceId = "IRK_TEST",
             programmeForeignId = "S1-E",
             programmeForeignName = "S1_PL_SZ_202021",
-            indexPoolName = "Centralna"
+            indexPoolName = "Centralna",
+            dataFile = null
         )
-        val importDto = import.id?.let { importRepository.getById(it) }!!
-//        val irkApplication = irkService.getApplication(2159)!!
-//        //val irkApplication = irkService.getApplication(1757)!!
-//        val irkApplicant = irkService.getApplicantById(irkApplication.foreignApplicantId)
-//        val application = irkApplicationMapper.mapApplicationDtoToApplication(irkApplication).also {
-//            it.dataSourceId = "IRK_TEST"
-//        }
-//        val applicant = irkApplicant?.let { irkApplicantMapper.mapApplicantDtoToApplicant(it) }!!.also {
-//            it.dataSourceId = "IRK_TEST"
-//        }
         val testDate = Date()
         val application = Application(
             foreignId = 1,
@@ -213,7 +201,7 @@ class PersonServiceTest : AbstractIT() {
         val startTime = System.nanoTime()
         var person: Person
         try {
-            person = personService.process(application, importDto) {
+            person = personService.process(application, import) {
                 1
             }.first
         } catch (e: ObjectOptimisticLockingFailureException) {

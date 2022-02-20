@@ -14,7 +14,7 @@ import pl.poznan.ue.matriculation.local.domain.enum.AddressType
 import pl.poznan.ue.matriculation.oracle.repo.SchoolRepository
 import java.util.*
 
-open class DreamApplyApplicantMapper(val schoolRepository: SchoolRepository) {
+open class DreamApplyApplicantMapper(private val schoolRepository: SchoolRepository) {
 
     private val maturaRegex = "M/[0-9]{8}/[0-9]{2}".toRegex()
     private val okeMap = mapOf(

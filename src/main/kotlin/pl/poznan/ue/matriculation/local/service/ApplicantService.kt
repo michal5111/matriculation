@@ -4,6 +4,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.exception.ApplicantCheckException
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.mapper.ApplicantToPersonMapper
@@ -119,5 +120,18 @@ class ApplicantService(
             }
         }
         return applicant
+    }
+
+    fun save(applicant: Applicant): Applicant {
+        return applicantRepository.save(applicant)
+    }
+
+    fun findByForeignIdAndDataSourceId(foreignId: Long, dataSourceId: String): Applicant? {
+        return applicantRepository.findByForeignIdAndDataSourceId(foreignId, dataSourceId)
+    }
+
+    @Transactional
+    fun deleteOrphaned() {
+        return applicantRepository.deleteOrphaned()
     }
 }

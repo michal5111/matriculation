@@ -3,6 +3,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ErrorDialogComponent} from '../component/dialog/error-dialog/error-dialog.component';
 import {ErrorDialogData} from '../model/dialog/error-dialog-data';
+import {BackendError} from './backend-error';
 
 @Injectable()
 export class ExceptionHandler implements ErrorHandler {
@@ -16,29 +17,36 @@ export class ExceptionHandler implements ErrorHandler {
   openedDialogs = 0;
   title: string;
   message: string;
+  path: string;
   stacktrace: string;
 
   handleError(error: any): void {
-    this.title = '';
+    this.title = 'Error ';
     if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
       return;
     }
     console.log(error.constructor.name);
     console.log(error);
     if (error instanceof Error) {
-      console.log(`Error: ${error}`);
       this.message = error.message;
       this.title += ` ${error.name}`;
       this.stacktrace = error.stack;
     }
     if (error instanceof HttpErrorResponse) {
-      console.log(`Error: ${JSON.stringify(error.error)}`);
-      this.message = error.error.message;
-      if (error.error.status) {
-        this.title += `${error.error.status}`;
+      if (error.error instanceof BackendError) {
+        const backedError = error.error;
+        this.message = backedError.message;
+        if (backedError.status) {
+          this.title += backedError.status;
+        }
+        this.title += ` ${backedError.error}`;
+        this.path = backedError.path;
+        this.stacktrace = backedError.trace;
+      } else {
+        this.title += error.statusText;
+        this.message = error.message;
+        this.path = error.url;
       }
-      this.title += ` ${error.error.error}`;
-      this.stacktrace = error.error.path;
     }
     if (typeof error === 'string') {
       this.message = error;
@@ -53,7 +61,7 @@ export class ExceptionHandler implements ErrorHandler {
 
   openDialog() {
     const dialogRef = this.dialog.open(ErrorDialogComponent, {
-      data: new ErrorDialogData(this.title, this.message, this.stacktrace)
+      data: new ErrorDialogData(this.title, this.message, this.stacktrace, this.path)
     });
     this.openedDialogs++;
     dialogRef.afterClosed().subscribe(

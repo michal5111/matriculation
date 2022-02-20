@@ -14,8 +14,6 @@ import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
-import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
-import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.oracle.service.PersonService
 
@@ -25,8 +23,7 @@ class ApplicationProcessor(
     private val importRepository: ImportRepository,
     private val asyncService: AsyncService,
     private val personService: PersonService,
-    private val applicantRepository: ApplicantRepository,
-    private val applicationRepository: ApplicationRepository
+    private val applicationService: ApplicationService
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(ApplicationProcessor::class.java)
@@ -73,9 +70,9 @@ class ApplicationProcessor(
             importStatus = ApplicationImportStatus.IMPORTED
         }
         logger.trace("Zapisuję aplikanta")
-        applicantRepository.save(applicant)
+        applicantService.save(applicant)
         logger.trace("Zapisuję zgłoszenie")
-        applicationRepository.save(application)
+        applicationService.save(application)
         importProgress.savedApplicants++
         logger.trace("------------------------------------------------koniec ${application.id}---------------------------------------------")
     }

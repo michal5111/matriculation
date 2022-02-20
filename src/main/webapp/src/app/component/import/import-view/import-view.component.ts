@@ -7,7 +7,6 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, Sort} from '@angular/material/sort';
 import {Application} from '../../../model/applications/application';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ImportProgress} from '../../../model/import/import-progress';
 import {Observable, Subscription} from 'rxjs';
 import {Import} from '../../../model/import/import';
 import {UserService} from '../../../service/user-service/user.service';
@@ -37,7 +36,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
 
   importId: number;
   import: Import;
-  importProgress: ImportProgress;
   progressSubscription: Subscription;
   usosUrl: UrlDto;
   pageSize = parseInt(localStorage.getItem('importViewPageSize'), 10) ?? 5;
@@ -84,7 +82,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['duplicateStatus', 'applicant.potentialDuplicateStatus']
   ]);
 
-  importProgressObservable$: Observable<ImportProgress>;
+  private importObservable$: Observable<Import>;
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -114,7 +112,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   getImport(importId: number): Observable<Import> {
-    return this.importService.getImport(importId).pipe(
+    return this.importService.findById(importId).pipe(
       tap(importObject => this.import = importObject)
     );
   }
@@ -123,9 +121,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
     this.importId = this.route.snapshot.params.id;
-    if (!this.importId) {
-      return;
-    }
     this.getImport(this.importId).subscribe();
     this.usosService.getUsosUrl().subscribe(
       result => {
@@ -139,20 +134,18 @@ export class ImportViewComponent implements OnInit, OnDestroy {
         this.sortDirString = params.dir ?? this.sortDirString;
         this.pageSize = params.pageSize ?? this.pageSize;
       }),
-      switchMap(params => this.getPage(
-        params.page ?? this.pageNumber,
+      switchMap(() => this.getPage(
+        this.pageNumber,
         this.pageSize,
         this.sortString,
         this.sortDirString
       ))
     ).subscribe();
-    this.importProgressObservable$ = this.rxStompService.watch(`/topic/importProgress/${this.importId}`).pipe(
+    this.importObservable$ = this.rxStompService.watch(`/topic/import/${this.importId}`).pipe(
       map((message: Message) => JSON.parse(message.body)),
-      tap((importProgress: ImportProgress) => this.importProgress = importProgress)
+      tap((importObject: Import) => this.import = importObject)
     );
-    this.progressSubscription = this.importService.getImportProgress(this.importId).pipe(
-      tap((importProgress: ImportProgress) => this.importProgress = importProgress),
-      switchMap(() => this.importProgressObservable$),
+    this.progressSubscription = this.importObservable$.pipe(
       switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString))
     ).subscribe();
   }
@@ -270,7 +263,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   isStartImportButtonDisabled(): boolean {
-    switch (this.importProgress.importStatus) {
+    switch (this.import.importStatus) {
       case 'ARCHIVED':
       case 'SAVING':
       case 'STARTED':
@@ -279,15 +272,15 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       case 'SENDING_NOTIFICATIONS':
         return true;
       case 'ERROR':
-        return this.importProgress.savedApplicants === this.importProgress.totalCount
-          && this.importProgress.totalCount > 0;
+        return this.import.savedApplicants === this.import.totalCount
+          && this.import.totalCount > 0;
       default:
         return false;
     }
   }
 
   isSavePersonsButtonDisabled(): boolean {
-    switch (this.importProgress.importStatus) {
+    switch (this.import.importStatus) {
       case 'COMPLETED_WITH_ERRORS':
       case 'IMPORTED':
         return false;
@@ -297,16 +290,16 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   isArchiveButtonDisabled(): boolean {
-    return this.importProgress.importStatus !== 'COMPLETE';
+    return this.import.importStatus !== 'COMPLETE';
   }
 
   isFindUidsButtonDisabled(): boolean {
-    switch (this.importProgress.importStatus) {
+    switch (this.import.importStatus) {
       case 'COMPLETE':
       case 'COMPLETED_WITH_ERRORS':
       case 'ERROR':
-        return this.importProgress.savedApplicants !== this.importProgress.totalCount
-          || this.importProgress.importedUids === this.importProgress.totalCount;
+        return this.import.savedApplicants !== this.import.totalCount
+          || this.import.importedUids === this.import.totalCount;
       default:
         return true;
     }
@@ -321,19 +314,19 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   isSendNotificationsDisabled(): boolean {
-    switch (this.importProgress.importStatus) {
+    switch (this.import.importStatus) {
       case 'COMPLETE':
       case 'COMPLETED_WITH_ERRORS':
-        return this.importProgress.savedApplicants !== this.importProgress.totalCount
-          || this.importProgress.importedUids !== this.importProgress.totalCount
-          || this.importProgress.notificationsSend === this.importProgress.totalCount;
+        return this.import.savedApplicants !== this.import.totalCount
+          || this.import.importedUids !== this.import.totalCount
+          || this.import.notificationsSend === this.import.totalCount;
       default:
         return true;
     }
   }
 
   isCheckForDuplicatesDisabled(): boolean {
-    switch (this.importProgress.importStatus) {
+    switch (this.import.importStatus) {
       case 'IMPORTED':
         return false;
       default:
@@ -359,7 +352,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
           usosId: (result.notDuplicate ? undefined : result.person.id),
           potentialDuplicateStatus: (result.notDuplicate ? 'CONFIRMED_NOT_DUPLICATE' : 'OK')
         }).subscribe(updatedApplication => {
-          this.importProgress.potentialDuplicates--;
+          this.import.potentialDuplicates--;
           application.applicant.potentialDuplicateStatus = updatedApplication.applicant.potentialDuplicateStatus;
           application.applicant.usosId = updatedApplication.applicant.usosId;
         });

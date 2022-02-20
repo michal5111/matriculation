@@ -54,7 +54,6 @@ interface PersonRepository : JpaRepository<Person, Long> {
     )
     fun findOneByPrivateEmail(privateEmail: String): Person?
 
-    @EntityGraph("person.basicDataAndAddresses")
     @Lock(LockModeType.OPTIMISTIC)
     @Query(
         """

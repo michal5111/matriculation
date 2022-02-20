@@ -5,14 +5,12 @@ import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.job.startConditions.IStartConditions
 import pl.poznan.ue.matriculation.local.job.startConditions.SavePersonsStartConditions
 import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
-import pl.poznan.ue.matriculation.local.service.ImportService
 import pl.poznan.ue.matriculation.local.service.ProcessService
 
 class SavePersonsJob(
     private val processService: ProcessService,
     private val importId: Long,
-    private val applicationDataSourceFactory: ApplicationDataSourceFactory,
-    private val importService: ImportService
+    private val applicationDataSourceFactory: ApplicationDataSourceFactory
 ) : IJob {
     override var status: JobStatus = JobStatus.PENDING
 
@@ -24,13 +22,11 @@ class SavePersonsJob(
     }
 
     override fun doWork(import: Import): Import {
-        val importDto = importService.get(importId)
-        processService.processApplications(
+        return processService.processApplications(
             importId = importId,
-            importDto = importDto,
-            applicationDtoDataSource = applicationDataSourceFactory.getDataSource(importDto.dataSourceId)
+            import = import,
+            applicationDtoDataSource = applicationDataSourceFactory.getDataSource(import.dataSourceId)
         )
-        return importService.get(importId)
     }
 
     override fun getCompletionStatus(import: Import): ImportStatus {

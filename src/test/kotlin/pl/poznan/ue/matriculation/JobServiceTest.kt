@@ -17,6 +17,7 @@ import pl.poznan.ue.matriculation.applicantDataSources.IPhotoDownloader
 import pl.poznan.ue.matriculation.kotlinExtensions.toByteArray
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
+import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.job.JobType
 import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
 import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
@@ -87,7 +88,7 @@ class JobServiceTest : AbstractIT() {
         dataSourceType: String,
         programmeForeignId: String
     ) {
-        var import = importService.create(
+        var import = Import(
             dateOfAddmision = Date(),
             didacticCycleCode = "202021/SL",
             indexPoolCode = "C",
@@ -95,17 +96,19 @@ class JobServiceTest : AbstractIT() {
             registration = registration,
             stageCode = stageCode,
             startDate = Date(),
-            dataSourceType = dataSourceType,
+            dataSourceId = dataSourceType,
             programmeForeignId = programmeForeignId,
             programmeForeignName = registration,
-            indexPoolName = "Centralna"
+            indexPoolName = "Centralna",
+            dataFile = null
         )
-        jobService.runJob(JobType.IMPORT, import.id!!)
-        jobService.runJob(JobType.IMPORT, import.id!!)
+        val importId = importService.save(import).id
+        jobService.runJob(JobType.IMPORT, importId!!)
+        jobService.runJob(JobType.IMPORT, importId)
         logger.info("-------------------------------------------------------Koniec importu. Zapisywanie-----------")
-        jobService.runJob(JobType.SAVE, import.id!!)
-        import = importService.get(import.id!!)
-        applicationRepository.findAllByImportId(import.id!!).forEach { application ->
+        jobService.runJob(JobType.SAVE, importId)
+        import = importService.get(importId)
+        applicationRepository.findAllByImportId(importId).forEach { application ->
             logger.info(application.id.toString())
             logger.info(application.stackTrace.orEmpty())
             assertEquals(null, application.importError)

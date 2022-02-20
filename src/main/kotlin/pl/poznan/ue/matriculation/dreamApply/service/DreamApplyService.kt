@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.dreamApply.service
 
-import org.apache.poi.util.IOUtils
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.core.io.Resource
 import org.springframework.http.*
@@ -121,16 +120,16 @@ class DreamApplyService(
         return response.body
     }
 
-    fun getPhoto(photoUrl: String): ByteArray {
+    fun getPhoto(photoUrl: String): ByteArray? {
         val responseEntity: ResponseEntity<Resource> = restTemplate.exchange(
             "$instanceUrl$photoUrl",
             HttpMethod.GET,
             httpEntity,
             Resource::class.java
         )
-        var byteArray: ByteArray
-        responseEntity.body!!.inputStream.use {
-            byteArray = IOUtils.toByteArray(it)
+        var byteArray: ByteArray?
+        responseEntity.body?.inputStream.use {
+            byteArray = it?.readBytes()
         }
         return byteArray
     }

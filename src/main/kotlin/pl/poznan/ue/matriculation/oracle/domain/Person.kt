@@ -10,9 +10,6 @@ import javax.persistence.*
         attributeNodes = [
             NamedAttributeNode("nationality"),
             NamedAttributeNode("citizenship"),
-            //NamedAttributeNode("organizationalUnit"),
-            //NamedAttributeNode("middleSchool"),
-            //NamedAttributeNode("birthCountry"),
             NamedAttributeNode("identityDocumentIssuerCountry"),
             NamedAttributeNode("addresses", subgraph = "subgraph.addressType"),
         ],

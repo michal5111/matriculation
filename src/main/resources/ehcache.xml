@@ -7,7 +7,7 @@
     <!--    <persistence directory="java.io.tmpdir" />-->
     <cache-template name="default">
         <expiry>
-            <ttl unit="seconds">30</ttl>
+            <ttl>30</ttl>
         </expiry>
         <!--        <listeners>-->
         <!--            <listener>-->

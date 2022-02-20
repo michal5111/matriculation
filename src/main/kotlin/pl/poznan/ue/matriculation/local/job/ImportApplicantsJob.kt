@@ -25,7 +25,6 @@ class ImportApplicantsJob(
     }
 
     override fun doWork(import: Import): Import {
-        val import = importService.get(importId)
         import.error = null
         val applicantDataSource = applicationDataSourceFactory.getDataSource(import.dataSourceId)
         var currentPage = 1

@@ -16,12 +16,22 @@ export class AppComponent {
   constructor(
     public userService: UserService,
     @Inject(APP_BASE_HREF) public baseHref: string,
-    public location: Location
+    private location: Location
   ) {
     this.getUser();
   }
 
   getUser() {
     this.userService.getUser().subscribe();
+  }
+
+  getUserCaption() {
+    const givenName = this.userService.user?.casAssertion?.principal?.attributes?.givenname;
+    const surname = this.userService.user?.casAssertion?.principal?.attributes?.lastname;
+    return `${givenName} ${surname}`;
+  }
+
+  getServiceUrl() {
+    return this.baseHref + this.location.path().slice(1, this.location.path().length);
   }
 }

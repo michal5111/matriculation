@@ -16,6 +16,6 @@ interface ApplicantRepository : JpaRepository<Applicant, Long> {
     fun findByUsosId(usosId: Long): Applicant?
 
     @Modifying
-    @Query("delete from Applicant a where a.id in (select ap.applicant.id from Application ap where ap.import.id = :importId) and a.id not in (select ap2.applicant.id from Application ap2 where ap2.import.id <> :importId)")
-    fun deleteAllByImportId(importId: Long)
+    @Query("delete from Applicant a where a.id not in (select ap.applicant.id from Application ap)")
+    fun deleteOrphaned()
 }

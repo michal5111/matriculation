@@ -21,10 +21,9 @@ class JobFactory(
                 importId = importId
             )
             SAVE -> SavePersonsJob(
-                applicationDataSourceFactory = applicationDataSourceFactory,
+                processService = processService,
                 importId = importId,
-                importService = importService,
-                processService = processService
+                applicationDataSourceFactory = applicationDataSourceFactory
             )
             FIND_UIDS -> GetUidsJob(
                 processService = processService,
@@ -37,8 +36,7 @@ class JobFactory(
             SEND_NOTIFICATIONS -> SendNotificationsJob(
                 processService = processService,
                 applicationDataSourceFactory = applicationDataSourceFactory,
-                importId = importId,
-                importService = importService
+                importId = importId
             )
             CHECK_FOR_POTENTIAL_DUPLICATES -> CheckForPotentialDuplicatesJob(
                 processService = processService,

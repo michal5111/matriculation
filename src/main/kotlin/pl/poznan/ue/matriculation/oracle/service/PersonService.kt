@@ -308,16 +308,21 @@ class PersonService(
         }
     }
 
-    private fun createOrUpdatePersonPhoto(person: Person, applicant: Applicant) =
+    private fun createOrUpdatePersonPhoto(person: Person, applicant: Applicant) {
+        logger.trace("Czekam na zdjęcie")
         applicant.photoByteArrayFuture?.get()?.let { photoByteArray ->
+            logger.trace("Pobrałem zdjęcie. Sprawdzam czy osoba ma zdjęcie.")
             if (person.personPhoto != null) {
+                logger.trace("Osoba ma zdjęcie. Aktualizuję...")
                 person.personPhoto?.photoBlob = photoByteArray.toSerialBlob()
             } else {
+                logger.trace("Osoba nie ma zdjęcia. Tworzę...")
                 person.personPhoto = PersonPhoto(
                     person = person,
                     photoBlob = photoByteArray.toSerialBlob()
                 )
             }
+            logger.trace("Zakończyłem przetwarzanie zdjęcia.")
             val personPreference = person.personPreferences.find {
                 it.attribute == "photo_visibility"
             }
@@ -329,6 +334,7 @@ class PersonService(
                 )
             }
         }
+    }
 
     private fun createOrUpdateOwnedDocuments(person: Person, applicant: Applicant) {
         when (applicant.applicantForeignerData?.baseOfStay) {

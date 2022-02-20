@@ -30,6 +30,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   didacticCycles: string[];
   importCreationFormGroup: FormGroup;
   changesSubscription: Subscription;
+  isButtonDisabled = false;
 
   constructor(
     private importService: ImportService,
@@ -102,6 +103,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
+    this.isButtonDisabled = true;
     this.import.registration = this.importCreationFormGroup.value.registration;
     this.import.programmeCode = this.importCreationFormGroup.value.registrationProgramme.usosId;
     this.import.programmeForeignId = this.importCreationFormGroup.value.registrationProgramme.id;
@@ -114,19 +116,13 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.import.stageCode = this.importCreationFormGroup.value.stage;
     this.import.dataSourceId = this.importCreationFormGroup.value.dataSource;
     this.importService.createImport(this.import).subscribe(
-      importObject => this.onImportCreated(importObject)
-      // error => this.onError('Błąd przy tworzeniu importu', error)
+      importObject => this.onImportCreated(importObject),
+      error => {
+        this.isButtonDisabled = false;
+        throw error;
+      }
     );
   }
-
-  // onError(title: string, error): void {
-  //   if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
-  //     return;
-  //   }
-  //   this.dialog.open(ErrorDialogComponent, {
-  //     data: new ErrorDialogData(title, error)
-  //   });
-  // }
 
   onImportCreated(importObject: Import): void {
     const snackBarRef = this.snackBar.open('Import utworzony', 'OK', {
@@ -136,6 +132,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.formGroupDirective.resetForm();
     this.import = importObject;
     this.importCreated.next(this.import);
+    this.isButtonDisabled = false;
   }
 
   ngOnDestroy(): void {

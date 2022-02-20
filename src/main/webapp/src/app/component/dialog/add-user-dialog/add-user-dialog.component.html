@@ -9,7 +9,7 @@
         {{role.name}}
       </mat-list-option>
     </mat-selection-list>
-    <button mat-button type="submit" [disabled]="!addUserFormGroup.valid">
+    <button mat-button type="submit" [disabled]="!addUserFormGroup.valid || isButtonDisabled">
       <mat-icon>add</mat-icon>
       Dodaj
     </button>

@@ -19,11 +19,11 @@ class IncomingApplicantMapper(schoolRepository: SchoolRepository) : DreamApplyAp
     override fun update(applicant: Applicant, dreamApplyApplicantDto: DreamApplyApplicantDto): Applicant {
         return super.update(applicant, dreamApplyApplicantDto).also {
             val accommodationPreference = getAccommodationPreference(dreamApplyApplicantDto)
-            val homeData = dreamApplyApplicantDto.dreamApplyApplication?.home!!
+            val homeData = dreamApplyApplicantDto.dreamApplyApplication?.home ?: return@also
             if (it.erasmusData == null) {
                 it.erasmusData = createErasmusData(homeData, it, dreamApplyApplicantDto)
             } else {
-                it.erasmusData!!.apply {
+                (it.erasmusData ?: return@also).apply {
                     this.accommodationPreference = accommodationPreference
                     coordinatorData = CoordinatorData(
                         email = homeData.contact?.email,
@@ -41,7 +41,7 @@ class IncomingApplicantMapper(schoolRepository: SchoolRepository) : DreamApplyAp
                         departmentName = homeData.institution?.department?.name,
                         erasmusCode = homeData.institution?.erasmus
                     )
-                    type = dreamApplyApplicantDto.dreamApplyApplication!!.courseType
+                    type = (dreamApplyApplicantDto.dreamApplyApplication ?: return@apply).courseType
                     duration = when (dreamApplyApplicantDto.dreamApplyApplication?.duration) {
                         "2 semesters" -> DurationType.TWO_SEMESTERS
                         else -> DurationType.ONE_SEMESTER

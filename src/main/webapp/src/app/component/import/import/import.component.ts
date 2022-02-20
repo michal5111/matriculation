@@ -8,7 +8,10 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, Sort} from '@angular/material/sort';
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {UserService} from '../../../service/user-service/user.service';
-import {Subscription, timer} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Message} from '@stomp/stompjs';
+import {RxStompService} from '@stomp/ng2-stompjs';
 
 @Component({
   selector: 'app-import',
@@ -17,11 +20,11 @@ import {Subscription, timer} from 'rxjs';
 })
 export class ImportComponent implements OnInit, OnDestroy {
 
+  private subs: Subscription[] = [];
   page: Page<Import>;
   totalElements = 0;
-  pageIndex = 0;
-  pageSize = 0;
-  pageSubscription: Subscription;
+  pageNumber = 0;
+  pageSize = parseInt(localStorage.getItem('importPageSize'), 10) ?? 10;
   dataSource = new MatTableDataSource<Import>();
   sortString = 'id';
   sortDirString = 'desc';
@@ -45,72 +48,122 @@ export class ImportComponent implements OnInit, OnDestroy {
     'selectImport'
   ];
 
-  $importProgressObservable = timer(0, 1000).pipe(
-    switchMap(() => this.getPage(this.pageIndex, this.pageSize, this.sortString, this.sortDirString)),
-  );
-
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatExpansionPanel, {static: true}) importCreateExpansionPanel: MatExpansionPanel;
 
   constructor(
     private importService: ImportService,
-    public userService: UserService
+    public userService: UserService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private rxStompService: RxStompService
   ) {
   }
 
   getPage(page: number, size: number, sort?: string, sortDir?: string) {
-    return this.importService.getImportsPage(page, size, sort, sortDir)
-      .pipe(
-        tap(importPage => {
-          this.page = importPage;
-          this.totalElements = importPage.totalElements;
-          this.pageSize = importPage.size;
-        }),
-        map(importPage => importPage.content),
-        tap(content => this.dataSource.data = content)
-      );
+    return this.importService.getImportsPage(page, size, sort, sortDir).pipe(
+      tap(importPage => {
+        this.page = importPage;
+        this.totalElements = importPage.totalElements;
+        this.pageSize = importPage.size;
+      }),
+      map(importPage => importPage.content),
+      tap(content => this.dataSource.data = content)
+    );
   }
 
   ngOnInit(): void {
     this.dataSource.paginator = this.paginator;
-    this.pageSubscription = this.$importProgressObservable.subscribe(
-      () => {
-      }
+    this.subs.push(
+      this.route.queryParams.pipe(
+        tap(params => {
+          this.pageNumber = params.page ?? this.pageNumber;
+          this.sortString = params.sort ?? this.sortString;
+          this.sortDirString = params.dir ?? this.sortDirString;
+          this.pageSize = params.pageSize ?? this.pageSize;
+        }),
+        switchMap(params => this.getPage(
+          params.page ?? this.pageNumber,
+          this.pageSize,
+          this.sortString,
+          this.sortDirString
+        ))
+      ).subscribe(),
+      this.rxStompService.watch('/topic/import').pipe(
+        map((message: Message) => JSON.parse(message.body)),
+        tap((importObject: Import) => {
+          this.dataSource.data = this.dataSource.data.map(element => {
+            if (element.id === importObject.id) {
+              return importObject;
+            }
+            return element;
+          });
+        })
+      ).subscribe(),
+      this.rxStompService.watch('/topic/delete/import').pipe(
+        map((message: Message) => JSON.parse(message.body)),
+        tap(importObj => this.removeImportFromData(importObj))
+      ).subscribe(),
+      this.rxStompService.watch('/topic/insert/import').pipe(
+        map((message: Message) => JSON.parse(message.body)),
+        switchMap(importObj => this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString))
+      ).subscribe()
     );
+
   }
 
   switchPage(pageEvent: PageEvent): void {
-    this.pageSize = pageEvent.pageSize;
-    this.pageIndex = pageEvent.pageIndex;
-    this.getPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe(
-      () => {
+    localStorage.setItem('importPageSize', pageEvent.pageSize.toString());
+    this.router.navigate(
+      [],
+      {
+        relativeTo: this.route,
+        queryParams: {
+          page: pageEvent.pageIndex,
+          sort: this.sortString,
+          dir: this.sortDirString,
+          pageSize: pageEvent.pageSize
+        }
       }
     );
   }
 
   sortEvent(sortEvent: Sort): void {
-    this.sortString = sortEvent.active;
-    this.sortDirString = sortEvent.direction;
-    this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe(
-      () => {
+    this.router.navigate(
+      [],
+      {
+        relativeTo: this.route,
+        queryParams: {
+          page: this.pageNumber,
+          // sort: this.sortingMap.get(sortEvent.active),
+          sort: sortEvent.active,
+          dir: sortEvent.direction,
+          pageSize: this.pageSize
+        }
       }
     );
   }
 
   onImportCreated(event: Import): void {
-    // this.importCreateExpansionPanel.close();
-    this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe(
-      () => {
-      }
+    this.subs.push(
+      this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe()
     );
   }
 
+  deleteImport(importObject: Import): Observable<any> {
+    return this.importService.deleteImport(importObject.id).pipe(
+      tap(() => this.removeImportFromData(importObject))
+    );
+  }
+
+  removeImportFromData(importObject: Import) {
+    this.dataSource.data = this.dataSource.data.filter(i => i.id !== importObject.id);
+  }
+
   onDeleteImportClick(importObj: Import): void {
-    this.importService.deleteImport(importObj.id).pipe(
-      // switchMap(() => this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString))
-    ).subscribe(
-      () => this.dataSource.data = this.dataSource.data.filter(i => i !== importObj)
+    this.subs.push(
+      this.importService.deleteImport(importObj.id).subscribe()
     );
   }
 
@@ -125,13 +178,13 @@ export class ImportComponent implements OnInit, OnDestroy {
       case 'IMPORTED':
       case 'ERROR':
       case 'PENDING':
-        return importObject.importedApplications > 0;
+        return importObject.savedApplicants > 0;
       default:
         return true;
     }
   }
 
   ngOnDestroy(): void {
-    this.pageSubscription.unsubscribe();
+    this.subs.forEach(subscription => subscription.unsubscribe());
   }
 }

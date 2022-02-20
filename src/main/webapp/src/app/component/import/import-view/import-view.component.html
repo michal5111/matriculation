@@ -1,9 +1,5 @@
 <ng-template [ngIf]="userService.isAuthenticated">
-  <button mat-button routerLink="/import">
-    <mat-icon>arrow_back</mat-icon>
-    Wróć
-  </button>
-  <ng-template [ngIf]="importProgress && rxStompService.connected()">
+  <ng-template [ngIf]="import && rxStompService.connected()">
     <header *ngIf="import" class="card-wrapper">
       <mat-card class="card-centered">
         <mat-card-title>
@@ -19,23 +15,23 @@
         </mat-card-subtitle>
       </mat-card>
       <mat-card class="card-centered">
-        <mat-card-content *ngIf="importProgress && rxStompService.connected()">
-          <app-import-status-indicator [importStatus]="importProgress.importStatus"></app-import-status-indicator>
-          <p *ngIf="importProgress.error">Błąd importu:
-            <mark class="error-color">{{importProgress.error}}</mark>
+        <mat-card-content *ngIf="import && rxStompService.connected()">
+          <app-import-status-indicator [importStatus]="import.importStatus"></app-import-status-indicator>
+          <p *ngIf="import.error">Błąd importu:
+            <mark class="error-color">{{import.error}}</mark>
           </p>
           <app-progress-viewer
             header="Zaimportowane zgłoszenia:"
-            [value]="importProgress.importedApplications"
-            [total]="importProgress.totalCount">
+            [value]="import.importedApplications"
+            [total]="import.totalCount">
           </app-progress-viewer>
           <app-progress-viewer
             header="Zapisane zgłoszenia:"
-            [value]="importProgress.savedApplicants"
-            [total]="importProgress.totalCount"
-            [errorsCount]="importProgress.saveErrors">
+            [value]="import.savedApplicants"
+            [total]="import.totalCount"
+            [errorsCount]="import.saveErrors">
           </app-progress-viewer>
-          <p>Błędy przy zapisywaniu: {{importProgress.saveErrors}}</p>
+          <p>Błędy przy zapisywaniu: {{import.saveErrors}}</p>
         </mat-card-content>
         <mat-card-actions>
           <button mat-button (click)="startImport()" [disabled]="isStartImportButtonDisabled()">
@@ -56,15 +52,15 @@
         <mat-card-content>
           <app-progress-viewer
             header="Znalezione UIDy:"
-            [value]="importProgress.importedUids"
-            [total]="importProgress.totalCount"
-            [errorsCount]="importProgress.saveErrors">
+            [value]="import.importedUids"
+            [total]="import.totalCount"
+            [errorsCount]="import.saveErrors">
           </app-progress-viewer>
           <app-progress-viewer
             header="Wysłane powiadomienia:"
-            [value]="importProgress.notificationsSend"
-            [total]="importProgress.totalCount"
-            [errorsCount]="importProgress.saveErrors">
+            [value]="import.notificationsSend"
+            [total]="import.totalCount"
+            [errorsCount]="import.saveErrors">
           </app-progress-viewer>
         </mat-card-content>
         <mat-card-actions>
@@ -81,7 +77,7 @@
       <mat-card class="card-centered">
         <mat-card-content>
           Potencjalne duplikaty: <span
-          [class.red_backgroud]="importProgress.potentialDuplicates > 0">{{importProgress.potentialDuplicates}}</span>
+          [class.red_backgroud]="import.potentialDuplicates > 0">{{import.potentialDuplicates}}</span>
         </mat-card-content>
         <mat-card-actions>
           <button mat-button (click)="onCheckForPotentialDuplicates()" [disabled]="isCheckForDuplicatesDisabled()">

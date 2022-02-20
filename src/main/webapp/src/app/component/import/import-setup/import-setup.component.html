@@ -89,7 +89,7 @@
         <mat-datepicker #dateOfAddmisionPicker></mat-datepicker>
       </mat-form-field>
     </div>
-    <button mat-button type="submit" [disabled]="!importCreationFormGroup.valid">
+    <button mat-button type="submit" [disabled]="!importCreationFormGroup.valid || isButtonDisabled">
       <mat-icon>add</mat-icon>
       Utwórz
     </button>

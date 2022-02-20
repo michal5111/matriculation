@@ -15,12 +15,12 @@
       </ng-template>
       <span class="fill-remaining-space"></span>
       <ng-template [ngIf]="userService.isAuthenticated" [ngIfElse]="loggedOut">
-        <span>{{userService.user?.casAssertion?.principal?.attributes?.givenname}} {{userService.user?.casAssertion?.principal?.attributes?.lastname}}</span>
-        <a mat-stroked-button href="{{baseHref}}logout">Wyloguj</a>
+        <span>{{getUserCaption()}}</span>
+        <a mat-stroked-button class="toolbarButton" href="{{baseHref}}logout">Wyloguj</a>
       </ng-template>
       <ng-template #loggedOut>
-        <a mat-stroked-button
-           href="{{baseHref}}login?service={{baseHref+location.path().slice(1,location.path().length)}}">Zaloguj</a>
+        <a mat-stroked-button class="toolbarButton"
+           href="{{baseHref}}login?service={{getServiceUrl()}}">Zaloguj</a>
       </ng-template>
     </mat-toolbar>
     <router-outlet></router-outlet>

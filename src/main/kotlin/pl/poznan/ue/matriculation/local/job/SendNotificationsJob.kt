@@ -6,14 +6,12 @@ import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.job.startConditions.IStartConditions
 import pl.poznan.ue.matriculation.local.job.startConditions.SendNotificationsStartConditions
 import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
-import pl.poznan.ue.matriculation.local.service.ImportService
 import pl.poznan.ue.matriculation.local.service.ProcessService
 
 class SendNotificationsJob(
     private val processService: ProcessService,
     private val applicationDataSourceFactory: ApplicationDataSourceFactory,
-    private val importId: Long,
-    private val importService: ImportService
+    private val importId: Long
 ) : IJob {
     override var status: JobStatus = JobStatus.PENDING
     override val startCondition: IStartConditions
@@ -24,7 +22,6 @@ class SendNotificationsJob(
     }
 
     override fun doWork(import: Import): Import {
-        val import = importService.get(importId)
         val ads = applicationDataSourceFactory.getDataSource(import.dataSourceId)
         if (ads !is INotificationSender) return import
         processService.sendNotifications(importId = importId, ads)

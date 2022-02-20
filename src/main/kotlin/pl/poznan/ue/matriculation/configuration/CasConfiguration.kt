@@ -23,7 +23,7 @@ import pl.poznan.ue.matriculation.security.CustomUserDetailsService
 
 @Configuration
 @Profile("prod")
-class CasConfiguration() {
+class CasConfiguration {
 
     @Value("\${cas.service.logout}")
     private lateinit var casUrlLogout: String

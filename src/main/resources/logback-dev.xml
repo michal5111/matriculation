@@ -38,10 +38,33 @@
         <appender-ref ref="Console"/>
     </root>
 
-    <!-- LOG "com.baeldung*" at TRACE level -->
-    <logger name="com.baeldung" level="trace" additivity="false">
-        <appender-ref ref="RollingFile"/>
+    <logger name="pl.poznan.ue.matriculation.configuration.LogAspect" level="debug" additivity="false">
         <appender-ref ref="Console"/>
+        <appender-ref ref="RollingFile"/>
     </logger>
+
+    <logger name="org.hibernate.SQL" level="debug" additivity="false">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="RollingFile"/>
+    </logger>
+
+    <logger name="pl.poznan.ue.matriculation.oracle.service.PersonService" level="trace" additivity="false">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="RollingFile"/>
+    </logger>
+
+    <logger name="pl.poznan.ue.matriculation.local.service.ApplicationProcessor" level="trace" additivity="false">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="RollingFile"/>
+    </logger>
+
+    <logger name="pl.poznan.ue.matriculation.oracle.customHibernateTypes.OracleDateType" level="trace"
+            additivity="false">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="RollingFile"/>
+    </logger>
+    <!--    <logger name="org.hibernate.type.descriptor.sql" level="trace" additivity="false">-->
+    <!--        <appender-ref ref="Console"/>-->
+    <!--    </logger>-->
 
 </configuration>

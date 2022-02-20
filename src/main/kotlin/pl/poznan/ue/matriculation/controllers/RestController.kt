@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
-import pl.poznan.ue.matriculation.local.domain.import.ImportProgress
 import pl.poznan.ue.matriculation.local.domain.user.Role
 import pl.poznan.ue.matriculation.local.domain.user.User
 import pl.poznan.ue.matriculation.local.dto.*
@@ -23,11 +22,6 @@ import pl.poznan.ue.matriculation.oracle.service.UsosService
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(
-    originPatterns = ["*"],
-    allowCredentials = "true",
-    methods = [RequestMethod.GET, RequestMethod.PATCH, RequestMethod.TRACE, RequestMethod.POST, RequestMethod.OPTIONS, RequestMethod.DELETE, RequestMethod.HEAD, RequestMethod.PUT]
-)
 class RestController(
     private val applicationDataSourceFactory: ApplicationDataSourceFactory,
     private val importService: ImportService,
@@ -90,11 +84,7 @@ class RestController(
     fun importApplicants(@PathVariable("id") importId: Long) = jobService.runJob(JobType.IMPORT, importId)
 
     @GetMapping("/import/{id}")
-    fun getImport(@PathVariable("id") importId: Long): Import = importService.get(importId)
-
-
-    @GetMapping("/import/{id}/progress")
-    fun getProgress(@PathVariable("id") importId: Long): ImportProgress = importService.getProgress(importId)
+    fun findImportById(@PathVariable("id") importId: Long): Import = importService.findById(importId)
 
     @GetMapping("/import/{id}/save")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -103,9 +93,11 @@ class RestController(
     @GetMapping("/import")
     fun getImportsPage(pageable: Pageable): Page<Import> = importService.getAll(pageable)
 
-
     @DeleteMapping("/import/{id}")
-    fun deleteImport(@PathVariable("id") importId: Long) = importService.delete(importId)
+    fun deleteImport(@PathVariable("id") importId: Long) {
+        importService.delete(importId)
+        applicantService.deleteOrphaned()
+    }
 
 
     @GetMapping("/import/{id}/applications")

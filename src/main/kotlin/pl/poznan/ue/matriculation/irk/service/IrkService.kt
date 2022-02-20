@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.irk.service
 
-import org.apache.poi.util.IOUtils
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.core.io.Resource
 import org.springframework.http.*
@@ -30,7 +29,7 @@ class IrkService(
 
     private val restTemplate: RestTemplate = RestTemplate()
 
-    val httpHeaders = HttpHeaders()
+    private val httpHeaders = HttpHeaders()
 
     private val httpEntity: HttpEntity<Any>
 
@@ -192,7 +191,7 @@ class IrkService(
         )
         var byteArray: ByteArray?
         responseEntity.body?.inputStream.use {
-            byteArray = IOUtils.toByteArray(it)
+            byteArray = it?.readBytes()
         }
         return byteArray
     }

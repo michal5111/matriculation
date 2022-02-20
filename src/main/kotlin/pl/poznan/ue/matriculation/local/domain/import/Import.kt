@@ -83,7 +83,7 @@ class Import(
     var error: String? = null,
 
     @JsonIgnore
-    @OneToMany(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
+    @OneToMany(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE, CascadeType.REMOVE])
     val applications: MutableSet<Application> = HashSet()
 ) : BaseEntityLongId() {
 

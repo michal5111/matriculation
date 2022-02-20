@@ -17,6 +17,7 @@ export class AddUserDialogComponent implements OnInit {
   addUserFormGroup: FormGroup;
   user: User;
   rolesList: Role[];
+  isButtonDisabled: boolean;
 
   @ViewChild('roleSelectionList') roleSelectionList: MatSelectionList;
 
@@ -40,26 +41,20 @@ export class AddUserDialogComponent implements OnInit {
     );
   }
 
-  // onError(title: string, error): void {
-  //   if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
-  //     return;
-  //   }
-  //   this.dialog.open(ErrorDialogComponent, {
-  //     data: new ErrorDialogData(title, error)
-  //   });
-  // }
-
   onSubmit() {
     this.user = new User();
     this.user.uid = this.addUserFormGroup.value.uid;
     this.user.roles = this.roleSelectionList.selectedOptions.selected.map(selectedOption => {
       return selectedOption.value;
     });
-    console.log(this.user);
+    this.isButtonDisabled = true;
     this.userService.create(this.user).subscribe(
       user => {
         this.dialogRef.close(user);
-      }// , error => this.onError('Błąd dodawania użytkownika', error)
+      }, error => {
+        this.isButtonDisabled = false;
+        throw error;
+      }
     );
   }
 }

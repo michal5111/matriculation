@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
-import pl.poznan.ue.matriculation.local.domain.import.ImportProgress
 
 @Repository
 interface ImportRepository : JpaRepository<Import, Long>, PagingAndSortingRepository<Import, Long> {
@@ -39,7 +38,4 @@ interface ImportRepository : JpaRepository<Import, Long>, PagingAndSortingReposi
     @Transactional(transactionManager = "transactionManager")
     @Query("update Import ip set ip.importStatus = :importStatus where ip.id = :importId")
     fun setStatus(importStatus: ImportStatus, importId: Long)
-
-    fun findProgressById(id: Long): ImportProgress?
-
 }

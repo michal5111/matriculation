@@ -4,7 +4,6 @@ import {Observable} from 'rxjs';
 import {Page} from '../../model/oracle/page/page';
 import {Import} from '../../model/import/import';
 import {Application} from '../../model/applications/application';
-import {ImportProgress} from '../../model/import/import-progress';
 import {Registration} from '../../model/applications/registration';
 import {APP_BASE_HREF} from '@angular/common';
 import {DataSource} from '../../model/import/dataSource';
@@ -51,7 +50,7 @@ export class ImportService {
     return this.http.delete(`${this.apiUrl}/import/${importId}`, httpOptions);
   }
 
-  getImport(importId: number) {
+  findById(importId: number) {
     return this.http.get<Import>(`${this.apiUrl}/import/${importId}`, httpOptions);
   }
 
@@ -74,10 +73,6 @@ export class ImportService {
 
   savePersons(importId: number) {
     return this.http.get(`${this.apiUrl}/import/${importId}/save`);
-  }
-
-  getImportProgress(importId: number): Observable<ImportProgress> {
-    return this.http.get<ImportProgress>(`${this.apiUrl}/import/${importId}/progress`);
   }
 
   archiveImport(importId: number): Observable<any> {

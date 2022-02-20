@@ -4,7 +4,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.data.domain.Sort
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
@@ -26,17 +25,13 @@ import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
-import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
-import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
-import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import java.util.stream.Stream
 import javax.persistence.OptimisticLockException
 
 @Service
 class ProcessService(
-    private val importRepository: ImportRepository,
-    private val applicationRepository: ApplicationRepository,
-    private val applicantRepository: ApplicantRepository,
+    private val importService: ImportService,
+    private val applicationService: ApplicationService,
     private val applicantService: ApplicantService,
     private val saveExceptionHandler: ISaveExceptionHandler,
     private val uidService: UidService,
@@ -60,7 +55,7 @@ class ProcessService(
         if (!TransactionSynchronizationManager.isActualTransactionActive()) {
             throw IllegalStateException("Nie ma aktywnej transakcji")
         }
-        val import = importRepository.getById(importId)
+        val import = importService.get(importId)
         val applicantDto = applicationDtoDataSource.getApplicantById(applicationDto.foreignApplicantId)
         applicationDtoDataSource.preprocess(applicationDto, applicantDto)
         var application = createOrUpdateApplication(applicationDto, applicationDtoDataSource)
@@ -72,7 +67,7 @@ class ProcessService(
             applicationDto = applicationDto,
             import = import
         )
-        applicant = applicantRepository.save(applicant)
+        applicant = applicantService.save(applicant)
         application.applicant = applicant
         application.certificate = applicationDtoDataSource.getPrimaryCertificate(
             applicant = applicant,
@@ -82,7 +77,7 @@ class ProcessService(
             import = import
         )
         application.import = import
-        application = applicationRepository.save(application)
+        application = applicationService.save(application)
         import.importedApplications++
         return application
     }
@@ -92,7 +87,7 @@ class ProcessService(
         applicationDto: IApplicationDto,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
     ): Application {
-        val foundApplication = applicationRepository.findByForeignIdAndDataSourceId(
+        val foundApplication = applicationService.findByForeignIdAndDataSourceId(
             applicationDto.foreignId,
             applicationDtoDataSource.id
         )
@@ -114,7 +109,7 @@ class ProcessService(
         applicantDto: IApplicantDto,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
     ): Applicant {
-        val foundApplicant = applicantRepository.findByForeignIdAndDataSourceId(
+        val foundApplicant = applicantService.findByForeignIdAndDataSourceId(
             applicantDto.foreignId,
             applicationDtoDataSource.id
         )
@@ -131,11 +126,11 @@ class ProcessService(
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     fun processApplications(
         importId: Long,
-        importDto: Import,
+        import: Import,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
-    ) {
+    ): Import {
         logger.trace("Pobieram strumień zgłoszeń ze statusem nie zaimportowany i błąd")
-        val applicationsPage: Stream<Application> = applicationRepository.getAllByImportIdAndImportStatusIn(
+        val applicationsPage: Stream<Application> = applicationService.getAllByImportIdAndImportStatusIn(
             importId,
             listOf(ApplicationImportStatus.NOT_IMPORTED, ApplicationImportStatus.ERROR),
             Sort.by(
@@ -159,7 +154,7 @@ class ProcessService(
                         applicationProcessor.processApplication(
                             importId = importId,
                             application = application,
-                            importDto = importDto,
+                            importDto = import,
                             applicationDtoDataSource = applicationDtoDataSource
                         )
                     }
@@ -170,6 +165,7 @@ class ProcessService(
                 }
             }
         }
+        return import
     }
 
     @Transactional(
@@ -178,8 +174,8 @@ class ProcessService(
         transactionManager = "transactionManager"
     )
     fun archivePersons(importId: Long): Import {
-        val import = importRepository.getById(importId)
-        val applicationStream = applicationRepository.findAllByImportId(importId)
+        val import = importService.get(importId)
+        val applicationStream = applicationService.findAllByImportId(importId)
         applicationStream.use {
             it.filter { application ->
                 val applicant = application.applicant ?: throw ApplicantNotFoundException()
@@ -198,7 +194,7 @@ class ProcessService(
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     fun getUids(importId: Long) {
-        val applicationStream = applicationRepository.findAllStreamByImportId(importId)
+        val applicationStream = applicationService.findAllStreamByImportId(importId)
         applicationStream.use {
             it.forEach { application ->
                 application.applicant?.let { applicant ->
@@ -213,9 +209,9 @@ class ProcessService(
         importId: Long,
         notificationSender: INotificationSender
     ) {
-        val applicationStream = applicationRepository.findAllStreamByImportId(importId)
-        val importProgress = importRepository.findByIdOrNull(importId)
-        importProgress?.notificationsSend = 0
+        val applicationStream = applicationService.findAllStreamByImportId(importId)
+        val importProgress = importService.get(importId)
+        importProgress.notificationsSend = 0
         applicationStream.use {
             it.forEach { application ->
                 application.applicant?.let { applicant ->
@@ -234,7 +230,7 @@ class ProcessService(
     fun findPotentialDuplicates(importId: Long) {
         try {
             val applicationsStream =
-                applicationRepository.findAllStreamByImportIdAndApplicantPotentialDuplicateStatusIn(
+                applicationService.findAllStreamByImportIdAndApplicantPotentialDuplicateStatusIn(
                     importId,
                     listOf(DuplicateStatus.NOT_CHECKED, DuplicateStatus.POTENTIAL_DUPLICATE)
                 )
