@@ -28,9 +28,13 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   $indexPoolsObservable: Observable<[IndexType]> = this.usosService.getAvailableIndexPools();
   stages: string[];
   didacticCycles: string[];
-  importCreationFormGroup: FormGroup;
+  formGroup: FormGroup;
   changesSubscription: Subscription;
   isButtonDisabled = false;
+  areRegistrationLoading = false;
+  areProgrammesLoading = false;
+  areStagesLoading = false;
+  subs: Subscription[] = [];
 
   constructor(
     private importService: ImportService,
@@ -46,7 +50,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   @ViewChild(FormGroupDirective) formGroupDirective: FormGroupDirective;
 
   ngOnInit(): void {
-    this.importCreationFormGroup = this.formBuilder.group({
+    this.formGroup = this.formBuilder.group({
       dataSource: ['', Validators.required],
       registration: ['', Validators.required],
       registrationProgramme: ['', Validators.required],
@@ -58,63 +62,80 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
       dataFile: ['']
     });
     this.onDidacticCycleInputChanges();
-    this.importCreationFormGroup.controls.dataFile.valueChanges.subscribe((fileInput: any) => {
-      const reader = new FileReader();
+    this.subs.push(
+      this.formGroup.controls.dataFile.valueChanges.subscribe((fileInput: any) => {
+        const reader = new FileReader();
 
-      if (fileInput) {
-        reader.readAsDataURL(fileInput);
-        reader.onload = () => {
-          this.import.dataFile = reader.result.toString().replace(/^data:(.*,)?/, '');
-          this.cd.markForCheck();
-        };
-      }
-    });
+        if (fileInput) {
+          reader.readAsDataURL(fileInput);
+          reader.onload = () => {
+            this.import.dataFile = reader.result.toString().replace(/^data:(.*,)?/, '');
+            this.cd.markForCheck();
+          };
+        }
+      })
+    );
   }
 
   onRegistrationSelectionChange(event: MatSelectChange): void {
-    this.importService.getAvailableRegistrationProgrammes(event.value, this.dataSourceId).pipe(
-      tap(results => this.registrationProgrammes = results)
-    ).subscribe(
-      () => {
-        this.importCreationFormGroup.patchValue({registrationProgramme: null, stage: null});
-      }// , error => this.onError('Błąd przy pobieraniu programów', error)
+    this.areProgrammesLoading = true;
+    this.subs.push(
+      this.importService.getAvailableRegistrationProgrammes(event.value, this.dataSourceId).pipe(
+        tap(results => this.registrationProgrammes = results)
+      ).subscribe(
+        () => {
+          this.formGroup.patchValue({registrationProgramme: null, stage: null});
+          this.areProgrammesLoading = false;
+        },
+        error => {
+          this.areProgrammesLoading = false;
+          throw error;
+        }
+      )
     );
   }
 
   onRegistrationProgrammeChange(event: MatSelectChange): void {
-    this.usosService.getAvailableStages(event.value.usosId).pipe(
-      tap(results => this.stages = results)
-    ).subscribe(
-      () => {
-        this.importCreationFormGroup.patchValue({stage: null});
-      }// , error => this.onError('Błąd przy pobieraniu etapów', error)
+    this.areStagesLoading = true;
+    this.subs.push(
+      this.usosService.getAvailableStages(event.value.usosId).pipe(
+        tap(results => this.stages = results)
+      ).subscribe(
+        () => {
+          this.formGroup.patchValue({stage: null});
+          this.areStagesLoading = false;
+        },
+        error => {
+          this.areStagesLoading = false;
+          throw error;
+        }
+      )
     );
   }
 
   onDidacticCycleInputChanges(): void {
-    this.changesSubscription = this.importCreationFormGroup.get('didacticCycle').valueChanges.pipe(
-      filter(value => value !== undefined && value !== '' && value !== null && value.length >= 2),
-      switchMap(value => this.usosService.findDidacticCycleCodes(value)),
-      tap(didacticCycles => this.didacticCycles = didacticCycles)
-    ).subscribe(
-      () => {
-      }// , error => this.onError('Błąd przy pobieraniu cykli dydaktycznych', error)
+    this.subs.push(
+      this.formGroup.get('didacticCycle').valueChanges.pipe(
+        filter(value => value !== undefined && value !== '' && value !== null && value.length >= 2),
+        switchMap(value => this.usosService.findDidacticCycleCodes(value)),
+        tap(didacticCycles => this.didacticCycles = didacticCycles)
+      ).subscribe()
     );
   }
 
   onSubmit() {
     this.isButtonDisabled = true;
-    this.import.registration = this.importCreationFormGroup.value.registration;
-    this.import.programmeCode = this.importCreationFormGroup.value.registrationProgramme.usosId;
-    this.import.programmeForeignId = this.importCreationFormGroup.value.registrationProgramme.id;
-    this.import.programmeForeignName = this.importCreationFormGroup.value.registrationProgramme.name;
-    this.import.didacticCycleCode = this.importCreationFormGroup.value.didacticCycle;
-    this.import.dateOfAddmision = this.importCreationFormGroup.value.dateOfAddmision;
-    this.import.startDate = this.importCreationFormGroup.value.startDate;
-    this.import.indexPoolCode = this.importCreationFormGroup.value.indexPoolCode.code;
-    this.import.indexPoolName = this.importCreationFormGroup.value.indexPoolCode.description;
-    this.import.stageCode = this.importCreationFormGroup.value.stage;
-    this.import.dataSourceId = this.importCreationFormGroup.value.dataSource;
+    this.import.registration = this.formGroup.value.registration;
+    this.import.programmeCode = this.formGroup.value.registrationProgramme.usosId;
+    this.import.programmeForeignId = this.formGroup.value.registrationProgramme.id;
+    this.import.programmeForeignName = this.formGroup.value.registrationProgramme.name;
+    this.import.didacticCycleCode = this.formGroup.value.didacticCycle;
+    this.import.dateOfAddmision = this.formGroup.value.dateOfAddmision;
+    this.import.startDate = this.formGroup.value.startDate;
+    this.import.indexPoolCode = this.formGroup.value.indexPoolCode.code;
+    this.import.indexPoolName = this.formGroup.value.indexPoolCode.description;
+    this.import.stageCode = this.formGroup.value.stage;
+    this.import.dataSourceId = this.formGroup.value.dataSource;
     this.importService.createImport(this.import).subscribe(
       importObject => this.onImportCreated(importObject),
       error => {
@@ -128,7 +149,9 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     const snackBarRef = this.snackBar.open('Import utworzony', 'OK', {
       duration: 3000
     });
-    snackBarRef.onAction().subscribe(() => snackBarRef.dismiss());
+    this.subs.push(
+      snackBarRef.onAction().subscribe(() => snackBarRef.dismiss())
+    );
     this.formGroupDirective.resetForm();
     this.import = importObject;
     this.importCreated.next(this.import);
@@ -137,17 +160,25 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.snackBar.ngOnDestroy();
-    this.changesSubscription.unsubscribe();
+    this.subs.forEach(subscription => subscription.unsubscribe());
   }
 
   onDataSourceSelectionChange(event: MatSelectChange) {
     this.dataSourceId = event.value;
-    this.importService.getAvailableRegistrations(event.value).pipe(
-      tap(results => this.registrations = results)
-    ).subscribe(
-      () => {
-        this.importCreationFormGroup.patchValue({registration: null, registrationProgramme: null, stage: null});
-      }// , error => this.onError('Błąd przy pobieraniu rekrutacji', error)
+    this.areRegistrationLoading = true;
+    this.subs.push(
+      this.importService.getAvailableRegistrations(event.value).pipe(
+        tap(results => this.registrations = results)
+      ).subscribe(
+        () => {
+          this.formGroup.patchValue({registration: null, registrationProgramme: null, stage: null});
+          this.areRegistrationLoading = false;
+        },
+        error => {
+          this.areRegistrationLoading = false;
+          throw error;
+        }
+      )
     );
   }
 }
