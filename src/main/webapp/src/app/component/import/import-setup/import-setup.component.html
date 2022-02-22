@@ -1,5 +1,5 @@
 <div class="wrapper">
-  <form [formGroup]="importCreationFormGroup" (ngSubmit)="onSubmit()">
+  <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
     <mat-form-field class="form-field wide-field">
       <mat-label>Źródło danych</mat-label>
       <mat-select formControlName="dataSource" required="true"
@@ -25,38 +25,50 @@
     <mat-form-field class="form-field wide-field">
       <mat-label>Rekrutacja</mat-label>
       <mat-select formControlName="registration" required="true"
-                  (selectionChange)="onRegistrationSelectionChange($event)">
+                  (selectionChange)="onRegistrationSelectionChange($event)"
+                  [disabled]="areRegistrationLoading">
         <mat-option
           *ngFor="let registration of registrations"
           [value]="registration.id">{{registration.id}} {{registration.name}}
         </mat-option>
       </mat-select>
+      <ng-template matPrefix [ngIf]="areRegistrationLoading"><p></p>
+        <mat-spinner diameter="20"></mat-spinner>
+      </ng-template>
     </mat-form-field>
     <mat-form-field class="form-field wide-field">
       <mat-label>Program</mat-label>
       <mat-select formControlName="registrationProgramme" required="true"
-                  (selectionChange)="onRegistrationProgrammeChange($event)">
+                  (selectionChange)="onRegistrationProgrammeChange($event)"
+                  [disabled]="areRegistrationLoading || areProgrammesLoading">
         <mat-option
           *ngFor="let registrationProgramme of registrationProgrammes"
           [value]="registrationProgramme">{{registrationProgramme.name}}
         </mat-option>
       </mat-select>
+      <ng-template matPrefix [ngIf]="areProgrammesLoading"><p></p>
+        <mat-spinner diameter="20"></mat-spinner>
+      </ng-template>
     </mat-form-field>
-    <div class="wide-wrapper">
-      <mat-form-field class="form-field">
-        <mat-label>Etap</mat-label>
-        <mat-select formControlName="stage" required="true">
-          <mat-option
-            *ngFor="let stage of stages"
-            [value]="stage">{{stage}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field class="form-field">
+    <mat-form-field class="form-field wide-field">
+      <mat-label>Etap</mat-label>
+      <mat-select formControlName="stage" required="true"
+                  [disabled]="areRegistrationLoading || areProgrammesLoading || areRegistrationLoading">
+        <mat-option
+          *ngFor="let stage of stages"
+          [value]="stage">{{stage}}
+        </mat-option>
+      </mat-select>
+      <ng-template matPrefix [ngIf]="areStagesLoading"><p></p>
+        <mat-spinner diameter="20"></mat-spinner>
+      </ng-template>
+    </mat-form-field>
+    <div class="flex-container">
+      <mat-form-field class="form-field flex-form-field">
         <mat-label>Cykl dydaktyczny</mat-label>
         <input type="text" matInput formControlName="didacticCycle" [matAutocomplete]="auto" required="true">
-        <button mat-button *ngIf="importCreationFormGroup.value.didacticCycle" matSuffix mat-icon-button
-                aria-label="Clear" (click)="importCreationFormGroup.value.didacticCycle=''">
+        <button mat-button *ngIf="formGroup.value.didacticCycle" matSuffix mat-icon-button
+                aria-label="Clear" (click)="formGroup.value.didacticCycle=''">
           <mat-icon>close</mat-icon>
         </button>
         <mat-autocomplete #auto="matAutocomplete">
@@ -65,7 +77,7 @@
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
-      <mat-form-field class="form-field">
+      <mat-form-field class="form-field flex-form-field">
         <mat-label>Pula indeksów</mat-label>
         <mat-select formControlName="indexPoolCode" required="true">
           <mat-option
@@ -74,8 +86,6 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-    </div>
-    <div>
       <mat-form-field class="form-field form-field-date">
         <mat-label>Data rozpoczęcia studiów</mat-label>
         <input matInput [matDatepicker]="startDatePicker" formControlName="startDate" required="true">
@@ -89,7 +99,7 @@
         <mat-datepicker #dateOfAddmisionPicker></mat-datepicker>
       </mat-form-field>
     </div>
-    <button mat-button type="submit" [disabled]="!importCreationFormGroup.valid || isButtonDisabled">
+    <button mat-button type="submit" [disabled]="!formGroup.valid || isButtonDisabled">
       <mat-icon>add</mat-icon>
       Utwórz
     </button>

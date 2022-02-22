@@ -29,6 +29,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {NgxMatFileInputModule} from '@angular-material-components/file-input';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [],
@@ -62,7 +63,8 @@ import {MatMomentDateModule} from '@angular/material-moment-adapter';
     MatTooltipModule,
     NgxMatFileInputModule,
     MatCheckboxModule,
-    MatMomentDateModule
+    MatMomentDateModule,
+    MatProgressSpinnerModule
   ],
   exports: [
     MatToolbarModule,
@@ -93,7 +95,8 @@ import {MatMomentDateModule} from '@angular/material-moment-adapter';
     MatTooltipModule,
     NgxMatFileInputModule,
     MatCheckboxModule,
-    MatMomentDateModule
+    MatMomentDateModule,
+    MatProgressSpinnerModule
   ]
 })
 export class MaterialModule {

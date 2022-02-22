@@ -54,12 +54,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['names', true],
     ['birthDateAndPlace', true],
     ['pesel', true],
-    // ['secondarySchoolDocumentNumber', false],
-    // ['secondarySchoolDocumentIssueInstitution', false],
-    // ['secondarySchoolDocumentIssueDate', false],
-    // ['diplomaSchoolDocumentNumber', false],
-    // ['diplomaSchoolDocumentIssueDateAndPlace', false],
-    // ['diplomaSchoolDocumentIssueInstitution', false],
     ['certificateDocumentNumber', false],
     ['certificateDocumentIssueDateAndPlace', false],
     ['certificateDocumentIssueInstitution', false],
@@ -81,6 +75,8 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['importError', 'importError'],
     ['duplicateStatus', 'applicant.potentialDuplicateStatus']
   ]);
+
+  subs: Subscription[] = [];
 
   private importObservable$: Observable<Import>;
 
@@ -121,33 +117,35 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
     this.importId = this.route.snapshot.params.id;
-    this.getImport(this.importId).subscribe();
-    this.usosService.getUsosUrl().subscribe(
-      result => {
-        this.usosUrl = result;
-      }
+    this.subs.push(
+      this.getImport(this.importId).subscribe(),
+      this.usosService.getUsosUrl().subscribe(
+        result => this.usosUrl = result
+      ),
+      this.route.queryParams.pipe(
+        tap(params => {
+          this.pageNumber = params.page ?? this.pageNumber;
+          this.sortString = params.sort ?? this.sortString;
+          this.sortDirString = params.dir ?? this.sortDirString;
+          this.pageSize = params.pageSize ?? this.pageSize;
+        }),
+        switchMap(() => this.getPage(
+          this.pageNumber,
+          this.pageSize,
+          this.sortString,
+          this.sortDirString
+        ))
+      ).subscribe()
     );
-    this.route.queryParams.pipe(
-      tap(params => {
-        this.pageNumber = params.page ?? this.pageNumber;
-        this.sortString = params.sort ?? this.sortString;
-        this.sortDirString = params.dir ?? this.sortDirString;
-        this.pageSize = params.pageSize ?? this.pageSize;
-      }),
-      switchMap(() => this.getPage(
-        this.pageNumber,
-        this.pageSize,
-        this.sortString,
-        this.sortDirString
-      ))
-    ).subscribe();
     this.importObservable$ = this.rxStompService.watch(`/topic/import/${this.importId}`).pipe(
       map((message: Message) => JSON.parse(message.body)),
       tap((importObject: Import) => this.import = importObject)
     );
-    this.progressSubscription = this.importObservable$.pipe(
-      switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString))
-    ).subscribe();
+    this.subs.push(
+      this.importObservable$.pipe(
+        switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString))
+      ).subscribe()
+    );
   }
 
   switchPage(pageEvent: PageEvent): void {
@@ -182,22 +180,16 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   startImport(): void {
-    this.progressSubscription = this.importService.startImport(this.importId).subscribe();
+    this.subs.push(
+      this.progressSubscription = this.importService.startImport(this.importId).subscribe()
+    );
   }
 
   savePersons(): void {
-    this.progressSubscription = this.importService.savePersons(this.importId).subscribe();
+    this.subs.push(
+      this.progressSubscription = this.importService.savePersons(this.importId).subscribe()
+    );
   }
-
-  // getSecondarySchoolDocument(application: Application): Document {
-  //   return application.applicant.documents
-  //     .find(document => ['D', 'N', 'E', 'Z'].some(code => document.certificateUsosCode === code));
-  // }
-
-  // getDiplomaDocument(application: Application): Document {
-  //   return application.applicant.documents
-  //     .find(document => ['L', 'I'].some(code => document.certificateUsosCode === code));
-  // }
 
   updateIndexNumber(application: Application): void {
     const dialogRef = this.dialog.open(UpdateIndexNumberDialogComponent, {
@@ -209,11 +201,13 @@ export class ImportViewComponent implements OnInit, OnDestroy {
         indexNumber: application.applicant.assignedIndexNumber
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result !== undefined && result !== '') {
-        application.applicant.assignedIndexNumber = result;
-      }
-    });
+    this.subs.push(
+      dialogRef.afterClosed().subscribe(result => {
+        if (result !== undefined && result !== '') {
+          application.applicant.assignedIndexNumber = result;
+        }
+      })
+    );
   }
 
   getElementNumber(application: Application): number {
@@ -225,10 +219,12 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data
     });
-    dialogRef.afterClosed().pipe(
-      filter(result => result === true),
-      switchMap((result) => this.importService.archiveImport(this.importId))
-    ).subscribe();
+    this.subs.push(
+      dialogRef.afterClosed().pipe(
+        filter(result => result === true),
+        switchMap((result) => this.importService.archiveImport(this.importId))
+      ).subscribe()
+    );
   }
 
   getApplicationEditUrl(application: Application): string {
@@ -240,7 +236,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.progressSubscription.unsubscribe();
+    this.subs.forEach(subscription => subscription.unsubscribe());
   }
 
   showApplicationErrorDialog(application: Application): void {
@@ -306,11 +302,11 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   onFindUidsClick() {
-    this.progressSubscription = this.importService.findUids(this.importId).subscribe();
+    this.subs.push(this.progressSubscription = this.importService.findUids(this.importId).subscribe());
   }
 
   onSendNotificationsClick() {
-    this.progressSubscription = this.importService.sendNotifications(this.importId).subscribe();
+    this.subs.push(this.progressSubscription = this.importService.sendNotifications(this.importId).subscribe());
   }
 
   isSendNotificationsDisabled(): boolean {
@@ -335,7 +331,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   onCheckForPotentialDuplicates() {
-    this.progressSubscription = this.importService.checkForPotentialDuplicates(this.importId).subscribe();
+    this.subs.push(this.progressSubscription = this.importService.checkForPotentialDuplicates(this.importId).subscribe());
   }
 
   onPotentialDuplicateClick(application: Application) {
@@ -348,14 +344,16 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined && result !== '') {
-        this.applicationsService.updatePotentialDuplicateStatus(application.id, {
-          usosId: (result.notDuplicate ? undefined : result.person.id),
-          potentialDuplicateStatus: (result.notDuplicate ? 'CONFIRMED_NOT_DUPLICATE' : 'OK')
-        }).subscribe(updatedApplication => {
-          this.import.potentialDuplicates--;
-          application.applicant.potentialDuplicateStatus = updatedApplication.applicant.potentialDuplicateStatus;
-          application.applicant.usosId = updatedApplication.applicant.usosId;
-        });
+        this.subs.push(
+          this.applicationsService.updatePotentialDuplicateStatus(application.id, {
+            usosId: (result.notDuplicate ? undefined : result.person.id),
+            potentialDuplicateStatus: (result.notDuplicate ? 'CONFIRMED_NOT_DUPLICATE' : 'OK')
+          }).subscribe(updatedApplication => {
+            this.import.potentialDuplicates--;
+            application.applicant.potentialDuplicateStatus = updatedApplication.applicant.potentialDuplicateStatus;
+            application.applicant.usosId = updatedApplication.applicant.usosId;
+          })
+        );
       }
     });
   }
