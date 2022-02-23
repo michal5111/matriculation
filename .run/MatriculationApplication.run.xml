@@ -8,7 +8,7 @@
         <option name="ALTERNATIVE_JRE_PATH"/>
         <option name="UPDATE_ACTION_UPDATE_POLICY" value="UpdateClassesAndTriggerFile"/>
         <method v="2">
-            <option name="Maven.BeforeRunTask" enabled="true" file="$PROJECT_DIR$/pom.xml" goal="test"/>
+            <option name="MakeProject" enabled="true"/>
         </method>
     </configuration>
 </component>
