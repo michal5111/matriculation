@@ -21,8 +21,8 @@ class SavePersonsJob(
         import.saveErrors = 0
     }
 
-    override fun doWork(import: Import): Import {
-        return processService.processApplications(
+    override fun doWork(import: Import) {
+        processService.processApplications(
             importId = importId,
             import = import,
             applicationDtoDataSource = applicationDataSourceFactory.getDataSource(import.dataSourceId)

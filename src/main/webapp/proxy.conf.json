@@ -9,6 +9,11 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/logout": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/ws": {
     "target": "ws://localhost:8081",
     "secure": false,

@@ -19,9 +19,8 @@ class CheckForPotentialDuplicatesJob(
         import.potentialDuplicates = 0
     }
 
-    override fun doWork(import: Import): Import {
+    override fun doWork(import: Import) {
         processService.findPotentialDuplicates(importId)
-        return import
     }
 
     override fun getCompletionStatus(import: Import): ImportStatus {

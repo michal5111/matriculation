@@ -19,8 +19,8 @@ class ArchiveApplicationsJob(
         TODO("Not yet implemented")
     }
 
-    override fun doWork(import: Import): Import {
-        return processService.archivePersons(importId)
+    override fun doWork(import: Import) {
+        processService.archivePersons(importId)
     }
 
     override fun getCompletionStatus(import: Import): ImportStatus {

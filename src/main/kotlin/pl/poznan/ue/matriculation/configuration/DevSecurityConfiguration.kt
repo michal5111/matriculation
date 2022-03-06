@@ -46,6 +46,7 @@ class DevSecurityConfiguration : WebSecurityConfigurerAdapter() {
             .antMatcher("/login*")
             .authorizeRequests().anyRequest().authenticated()
             .and().httpBasic().authenticationEntryPoint(authenticationEntryPoint())
+            .and().logout()
     }
 
     @Bean

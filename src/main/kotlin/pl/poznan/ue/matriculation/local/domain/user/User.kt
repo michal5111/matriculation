@@ -7,7 +7,12 @@ import javax.persistence.*
 @Entity
 @NamedEntityGraph(
     name = "user.roles",
-    attributeNodes = [NamedAttributeNode(value = "roles")]
+    attributeNodes = [NamedAttributeNode(value = "roles", subgraph = "subgraph.userRole")],
+    subgraphs = [NamedSubgraph(
+        name = "subgraph.userRole", attributeNodes = [
+            NamedAttributeNode("role")
+        ]
+    )]
 )
 class User(
 
@@ -23,6 +28,11 @@ class User(
     var usosId: Long? = null
 
 ) : BaseEntityLongId() {
+
+    fun addRole(role: Role) {
+        roles.add(UserRole(this, role))
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

@@ -12,7 +12,7 @@ interface IJob {
 
     fun prepare(import: Import)
 
-    fun doWork(import: Import): Import
+    fun doWork(import: Import)
 
     fun getCompletionStatus(import: Import): ImportStatus
 

@@ -51,12 +51,12 @@ class ApplicantToPersonMapper(
             middleSchool = applicant.highSchoolUsosCode?.let {
                 schoolRepository.getById(it)
             },
-            idNumber = applicant.identityDocuments.firstOrNull()?.number,
-            documentType = applicant.identityDocuments.firstOrNull()?.number?.let {
-                applicant.identityDocuments.firstOrNull()?.type
+            idNumber = applicant.primaryIdentityDocument?.number,
+            documentType = applicant.primaryIdentityDocument?.number?.let {
+                applicant.primaryIdentityDocument?.type
             },
-            identityDocumentExpirationDate = applicant.identityDocuments.firstOrNull()?.expDate,
-            identityDocumentIssuerCountry = applicant.identityDocuments.firstOrNull()?.country?.let {
+            identityDocumentExpirationDate = applicant.primaryIdentityDocument?.expDate,
+            identityDocumentIssuerCountry = applicant.primaryIdentityDocument?.country?.let {
                 citizenshipRepository.getById(it)
             },
             mothersName = applicant.mothersName,

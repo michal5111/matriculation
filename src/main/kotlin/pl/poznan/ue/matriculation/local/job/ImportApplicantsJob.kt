@@ -24,7 +24,7 @@ class ImportApplicantsJob(
         import.importedApplications = 0
     }
 
-    override fun doWork(import: Import): Import {
+    override fun doWork(import: Import) {
         import.error = null
         val applicantDataSource = applicationDataSourceFactory.getDataSource(import.dataSourceId)
         var currentPage = 1
@@ -59,7 +59,6 @@ class ImportApplicantsJob(
         } catch (e: Exception) {
             throw ImportException(import.id, e.message, e)
         }
-        return import
     }
 
     override fun getCompletionStatus(import: Import): ImportStatus {

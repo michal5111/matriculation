@@ -19,9 +19,8 @@ class GetUidsJob(
         import.importedUids = 0
     }
 
-    override fun doWork(import: Import): Import {
+    override fun doWork(import: Import) {
         processService.getUids(importId)
-        return import
     }
 
     override fun getCompletionStatus(import: Import): ImportStatus {

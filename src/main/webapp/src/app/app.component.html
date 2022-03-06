@@ -5,7 +5,9 @@
         Immatrykulator 5000
       </button>
       <ng-template [ngIf]="userService.isAuthenticated">
-        <button mat-stroked-button class="toolbarButton" routerLink="/import">Importy</button>
+        <button mat-stroked-button class="toolbarButton" routerLink="/import"
+                [disabled]="!userService.hasAnyRole('ROLE_IMPORT_VIEW','ROLE_ADMIN')">Importy
+        </button>
       </ng-template>
       <ng-template [ngIf]="userService.hasRole('ROLE_ADMIN')">
         <button mat-stroked-button class="toolbarButton" routerLink="/userManager">

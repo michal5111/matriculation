@@ -21,11 +21,11 @@ class SendNotificationsJob(
         import.notificationsSend = 0
     }
 
-    override fun doWork(import: Import): Import {
+    override fun doWork(import: Import) {
         val ads = applicationDataSourceFactory.getDataSource(import.dataSourceId)
-        if (ads !is INotificationSender) return import
-        processService.sendNotifications(importId = importId, ads)
-        return import
+        if (ads is INotificationSender) {
+            processService.sendNotifications(importId = importId, ads)
+        }
     }
 
     override fun getCompletionStatus(import: Import): ImportStatus {

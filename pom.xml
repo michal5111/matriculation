@@ -18,7 +18,7 @@
     <properties>
         <java.version>1.8</java.version>
         <kotlin.version>1.6.10</kotlin.version>
-        <nodeVersion>v16.6.2</nodeVersion>
+        <nodeVersion>v17.6.0</nodeVersion>
         <npmVersion>7.20.6</npmVersion>
     </properties>
 

@@ -6,6 +6,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.exception.UidNotFoundException
+import pl.poznan.ue.matriculation.exception.UserNotFoundException
 import pl.poznan.ue.matriculation.ldap.repo.LdapUserRepository
 import pl.poznan.ue.matriculation.local.domain.user.User
 import pl.poznan.ue.matriculation.local.domain.user.UserRole
@@ -22,6 +23,10 @@ class UserService(
     val roleService: RoleService
 ) {
 
+    fun findById(id: Long): User {
+        return userRepository.findById(id).orElseThrow { UserNotFoundException() }
+    }
+
     fun getByUid(uid: String): User? {
         return userRepository.getByUid(uid)
     }
@@ -33,8 +38,10 @@ class UserService(
     fun save(userDto: UserDto): User {
         val ldapUser = ldapUserRepository.findByUid(userDto.uid) ?: throw UidNotFoundException()
         val user = User(uid = userDto.uid, usosId = ldapUser.usosId).apply {
-            userDto.roles.map { (code) ->
-                UserRole(this, roleService.getOne(code))
+            val roleCodes = userDto.roles.map { it.code }
+            val rolesList = roleRepository.findAllByCodeIn(roleCodes)
+            rolesList.map { role ->
+                UserRole(this, role)
             }.let {
                 roles.addAll(it)
             }

@@ -17,8 +17,9 @@ class AsyncService(
     fun doWorkAsync(job: IJob, import: Import) {
         job.status = JobStatus.WORKING
         try {
-            val import2 = job.doWork(import)
+            job.doWork(import)
             val importId: Long = import.id ?: throw IllegalArgumentException("Import id is null")
+            val import2 = importService.get(importId = importId)
             importService.setImportStatus(importId = importId, importStatus = job.getCompletionStatus(import2))
         } catch (e: Exception) {
             job.status = JobStatus.ERROR

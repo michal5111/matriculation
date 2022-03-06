@@ -128,7 +128,7 @@ class ProcessService(
         importId: Long,
         import: Import,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
-    ): Import {
+    ) {
         logger.trace("Pobieram strumień zgłoszeń ze statusem nie zaimportowany i błąd")
         val applicationsPage: Stream<Application> = applicationService.getAllByImportIdAndImportStatusIn(
             importId,
@@ -165,7 +165,6 @@ class ProcessService(
                 }
             }
         }
-        return import
     }
 
     @Transactional(
@@ -173,7 +172,7 @@ class ProcessService(
         propagation = Propagation.REQUIRED,
         transactionManager = "transactionManager"
     )
-    fun archivePersons(importId: Long): Import {
+    fun archivePersons(importId: Long) {
         val import = importService.get(importId)
         val applicationStream = applicationService.findAllByImportId(importId)
         applicationStream.use {
@@ -189,7 +188,6 @@ class ProcessService(
             }
         }
         import.importStatus = ImportStatus.ARCHIVED
-        return import
     }
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED, transactionManager = "transactionManager")

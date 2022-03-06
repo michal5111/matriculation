@@ -29,8 +29,12 @@ export class UserService implements CanActivate {
   getUser() {
     return this.http.get<UserDetails>(this.userUrl, httpOptions).pipe(
       tap(user => this.user = user),
-      tap(user => this.isAuthenticated = user?.authorities?.length > 0)
+      tap(user => this.isAuthenticated = user?.username !== undefined)
     );
+  }
+
+  findById(userId: number) {
+    return this.http.get<User>(`${this.userUrl}/${userId}`, httpOptions);
   }
 
   update(user: User): Observable<User> {
@@ -59,24 +63,21 @@ export class UserService implements CanActivate {
     return this.user.authorities.find(x => x.authority === role) !== undefined;
   }
 
-  hasAnyRole(roles: string[]): boolean {
-    for (const role of roles) {
-      if (this.hasRole(role)) {
-        return true;
-      }
-    }
-    return false;
+  hasAnyRole(...roles: string[]): boolean {
+    return roles.some(role => this.hasRole(role));
   }
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    const authorities = route.data?.authorities;
-    if (!authorities || authorities.length === 0 || this.hasAnyRole(authorities)) {
+    const authorities: string[] = route.data?.authorities;
+    if (!authorities || authorities.length === 0) {
+      return true;
+    } else {
       return this.getUser().pipe(
-        map(user => user.authorities?.length > 0)
+        map(user => user.authorities),
+        map(() => this.hasAnyRole(...authorities))
       );
     }
-    return false;
   }
 }

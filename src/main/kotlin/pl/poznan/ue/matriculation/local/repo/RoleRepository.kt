@@ -5,4 +5,7 @@ import org.springframework.stereotype.Repository
 import pl.poznan.ue.matriculation.local.domain.user.Role
 
 @Repository
-interface RoleRepository : JpaRepository<Role, String>
+interface RoleRepository : JpaRepository<Role, String> {
+
+    fun findAllByCodeIn(codes: List<String>): List<Role>
+}

@@ -36,7 +36,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     'programmeForeignName',
     'stageCode',
     'didacticCycleCode',
-    'indexPoolCode',
+    // 'indexPoolCode',
     'indexPoolName',
     'startDate',
     'dateOfAddmision',

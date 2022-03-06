@@ -465,7 +465,7 @@ class PersonService(
             applicationId = application.foreignId,
             confirmationStatus = 0,
             irkInstance = dataSourceId?.let {
-                applicationDataSourceFactory.getDataSource(dataSourceId).instanceUrl
+                applicationDataSourceFactory.getDataSource(dataSourceId).instanceUrl + '/'
             } ?: "Nieznany"
         )
         logger.trace("Tworzę lub wybieram studenta")
@@ -476,7 +476,14 @@ class PersonService(
             application = application
         )
         logger.trace("Wykonuję operacje poimmatrykulacyjne")
-        irkApplication.confirmationStatus = postMatriculation(application.foreignId)
+        irkApplication.confirmationStatus = try {
+            val result = postMatriculation(application.foreignId)
+            logger.debug("postmatriculation result = {}", result)
+            result
+        } catch (e: Exception) {
+            logger.error("Error in post matriculation method", e)
+            0
+        }
         return Pair(person, student)
     }
 

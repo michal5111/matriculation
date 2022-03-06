@@ -15,4 +15,8 @@ class RoleService(
     fun getOne(code: String): Role {
         return roleRepository.getById(code)
     }
+
+    fun findAllByCodeIn(codes: List<String>): List<Role> {
+        return roleRepository.findAllByCodeIn(codes)
+    }
 }

@@ -27,7 +27,7 @@ class SaveExceptionHandler(
     )
     override fun handle(exception: Exception, application: Application, importId: Long) {
         val importProgress = importRepository.getById(importId)
-        application.importError = null
+        application.importError = ""
         var e: Throwable? = exception
         do {
             when (e) {

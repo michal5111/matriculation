@@ -14,6 +14,7 @@ import pl.poznan.ue.matriculation.local.domain.user.Role
 import pl.poznan.ue.matriculation.local.domain.user.User
 import pl.poznan.ue.matriculation.local.dto.*
 import pl.poznan.ue.matriculation.local.job.JobType
+import pl.poznan.ue.matriculation.local.mapper.UserMapper
 import pl.poznan.ue.matriculation.local.service.*
 import pl.poznan.ue.matriculation.oracle.dto.IndexTypeDto
 import pl.poznan.ue.matriculation.oracle.entityRepresentations.PersonBasicData
@@ -147,6 +148,13 @@ class RestController(
 
     @GetMapping("/users")
     fun getAllUsers(pageable: Pageable): Page<User> = userService.getAll(pageable)
+
+    @GetMapping("/user/{id}")
+    fun findUserById(@PathVariable("id") id: Long): UserDto {
+        val user = userService.findById(id)
+        val userMapper = UserMapper()
+        return userMapper.mapUserToUserDto(user)
+    }
 
     @GetMapping("/import/{id}/importUids")
     @ResponseStatus(HttpStatus.ACCEPTED)

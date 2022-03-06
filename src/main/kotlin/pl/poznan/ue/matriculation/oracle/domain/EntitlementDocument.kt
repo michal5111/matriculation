@@ -35,19 +35,25 @@ class EntitlementDocument(
     @OneToMany(mappedBy = "entitlementDocument", fetch = FetchType.LAZY)
     val personProgrammes: MutableList<PersonProgramme> = mutableListOf(),
 ) : BaseEntity() {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
 
-        other as EntitlementDocument
-
-        if (id != other.id) return false
-
-        return true
-    }
 
     override fun hashCode(): Int {
         return id?.hashCode() ?: 0
+    }
+
+    fun addPersonProgramme(personProgramme: PersonProgramme) {
+        personProgrammes.add(personProgramme)
+        personProgramme.entitlementDocument = this
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is EntitlementDocument) return false
+
+        if (type != other.type) return false
+        if (number != other.number) return false
+
+        return true
     }
 
 }

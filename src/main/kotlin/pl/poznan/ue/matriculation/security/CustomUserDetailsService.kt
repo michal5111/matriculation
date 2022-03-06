@@ -25,21 +25,20 @@ internal class CustomUserDetailsService(
         log.debug("Authenticating '{}'", login)
         val grantedAuthorities = ArrayList<GrantedAuthority>()
         val user = userService.getByUsosId(lowercaseLogin.toLong())
-            ?: throw UsernameNotFoundException("No user with usos_id $lowercaseLogin")
-
+        grantedAuthorities.add(SimpleGrantedAuthority("ROLE_USER"))
         if (admins.contains(lowercaseLogin)) {
             grantedAuthorities.add(SimpleGrantedAuthority("ROLE_ADMIN"))
         }
 
-        user.roles.forEach {
+        user?.roles?.forEach {
             grantedAuthorities.add(SimpleGrantedAuthority(it.role.code))
         }
 
         return CasUserDetails(
-            userId = user.uid,
+            userId = user?.uid ?: "N/A",
             authorities = grantedAuthorities,
             casAssertion = token.assertion,
-            usosId = user.usosId
+            usosId = user?.usosId
         )
     }
 }

@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
-import {FormBuilder, FormGroup, FormGroupDirective, Validators} from '@angular/forms';
+import {FormControl, FormGroup, FormGroupDirective, Validators} from '@angular/forms';
 import {Observable, Subscription} from 'rxjs';
 import {filter, switchMap, tap} from 'rxjs/operators';
 import {IndexType} from '../../../model/oracle/index-type';
@@ -29,7 +29,6 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   stages: string[];
   didacticCycles: string[];
   formGroup: FormGroup;
-  changesSubscription: Subscription;
   isButtonDisabled = false;
   areRegistrationLoading = false;
   areProgrammesLoading = false;
@@ -39,7 +38,6 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   constructor(
     private importService: ImportService,
     private usosService: UsosService,
-    private formBuilder: FormBuilder,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private cd: ChangeDetectorRef
@@ -50,16 +48,16 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   @ViewChild(FormGroupDirective) formGroupDirective: FormGroupDirective;
 
   ngOnInit(): void {
-    this.formGroup = this.formBuilder.group({
-      dataSource: ['', Validators.required],
-      registration: ['', Validators.required],
-      registrationProgramme: ['', Validators.required],
-      indexPoolCode: ['', Validators.required],
-      stage: ['', Validators.required],
-      didacticCycle: ['', Validators.required],
-      startDate: ['', Validators.required],
-      dateOfAddmision: ['', Validators.required],
-      dataFile: ['']
+    this.formGroup = new FormGroup({
+      dataSource: new FormControl('', Validators.required),
+      registration: new FormControl('', Validators.required),
+      registrationProgramme: new FormControl('', Validators.required),
+      indexPoolCode: new FormControl('', Validators.required),
+      stage: new FormControl('', Validators.required),
+      didacticCycle: new FormControl('', Validators.required),
+      startDate: new FormControl('', Validators.required),
+      dateOfAddmision: new FormControl('', Validators.required),
+      dataFile: new FormControl('')
     });
     this.onDidacticCycleInputChanges();
     this.subs.push(

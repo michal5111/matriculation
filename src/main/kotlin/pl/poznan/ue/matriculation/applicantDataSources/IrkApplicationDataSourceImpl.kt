@@ -3,6 +3,7 @@ package pl.poznan.ue.matriculation.applicantDataSources
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.web.client.HttpStatusCodeException
 import pl.poznan.ue.matriculation.irk.dto.ErrorMessageDto
 import pl.poznan.ue.matriculation.irk.dto.NotificationDto
@@ -70,8 +71,11 @@ open class IrkApplicationDataSourceImpl(
             irkService.completeImmatriculation(foreignApplicationId)
             1
         } catch (e: HttpStatusCodeException) {
-            val errorMessageDto = jacksonObjectMapper().readValue(e.responseBodyAsString, ErrorMessageDto::class.java)
-            errorMessageDto.error
+            if (e.statusCode == HttpStatus.BAD_REQUEST) {
+                val errorMessageDto =
+                    jacksonObjectMapper().readValue(e.responseBodyAsString, ErrorMessageDto::class.java)
+                return errorMessageDto.error
+            } else throw e
         }
     }
 

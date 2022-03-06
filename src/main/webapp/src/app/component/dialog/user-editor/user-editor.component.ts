@@ -6,6 +6,7 @@ import {MatSelectionList} from '@angular/material/list';
 import {Role} from '../../../model/user/role';
 import {UserService} from '../../../service/user-service/user.service';
 import {RoleService} from '../../../service/role-service/role.service';
+import {tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-editor',
@@ -28,21 +29,14 @@ export class UserEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.user = this.data.user;
+    this.userService.findById(this.data.user.id).pipe(
+      tap(user => console.log(user))
+    ).subscribe(user => this.user = user);
     this.roleService.getRoles().subscribe(results => {
         this.rolesList = results;
-      }// , error => this.onError('Błąd przy pobieraniu ról', error)
+      }
     );
   }
-
-  // onError(title: string, error): void {
-  //   if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
-  //     return;
-  //   }
-  //   this.dialog.open(ErrorDialogComponent, {
-  //     data: new ErrorDialogData(title, error)
-  //   });
-  // }
 
   onUpdateUserClick() {
     this.user.roles = this.roleSelectionList.selectedOptions.selected.map(selectedRole => {
@@ -56,12 +50,12 @@ export class UserEditorComponent implements OnInit {
       result => {
         this.user = result;
         this.dialogRef.close(result);
-      }// , error => this.onError('Błąd przy aktualizacji użytkownika', error)
+      }
     );
   }
 
   hasRole(role: Role) {
-    return this.user.roles.some(element => {
+    return this.user.roles?.some(element => {
       return element.code === role.code;
     });
   }

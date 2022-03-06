@@ -211,7 +211,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   getElementNumber(application: Application): number {
-    return this.page.content.indexOf(application) + this.pageSize * this.page.number + 1;
+    return this.page.content.indexOf(application) + this.pageSize * this.pageNumber + 1;
   }
 
   onArchiveClick(): void {

@@ -42,7 +42,7 @@ class PersonProgramme(
     @JoinColumn(name = "JED_ORG_KOD", referencedColumnName = "KOD", nullable = true)
     var organizationalUnit: OrganizationalUnit? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH])
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE])
     @JoinColumn(name = "DOK_UPR_ID", referencedColumnName = "ID")
     var entitlementDocument: EntitlementDocument? = null,
 

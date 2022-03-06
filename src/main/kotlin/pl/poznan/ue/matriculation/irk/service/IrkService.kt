@@ -197,10 +197,12 @@ class IrkService(
     }
 
     fun completeImmatriculation(applicationId: Long): ResponseEntity<Map<String, String>> {
+        val request: HttpEntity<Map<String, String>> =
+            HttpEntity(mapOf("username" to "Immatrykulator5000"), httpHeaders)
         return restTemplate.exchange(
             "${apiUrl}matriculation/${applicationId}/complete/",
             HttpMethod.POST,
-            httpEntity,
+            request,
             object : ParameterizedTypeReference<Map<String, String>>() {}
         )
     }

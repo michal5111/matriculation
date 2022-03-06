@@ -68,6 +68,7 @@ class StudentService(
     ): PersonProgramme {
         val programme = programmeRepository.getById(importDto.programmeCode)
         val didacticCycle = didacticCycleRepository.getById(importDto.didacticCycleCode)
+        val entitlementDocument = getEntitlementDocument(certificate, person)
         val personProgramme = PersonProgramme(
             person = person,
             programme = programme,
@@ -75,9 +76,9 @@ class StudentService(
             startDate = importDto.startDate,
             dateOfAddmision = importDto.dateOfAddmision,
             dateToNextPass = didacticCycle.dateTo,
-            isDefault = isDefault,
-            entitlementDocument = getCertificate(certificate, person)
+            isDefault = isDefault
         )
+        entitlementDocument?.addPersonProgramme(personProgramme)
         addSourceOfFinancing(sourceOfFinancing, personProgramme, importDto.dateOfAddmision)
         addBasisOfAdmission(basisOfAdmission, personProgramme, importDto.dateOfAddmision)
         addPersonStage(personProgramme, didacticCycle, programme, importDto.stageCode)
@@ -85,7 +86,7 @@ class StudentService(
         return personProgramme
     }
 
-    private fun getCertificate(
+    private fun getEntitlementDocument(
         certificate: Document?,
         person: Person
     ) = certificate?.let {
