@@ -16,7 +16,6 @@ class ArchiveApplicationsJob(
         get() = ArchivePersonsStartConditions()
 
     override fun prepare(import: Import) {
-        TODO("Not yet implemented")
     }
 
     override fun doWork(import: Import) {

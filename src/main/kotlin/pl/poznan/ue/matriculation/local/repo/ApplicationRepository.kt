@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.EntityGraph
+import org.springframework.data.jpa.repository.Query
 import org.springframework.data.jpa.repository.QueryHints
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.data.repository.query.Param
@@ -33,6 +34,8 @@ interface ApplicationRepository : PagingAndSortingRepository<Application, Long> 
     fun findAllStreamByImportId(@Param("importId") importId: Long): Stream<Application>
 
     fun findByForeignIdAndDataSourceId(foreignId: Long, dataSourceId: String): Application?
+
+    fun findAllByImportIdAndNotificationSentAndApplicantUidNotNull(importId: Long, sent: Boolean): Stream<Application>
 
     @EntityGraph("application.applicant")
     //@QueryHints(value = [QueryHint(name = HINT_FETCH_SIZE, value = "" + Integer.MIN_VALUE)]) //MySql
@@ -66,4 +69,20 @@ interface ApplicationRepository : PagingAndSortingRepository<Application, Long> 
         @Param("importId") importId: Long,
         @Param("statuses") statuses: List<DuplicateStatus>
     ): Stream<Application>
+
+    @Query(
+        """
+        SELECT A FROM Application A
+        WHERE not exists(
+            SELECT 'x' FROM Applicant ap
+            JOIN Application A2 ON ap.id = A2.applicant.id
+            JOIN Import I ON A2.import.id = I.id
+            WHERE A.applicant.id = ap.id
+            AND A2.id <> A.id
+            AND I.importStatus <> 'ARCHIVED'
+        )
+        AND A.import.id = :importId
+    """
+    )
+    fun findAllForArchive(importId: Long): Stream<Application>
 }

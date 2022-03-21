@@ -23,7 +23,7 @@
         <rollingPolicy
             class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily and when the file reaches 10 MegaBytes -->
-            <fileNamePattern>${LOGS}/archived/spring-boot-logger-%d{yyyy-MM-dd}.%i.log
+            <fileNamePattern>${LOGS}/archived/immatrykulator5000-%d{yyyy-MM-dd}.%i.log
             </fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                 class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -59,6 +59,12 @@
     </logger>
 
     <logger name="pl.poznan.ue.matriculation.oracle.customHibernateTypes.OracleDateType" level="trace"
+            additivity="false">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="RollingFile"/>
+    </logger>
+
+    <logger name="org.springframework.transaction" level="trace"
             additivity="false">
         <appender-ref ref="Console"/>
         <appender-ref ref="RollingFile"/>

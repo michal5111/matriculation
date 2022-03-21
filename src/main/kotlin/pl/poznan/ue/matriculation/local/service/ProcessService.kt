@@ -14,14 +14,12 @@ import pl.poznan.ue.matriculation.applicantDataSources.INotificationSender
 import pl.poznan.ue.matriculation.configuration.LogExecutionTime
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.exception.ApplicationNotFoundException
-import pl.poznan.ue.matriculation.exception.ImportException
 import pl.poznan.ue.matriculation.exception.exceptionHandler.ISaveExceptionHandler
 import pl.poznan.ue.matriculation.kotlinExtensions.retry
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
-import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
@@ -173,21 +171,14 @@ class ProcessService(
         transactionManager = "transactionManager"
     )
     fun archivePersons(importId: Long) {
-        val import = importService.get(importId)
-        val applicationStream = applicationService.findAllByImportId(importId)
+        val applicationStream = applicationService.findAllForArchive(importId)
         applicationStream.use {
-            it.filter { application ->
-                val applicant = application.applicant ?: throw ApplicantNotFoundException()
-                applicant.applications.none { applicantApplication ->
-                    applicantApplication != application
-                        && applicantApplication.import?.importStatus != ImportStatus.ARCHIVED
-                }
-            }.forEach { application ->
+            it.forEach { application ->
                 val applicant = application.applicant ?: throw ApplicationNotFoundException()
+                application.certificate = null
                 applicantService.anonymize(applicant)
             }
         }
-        import.importStatus = ImportStatus.ARCHIVED
     }
 
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
@@ -202,19 +193,15 @@ class ProcessService(
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
+    @Transactional(propagation = Propagation.REQUIRED, transactionManager = "transactionManager", readOnly = true)
     fun sendNotifications(
         importId: Long,
         notificationSender: INotificationSender
     ) {
-        val applicationStream = applicationService.findAllStreamByImportId(importId)
-        val importProgress = importService.get(importId)
-        importProgress.notificationsSend = 0
+        val applicationStream = applicationService.findAllByImportIdAndNotificationSent(importId, false)
         applicationStream.use {
             it.forEach { application ->
-                application.applicant?.let { applicant ->
-                    notificationService.sendNotification(applicant, importId, notificationSender)
-                }
+                notificationService.sendNotification(application, importId, notificationSender)
             }
         }
     }
@@ -226,20 +213,15 @@ class ProcessService(
         readOnly = true
     )
     fun findPotentialDuplicates(importId: Long) {
-        try {
-            val applicationsStream =
-                applicationService.findAllStreamByImportIdAndApplicantPotentialDuplicateStatusIn(
-                    importId,
-                    listOf(DuplicateStatus.NOT_CHECKED, DuplicateStatus.POTENTIAL_DUPLICATE)
-                )
-            applicationsStream.use { stream ->
-                stream.forEach {
-                    val applicant = it.applicant ?: throw ApplicantNotFoundException()
-                    potentialDuplicateFinder.findPotentialDuplicate(applicant, importId)
-                }
+        val applicationsStream = applicationService.findAllStreamByImportIdAndApplicantPotentialDuplicateStatusIn(
+            importId,
+            listOf(DuplicateStatus.NOT_CHECKED, DuplicateStatus.POTENTIAL_DUPLICATE)
+        )
+        applicationsStream.use { stream ->
+            stream.forEach {
+                val applicant = it.applicant ?: throw ApplicantNotFoundException()
+                potentialDuplicateFinder.findPotentialDuplicate(applicant, importId)
             }
-        } catch (e: Exception) {
-            throw ImportException(importId, "Błąd przy wyszukiwaniu duplikatów", e)
         }
     }
 }

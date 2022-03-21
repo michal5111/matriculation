@@ -62,23 +62,32 @@ class Import(
     @Lob
     val dataFile: ByteArray?,
 
+    @Volatile
     var importedApplications: Int = 0,
 
+    @Volatile
     var saveErrors: Int = 0,
 
+    @Volatile
     var savedApplicants: Int = 0,
 
+    @Volatile
     var totalCount: Int? = null,
 
+    @Volatile
     var importedUids: Int = 0,
 
+    @Volatile
     var notificationsSend: Int = 0,
 
+    @Volatile
     var potentialDuplicates: Int = 0,
 
+    @Volatile
     @Enumerated(EnumType.STRING)
     var importStatus: ImportStatus = ImportStatus.PENDING,
 
+    @Volatile
     @Lob
     var error: String? = null,
 

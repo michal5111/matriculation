@@ -23,14 +23,18 @@ import {APP_BASE_HREF, PlatformLocation, registerLocaleData} from '@angular/comm
 import localePl from '@angular/common/locales/pl';
 import {MatPaginatorIntl} from '@angular/material/paginator';
 import {MatPaginatorIntlPl} from './customProviders/mat-paginator-intl-pl';
-import {UpdateIndexNumberDialogComponent} from './component/dialog/update-index-number-dialog/update-index-number-dialog.component';
+import {
+  UpdateIndexNumberDialogComponent
+} from './component/dialog/update-index-number-dialog/update-index-number-dialog.component';
 import {FooterComponent} from './component/footer/footer.component';
 import {ConfirmationDialogComponent} from './component/dialog/confirmation-dialog/confirmation-dialog.component';
 import {ErrorDialogComponent} from './component/dialog/error-dialog/error-dialog.component';
 import {UserManagerComponent} from './component/user-manager/user-manager.component';
 import {UserEditorComponent} from './component/dialog/user-editor/user-editor.component';
 import {ProgressViewerComponent} from './component/progress-viewer/progress-viewer.component';
-import {ImportStatusIndicatorComponent} from './component/import/import-status-indicator/import-status-indicator.component';
+import {
+  ImportStatusIndicatorComponent
+} from './component/import/import-status-indicator/import-status-indicator.component';
 import {AddUserDialogComponent} from './component/dialog/add-user-dialog/add-user-dialog.component';
 import {ExceptionHandler} from './exceptionHandler/exception-handler';
 import {SelectPersonDialogComponent} from './component/dialog/select-person-dialog/select-person-dialog.component';
@@ -39,6 +43,7 @@ import {InjectableRxStompConfig, RxStompService, rxStompServiceFactory} from '@s
 import {WS_URL} from './injectableTokens/WS_URL';
 import {MAT_DATE_FORMATS} from '@angular/material/core';
 import {MY_DATE_FORMATS} from './service/configConsts/MY_DATE_FORMATS';
+import {DatesValidatorDirective} from './validator/dates-validator.directive';
 
 @NgModule({
   declarations: [
@@ -63,7 +68,8 @@ import {MY_DATE_FORMATS} from './service/configConsts/MY_DATE_FORMATS';
     ProgressViewerComponent,
     ImportStatusIndicatorComponent,
     AddUserDialogComponent,
-    SelectPersonDialogComponent
+    SelectPersonDialogComponent,
+    DatesValidatorDirective
   ],
   imports: [
     BrowserModule,

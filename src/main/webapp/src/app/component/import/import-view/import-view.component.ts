@@ -254,7 +254,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     if (application.applicant.pesel != null) {
       return application.applicant.pesel;
     } else {
-      return application.applicant.primaryIdentityDocument.number;
+      return application.applicant.primaryIdentityDocument?.number;
     }
   }
 
@@ -314,7 +314,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       case 'COMPLETE':
       case 'COMPLETED_WITH_ERRORS':
         return this.import.savedApplicants !== this.import.totalCount
-          || this.import.importedUids !== this.import.totalCount
           || this.import.notificationsSend === this.import.totalCount;
       default:
         return true;

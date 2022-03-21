@@ -54,6 +54,9 @@ class ImportService(
         if (!didacticCycleRepository.existsById(didacticCycleCode)) {
             throw ImportCreationException("Podany cykl dydaktyczny nie istnieje.")
         }
+        if (dateOfAddmision < startDate) {
+            throw ImportCreationException("Data przyjęcia na program musi być mniejsza bądź równa dacie rozpoczęcia.")
+        }
         val import = Import(
             dateOfAddmision = dateOfAddmision,
             didacticCycleCode = didacticCycleCode,

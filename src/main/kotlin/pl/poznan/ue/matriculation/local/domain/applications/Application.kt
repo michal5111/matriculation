@@ -40,7 +40,6 @@ import javax.persistence.*
 )
 class Application(
 
-    @Basic(fetch = FetchType.EAGER)
     @Column(nullable = false, name = "foreignId")
     val foreignId: Long,
 
@@ -62,9 +61,6 @@ class Application(
 
     var editUrl: String? = null,
 
-    //@JsonProperty("certificateId")
-    //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
-    //@JsonIdentityReference(alwaysAsId = true)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "certificate_id", referencedColumnName = "id")
     var certificate: Document? = null,
@@ -91,7 +87,9 @@ class Application(
 
     var basisOfAdmission: String?,
 
-    var sourceOfFinancing: String?
+    var sourceOfFinancing: String?,
+
+    var notificationSent: Boolean = false
 ) : BaseEntityLongId(), Serializable {
 
     override fun toString(): String {

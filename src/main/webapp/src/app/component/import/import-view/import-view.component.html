@@ -338,7 +338,8 @@
                    showFirstLastButtons
                    [length]="totalElements"
                    [pageSize]="pageSize"
-                   (page)="switchPage($event)">
+                   (page)="switchPage($event)"
+                   [pageIndex]="pageNumber">
     </mat-paginator>
   </div>
 </ng-template>

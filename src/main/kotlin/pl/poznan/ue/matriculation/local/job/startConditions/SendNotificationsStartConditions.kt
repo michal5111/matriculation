@@ -27,9 +27,6 @@ class SendNotificationsStartConditions : IStartConditions {
                 if (import.savedApplicants != totalCount) {
                     throw ImportStartException(import.id, "Nie wszyscy kandydaci zostali zapisani")
                 }
-                if (import.importedUids != totalCount) {
-                    throw ImportStartException(import.id, "Nie wszystkie UIDy są znalezione")
-                }
                 if (import.notificationsSend == totalCount) {
                     throw ImportStartException(import.id, "Wszystkie powiadomienia są już wysłane")
                 }

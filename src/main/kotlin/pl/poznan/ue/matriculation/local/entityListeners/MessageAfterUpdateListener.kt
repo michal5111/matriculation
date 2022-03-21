@@ -5,28 +5,28 @@ package pl.poznan.ue.matriculation.local.entityListeners
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Component
 import pl.poznan.ue.matriculation.local.domain.import.Import
-import javax.persistence.PrePersist
-import javax.persistence.PreRemove
-import javax.persistence.PreUpdate
+import javax.persistence.PostPersist
+import javax.persistence.PostRemove
+import javax.persistence.PostUpdate
 
 @Component
 class MessageAfterUpdateListener(
     private val simpMessagingTemplate: SimpMessagingTemplate
 ) {
 
-    @PreUpdate
-    fun beforeUpdate(entity: Import) {
+    @PostUpdate
+    fun afterUpdate(entity: Import) {
         simpMessagingTemplate.convertAndSend("/topic/import/${entity.id}", entity)
         simpMessagingTemplate.convertAndSend("/topic/import", entity)
     }
 
-    @PreRemove
-    fun beforeDelete(entity: Import) {
+    @PostRemove
+    fun afterDelete(entity: Import) {
         simpMessagingTemplate.convertAndSend("/topic/delete/import", entity)
     }
 
-    @PrePersist
-    fun beforeInsert(entity: Import) {
+    @PostPersist
+    fun afterInsert(entity: Import) {
         simpMessagingTemplate.convertAndSend("/topic/insert/import", entity)
     }
 }

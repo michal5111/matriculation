@@ -32,7 +32,7 @@ class ApplicationProcessor(
     @Transactional(
         rollbackFor = [Exception::class, RuntimeException::class],
         propagation = Propagation.REQUIRES_NEW,
-        transactionManager = "transactionManager"
+        transactionManager = "transactionManager",
     )
     fun processApplication(
         importId: Long,

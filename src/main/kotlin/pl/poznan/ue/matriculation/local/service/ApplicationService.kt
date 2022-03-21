@@ -69,6 +69,11 @@ class ApplicationService(
     }
 
     @Transactional
+    fun findAllByImportIdAndNotificationSent(importId: Long, sent: Boolean): Stream<Application> {
+        return applicationRepository.findAllByImportIdAndNotificationSentAndApplicantUidNotNull(importId, sent)
+    }
+
+    @Transactional
     fun findAllStreamByImportIdAndApplicantPotentialDuplicateStatusIn(
         importId: Long,
         duplicateStatusList: List<DuplicateStatus>
@@ -77,5 +82,10 @@ class ApplicationService(
             importId,
             duplicateStatusList
         )
+    }
+
+    @Transactional
+    fun findAllForArchive(importId: Long): Stream<Application> {
+        return applicationRepository.findAllForArchive(importId)
     }
 }

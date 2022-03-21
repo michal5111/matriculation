@@ -62,18 +62,9 @@ class ApplicantService(
             pesel = null
             sex = 'M'
 
-            applicant.addresses.forEach {
-                it.city = null
-                it.countryCode = null
-                it.flatNumber = null
-                it.postalCode = null
-                it.street = null
-                it.streetNumber = null
-            }
-            phoneNumbers.forEach {
-                it.number = ""
-                it.comment = ""
-            }
+            applicant.addresses.clear()
+            phoneNumbers.clear()
+            primaryIdentityDocument = null
             fathersName = null
             militaryCategory = null
             militaryStatus = null
@@ -81,9 +72,7 @@ class ApplicantService(
             wku = null
             applicant.applicantForeignerData?.apply {
                 baseOfStay = null
-                foreignerStatus.forEach {
-                    it.status = ""
-                }
+                foreignerStatus.clear()
                 polishCardIssueCountry = null
                 polishCardIssueDate = null
                 polishCardNumber = null
@@ -113,11 +102,7 @@ class ApplicantService(
                     term = null
                 }
             }
-            applicant.identityDocuments.forEach {
-                it.number = null
-                it.country = null
-                it.expDate = null
-            }
+            applicant.identityDocuments.clear()
         }
         return applicant
     }
