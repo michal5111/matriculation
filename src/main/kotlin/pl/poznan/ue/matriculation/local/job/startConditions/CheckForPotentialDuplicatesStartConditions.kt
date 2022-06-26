@@ -1,14 +1,12 @@
 package pl.poznan.ue.matriculation.local.job.startConditions
 
-import pl.poznan.ue.matriculation.exception.ImportException
-import pl.poznan.ue.matriculation.exception.ImportStartException
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 
 class CheckForPotentialDuplicatesStartConditions : IStartConditions {
-    override fun canStart(import: Import) {
+    override fun canStart(import: Import): StateTransitionResult {
         when (import.importStatus) {
-            ImportStatus.ARCHIVED -> throw ImportException(import.id, "Import został zarchiwizowany.")
+            ImportStatus.ARCHIVED -> return StateTransitionFailure("Import został zarchiwizowany.")
             ImportStatus.PENDING,
             ImportStatus.STARTED,
             ImportStatus.SAVING,
@@ -17,17 +15,15 @@ class CheckForPotentialDuplicatesStartConditions : IStartConditions {
             ImportStatus.COMPLETE,
             ImportStatus.COMPLETED_WITH_ERRORS,
             ImportStatus.SEARCHING_UIDS,
-            ImportStatus.CHECKING_POTENTIAL_DUPLICATES -> throw ImportStartException(
-                import.id,
-                "Zły stan importu. ${import.importStatus}"
-            )
+            ImportStatus.CHECKING_POTENTIAL_DUPLICATES -> return StateTransitionFailure("Zły stan importu. ${import.importStatus}")
             ImportStatus.IMPORTED -> {
                 val totalCount = import.totalCount
-                    ?: throw ImportStartException(import.id, "Liczba aplikantów to null")
+                    ?: return StateTransitionFailure("Liczba aplikantów to null")
                 if (totalCount < 1 || totalCount == import.savedApplicants) {
-                    throw ImportStartException(import.id, "Liczba aplikantów wynosi 0 lub wszyscy są już zapisani")
+                    return StateTransitionFailure("Liczba aplikantów wynosi 0 lub wszyscy są już zapisani")
                 }
             }
         }
+        return StateTransitionSuccess
     }
 }

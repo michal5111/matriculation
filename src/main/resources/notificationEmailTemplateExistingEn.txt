@@ -1,0 +1,10 @@
+Dear Student,
+
+Your login number (called UID or NIU) used to login to PUEB IT systems is: {{NIU}}
+Your password is the same as before. On the login page, you can also reset your password by sending a link to the e-mail address provided during recruitment.
+Please keep this message or remember your login number (UID/NIU)
+If you have any problems logging in please contact us at: helpdesk@ue.poznan.pl
+
+with best regards
+
+PUEB IT Centre

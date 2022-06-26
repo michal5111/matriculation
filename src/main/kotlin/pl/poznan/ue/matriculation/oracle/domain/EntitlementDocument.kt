@@ -22,6 +22,7 @@ class EntitlementDocument(
     @Column(name = "NUMER", length = 200, nullable = false)
     var number: String,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_WYSTAWIENIA", nullable = false)
     var issueDate: Date,
 

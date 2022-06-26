@@ -3,12 +3,14 @@ package pl.poznan.ue.matriculation.applicantDataSources
 import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Sort
 import pl.poznan.ue.matriculation.excelfile.dto.Address
 import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicantDto
 import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicationDto
 import pl.poznan.ue.matriculation.excelfile.mapper.ExcelFileApplicantMapper
 import pl.poznan.ue.matriculation.excelfile.mapper.ExcelFileApplicationMapper
-import pl.poznan.ue.matriculation.exception.ImportException
 import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPhoneNumber
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPostalCode
@@ -17,49 +19,41 @@ import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applicants.IdentityDocument
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
+import pl.poznan.ue.matriculation.local.dto.DataSourceAdditionalParameter
+import pl.poznan.ue.matriculation.local.dto.FileDataSourceAdditionalParameter
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
-import pl.poznan.ue.matriculation.oracle.repo.ProgrammeRepository
+import pl.poznan.ue.matriculation.oracle.service.ProgrammeService
 import java.text.SimpleDateFormat
+import java.util.*
 
 
 class ExcelFileDataSourceImpl(
-    private val programmeRepository: ProgrammeRepository,
+    private val programmeService: ProgrammeService,
     private val excelFileApplicantMapper: ExcelFileApplicantMapper,
     private val excelFileApplicationMapper: ExcelFileApplicationMapper
 ) : IApplicationDataSource<ExcelFileApplicationDto, ExcelFileApplicantDto> {
 
-    private var lastPage: IPage<ExcelFileApplicationDto>? = null
+    val logger: Logger = LoggerFactory.getLogger(ExcelFileDataSourceImpl::class.java)
 
-    data class CellInfo(
-        val number: Int,
-        val name: String
-    )
+    override val name = "Plik Excel"
+
+    override val id = "EXCEL_FILE"
+
+    override val instanceUrl = "Plik Excel"
+
+    override val additionalParameters: List<DataSourceAdditionalParameter>
+        get() = listOf(
+            FileDataSourceAdditionalParameter(
+                "dataFile",
+                "application/vnd.ms-excel|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                false,
+                "files/importFileTemplates/szablon_importu.xlsx",
+                "Plik Excel"
+            )
+        )
 
     companion object {
-        val cellsInfo = arrayOf(
-            CellInfo(0, "IMIĘ"),
-            CellInfo(1, "DRUGIE IMIĘ"),
-            CellInfo(2, "NAZWISKO"),
-            CellInfo(3, "PŁEĆ"),
-            CellInfo(4, "EMAIL"),
-            CellInfo(5, "PESEL"),
-            CellInfo(6, "NR PASZPORTU"),
-            CellInfo(7, "KRAJ WYDANIA"),
-            CellInfo(8, "DATA WAŻNOŚCI"),
-            CellInfo(9, "DATA URODZENIA"),
-            CellInfo(10, "MIEJSCE URODZENIA"),
-            CellInfo(11, "IMIĘ OJCA"),
-            CellInfo(12, "IMIĘ MATKI"),
-            CellInfo(13, "KOD OBYWATELSTWA ISO 3166-1 ALFA-2"),
-            CellInfo(14, "KOD KRAJU ISO 3166-1 ALFA-2"),
-            CellInfo(15, "MIASTO"),
-            CellInfo(16, "ULICA"),
-            CellInfo(17, "NUMER ULICY"),
-            CellInfo(18, "NUMER MIESZKANIA"),
-            CellInfo(19, "KOD POCZTOWY"),
-            CellInfo(20, "NR TELEFONU")
-        )
         const val NAME_CELL = 0
         const val MIDDLE_NAME_CELL = 1
         const val SURNAME_CELL = 2
@@ -90,54 +84,47 @@ class ExcelFileDataSourceImpl(
         pageNumber: Int
     ): IPage<ExcelFileApplicationDto> {
         val excelFileApplicationDtoList: MutableList<ExcelFileApplicationDto> = mutableListOf()
-        import.dataFile ?: throw IllegalStateException("Data file is null")
-        val dataFile = XSSFWorkbook(import.dataFile?.inputStream())
-        val sheet = dataFile.getSheet("Arkusz1")
-        val rows = sheet.iterator()
-        val header = rows.next()
-        checkSpreadsheet(import.id, header)
-        val fileHashCode = import.dataFile.hashCode()
-        while (rows.hasNext()) {
-            val currentRow = rows.next()
-            excelFileApplicationDtoList += mapExcelRowToDto(currentRow, fileHashCode)
+        val dataFileBase64 = (import.additionalProperties?.get("dataFile") as String?)?.substringAfter("base64,")
+            ?: throw IllegalStateException("Data file is null")
+        val importDataFile = Base64.getDecoder().decode(dataFileBase64)
+        XSSFWorkbook(importDataFile.inputStream()).use {
+            val sheet = it.getSheetAt(0)
+            val rows = sheet.iterator()
+            val header = rows.next()
+            val fileHashCode = importDataFile.hashCode()
+            while (rows.hasNext()) {
+                val currentRow = rows.next()
+                if (currentRow.getCellStringOrNull(SURNAME_CELL) == null) {
+                    continue
+                }
+                excelFileApplicationDtoList += mapExcelRowToDto(currentRow, fileHashCode)
+            }
         }
-        val page = object : IPage<ExcelFileApplicationDto> {
-            override fun getSize(): Int {
+        return object : IPage<ExcelFileApplicationDto> {
+            override fun getTotalSize(): Int {
                 return excelFileApplicationDtoList.size
             }
 
-            override fun getResultsList(): List<ExcelFileApplicationDto> {
+            override fun getContent(): List<ExcelFileApplicationDto> {
                 return excelFileApplicationDtoList
             }
 
             override fun hasNext(): Boolean {
                 return false
             }
-
         }
-        lastPage = page
-        dataFile.close()
-        return page
     }
 
-    override fun getApplicantById(applicantId: Long): ExcelFileApplicantDto {
-        return lastPage?.getResultsList()?.find {
-            it.applicant.id == applicantId
-        }?.applicant ?: throw IllegalStateException("Unable to find applicant")
+    override fun getApplicantById(applicantId: Long, applicationDto: ExcelFileApplicationDto): ExcelFileApplicantDto {
+        return applicationDto.applicant
     }
-
-    override val name = "Plik Excel"
-
-    override val id = "EXCEL_FILE"
-
-    override val instanceUrl = "Plik Excel"
 
     override fun postMatriculation(foreignApplicationId: Long): Int {
         return 1
     }
 
     override fun getAvailableRegistrationProgrammes(registration: String): List<ProgrammeDto> {
-        return programmeRepository.findAll().map {
+        return programmeService.findAll(Sort.by("code")).map {
             ProgrammeDto(
                 id = it.code,
                 name = "${it.code} ${it.description}",
@@ -155,10 +142,11 @@ class ExcelFileDataSourceImpl(
         )
     }
 
-    override fun getApplicationById(applicationId: Long): ExcelFileApplicationDto {
-        return lastPage?.getResultsList()?.find {
-            it.id == applicationId
-        } ?: throw IllegalStateException("Unable to find application")
+    override fun getApplicationById(
+        applicationId: Long,
+        applicationDto: ExcelFileApplicationDto
+    ): ExcelFileApplicationDto {
+        return applicationDto
     }
 
     override fun mapApplicationDtoToApplication(applicationDto: ExcelFileApplicationDto): Application {
@@ -169,11 +157,18 @@ class ExcelFileDataSourceImpl(
         return excelFileApplicantMapper.mapExcelFileApplicantToApplicant(applicantDto)
     }
 
-    override fun updateApplication(application: Application, applicationDto: ExcelFileApplicationDto): Application {
+    override fun updateApplication(
+        application: Application,
+        applicationDto: ExcelFileApplicationDto
+    ): Application {
         return excelFileApplicationMapper.updateApplicationFromExcelFileApplication(application, applicationDto)
     }
 
-    override fun updateApplicant(applicant: Applicant, applicantDto: ExcelFileApplicantDto): Applicant {
+    override fun updateApplicant(
+        applicant: Applicant,
+        applicantDto: ExcelFileApplicantDto,
+        applicationDto: ExcelFileApplicationDto
+    ): Applicant {
         return excelFileApplicantMapper.updateApplicantFromExcelApplicantDto(applicant, applicantDto)
     }
 
@@ -187,74 +182,61 @@ class ExcelFileDataSourceImpl(
         return null
     }
 
-    override fun getApplicationEditUrl(applicationId: Long): String {
-        return ""
+    override fun getApplicationEditUrl(applicationId: Long): String? {
+        return null
     }
 
     private fun mapExcelRowToDto(row: Row, fileHashCode: Int): ExcelFileApplicationDto {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
         return ExcelFileApplicationDto(
-            id = if (row.getCell(PESEL_CELL)?.stringCellValue != null)
-                row.getCell(PESEL_CELL).stringCellValue.replace(" ", "").hashCode().toLong() + fileHashCode
+            id = if (row.getCellStringOrNull(PESEL_CELL) != null)
+                row.getCellString(PESEL_CELL).replace(" ", "").hashCode().toLong() + fileHashCode
             else
-                row.getCell(6)?.stringCellValue?.replace(" ", "").hashCode().toLong() + fileHashCode,
+                row.getCellStringOrNull(PASSPORT_NUMBER_CELL)?.replace(" ", "").hashCode().toLong() + fileHashCode,
             applicant = ExcelFileApplicantDto(
-                id = if (row.getCell(PESEL_CELL)?.stringCellValue != null)
-                    row.getCell(PESEL_CELL)?.stringCellValue?.replace(" ", "").hashCode().toLong()
+                id = if (row.getCellStringOrNull(PESEL_CELL) != null)
+                    row.getCellStringOrNull(PESEL_CELL)?.replace(" ", "").hashCode().toLong()
                 else
-                    row.getCell(PASSPORT_NUMBER_CELL)?.stringCellValue?.replace(" ", "").hashCode().toLong(),
-                given = row.getCell(NAME_CELL).stringCellValue.nameCapitalize(),
-                middle = row.getCell(MIDDLE_NAME_CELL).stringCellValue.nameCapitalize(),
-                family = row.getCell(SURNAME_CELL).stringCellValue.nameCapitalize(),
-                sex = row.getCell(SEX_CELL).stringCellValue.trim().first(),
-                email = row.getCell(EMAIL_CELL).stringCellValue.trim(),
-                pesel = row.getCell(PESEL_CELL)?.stringCellValue?.trim(),
-                passport = row.getCell(PASSPORT_NUMBER_CELL)?.stringCellValue?.trim(),
-                issueCountry = row.getCell(PASSPORT_COUNTRY)?.stringCellValue?.trim(),
-                issueDate = if (row.getCell(PASSPORT_VALID_DATE_CELL)?.cellType == CellType.NUMERIC) row.getCell(
-                    PASSPORT_VALID_DATE_CELL
-                )?.dateCellValue
-                else row.getCell(PASSPORT_VALID_DATE_CELL)?.stringCellValue?.let {
-                    simpleDateFormat.parse(row.getCell(PASSPORT_VALID_DATE_CELL)?.stringCellValue)
+                    row.getCellStringOrNull(PASSPORT_NUMBER_CELL)?.replace(" ", "").hashCode().toLong(),
+                given = row.getCellString(NAME_CELL).nameCapitalize(),
+                middle = row.getCellStringOrNull(MIDDLE_NAME_CELL)?.nameCapitalize(),
+                family = row.getCellString(SURNAME_CELL).nameCapitalize(),
+                sex = row.getCellString(SEX_CELL).first().uppercaseChar(),
+                email = row.getCellString(EMAIL_CELL),
+                pesel = row.getCellStringOrNull(PESEL_CELL),
+                passport = row.getCellStringOrNull(PASSPORT_NUMBER_CELL),
+                issueCountry = row.getCellStringOrNull(PASSPORT_COUNTRY),
+                issueDate = if (row.getCell(PASSPORT_VALID_DATE_CELL)?.cellType == CellType.NUMERIC)
+                    row.getCell(PASSPORT_VALID_DATE_CELL)?.dateCellValue
+                else row.getCellStringOrNull(PASSPORT_VALID_DATE_CELL)?.let {
+                    simpleDateFormat.parse(it)
                 },
-                birthDate = if (row.getCell(BIRTH_DATE_CELL)?.cellType == CellType.NUMERIC) row.getCell(BIRTH_DATE_CELL).dateCellValue
-                else simpleDateFormat.parse(row.getCell(BIRTH_DATE_CELL)?.stringCellValue),
-                birthPlace = row.getCell(BIRTH_PLACE_CELL).stringCellValue.trim(),
-                fathersName = row.getCell(FATHERS_NAME_CELL)?.stringCellValue?.nameCapitalize(),
-                mothersName = row.getCell(MOTHERS_NAME_CELL)?.stringCellValue?.nameCapitalize(),
-                citizenship = row.getCell(CITIZENSHIP_CELL).stringCellValue.trim(),
+                birthDate = if (row.getCell(BIRTH_DATE_CELL)?.cellType == CellType.NUMERIC)
+                    row.getCell(BIRTH_DATE_CELL).dateCellValue
+                else simpleDateFormat.parse(row.getCell(BIRTH_DATE_CELL)?.toString()),
+                birthPlace = row.getCellString(BIRTH_PLACE_CELL),
+                fathersName = row.getCellStringOrNull(FATHERS_NAME_CELL)?.nameCapitalize(),
+                mothersName = row.getCellStringOrNull(MOTHERS_NAME_CELL)?.nameCapitalize(),
+                citizenship = row.getCellString(CITIZENSHIP_CELL),
                 address = Address(
-                    countryCode = row.getCell(ADDRESS_COUNTRY_CELL)?.stringCellValue?.trim(),
-                    city = row.getCell(CITY_CELL)?.stringCellValue?.trim(),
-                    street = row.getCell(STREET_CELL)?.stringCellValue?.trim(),
-                    streetNumber = row.getCell(STREET_NUMBER_CELL)?.let {
-                        row.getCell(STREET_NUMBER_CELL)?.stringCellValue?.trim()
-                    },
-                    flatNumber = row.getCell(FLAT_NUMBER_CELL)?.let {
-                        it.stringCellValue?.trim()
-                    },
-                    postalCode = row.getCell(POSTAL_CODE_CELL)?.let {
-                        it.stringCellValue?.trimPostalCode()
-                    }
+                    countryCode = row.getCellStringOrNull(ADDRESS_COUNTRY_CELL),
+                    city = row.getCellStringOrNull(CITY_CELL),
+                    street = row.getCellStringOrNull(STREET_CELL),
+                    streetNumber = row.getCellStringOrNull(STREET_NUMBER_CELL),
+                    flatNumber = row.getCellStringOrNull(FLAT_NUMBER_CELL),
+                    postalCode = row.getCellStringOrNull(POSTAL_CODE_CELL)?.trimPostalCode()
                 ),
-                phoneNumber = row.getCell(PHONE_NUMBER_CELL)?.stringCellValue?.trimPhoneNumber()
+                phoneNumber = row.getCellStringOrNull(PHONE_NUMBER_CELL)?.trimPhoneNumber()
             )
         )
     }
 
-    private fun checkSpreadsheet(importId: Long?, headerRow: Row) {
-        cellsInfo.forEach {
-            val value = headerRow.getCell(it.number)?.stringCellValue?.uppercase()
-            if (value != it.name) {
-                throw ImportException(
-                    importId,
-                    "Plik nie zgadza się z szablonem. W nagłówku kolumny ${it.number + 1} powinno być \"${it.name}\", a jest \"${value}\""
-                )
-            }
-        }
+    private fun Row.getCellStringOrNull(index: Int): String? {
+        return this.getCell(index)?.toString()?.takeIf { it.isNotBlank() }?.trim()
     }
 
-    override fun preprocess(applicationDto: ExcelFileApplicationDto, applicantDto: ExcelFileApplicantDto) {
+    private fun Row.getCellString(index: Int): String {
+        return this.getCellStringOrNull(index) ?: error("Cell $index is null")
     }
 
     override fun getPrimaryIdentityDocument(

@@ -6,6 +6,7 @@ import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import pl.poznan.ue.matriculation.exception.ImportException
+import pl.poznan.ue.matriculation.kotlinExtensions.stackTraceToHtmlString
 import pl.poznan.ue.matriculation.local.service.ImportService
 import java.lang.reflect.Method
 import java.sql.SQLException
@@ -22,28 +23,36 @@ class AsyncExceptionHandler : AsyncUncaughtExceptionHandler {
         var e: Throwable? = throwable
         do {
             if (e is ImportException) {
-                val importId = e.importId ?: continue
-                when (e.cause) {
-                    is SQLException -> {
-                        val sqlException = e.cause as SQLException
-                        importService.setError(
-                            importId,
-                            "${sqlException.sqlState.orEmpty()}\n${e.message ?: "Unknown error"}"
-                        )
-                    }
-                    else -> importService.setError(importId, e.message ?: "Unknown error")
-                }
+                handleImportException(e)
             }
             e = e?.cause
         } while (e != null)
-        logger.error("Objects: ${objects.joinToString { it.toString() }}")
-        logger.error("Exception message - " + throwable.message)
-        logger.error("Cause " + throwable.cause?.message)
-        logger.error("Method name - " + method.name)
-        for (param in objects) {
-            logger.error("Parameter value - $param")
+        logger.error(
+            """
+            Exception message: ${throwable.message}
+            Cause: ${throwable.cause?.message}
+            Method name: ${method.name}
+            Params: ${objects.joinToString { it.toString() }}
+        """.trimIndent(), throwable
+        )
+    }
+
+    private fun handleImportException(e: ImportException) {
+        val importId = e.importId ?: return
+        when (val cause = e.cause) {
+            is SQLException -> {
+                importService.setError(
+                    importId,
+                    "${cause.sqlState.orEmpty()} ${e.message ?: "Unknown error"}",
+                    e.stackTraceToHtmlString()
+                )
+            }
+            else -> importService.setError(
+                importId,
+                e.message ?: "Unknown error",
+                e.stackTraceToHtmlString()
+            )
         }
-        logger.error("Async exception", throwable)
     }
 
 

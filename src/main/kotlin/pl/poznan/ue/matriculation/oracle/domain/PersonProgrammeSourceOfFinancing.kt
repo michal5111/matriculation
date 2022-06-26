@@ -20,9 +20,11 @@ class PersonProgrammeSourceOfFinancing(
     @JoinColumn(name = "TRYB_ODB_ST_KOD", referencedColumnName = "KOD")
     val sourceOfFinancing: SourceOfFinancing,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_OD", nullable = false)
     val dateFrom: Date,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_DO", nullable = true)
     val dateTo: Date? = null
 ) : BaseEntity() {

@@ -14,9 +14,11 @@ class Arrival(
     @Column(name = "ID", length = 10)
     val id: Long? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_POCZ", nullable = false)
     val startDate: Date,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_KON", nullable = false)
     val endDate: Date,
 
@@ -78,12 +80,15 @@ class Arrival(
     @Column(name = "CZY_POLONICUM", nullable = true, length = 1)
     val polonicum: Char? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_PRZYJAZDU", nullable = true)
     val arrivalDate: Date? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_WYJAZDU", nullable = true)
     val leavingDate: Date? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "PRZEDLUZENIE", nullable = true)
     val extension: Date? = null,
 

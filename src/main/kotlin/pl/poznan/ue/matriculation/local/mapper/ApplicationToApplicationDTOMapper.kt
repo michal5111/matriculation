@@ -4,6 +4,7 @@ import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.dto.ApplicantBasicDto
 import pl.poznan.ue.matriculation.local.dto.ApplicationBasicDto
 import pl.poznan.ue.matriculation.local.dto.DocumentDto
+import java.util.*
 
 class ApplicationToApplicationDTOMapper {
     fun map(application: Application): ApplicationBasicDto {
@@ -42,7 +43,7 @@ class ApplicationToApplicationDTOMapper {
                     nationality = it.nationality,
                     photo = it.photo,
                     photoPermission = it.photoPermission,
-                    modificationDate = it.modificationDate,
+                    modificationDate = it.modificationDate ?: Date(),
                     usosId = it.usosId
                 )
             },

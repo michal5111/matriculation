@@ -37,13 +37,15 @@ class Building(
     @Column(name = "KOD_ERP", length = 50, nullable = true)
     val erpCode: String? = null,
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FOTO_BLOB_ID", referencedColumnName = "ID")
-    val photoBlob: Blob,
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "FOTO_BLOB_ID", referencedColumnName = "ID")
+//    val photoBlob: Blob,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_OD", nullable = true)
     val dateFrom: Date? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_DO", nullable = true)
     val dateTO: Date? = null,
 

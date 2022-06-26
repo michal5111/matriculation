@@ -1,6 +1,8 @@
 package pl.poznan.ue.matriculation.irk.dto
 
 data class NotificationDto(
-    val header: String,
-    val message: String
+    val headerPl: String,
+    val messagePl: String,
+    val headerEn: String,
+    val messageEn: String
 )

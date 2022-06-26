@@ -52,7 +52,7 @@ class Document(
 
     var modificationDate: Date?,
 
-    @get:JsonIgnore
+    @JsonIgnore
     @OneToMany(mappedBy = "certificate", fetch = FetchType.LAZY)
     var Applications: MutableList<Application> = mutableListOf()
 

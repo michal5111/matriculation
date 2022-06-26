@@ -1,0 +1,9 @@
+Dzień dobry,
+
+Twój numer użytkownika – UID (NIU) za pomocą, którego będziesz się logował do systemów uczelnianych takich jak np. USOSweb, poczta uczelniana, to: {{NIU}}
+Twoje hasło jest takie samo jak wcześniej. Na stronie logowania istnieje również możliwość zresetowania hasła poprzez wysłanie linku na adres e-mail podany podczas rekrutacji.
+W wypadku problemów z logowaniem prosimy o kontakt – helpdesk@ue.poznan.pl
+
+Pozdrawiamy!
+
+Zespół Centrum Informatyki UEP

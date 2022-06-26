@@ -4,7 +4,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import pl.poznan.ue.matriculation.configuration.LogExecutionTime
+import pl.poznan.ue.matriculation.annotation.LogExecutionTime
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.oracle.domain.*
@@ -36,21 +36,22 @@ class StudentService(
             return it
         }
         val indexNumberDto = studentRepository.getNewIndexNumber(indexPoolCode)
-        val organizationalUnit =
-            if (indexNumberDto.organizationalUnitCode != null) organizationalUnitRepository.getById(indexNumberDto.organizationalUnitCode)
-            else organizationalUnitRepository.getById(defaultStudentOrganizationalUnitCode)
+        val organizationalUnit = if (indexNumberDto.organizationalUnitCode != null)
+            organizationalUnitRepository.getById(indexNumberDto.organizationalUnitCode)
+        else organizationalUnitRepository.getById(defaultStudentOrganizationalUnitCode)
         if (organizationalUnit.code == defaultStudentOrganizationalUnitCode) {
             person.students.find {
                 it.mainIndex
-            }?.let {
-                studentRepository.setMainIndex(it.id ?: -1, false)
+            }?.id?.let {
+                studentRepository.setMainIndex(it, false)
             }
         }
         val student = Student(
             indexType = indexTypeRepository.getById(indexPoolCode),
             organizationalUnit = organizationalUnit,
             indexNumber = indexNumberDto.number,
-            mainIndex = indexNumberDto.organizationalUnitCode == defaultStudentOrganizationalUnitCode,
+            mainIndex = indexNumberDto.organizationalUnitCode == defaultStudentOrganizationalUnitCode
+                || person.students.isEmpty(),
             person = person
         )
         person.addStudent(student)

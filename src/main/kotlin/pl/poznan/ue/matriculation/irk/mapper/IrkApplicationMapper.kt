@@ -21,18 +21,15 @@ class IrkApplicationMapper {
         )
     }
 
-    fun update(application: Application, applicationDto: IrkApplicationDTO): Application {
-        application.apply {
-            admitted = applicationDto.admitted
-            comment = applicationDto.comment
-            baseOfStay = applicationDto.foreignerData?.baseOfStay
-            basisOfAdmission = applicationDto.foreignerData?.basisOfAdmission
-            sourceOfFinancing = applicationDto.foreignerData?.sourceOfFinancing
-            payment = applicationDto.payment
-            position = applicationDto.position
-            qualified = applicationDto.qualified
-            score = applicationDto.score
-        }
-        return application
+    fun update(application: Application, applicationDto: IrkApplicationDTO): Application = application.apply {
+        admitted = applicationDto.admitted
+        comment = applicationDto.comment
+        baseOfStay = applicationDto.foreignerData?.baseOfStay
+        basisOfAdmission = applicationDto.foreignerData?.basisOfAdmission
+        sourceOfFinancing = applicationDto.foreignerData?.sourceOfFinancing
+        payment = applicationDto.payment
+        position = applicationDto.position
+        qualified = applicationDto.qualified
+        score = applicationDto.score
     }
 }

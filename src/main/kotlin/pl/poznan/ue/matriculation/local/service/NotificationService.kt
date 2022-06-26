@@ -26,13 +26,29 @@ class NotificationService(
         importId: Long,
         notificationSender: INotificationSender
     ) {
+        val personExisted = application.applicant?.personExisted ?: false
         val importProgress = importRepository.findByIdOrNull(importId) ?: throw ImportNotFoundException()
-        val template = ClassPathResource("notificationEmailTemplate.txt").file
+        var headerPl = "Twoje konto USOS zostało utworzone."
+        var headerEn = "Your USOS account has been created."
+        val templatePl = if (personExisted) {
+            headerPl = "Twoje konto USOS zostało aktywowane."
+            ClassPathResource("notificationEmailTemplateExistingPl.txt").file
+        } else {
+            ClassPathResource("notificationEmailTemplatePl.txt").file
+        }
+        val templateEn = if (personExisted) {
+            headerEn = "Your USOS account has been activated."
+            ClassPathResource("notificationEmailTemplateExistingEn.txt").file
+        } else {
+            ClassPathResource("notificationEmailTemplate.txtEn").file
+        }
         val applicant = application.applicant ?: throw ApplicantNotFoundException()
 
         val notificationDto = NotificationDto(
-            header = "Twoje konto USOS zostało utworzone. / Your USOS account has been created.",
-            message = template.readText().replace("{{NIU}}", applicant.uid.toString())
+            headerPl = headerPl,
+            headerEn = headerEn,
+            messagePl = templatePl.readText().replace("{{NIU}}", applicant.uid.toString()),
+            messageEn = templateEn.readText().replace("{{NIU}}", applicant.uid.toString())
         )
         notificationSender.sendNotification(applicant.foreignId, notificationDto)
         importProgress.notificationsSend++

@@ -3,8 +3,7 @@ package pl.poznan.ue.matriculation.applicantDataSources
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
-import org.springframework.web.client.HttpStatusCodeException
+import org.springframework.web.client.HttpClientErrorException
 import pl.poznan.ue.matriculation.irk.dto.ErrorMessageDto
 import pl.poznan.ue.matriculation.irk.dto.NotificationDto
 import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
@@ -43,11 +42,11 @@ open class IrkApplicationDataSourceImpl(
             pageNumber = pageNumber
         )
         return object : IPage<IrkApplicationDTO> {
-            override fun getSize(): Int {
+            override fun getTotalSize(): Int {
                 return page.count
             }
 
-            override fun getResultsList(): List<IrkApplicationDTO> {
+            override fun getContent(): List<IrkApplicationDTO> {
                 return page.results
             }
 
@@ -57,7 +56,7 @@ open class IrkApplicationDataSourceImpl(
         }
     }
 
-    override fun getApplicantById(applicantId: Long): IrkApplicantDto {
+    override fun getApplicantById(applicantId: Long, applicationDto: IrkApplicationDTO): IrkApplicantDto {
         return irkService.getApplicantById(applicantId) ?: throw IllegalArgumentException("Unable to get applicant")
     }
 
@@ -70,12 +69,10 @@ open class IrkApplicationDataSourceImpl(
         return try {
             irkService.completeImmatriculation(foreignApplicationId)
             1
-        } catch (e: HttpStatusCodeException) {
-            if (e.statusCode == HttpStatus.BAD_REQUEST) {
-                val errorMessageDto =
-                    jacksonObjectMapper().readValue(e.responseBodyAsString, ErrorMessageDto::class.java)
-                return errorMessageDto.error
-            } else throw e
+        } catch (e: HttpClientErrorException.BadRequest) {
+            val errorMessageDto =
+                jacksonObjectMapper().readValue(e.responseBodyAsString, ErrorMessageDto::class.java)
+            return errorMessageDto.error
         }
     }
 
@@ -96,7 +93,7 @@ open class IrkApplicationDataSourceImpl(
         do {
             val page = irkService.getAvailableRegistrationsPage(currentPage)
             page?.results?.forEach {
-                val registration = RegistrationDto(it.code, it.name.pl!!)
+                val registration = RegistrationDto(it.code, it.name.pl)
                 availableRegistrations.add(registration)
             }
             hasNext = page?.next != null
@@ -105,7 +102,7 @@ open class IrkApplicationDataSourceImpl(
         return availableRegistrations
     }
 
-    override fun getApplicationById(applicationId: Long): IrkApplicationDTO? {
+    override fun getApplicationById(applicationId: Long, applicationDto: IrkApplicationDTO): IrkApplicationDTO? {
         return irkService.getApplication(applicationId)
     }
 
@@ -119,11 +116,18 @@ open class IrkApplicationDataSourceImpl(
         return irkApplicantMapper.mapApplicantDtoToApplicant(applicantDto)
     }
 
-    override fun updateApplication(application: Application, applicationDto: IrkApplicationDTO): Application {
+    override fun updateApplication(
+        application: Application,
+        applicationDto: IrkApplicationDTO
+    ): Application {
         return irkApplicationMapper.update(application, applicationDto)
     }
 
-    override fun updateApplicant(applicant: Applicant, applicantDto: IrkApplicantDto): Applicant {
+    override fun updateApplicant(
+        applicant: Applicant,
+        applicantDto: IrkApplicantDto,
+        applicationDto: IrkApplicationDTO
+    ): Applicant {
         return irkApplicantMapper.update(applicant, applicantDto)
     }
 
@@ -146,9 +150,6 @@ open class IrkApplicationDataSourceImpl(
 
     override fun sendNotification(foreignApplicantId: Long, notificationDto: NotificationDto) {
         irkService.sendNotification(foreignApplicantId, notificationDto)
-    }
-
-    override fun preprocess(applicationDto: IrkApplicationDTO, applicantDto: IrkApplicantDto) {
     }
 
     override fun getPrimaryIdentityDocument(

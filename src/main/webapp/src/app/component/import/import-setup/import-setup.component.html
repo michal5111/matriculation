@@ -6,21 +6,31 @@
                   (selectionChange)="onDataSourceSelectionChange($event)">
         <mat-option
           *ngFor="let dataSource of $availableDataSourcesObservable | async"
-          [value]="dataSource.id">{{dataSource.name}}
+          [value]="dataSource">{{dataSource.name}}
         </mat-option>
       </mat-select>
     </mat-form-field>
 
-    <ng-template [ngIf]="dataSourceId.indexOf('FILE') >= 0">
-      <a mat-button href="assets/files/import_template/szablon_importu.xlsx">Pobierz szablon</a>
-      <mat-form-field class="form-field wide-field">
-        <ngx-mat-file-input formControlName="dataFile" placeholder="Plik excel"
-                            accept="application/vnd.ms-excel|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                            multiple="false" [required]="dataSourceId.indexOf('FILE') >= 0">
-          <mat-icon matSuffix>folder</mat-icon>
-        </ngx-mat-file-input>
-      </mat-form-field>
-    </ng-template>
+    <div formGroupName="additionalParameters">
+      <div *ngFor="let parameter of additionalParameters">
+        <div [ngSwitch]="parameter.type">
+          <mat-form-field *ngSwitchCase="'TEXT'" class="form-field wide-field">
+            <mat-label>{{parameter.name}}</mat-label>
+            <input type="text" matInput [formControlName]="parameter.name" required="true">
+          </mat-form-field>
+          <div *ngSwitchCase="'FILE'">
+            <a mat-button href="{{getUrlWithBaseHref(parameter.fileTemplate)}}">Pobierz szablon</a>
+            <mat-form-field class="form-field wide-field">
+              <ngx-mat-file-input [formControlName]="parameter.name" [placeholder]="parameter.placeholderValue"
+                                  [accept]="parameter.accept"
+                                  multiple="false">
+                <mat-icon matSuffix>folder</mat-icon>
+              </ngx-mat-file-input>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <mat-form-field class="form-field wide-field">
       <mat-label>Rekrutacja</mat-label>
@@ -29,7 +39,7 @@
                   [disabled]="areRegistrationLoading">
         <mat-option
           *ngFor="let registration of registrations"
-          [value]="registration.id">{{registration.id}} {{registration.name}}
+          [value]="registration.id">[{{registration.id}}] {{registration.name}}
         </mat-option>
       </mat-select>
       <ng-template matPrefix [ngIf]="areRegistrationLoading"><p></p>
@@ -43,7 +53,7 @@
                   [disabled]="areRegistrationLoading || areProgrammesLoading">
         <mat-option
           *ngFor="let registrationProgramme of registrationProgrammes"
-          [value]="registrationProgramme">{{registrationProgramme.name}}
+          [value]="registrationProgramme">[{{registrationProgramme.usosId}}] {{registrationProgramme.name}}
         </mat-option>
       </mat-select>
       <ng-template matPrefix [ngIf]="areProgrammesLoading"><p></p>

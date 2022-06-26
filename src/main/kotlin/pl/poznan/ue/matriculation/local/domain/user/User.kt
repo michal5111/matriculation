@@ -7,22 +7,22 @@ import javax.persistence.*
 @Entity
 @NamedEntityGraph(
     name = "user.roles",
-    attributeNodes = [NamedAttributeNode(value = "roles", subgraph = "subgraph.userRole")],
-    subgraphs = [NamedSubgraph(
-        name = "subgraph.userRole", attributeNodes = [
-            NamedAttributeNode("role")
-        ]
-    )]
+    attributeNodes = [NamedAttributeNode(value = "roles")]
 )
 class User(
 
     @Column(unique = true)
     val uid: String,
 
-    //@JsonSerialize(using = CustomRolesSerializer::class)
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    var roles: MutableSet<UserRole> = HashSet(),
+    var givenName: String? = null,
+
+    var surname: String? = null,
+
+    var email: String? = null,
+
+    @get:JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    val roles: MutableSet<Role> = HashSet(),
 
     @Column(unique = true)
     var usosId: Long? = null
@@ -30,7 +30,8 @@ class User(
 ) : BaseEntityLongId() {
 
     fun addRole(role: Role) {
-        roles.add(UserRole(this, role))
+        roles.add(role)
+        role.users.add(this)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -47,4 +48,10 @@ class User(
     override fun hashCode(): Int {
         return uid.hashCode()
     }
+
+    override fun toString(): String {
+        return "User(uid='$uid', givenName=$givenName, surname=$surname, email=$email, usosId=$usosId)"
+    }
+
+
 }

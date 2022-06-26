@@ -14,7 +14,7 @@ export class Import {
   dateOfAddmision: Date;
   didacticCycleCode: string;
   dataSourceId: string;
-  dataFile: string;
+  additionalProperties: {};
   importedApplications: number;
   saveErrors: number;
   savedApplicants: number;
@@ -24,4 +24,5 @@ export class Import {
   notificationsSend: number;
   potentialDuplicates: number;
   error: string;
+  stackTrace: string;
 }

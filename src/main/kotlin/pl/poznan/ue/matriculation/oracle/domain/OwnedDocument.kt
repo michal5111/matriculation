@@ -21,9 +21,11 @@ class OwnedDocument(
     @JoinColumn(name = "TDOK_KOD", referencedColumnName = "KOD", nullable = false)
     var documentType: DocumentType,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_WYDANIA", nullable = true)
     var issueDate: Date? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_WAZNOSCI", nullable = true)
     var expirationDate: Date? = null,
 

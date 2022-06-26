@@ -89,6 +89,7 @@ class OrganizationalUnit(
     @Column(name = "ARCH_NR_DOPLYWU_P", length = 10, nullable = true)
     val archInflowNumberP: Int?,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_ZALOZENIA", nullable = true)
     val dateOfEstablishment: Date?,
 
@@ -106,13 +107,13 @@ class OrganizationalUnit(
     @Column(name = "KOD_POLON", length = 50, nullable = true)
     val polonCode: String?,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ZDJECIE_BLOB_ID", referencedColumnName = "ID", nullable = true)
-    val pictureBlob: Blob?,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "LOGO_BLOB_ID", referencedColumnName = "ID", nullable = true)
-    val logoBlob: Blob?,
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "ZDJECIE_BLOB_ID", referencedColumnName = "ID", nullable = true)
+//    val pictureBlob: Blob?,
+//
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "LOGO_BLOB_ID", referencedColumnName = "ID", nullable = true)
+//    val logoBlob: Blob?,
 
     @Column(name = "MPK", length = 100, nullable = true)
     val mpk: String?,

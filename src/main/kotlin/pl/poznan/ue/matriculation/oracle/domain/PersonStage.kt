@@ -12,6 +12,7 @@ class PersonStage(
     @Column(name = "ID", length = 10)
     val id: Long? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_ZAKON", nullable = false)
     var endDate: Date,
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.Id
-import javax.persistence.OneToMany
+import javax.persistence.ManyToMany
 
 @Entity
 class Role(
@@ -15,8 +15,8 @@ class Role(
     val name: String,
 
     @JsonIgnore
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-    val userRoles: MutableSet<UserRole>
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    val users: MutableSet<User> = mutableSetOf()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

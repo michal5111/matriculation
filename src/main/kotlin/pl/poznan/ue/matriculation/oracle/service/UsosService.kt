@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.oracle.service
 
-import org.hibernate.exception.GenericJDBCException
 import org.springframework.stereotype.Service
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.exception.IndexChangeException
@@ -43,13 +42,6 @@ class UsosService(
             studentRepository.save(student)
             applicantRepository.save(applicant)
         } catch (e: Exception) {
-            var t: Throwable? = e
-            while (t != null) {
-                if (t is GenericJDBCException) {
-                    throw IndexChangeException("${t.sqlException} ${t.message}", e)
-                }
-                t = t.cause
-            }
             throw IndexChangeException(e.message, e)
         }
     }

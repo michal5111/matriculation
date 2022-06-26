@@ -56,7 +56,7 @@ interface ApplicationRepository : PagingAndSortingRepository<Application, Long> 
 
     fun deleteAllByImportId(importId: Long)
 
-    fun findAllByImportId(importId: Long): Stream<Application>
+    fun findAllByImportId(importId: Long): List<Application>
 
     @QueryHints(
         value = [

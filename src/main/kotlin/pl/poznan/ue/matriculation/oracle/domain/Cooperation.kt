@@ -59,9 +59,11 @@ class Cooperation(
     @Column(name = "UWAGI", nullable = true, length = 200)
     var comments: String?,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_POCZ", nullable = false)
     var startDate: Date,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_KON", nullable = false)
     var endDate: Date,
 

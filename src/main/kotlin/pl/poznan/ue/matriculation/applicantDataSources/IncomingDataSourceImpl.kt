@@ -60,11 +60,11 @@ class IncomingDataSourceImpl(
             }
         }
         return object : IPage<DreamApplyApplicationDto> {
-            override fun getSize(): Int {
+            override fun getTotalSize(): Int {
                 return applications.size
             }
 
-            override fun getResultsList(): List<DreamApplyApplicationDto> {
+            override fun getContent(): List<DreamApplyApplicationDto> {
                 return applications
             }
 
@@ -97,8 +97,8 @@ class IncomingDataSourceImpl(
         return programmeList
     }
 
-    override fun preprocess(applicationDto: DreamApplyApplicationDto, applicantDto: DreamApplyApplicantDto) {
-        super.preprocess(applicationDto, applicantDto).also {
+    override fun getApplicantById(applicantId: Long, applicationDto: DreamApplyApplicationDto): DreamApplyApplicantDto {
+        return super.getApplicantById(applicantId, applicationDto).also {
             val applicationCourses = dreamApplyService.getApplicantCourse(applicationDto.courses)
             val course = applicationCourses?.values?.first()?.course?.let { applicationCourse ->
                 dreamApplyService.getCourseByPath(applicationCourse)

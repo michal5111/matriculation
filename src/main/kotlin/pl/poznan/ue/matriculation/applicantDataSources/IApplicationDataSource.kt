@@ -5,10 +5,7 @@ import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applicants.IdentityDocument
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
-import pl.poznan.ue.matriculation.local.dto.IApplicantDto
-import pl.poznan.ue.matriculation.local.dto.IApplicationDto
-import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
-import pl.poznan.ue.matriculation.local.dto.RegistrationDto
+import pl.poznan.ue.matriculation.local.dto.*
 
 interface IApplicationDataSource<applicationDTO : IApplicationDto, applicantDTO : IApplicantDto> {
     val name: String
@@ -17,6 +14,9 @@ interface IApplicationDataSource<applicationDTO : IApplicationDto, applicantDTO 
 
     val instanceUrl: String
 
+    val additionalParameters: List<DataSourceAdditionalParameter>
+        get() = listOf()
+
     fun getApplicationsPage(
         import: Import,
         registrationCode: String,
@@ -24,7 +24,7 @@ interface IApplicationDataSource<applicationDTO : IApplicationDto, applicantDTO 
         pageNumber: Int
     ): IPage<applicationDTO>
 
-    fun getApplicantById(applicantId: Long): applicantDTO
+    fun getApplicantById(applicantId: Long, applicationDto: applicationDTO): applicantDTO
 
     fun postMatriculation(foreignApplicationId: Long): Int
 
@@ -32,7 +32,7 @@ interface IApplicationDataSource<applicationDTO : IApplicationDto, applicantDTO 
 
     fun getAvailableRegistrations(): List<RegistrationDto>
 
-    fun getApplicationById(applicationId: Long): applicationDTO?
+    fun getApplicationById(applicationId: Long, applicationDto: applicationDTO): applicationDTO?
 
     fun mapApplicationDtoToApplication(applicationDto: applicationDTO): Application
 
@@ -40,7 +40,7 @@ interface IApplicationDataSource<applicationDTO : IApplicationDto, applicantDTO 
 
     fun updateApplication(application: Application, applicationDto: applicationDTO): Application
 
-    fun updateApplicant(applicant: Applicant, applicantDto: applicantDTO): Applicant
+    fun updateApplicant(applicant: Applicant, applicantDto: applicantDTO, applicationDto: applicationDTO): Applicant
 
     fun getPrimaryCertificate(
         application: Application,
@@ -58,7 +58,5 @@ interface IApplicationDataSource<applicationDTO : IApplicationDto, applicantDTO 
         import: Import
     ): IdentityDocument?
 
-    fun getApplicationEditUrl(applicationId: Long): String
-
-    fun preprocess(applicationDto: applicationDTO, applicantDto: applicantDTO)
+    fun getApplicationEditUrl(applicationId: Long): String?
 }

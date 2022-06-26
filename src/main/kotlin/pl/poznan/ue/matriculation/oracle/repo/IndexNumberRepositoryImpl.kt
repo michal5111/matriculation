@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.SqlOutParameter
 import org.springframework.jdbc.core.SqlParameter
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.simple.SimpleJdbcCall
-import pl.poznan.ue.matriculation.configuration.LogExecutionTime
+import pl.poznan.ue.matriculation.annotation.LogExecutionTime
 import pl.poznan.ue.matriculation.oracle.dto.IndexNumberDto
 import java.sql.Types
 

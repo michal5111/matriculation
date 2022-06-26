@@ -17,5 +17,9 @@ data class User(
 
     @Attribute(name = "extensionAttribute14") val usosId: Long? = null,
 
-    @Attribute(name = "email") val email: String? = null
+    @Attribute(name = "mail") val email: String? = null,
+
+    @Attribute(name = "givenName") val givenName: String? = null,
+
+    @Attribute(name = "sn") val surname: String? = null
 )

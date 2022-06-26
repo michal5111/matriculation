@@ -31,7 +31,7 @@ internal class CustomUserDetailsService(
         }
 
         user?.roles?.forEach {
-            grantedAuthorities.add(SimpleGrantedAuthority(it.role.code))
+            grantedAuthorities.add(SimpleGrantedAuthority(it.code))
         }
 
         return CasUserDetails(

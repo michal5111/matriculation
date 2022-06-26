@@ -14,7 +14,7 @@ class Citizenship(
     val code: String,
 
     @Column(name = "OBYWATELSTWO", length = 100, nullable = true)
-    val nationalityString: String?,
+    val nationality: String?,
 
     @Column(name = "KRAJ", length = 100, nullable = true)
     val country: String?,

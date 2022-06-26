@@ -6,6 +6,8 @@ import pl.poznan.ue.matriculation.local.job.startConditions.IStartConditions
 
 interface IJob {
 
+    val jobType: JobType
+
     var status: JobStatus
 
     val startCondition: IStartConditions

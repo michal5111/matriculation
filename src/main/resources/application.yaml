@@ -49,9 +49,6 @@ spring:
                 order_updates: true
                 query:
                     in_clause_parameter_padding: true
-            org:
-                hibernate:
-                    flushMode: COMMIT
     profiles:
         active: '@spring.profiles.active@'
 

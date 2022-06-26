@@ -15,16 +15,17 @@ interface PersonProgrammeRepository : JpaRepository<PersonProgramme, Long> {
     @Modifying
     @Query(
         """
-        UPDATE PersonProgramme set isDefault = false 
-        where isDefault = true 
+        UPDATE PersonProgramme
+        set isDefault = false
+        where isDefault = true
         and (
-            plannedDateOfCompletion is null 
+            plannedDateOfCompletion is null
             or plannedDateOfCompletion <= :dateOfAddmision
             or status <> 'STU'
-        )
+        ) and person.id = :personId
     """
     )
-    fun updateToNotDefault(dateOfAddmision: Date): Int
+    fun updateToNotDefault(personId: Long, dateOfAddmision: Date): Int
 
     fun existsByIsDefault(isDefault: Boolean): Boolean
 }

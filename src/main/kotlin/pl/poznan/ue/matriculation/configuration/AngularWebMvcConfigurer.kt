@@ -32,6 +32,8 @@ class AngularWebMvcConfigurer : WebMvcConfigurer {
                     }
                 }
             })
+        registry.addResourceHandler("/files/**")
+            .addResourceLocations("classpath:/files/")
     }
 
     override fun addCorsMappings(registry: CorsRegistry) {

@@ -19,8 +19,7 @@ data class IrkApplicationDTO(
     val score: String?,
     val turn: TurnDTO,
     val user: Long,
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    var certificate: DocumentDTO? = null
+    val certificate: DocumentDTO? = null
 ) : Serializable, IApplicationDto {
 
     override val foreignApplicantId: Long

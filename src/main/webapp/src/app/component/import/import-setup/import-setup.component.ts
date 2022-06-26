@@ -1,17 +1,18 @@
-import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Inject, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
 import {FormControl, FormGroup, FormGroupDirective, Validators} from '@angular/forms';
-import {Observable, Subscription} from 'rxjs';
-import {filter, switchMap, tap} from 'rxjs/operators';
+import {concat, Observable, Observer, Subscription} from 'rxjs';
+import {filter, flatMap, switchMap, tap} from 'rxjs/operators';
 import {IndexType} from '../../../model/oracle/index-type';
 import {Registration} from '../../../model/applications/registration';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatDialog} from '@angular/material/dialog';
 import {MatSelectChange} from '@angular/material/select';
-import {DataSource} from '../../../model/import/dataSource';
+import {DataSource, DataSourceAdditionalParameter} from '../../../model/import/dataSource';
 import {Programme} from '../../../model/applications/programme';
 import {UsosService} from '../../../service/usos-service/usos.service';
+import {fromArray} from 'rxjs/internal/observable/fromArray';
+import {APP_BASE_HREF} from '@angular/common';
 
 @Component({
   selector: 'app-import-setup',
@@ -34,13 +35,15 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   areProgrammesLoading = false;
   areStagesLoading = false;
   subs: Subscription[] = [];
+  additionalParameters: DataSourceAdditionalParameter[] = [];
 
   constructor(
     private importService: ImportService,
     private usosService: UsosService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog,
-    private cd: ChangeDetectorRef
+    @Inject(APP_BASE_HREF) public baseHref
+    // private dialog: MatDialog,
+    // private cd: ChangeDetectorRef
   ) {
   }
 
@@ -49,30 +52,17 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.formGroup = new FormGroup({
-      dataSource: new FormControl('', Validators.required),
-      registration: new FormControl('', Validators.required),
-      registrationProgramme: new FormControl('', Validators.required),
-      indexPoolCode: new FormControl('', Validators.required),
-      stage: new FormControl('', Validators.required),
-      didacticCycle: new FormControl('', Validators.required),
-      startDate: new FormControl('', Validators.required),
-      dateOfAddmision: new FormControl('', Validators.required),
-      dataFile: new FormControl('')
+      dataSource: new FormControl(this.import.dataSourceId, Validators.required),
+      registration: new FormControl(this.import.registration, Validators.required),
+      registrationProgramme: new FormControl(this.import.programmeForeignId, Validators.required),
+      indexPoolCode: new FormControl(this.import.indexPoolCode, Validators.required),
+      stage: new FormControl(this.import.stageCode, Validators.required),
+      didacticCycle: new FormControl(this.import.didacticCycleCode, Validators.required),
+      startDate: new FormControl(this.import.startDate, Validators.required),
+      dateOfAddmision: new FormControl(this.import.dateOfAddmision, Validators.required),
+      additionalParameters: new FormGroup({})
     });
     this.onDidacticCycleInputChanges();
-    this.subs.push(
-      this.formGroup.controls.dataFile.valueChanges.subscribe((fileInput: any) => {
-        const reader = new FileReader();
-
-        if (fileInput) {
-          reader.readAsDataURL(fileInput);
-          reader.onload = () => {
-            this.import.dataFile = reader.result.toString().replace(/^data:(.*,)?/, '');
-            this.cd.markForCheck();
-          };
-        }
-      })
-    );
   }
 
   onRegistrationSelectionChange(event: MatSelectChange): void {
@@ -80,16 +70,14 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.subs.push(
       this.importService.getAvailableRegistrationProgrammes(event.value, this.dataSourceId).pipe(
         tap(results => this.registrationProgrammes = results)
-      ).subscribe(
-        () => {
+      ).subscribe({
+        next: () => {
           this.formGroup.patchValue({registrationProgramme: null, stage: null});
-          this.areProgrammesLoading = false;
         },
-        error => {
+        complete: () => {
           this.areProgrammesLoading = false;
-          throw error;
         }
-      )
+      })
     );
   }
 
@@ -98,16 +86,14 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.subs.push(
       this.usosService.getAvailableStages(event.value.usosId).pipe(
         tap(results => this.stages = results)
-      ).subscribe(
-        () => {
+      ).subscribe({
+        next: () => {
           this.formGroup.patchValue({stage: null});
-          this.areStagesLoading = false;
         },
-        error => {
+        complete: () => {
           this.areStagesLoading = false;
-          throw error;
         }
-      )
+      })
     );
   }
 
@@ -133,12 +119,30 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.import.indexPoolCode = this.formGroup.value.indexPoolCode.code;
     this.import.indexPoolName = this.formGroup.value.indexPoolCode.description;
     this.import.stageCode = this.formGroup.value.stage;
-    this.import.dataSourceId = this.formGroup.value.dataSource;
-    this.importService.createImport(this.import).subscribe(
-      importObject => this.onImportCreated(importObject),
-      error => {
-        this.isButtonDisabled = false;
-        throw error;
+    this.import.dataSourceId = this.formGroup.value.dataSource.id;
+    this.import.additionalProperties = this.formGroup.controls.additionalParameters.value;
+    const observables: Observable<string>[] = [];
+    Object.keys(this.import.additionalProperties).forEach(key => {
+      const ap = this.import.additionalProperties[key];
+      if (ap instanceof File) {
+        observables.push(
+          this.getBase64FromFile(ap).pipe(
+            tap(base64string => this.import.additionalProperties[key] = base64string)
+          )
+        );
+      }
+    });
+    concat(
+      fromArray(observables).pipe(
+        flatMap(ob => ob)
+      ),
+      this.importService.createImport(this.import).pipe(
+        tap((importObj: Import) => this.onImportCreated(importObj))
+      )
+    ).subscribe({
+        error: () => {
+          this.isButtonDisabled = false;
+        }
       }
     );
   }
@@ -162,21 +166,49 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   }
 
   onDataSourceSelectionChange(event: MatSelectChange) {
-    this.dataSourceId = event.value;
+    const dataSource: DataSource = event.value;
+    const additionalParametersFG: FormGroup = this.formGroup.controls.additionalParameters as FormGroup;
+    this.dataSourceId = dataSource.id;
+    this.additionalParameters.forEach(additionalParameter => {
+      additionalParametersFG.removeControl(additionalParameter.name);
+    });
+    this.additionalParameters = dataSource.additionalParameters;
+    dataSource.additionalParameters.forEach(additionalParameter => {
+      const fc = new FormControl(additionalParameter.value, Validators.required);
+      additionalParametersFG.addControl(additionalParameter.name, fc);
+    });
     this.areRegistrationLoading = true;
     this.subs.push(
-      this.importService.getAvailableRegistrations(event.value).pipe(
+      this.importService.getAvailableRegistrations(dataSource.id).pipe(
         tap(results => this.registrations = results)
-      ).subscribe(
-        () => {
-          this.formGroup.patchValue({registration: null, registrationProgramme: null, stage: null});
-          this.areRegistrationLoading = false;
-        },
-        error => {
-          this.areRegistrationLoading = false;
-          throw error;
+      ).subscribe({
+          next: () => {
+            this.formGroup.patchValue({registration: null, registrationProgramme: null, stage: null});
+          },
+          complete: () => {
+            this.areRegistrationLoading = false;
+          }
         }
-      )
-    );
+      ));
+  }
+
+  getBase64FromFile(file: File): Observable<string> {
+    return new Observable<string>((observer: Observer<string>) => {
+      const reader = new FileReader();
+      if (file) {
+        reader.onload = () => {
+          observer.next(reader.result.toString());
+          observer.complete();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  getUrlWithBaseHref(url: string): string {
+    if (this.baseHref) {
+      return `${this.baseHref}${url}`;
+    }
+    return url;
   }
 }

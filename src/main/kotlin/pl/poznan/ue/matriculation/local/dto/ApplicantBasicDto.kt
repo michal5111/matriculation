@@ -7,7 +7,7 @@ data class ApplicantBasicDto(
     val dataSourceId: String?,
     val email: String,
     val indexNumber: String?,
-    val citizenship: String,
+    val citizenship: String?,
     val nationality: String?,
     val photo: String?,
     val photoPermission: String?,

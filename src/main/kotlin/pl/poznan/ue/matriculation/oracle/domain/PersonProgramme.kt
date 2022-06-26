@@ -29,6 +29,7 @@ class PersonProgramme(
     @Column(name = "CZY_GLOWNY", length = 1, nullable = true)
     var isDefault: Boolean? = false,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_NAST_ZAL", nullable = true)
     var dateToNextPass: Date? = null,
 
@@ -46,9 +47,11 @@ class PersonProgramme(
     @JoinColumn(name = "DOK_UPR_ID", referencedColumnName = "ID")
     var entitlementDocument: EntitlementDocument? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_PRZYJECIA", nullable = true)
     var dateOfAddmision: Date? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "PLAN_DATA_UKON", nullable = true)
     var plannedDateOfCompletion: Date? = null,
 
@@ -59,6 +62,7 @@ class PersonProgramme(
     @Column(name = "STATUS", length = 6, nullable = false)
     var status: String = "STU",
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_ROZPOCZECIA", nullable = true)
     var startDate: Date,
 
@@ -72,6 +76,7 @@ class PersonProgramme(
     @JoinColumn(name = "TECZ_ID", referencedColumnName = "ID")
     var folder: Folder? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_ARCH", nullable = true)
     var archiveDate: Date? = null,
 

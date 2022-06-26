@@ -60,7 +60,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['indexNumber', true],
     ['applicationImportStatus', true],
     ['duplicateStatus', true],
-    ['importError', true]
+    // ['importError', true]
   ]);
   sortingMap: Map<string, string> = new Map<string, string>([
     ['id', 'id'],
@@ -72,7 +72,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['pesel', 'applicant.pesel'],
     ['indexNumber', 'applicant.assignedIndexNumber'],
     ['applicationImportStatus', 'importStatus'],
-    ['importError', 'importError'],
+    // ['importError', 'importError'],
     ['duplicateStatus', 'applicant.potentialDuplicateStatus']
   ]);
 
@@ -227,10 +227,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  getApplicationEditUrl(application: Application): string {
-    return application.editUrl;
-  }
-
   getPersonUsosUrl(application: Application): string {
     return `${this.usosUrl.url}/studenci/programyOsob.jsf?osobaId=${application.applicant.usosId}`;
   }
@@ -246,6 +242,17 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       }
       this.dialog.open(ErrorDialogComponent, {
         data: new ErrorDialogData('Błąd przy importowaniu', application.importError, application.stackTrace)
+      });
+    }
+  }
+
+  showImportErrorDialog(importObject: Import): void {
+    if (importObject.importStatus === 'ERROR') {
+      if (this.dialog.openDialogs.length > 0) {
+        return;
+      }
+      this.dialog.open(ErrorDialogComponent, {
+        data: new ErrorDialogData('Błąd przy importowaniu', importObject.error, importObject.stackTrace)
       });
     }
   }

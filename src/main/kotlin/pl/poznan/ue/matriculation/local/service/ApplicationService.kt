@@ -51,15 +51,11 @@ class ApplicationService(
         statusList: List<ApplicationImportStatus>,
         sort: Sort
     ): Stream<Application> {
-        return applicationRepository.getAllByImportIdAndImportStatusIn(
-            importId,
-            statusList,
-            sort
-        )
+        return applicationRepository.getAllByImportIdAndImportStatusIn(importId, statusList, sort)
     }
 
     @Transactional
-    fun findAllByImportId(importId: Long): Stream<Application> {
+    fun findAllByImportId(importId: Long): List<Application> {
         return applicationRepository.findAllByImportId(importId)
     }
 

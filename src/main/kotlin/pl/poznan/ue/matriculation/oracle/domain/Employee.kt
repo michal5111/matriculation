@@ -32,6 +32,7 @@ class Employee(
     @Column(name = "TELEFON2", nullable = true, length = 30)
     val phoneNumber2: String?,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "BADANIA_OKRESOWE", nullable = true)
     val periodicExaminations: Date?,
 
@@ -47,15 +48,18 @@ class Employee(
     @Column(name = "ZAINTERESOWANIA_ANG", nullable = true, length = 1000)
     val interestsEng: String?,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "EMERYTURA_DATA", nullable = true)
     val retirementDate: Date?,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_NADANIA_TYTULU", nullable = true)
     val dateOfConferringTheTitle: Date?,
 
     @Column(name = "AKTYWNY", nullable = false, length = 1)
     val active: Char,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_PRZESWIETLENIA", nullable = true)
     val XRayDate: Date?,
 

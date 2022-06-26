@@ -1,9 +1,9 @@
 package pl.poznan.ue.matriculation.applicantDataSources
 
 interface IPage<T> {
-    fun getSize(): Int
+    fun getTotalSize(): Int
 
-    fun getResultsList(): List<T>
+    fun getContent(): Collection<T>
 
     fun hasNext(): Boolean
 }

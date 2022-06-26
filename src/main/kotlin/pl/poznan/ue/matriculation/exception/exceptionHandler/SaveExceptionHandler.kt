@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
-import pl.poznan.ue.matriculation.kotlinExtensions.stackTraceToString
+import pl.poznan.ue.matriculation.kotlinExtensions.stackTraceToHtmlString
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
@@ -42,7 +42,7 @@ class SaveExceptionHandler(
             e = e?.cause
         } while (e != null)
         application.importStatus = ApplicationImportStatus.ERROR
-        application.stackTrace = exception.stackTraceToString()
+        application.stackTrace = exception.stackTraceToHtmlString()
         importProgress.saveErrors++
         val applicant = application.applicant ?: throw ApplicantNotFoundException()
         applicantRepository.save(applicant)

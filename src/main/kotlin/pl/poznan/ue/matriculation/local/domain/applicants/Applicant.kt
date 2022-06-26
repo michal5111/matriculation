@@ -7,6 +7,7 @@ import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
 import java.util.*
 import java.util.concurrent.Future
 import javax.persistence.*
+import javax.validation.constraints.Email
 
 @NamedEntityGraph(
     name = "applicant.data",
@@ -34,44 +35,45 @@ class Applicant(
     @Column(name = "datasourceId", nullable = false)
     var dataSourceId: String? = null,
 
+    @Email
     var email: String,
 
-    var indexNumber: String?,
+    var indexNumber: String? = null,
 
-    var password: String?,
+    var password: String? = null,
 
-    var citizenship: String,
+    var citizenship: String? = null,
 
     var nationality: String? = null,
 
-    var photo: String?,
+    var photo: String? = null,
 
     @Transient
     @JsonIgnore
     var photoByteArrayFuture: Future<ByteArray?>? = null,
 
-    var photoPermission: String?,
+    var photoPermission: String? = null,
 
-    var modificationDate: Date,
+    var modificationDate: Date? = null,
 
     @JsonIgnore
     @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    var applicantForeignerData: ApplicantForeignerData?,
+    var applicantForeignerData: ApplicantForeignerData? = null,
 
     @JsonIgnore
-    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val phoneNumbers: MutableSet<PhoneNumber> = HashSet(),
 
     @JsonIgnore
-    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val addresses: MutableSet<Address> = HashSet(),
 
     @JsonIgnore
-    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var identityDocuments: MutableSet<IdentityDocument> = HashSet(),
 
     @JsonIgnore
-    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var erasmusData: ErasmusData? = null,
 
     var usosId: Long? = null,
@@ -87,29 +89,29 @@ class Applicant(
 
     var uid: String? = null,
 
-    var fathersName: String?,
+    var fathersName: String? = null,
 
-    var militaryCategory: String?,
+    var militaryCategory: String? = null,
 
-    var militaryStatus: String?,
+    var militaryStatus: String? = null,
 
-    var mothersName: String?,
+    var mothersName: String? = null,
 
-    var wku: String?,
+    var wku: String? = null,
 
     var sex: Char,
 
-    var pesel: String?,
+    var pesel: String? = null,
 
     @Temporal(TemporalType.DATE)
     var dateOfBirth: Date?,
 
-    var cityOfBirth: String?,
+    var cityOfBirth: String? = null,
 
-    var countryOfBirth: String?,
+    var countryOfBirth: String? = null,
 
     @JsonIgnore
-    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val documents: MutableSet<Document> = HashSet(),
 
     var highSchoolCity: String? = null,
@@ -120,13 +122,15 @@ class Applicant(
 
     var highSchoolUsosCode: Long? = null,
 
-    var middle: String?,
+    var middle: String? = null,
 
     var family: String,
 
     var given: String,
 
-    var maiden: String?,
+    var maiden: String? = null,
+
+    var personExisted: Boolean = false,
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "primary_id_document_id", referencedColumnName = "id")

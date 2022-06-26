@@ -13,7 +13,7 @@ class LogAspect {
 
     val logger: Logger = LoggerFactory.getLogger(LogAspect::class.java)
 
-    @Around("@annotation(pl.poznan.ue.matriculation.configuration.LogExecutionTime)")
+    @Around("@annotation(pl.poznan.ue.matriculation.annotation.LogExecutionTime)")
     //@Pointcut("within(pl.poznan.ue.matriculation..*)")
     //@Pointcut("execution(* pl.poznan.ue.matriculation.local.service.*(..))")
     fun logExecutionTime(joinPoint: ProceedingJoinPoint): Any? {

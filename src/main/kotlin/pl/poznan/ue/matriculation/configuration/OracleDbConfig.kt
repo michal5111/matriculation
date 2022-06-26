@@ -48,8 +48,7 @@ class OracleDbConfig(
         @Qualifier("oracleDataSource") dataSource: DataSource
     ):
         LocalContainerEntityManagerFactoryBean {
-        val properties: MutableMap<String, Any> = HashMap()
-        properties["hibernate.dialect"] = oracleDBProperties.databasePlatform
+        val properties: Map<String, Any> = oracleDBProperties.jpa ?: HashMap()
         val em = builder
             .dataSource(dataSource)
             .packages("pl.poznan.ue.matriculation.oracle.domain")
@@ -70,10 +69,4 @@ class OracleDbConfig(
     fun oracleJdbcTemplate(@Qualifier("oracleDataSource") dataSource: DataSource): JdbcTemplate {
         return JdbcTemplate(dataSource)
     }
-
-//    @Bean(name = ["chainedTransactionManager"])
-//    fun transactionManager(@Qualifier("oracleDataSource") ds1: PlatformTransactionManager?,
-//                           @Qualifier("secondaryDs") ds2: PlatformTransactionManager?): ChainedTransactionManager? {
-//        return ChainedTransactionManager(ds1, ds2)
-//    }
 }

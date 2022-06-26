@@ -20,9 +20,11 @@ class PersonProgrammeBasisOfAdmission(
     @JoinColumn(name = "PODST_PODJ_STD_KOD", referencedColumnName = "KOD")
     val basisOfAdmission: BasisOfAdmission,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_OD", nullable = false)
     val dateFrom: Date,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_DO", nullable = true)
     val dateTo: Date? = null
 ) : BaseEntity() {

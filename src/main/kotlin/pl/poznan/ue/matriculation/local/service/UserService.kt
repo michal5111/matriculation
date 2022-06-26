@@ -2,27 +2,36 @@ package pl.poznan.ue.matriculation.local.service
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.exception.UidNotFoundException
 import pl.poznan.ue.matriculation.exception.UserNotFoundException
 import pl.poznan.ue.matriculation.ldap.repo.LdapUserRepository
 import pl.poznan.ue.matriculation.local.domain.user.User
-import pl.poznan.ue.matriculation.local.domain.user.UserRole
-import pl.poznan.ue.matriculation.local.dto.UserDto
-import pl.poznan.ue.matriculation.local.repo.RoleRepository
 import pl.poznan.ue.matriculation.local.repo.UserRepository
 import javax.persistence.EntityNotFoundException
 
 @Service
 class UserService(
     val userRepository: UserRepository,
-    val roleRepository: RoleRepository,
-    val ldapUserRepository: LdapUserRepository,
-    val roleService: RoleService
+    val ldapUserRepository: LdapUserRepository
 ) {
 
+    companion object {
+        fun checkDataSourcePermission(dataSourceId: String): Boolean {
+            val userDetails = SecurityContextHolder.getContext().authentication
+            val permissions = userDetails.authorities.map { it.authority }
+            val dataSourcePermissions = permissions
+                .filter { it.startsWith("ROLE_DATASOURCE_OPERATOR_") }
+                .map { it.substringAfter("ROLE_DATASOURCE_OPERATOR_") }
+            return permissions.contains("ROLE_ADMIN") || dataSourcePermissions.contains(dataSourceId)
+        }
+    }
+
+    @EntityGraph("user.roles")
     fun findById(id: Long): User {
         return userRepository.findById(id).orElseThrow { UserNotFoundException() }
     }
@@ -35,39 +44,23 @@ class UserService(
         return userRepository.getByUsosId(usosId)
     }
 
-    fun save(userDto: UserDto): User {
-        val ldapUser = ldapUserRepository.findByUid(userDto.uid) ?: throw UidNotFoundException()
-        val user = User(uid = userDto.uid, usosId = ldapUser.usosId).apply {
-            val roleCodes = userDto.roles.map { it.code }
-            val rolesList = roleRepository.findAllByCodeIn(roleCodes)
-            rolesList.map { role ->
-                UserRole(this, role)
-            }.let {
-                roles.addAll(it)
-            }
+    @Transactional
+    fun save(user: User): User {
+        val ldapUser = ldapUserRepository.findByUid(user.uid) ?: throw UidNotFoundException()
+        user.apply {
+            usosId = ldapUser.usosId
+            givenName = ldapUser.givenName
+            surname = ldapUser.surname
+            email = ldapUser.email
         }
         return userRepository.save(user)
     }
 
     @Transactional
-    fun update(userDto: UserDto): User {
-        val id = userDto.id ?: throw IllegalArgumentException("User id is null")
-        val user = userRepository.findByIdOrNull(id) ?: throw EntityNotFoundException("User not found")
-        user.roles.removeIf {
-            userDto.roles.none { (code) ->
-                it.role.code == code
-            }
-        }
-        userDto.roles.filter {
-            user.roles.none { userRole ->
-                it.code == userRole.role.code
-            }
-        }.map {
-            UserRole(user, roleRepository.getById(it.code))
-        }.let {
-            user.roles.addAll(it)
-        }
-        return user
+    fun update(user: User): User {
+        val id = user.id ?: throw IllegalArgumentException("User id is null")
+        userRepository.findByIdOrNull(id) ?: throw EntityNotFoundException("User not found")
+        return userRepository.save(user)
     }
 
     @Transactional

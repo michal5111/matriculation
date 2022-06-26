@@ -14,5 +14,5 @@ class ImportDto(
     val stageCode: String,
     val didacticCycleCode: String,
     val dataSourceId: String,
-    val dataFile: String?
+    val additionalProperties: Map<String, Any>?
 )

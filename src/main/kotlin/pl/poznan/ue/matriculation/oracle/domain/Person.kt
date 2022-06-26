@@ -71,6 +71,7 @@ class Person(
     @Column(name = "NAZWISKO", length = 40, nullable = false)
     var surname: String,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_UR", length = 60, nullable = true)
     var birthDate: Date? = null,
 
@@ -203,6 +204,7 @@ class Person(
     @JoinColumn(name = "KRAJ_DOK_KOD", referencedColumnName = "KOD", nullable = true)
     var identityDocumentIssuerCountry: Citizenship? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_WAZNOSCI_DOWODU", nullable = true)
     var identityDocumentExpirationDate: Date? = null,
 

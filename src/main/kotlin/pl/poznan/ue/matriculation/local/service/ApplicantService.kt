@@ -18,93 +18,87 @@ class ApplicantService(
     private val applicantRepository: ApplicantRepository
 ) {
 
+    val logger: Logger = LoggerFactory.getLogger(ApplicationService::class.java)
+
     fun findById(applicantId: Long): Applicant? {
         return applicantRepository.findByIdOrNull(applicantId)
     }
-
-    val logger: Logger = LoggerFactory.getLogger(ApplicationService::class.java)
 
     fun createPersonFromApplicant(applicant: Applicant): Person {
         return applicantToPersonMapper.map(applicant)
     }
 
     fun check(applicant: Applicant) {
-//        applicant.educationData.documents.forEach {
-//            if (it.issueDate == null || it.documentNumber == null) {
-//                //throw ApplicantCheckException("Brak daty lub numeru dokumentu uprawniającego do podjęcia studiów")
-//                logger.warn("Brak daty lub numeru dokumentu uprawniającego do podjęcia studiów. Pomijam dodawnie Tego dokumentu. ApplicantId: ${it.educationData?.applicantId}")
-//            }
-//        }
         if (applicant.pesel.isNullOrBlank() && !applicant.identityDocuments.any { it.number != null }) {
             throw ApplicantCheckException("Brak peselu lub dokumentu tożsamości")
         }
+        if (applicant.email.isBlank()) {
+            throw ApplicantCheckException("Brak adresu email")
+        }
     }
 
-    fun anonymize(applicant: Applicant): Applicant {
-        applicant.apply {
-            email = ""
-            indexNumber = null
-            password = null
+    fun anonymize(applicant: Applicant) = applicant.apply {
+        email = "$id@anonymous.pl"
+        indexNumber = null
+        password = null
 
-            middle = null
-            family = ""
-            maiden = null
-            given = ""
+        middle = null
+        family = "Anonymous"
+        maiden = null
+        given = "Anonymous"
 
-            citizenship = ""
-            photo = null
-            photoPermission = null
-            modificationDate = Date()
+        citizenship = null
+        photo = null
+        photoPermission = null
+        modificationDate = Date()
 
-            cityOfBirth = null
-            countryOfBirth = null
-            dateOfBirth = null
-            pesel = null
-            sex = 'M'
+        cityOfBirth = null
+        countryOfBirth = null
+        dateOfBirth = null
+        pesel = null
+        sex = 'M'
 
-            applicant.addresses.clear()
-            phoneNumbers.clear()
-            primaryIdentityDocument = null
-            fathersName = null
-            militaryCategory = null
-            militaryStatus = null
-            mothersName = null
-            wku = null
-            applicant.applicantForeignerData?.apply {
-                baseOfStay = null
-                foreignerStatus.clear()
-                polishCardIssueCountry = null
-                polishCardIssueDate = null
-                polishCardNumber = null
-                polishCardValidTo = null
-            }
-            documents.clear()
-            highSchoolCity = null
-            highSchoolName = null
-            highSchoolType = null
-            highSchoolUsosCode = null
-            applicant.erasmusData?.apply {
-                accommodationPreference = null
-                homeInstitution?.apply {
-                    departmentName = null
-                    erasmusCode = null
-                    country = null
-                    address = null
-                }
-                coordinatorData?.apply {
-                    email = null
-                    name = null
-                    phone = null
-                }
-                courseData?.apply {
-                    level = null
-                    name = null
-                    term = null
-                }
-            }
-            applicant.identityDocuments.clear()
+        addresses.clear()
+        phoneNumbers.clear()
+        primaryIdentityDocument = null
+        fathersName = null
+        militaryCategory = null
+        militaryStatus = null
+        mothersName = null
+        wku = null
+        applicantForeignerData?.apply {
+            baseOfStay = null
+            foreignerStatus.clear()
+            polishCardIssueCountry = null
+            polishCardIssueDate = null
+            polishCardNumber = null
+            polishCardValidTo = null
         }
-        return applicant
+        documents.clear()
+        highSchoolCity = null
+        highSchoolName = null
+        highSchoolType = null
+        highSchoolUsosCode = null
+        erasmusData?.apply {
+            accommodationPreference = null
+            homeInstitution?.apply {
+                departmentName = null
+                erasmusCode = null
+                country = null
+                address = null
+            }
+            coordinatorData?.apply {
+                email = null
+                name = null
+                phone = null
+            }
+            courseData?.apply {
+                level = null
+                name = null
+                term = null
+            }
+        }
+        identityDocuments.clear()
     }
 
     fun save(applicant: Applicant): Applicant {

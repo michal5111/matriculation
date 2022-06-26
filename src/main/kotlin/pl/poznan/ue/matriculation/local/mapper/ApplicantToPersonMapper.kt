@@ -36,7 +36,9 @@ class ApplicantToPersonMapper(
             name = applicant.given,
             middleName = applicant.middle,
             surname = applicant.family,
-            citizenship = citizenshipRepository.getById(applicant.citizenship),
+            citizenship = applicant.citizenship?.let {
+                citizenshipRepository.getById(it)
+            },
             birthDate = applicant.dateOfBirth,
             birthCity = applicant.cityOfBirth,
             birthCountry = applicant.countryOfBirth?.let {

@@ -85,9 +85,11 @@ class Address(
     @JoinColumn(name = "DOST_ID", referencedColumnName = "ID", nullable = true)
     var warehouseSuppliers: WarehouseSuppliers? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_OD", nullable = true)
     var dateFrom: Date? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_DO", nullable = true)
     var dateTo: Date? = null,
 

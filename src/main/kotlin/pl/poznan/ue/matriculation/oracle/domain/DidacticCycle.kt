@@ -19,9 +19,11 @@ class DidacticCycle(
     @Column(name = "OPIS", length = 100, nullable = false)
     val description: String,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_OD", nullable = false)
     val dateFrom: Date,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_DO", nullable = false)
     val dateTo: Date,
 
@@ -29,6 +31,7 @@ class DidacticCycle(
     @Column(name = "CZY_WYSWIETLAC", length = 1, nullable = false)
     val display: Boolean = false,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_ZAKON", nullable = false)
     val endDate: Date,
 

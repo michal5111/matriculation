@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import pl.poznan.ue.matriculation.configuration.LogExecutionTime
+import pl.poznan.ue.matriculation.annotation.LogExecutionTime
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.kotlinExtensions.toSerialBlob
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
@@ -106,7 +106,9 @@ class PersonService(
             }
             if (citizenship?.code != applicant.citizenship) {
                 changed = true
-                citizenship = citizenshipRepository.getById(applicant.citizenship)
+                citizenship = applicant.citizenship?.let {
+                    citizenshipRepository.getById(it)
+                }
             }
             applicant.dateOfBirth?.let {
                 birthDate = applicant.dateOfBirth
@@ -402,9 +404,10 @@ class PersonService(
         irkApplication: IrkApplication,
         application: Application
     ): Student {
+        val personId = person.id ?: throw IllegalStateException("Person id is null")
         val student = studentService.createOrFindStudent(person, importDto.indexPoolCode)
         val isDefaultProgramme = if (person.personProgrammes.any { it.isDefault == true }) {
-            personProgrammeRepository.updateToNotDefault(importDto.dateOfAddmision) == 1
+            personProgrammeRepository.updateToNotDefault(personId, importDto.dateOfAddmision) == 1
         } else true
         val personProgramme = studentService.createPersonProgramme(
             person = person,
@@ -503,6 +506,7 @@ class PersonService(
 
         person = if (person != null) {
             logger.trace("Osoba istnieje. Aktualizuję")
+            applicant.personExisted = true
             update(applicant, person)
         } else {
             logger.trace("Osoba nie istnieje. Tworzę")

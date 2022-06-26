@@ -8,13 +8,13 @@ import org.springframework.web.client.exchange
 import org.springframework.web.util.UriComponentsBuilder
 import pl.poznan.ue.matriculation.irk.dto.NotificationDto
 import pl.poznan.ue.matriculation.irk.dto.Page
+import pl.poznan.ue.matriculation.irk.dto.UserDto
 import pl.poznan.ue.matriculation.irk.dto.applicants.DocumentDTO
 import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
 import pl.poznan.ue.matriculation.irk.dto.applicants.MatriculationDataDTO
 import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
 import pl.poznan.ue.matriculation.irk.dto.programmes.ProgrammeGroupsDTO
 import pl.poznan.ue.matriculation.irk.dto.registrations.RegistrationDTO
-import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.programmes.ProgrammeGroups
 import pl.poznan.ue.matriculation.local.domain.registrations.Registration
@@ -40,13 +40,13 @@ class IrkService(
     }
 
     fun getApplicantById(id: Long): IrkApplicantDto? {
-        val response: ResponseEntity<IrkApplicantDto> = restTemplate.exchange(
-            "${apiUrl}applicants/$id",
+        val response: ResponseEntity<UserDto> = restTemplate.exchange(
+            "${apiUrl}user/data/?id=$id",
             HttpMethod.GET,
             httpEntity,
-            Applicant::javaClass
+            UserDto::class.java
         )
-        return response.body
+        return response.body?.user
     }
 
     fun getApplicantsByPesel(pesel: String): Page<IrkApplicantDto>? {

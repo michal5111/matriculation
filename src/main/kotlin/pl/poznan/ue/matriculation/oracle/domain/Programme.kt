@@ -20,9 +20,11 @@ class Programme(
     @Column(name = "OPIS", length = 200, nullable = false)
     val description: String,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_OD", nullable = false)
     val dateFrom: Date,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_DO", nullable = true)
     val dateTo: Date? = null,
 

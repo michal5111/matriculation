@@ -1,22 +1,20 @@
 package pl.poznan.ue.matriculation.kotlinExtensions
 
+import pl.poznan.ue.matriculation.local.domain.user.User
+import pl.poznan.ue.matriculation.local.dto.RoleDto
+import pl.poznan.ue.matriculation.local.dto.UserDto
 import pl.poznan.ue.matriculation.local.service.AsyncService
-import java.io.PrintWriter
-import java.io.StringWriter
 import java.sql.Blob
 import java.util.*
 import javax.sql.rowset.serial.SerialBlob
 import javax.sql.rowset.serial.SerialClob
 
-
-fun Exception.stackTraceToString(): String {
-    val sw = StringWriter()
-    this.printStackTrace(PrintWriter(sw))
-    return sw.toString()
-}
+fun Exception.stackTraceToHtmlString(): String = this.stackTraceToString()
+    .replace("\n", "<br>")
+    .replace("\t", "&emsp;")
 
 fun String.nameCapitalize(): String {
-    return this.trim().lowercase(Locale.getDefault()).split(" ").joinToString(" ") { s ->
+    return this.trim().lowercase(Locale.getDefault()).split(" -").joinToString(" ") { s ->
         s.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
     }
 }
@@ -70,3 +68,36 @@ fun Blob?.toByteArray(): ByteArray? {
 fun String.trimPostalCode() = this.replace("[^0-9]".toRegex(), "").ifBlank { null }
 
 fun String.trimPhoneNumber() = this.replace("[^0-9+]".toRegex(), "").ifBlank { null }
+
+data class ParsedAddress(val street: String?, val streetNumber: String?, val flatNumber: String?)
+
+fun parseAddressFromString(address: String?): ParsedAddress {
+    val addressStreetAndFlatNumber = address
+        ?.substringAfterLast(' ', "")
+        ?.takeIf { it.matches(".*\\d.*".toRegex()) }?.split('/')
+    val streetNumber = addressStreetAndFlatNumber?.getOrNull(0)
+    val flatNumber = addressStreetAndFlatNumber?.getOrNull(1)
+    var street = address?.takeIf { it.isNotBlank() }
+    if (streetNumber != null) {
+        street = street?.substringBeforeLast(' ')?.takeIf { it.isNotBlank() }
+    }
+    return ParsedAddress(street = street, streetNumber = streetNumber, flatNumber = flatNumber)
+}
+
+fun User.toUserDto() = let {
+    UserDto(
+        id = it.id,
+        uid = it.uid,
+        roles = it.roles.map { role ->
+            RoleDto(
+                code = role.code,
+                name = role.name
+            )
+        },
+        givenName = it.givenName,
+        surname = it.surname,
+        email = it.email,
+        usosId = it.usosId,
+        version = it.version
+    )
+}

@@ -67,9 +67,9 @@ class School(
     @Column(name = "CZY_NON_PROFIT", length = 1, nullable = true)
     val isNonProfit: String?,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "LOGO_BLOB_ID", referencedColumnName = "ID", nullable = true)
-    val logoBlob: Blob?,
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "LOGO_BLOB_ID", referencedColumnName = "ID", nullable = true)
+//    val logoBlob: Blob?,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "REG_NUTS_KOD", referencedColumnName = "KOD", nullable = true)

@@ -2,7 +2,6 @@ package pl.poznan.ue.matriculation.oracle.customKeyGenerator
 
 import org.hibernate.HibernateException
 import org.hibernate.engine.spi.SharedSessionContractImplementor
-import org.hibernate.id.Configurable
 import org.hibernate.id.IdentifierGenerator
 import org.hibernate.service.ServiceRegistry
 import org.hibernate.type.Type
@@ -11,7 +10,7 @@ import java.sql.PreparedStatement
 import java.sql.SQLException
 import java.util.*
 
-class SequenceStringKeyGenerator : IdentifierGenerator, Configurable {
+class SequenceStringKeyGenerator : IdentifierGenerator {
 
     private lateinit var sequenceId: String
 

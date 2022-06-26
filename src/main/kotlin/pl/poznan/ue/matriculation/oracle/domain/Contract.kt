@@ -15,6 +15,7 @@ class Contract(
     @Column(name = "RODZAJ", nullable = false)
     val type: Int,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_POCZ", nullable = false)
     val startDate: Date,
 
@@ -22,8 +23,9 @@ class Contract(
     @JoinColumn(name = "STATUS", referencedColumnName = "ID", nullable = false)
     val exchangeAttribute: ExchangeAttribute,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_KON", nullable = true)
-    val endDate: String,
+    val endDate: Date,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SZK_ID", referencedColumnName = "ID", nullable = true)
@@ -39,6 +41,7 @@ class Contract(
     @Column(name = "NUMER", nullable = false, length = 100)
     val number: String,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_PODPIS", nullable = false)
     val signatureDate: Date,
 

@@ -20,10 +20,8 @@ import javax.persistence.*
         NamedSubgraph(
             name = "subgraph.data",
             attributeNodes = [
-                //NamedAttributeNode("identityDocuments"),
-                NamedAttributeNode("foreignId"),
-                NamedAttributeNode("primaryIdentityDocument")
-                //NamedAttributeNode("documents")
+                NamedAttributeNode("primaryIdentityDocument"),
+                NamedAttributeNode("erasmusData")
             ]
         )
     ]
@@ -83,11 +81,11 @@ class Application(
     @JoinColumn(name = "import_id", referencedColumnName = "id")
     var import: Import? = null,
 
-    var baseOfStay: String?,
+    var baseOfStay: String? = null,
 
-    var basisOfAdmission: String?,
+    var basisOfAdmission: String? = null,
 
-    var sourceOfFinancing: String?,
+    var sourceOfFinancing: String? = null,
 
     var notificationSent: Boolean = false
 ) : BaseEntityLongId(), Serializable {

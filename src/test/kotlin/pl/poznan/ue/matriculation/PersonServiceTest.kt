@@ -5,21 +5,18 @@ import org.junit.jupiter.api.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.core.task.SyncTaskExecutor
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.transaction.annotation.Transactional
-import pl.poznan.ue.matriculation.irk.service.IrkService
 import pl.poznan.ue.matriculation.local.domain.applicants.*
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.AccommodationPreference
 import pl.poznan.ue.matriculation.local.domain.enum.AddressType
 import pl.poznan.ue.matriculation.local.domain.enum.DurationType
 import pl.poznan.ue.matriculation.local.domain.import.Import
-import pl.poznan.ue.matriculation.local.service.ImportService
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.repo.PersonRepository
 import pl.poznan.ue.matriculation.oracle.service.PersonService
@@ -30,13 +27,6 @@ import java.util.concurrent.Executor
 class PersonServiceTest : AbstractIT() {
 
     val logger: Logger = LoggerFactory.getLogger(PersonServiceTest::class.java)
-
-    @Autowired
-    lateinit var importService: ImportService
-
-    @Qualifier("TestIrkService")
-    @Autowired
-    lateinit var irkService: IrkService
 
     @Autowired
     lateinit var personService: PersonService
@@ -71,12 +61,12 @@ class PersonServiceTest : AbstractIT() {
             programmeForeignId = "S1-E",
             programmeForeignName = "S1_PL_SZ_202021",
             indexPoolName = "Centralna",
-            dataFile = null
+            additionalProperties = null
         )
         val testDate = Date()
         val application = Application(
             foreignId = 1,
-            dataSourceId = "IRK_TEST",
+            dataSourceId = "EXCEL_FILE",
             admitted = "addmited",
             comment = "comment",
             baseOfStay = "l",
@@ -90,7 +80,7 @@ class PersonServiceTest : AbstractIT() {
             import = import,
             applicant = Applicant(
                 foreignId = 1,
-                dataSourceId = "IRK_TEST",
+                dataSourceId = "EXCEL_FILE",
                 email = "mk@email.com",
                 indexNumber = "12345",
                 password = "",

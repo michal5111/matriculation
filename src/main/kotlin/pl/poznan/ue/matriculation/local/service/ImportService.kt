@@ -3,9 +3,11 @@ package pl.poznan.ue.matriculation.local.service
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionSynchronizationManager
+import org.springframework.web.server.ResponseStatusException
 import pl.poznan.ue.matriculation.exception.*
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
@@ -37,17 +39,21 @@ class ImportService(
         stageCode: String,
         didacticCycleCode: String,
         dataSourceType: String,
-        dataFile: String? = null
+        additionalProperties: Map<String, Any>? = null
     ): Import {
-        if (importRepository.existsByProgrammeForeignIdAndRegistrationAndStageCodeAndDidacticCycleCode(
-                programmeForeignId,
-                registration,
-                stageCode,
-                didacticCycleCode
-            )
-        ) {
-            throw ImportCreationException("Import tego programu już istnieje.")
+        logger.info("additionalProperties $additionalProperties")
+        if (!UserService.checkDataSourcePermission(dataSourceType)) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
+//        if (importRepository.existsByProgrammeForeignIdAndRegistrationAndStageCodeAndDidacticCycleCode(
+//                programmeForeignId,
+//                registration,
+//                stageCode,
+//                didacticCycleCode
+//            )
+//        ) {
+//            throw ImportCreationException("Import tego programu już istnieje.")
+//        }
         if (!programmeRepository.existsById(programmeCode)) {
             throw ImportCreationException("Wybrany program nie istnieje w USOSie.")
         }
@@ -69,9 +75,7 @@ class ImportService(
             startDate = startDate,
             stageCode = stageCode,
             dataSourceId = dataSourceType,
-            dataFile = dataFile?.let {
-                Base64.getDecoder().decode(dataFile)
-            },
+            additionalProperties = additionalProperties,
         )
         return importRepository.save(import)
     }
@@ -122,10 +126,12 @@ class ImportService(
         return importRepository.save(import)
     }
 
-    fun setError(importId: Long, s: String) = importRepository.getErrorAndStatusById(importId).apply {
-        error = s
-        importStatus = ImportStatus.ERROR
-    }
+    fun setError(importId: Long, error: String, stackTrace: String? = null) =
+        importRepository.getErrorAndStatusById(importId).apply {
+            this.error = error
+            this.stackTrace = stackTrace
+            importStatus = ImportStatus.ERROR
+        }
 
     fun setImportStatus(importStatus: ImportStatus, importId: Long) =
         importRepository.getById(importId).apply {

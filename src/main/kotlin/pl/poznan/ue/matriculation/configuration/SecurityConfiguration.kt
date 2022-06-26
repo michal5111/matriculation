@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.core.annotation.Order
-import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.cas.ServiceProperties
@@ -63,9 +62,5 @@ class SecurityConfiguration(
         http.headers().frameOptions().disable()
     }
 
-    override fun configure(web: WebSecurity) {
-        web.ignoring()
-            .antMatchers(HttpMethod.OPTIONS, "/**")
-            .antMatchers("/h2-console/**")
-    }
+    override fun configure(web: WebSecurity) {}
 }

@@ -1,20 +1,19 @@
 package pl.poznan.ue.matriculation.controllers
 
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
+import pl.poznan.ue.matriculation.kotlinExtensions.toUserDto
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.domain.user.Role
 import pl.poznan.ue.matriculation.local.domain.user.User
 import pl.poznan.ue.matriculation.local.dto.*
 import pl.poznan.ue.matriculation.local.job.JobType
-import pl.poznan.ue.matriculation.local.mapper.UserMapper
 import pl.poznan.ue.matriculation.local.service.*
 import pl.poznan.ue.matriculation.oracle.dto.IndexTypeDto
 import pl.poznan.ue.matriculation.oracle.entityRepresentations.PersonBasicData
@@ -41,9 +40,7 @@ class RestController(
     @GetMapping("/user")
     fun user(): Any {
         val principal = SecurityContextHolder.getContext().authentication.principal
-        return if (principal is String) {
-            "{}"
-        } else principal
+        return if (principal is String) "{}" else principal
     }
 
     @GetMapping("/registrations/{dataSourceType}/codes")
@@ -75,7 +72,7 @@ class RestController(
         stageCode = importDto.stageCode,
         didacticCycleCode = importDto.didacticCycleCode,
         dataSourceType = importDto.dataSourceId,
-        dataFile = importDto.dataFile,
+        additionalProperties = importDto.additionalProperties,
         programmeForeignName = importDto.programmeForeignName,
         indexPoolName = importDto.indexPoolName
     )
@@ -92,7 +89,15 @@ class RestController(
     fun savePersons(@PathVariable("id") importId: Long) = jobService.runJob(JobType.SAVE, importId)
 
     @GetMapping("/import")
-    fun getImportsPage(pageable: Pageable): Page<Import> = importService.getAll(pageable)
+    fun getImportsPage(pageable: Pageable): Page<Import> = importService.getAll(pageable).let {
+        Page(
+            content = it.content,
+            number = it.number,
+            totalElements = it.totalElements,
+            totalPages = it.totalPages,
+            size = it.size
+        )
+    }
 
     @DeleteMapping("/import/{id}")
     fun deleteImport(@PathVariable("id") importId: Long) {
@@ -105,7 +110,15 @@ class RestController(
     fun findAllApplicationsByImportId(
         pageable: Pageable,
         @PathVariable("id") importId: Long
-    ): Page<Application> = applicationService.findAllApplicationsByImportId(pageable, importId)
+    ): Page<Application> = applicationService.findAllApplicationsByImportId(pageable, importId).let {
+        Page(
+            content = it.content,
+            number = it.number,
+            totalElements = it.totalElements,
+            totalPages = it.totalPages,
+            size = it.size
+        )
+    }
 
 
     @GetMapping("/usos/indexPool")
@@ -138,23 +151,27 @@ class RestController(
     fun getUsosUrl(): UrlDto = UrlDto(usosUrl)
 
     @PostMapping("/user")
-    fun createUser(@RequestBody userDto: UserDto): User = userService.save(userDto)
+    fun createUser(@RequestBody user: User): User = userService.save(user)
 
     @PutMapping("/user")
-    fun updateUser(@RequestBody userDto: UserDto): User = userService.update(userDto)
+    fun updateUser(@RequestBody user: User): User = userService.update(user)
 
     @DeleteMapping("/user/{id}")
     fun deleteUser(@PathVariable("id") id: Long) = userService.delete(id)
 
     @GetMapping("/users")
-    fun getAllUsers(pageable: Pageable): Page<User> = userService.getAll(pageable)
+    fun getAllUsers(pageable: Pageable): Page<User> = userService.getAll(pageable).let {
+        Page(
+            content = it.content,
+            number = it.number,
+            totalElements = it.totalElements,
+            totalPages = it.totalPages,
+            size = it.size
+        )
+    }
 
     @GetMapping("/user/{id}")
-    fun findUserById(@PathVariable("id") id: Long): UserDto {
-        val user = userService.findById(id)
-        val userMapper = UserMapper()
-        return userMapper.mapUserToUserDto(user)
-    }
+    fun findUserById(@PathVariable("id") id: Long) = userService.findById(id).toUserDto()
 
     @GetMapping("/import/{id}/importUids")
     @ResponseStatus(HttpStatus.ACCEPTED)

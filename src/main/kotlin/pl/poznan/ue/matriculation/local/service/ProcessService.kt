@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionSynchronizationManager
+import pl.poznan.ue.matriculation.annotation.LogExecutionTime
 import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
 import pl.poznan.ue.matriculation.applicantDataSources.INotificationSender
-import pl.poznan.ue.matriculation.configuration.LogExecutionTime
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.exception.ApplicationNotFoundException
 import pl.poznan.ue.matriculation.exception.exceptionHandler.ISaveExceptionHandler
@@ -54,10 +54,9 @@ class ProcessService(
             throw IllegalStateException("Nie ma aktywnej transakcji")
         }
         val import = importService.get(importId)
-        val applicantDto = applicationDtoDataSource.getApplicantById(applicationDto.foreignApplicantId)
-        applicationDtoDataSource.preprocess(applicationDto, applicantDto)
+        val applicantDto = applicationDtoDataSource.getApplicantById(applicationDto.foreignApplicantId, applicationDto)
         var application = createOrUpdateApplication(applicationDto, applicationDtoDataSource)
-        var applicant = createOrUpdateApplicant(applicantDto, applicationDtoDataSource)
+        var applicant = createOrUpdateApplicant(applicantDto, applicationDtoDataSource, applicationDto)
         applicant.primaryIdentityDocument = applicationDtoDataSource.getPrimaryIdentityDocument(
             applicant = applicant,
             application = application,
@@ -90,10 +89,7 @@ class ProcessService(
             applicationDtoDataSource.id
         )
         return if (foundApplication != null) {
-            applicationDtoDataSource.updateApplication(
-                foundApplication,
-                applicationDto
-            )
+            applicationDtoDataSource.updateApplication(foundApplication, applicationDto)
         } else {
             applicationDtoDataSource.mapApplicationDtoToApplication(applicationDto).also {
                 it.dataSourceId = applicationDtoDataSource.id
@@ -105,14 +101,15 @@ class ProcessService(
     @LogExecutionTime
     private fun createOrUpdateApplicant(
         applicantDto: IApplicantDto,
-        applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
+        applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>,
+        applicationDto: IApplicationDto
     ): Applicant {
         val foundApplicant = applicantService.findByForeignIdAndDataSourceId(
             applicantDto.foreignId,
             applicationDtoDataSource.id
         )
         return if (foundApplicant != null) {
-            applicationDtoDataSource.updateApplicant(foundApplicant, applicantDto)
+            applicationDtoDataSource.updateApplicant(foundApplicant, applicantDto, applicationDto)
         } else {
             applicationDtoDataSource.mapApplicantDtoToApplicant(applicantDto).also {
                 it.dataSourceId = applicationDtoDataSource.id
@@ -193,7 +190,7 @@ class ProcessService(
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, transactionManager = "transactionManager", readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     fun sendNotifications(
         importId: Long,
         notificationSender: INotificationSender

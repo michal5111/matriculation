@@ -23,7 +23,8 @@ class ApplicationDataSourceFactory(applicationDataSources: List<IApplicationData
         return dataSourcesMap.map {
             DataSourceDto(
                 name = it.value.name,
-                id = it.key
+                id = it.key,
+                additionalParameters = it.value.additionalParameters
             )
         }
     }

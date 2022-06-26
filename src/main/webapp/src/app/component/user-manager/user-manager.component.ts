@@ -34,6 +34,9 @@ export class UserManagerComponent implements OnInit {
   displayedColumns: string[] = [
     'id',
     'uid',
+    'givenName',
+    'surname',
+    'email',
     'edit',
     'delete'
   ];
@@ -52,7 +55,7 @@ export class UserManagerComponent implements OnInit {
     this.dataSource.sort = this.sort;
     this.getUserPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe(
       () => {
-      }// , error => this.onError('Błąd przy pobieraniu użytkowników', error)
+      }
     );
   }
 
@@ -79,24 +82,12 @@ export class UserManagerComponent implements OnInit {
     );
   }
 
-  // onError(title: string, error): void {
-  //   if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
-  //     return;
-  //   }
-  //   if (this.dialog.openDialogs.length > 0) {
-  //     return;
-  //   }
-  //   this.dialog.open(ErrorDialogComponent, {
-  //     data: new ErrorDialogData(title, error)
-  //   });
-  // }
-
   switchPage(pageEvent: PageEvent): void {
     this.pageNumber = pageEvent.pageIndex;
     this.pageSize = pageEvent.pageSize;
     this.getUserPage(pageEvent.pageIndex, pageEvent.pageSize, this.sortString, this.sortDirString).subscribe(
       () => {
-      }// , error => this.onError('Błąd przy pobieraniu strony', error)
+      }
     );
   }
 
@@ -104,7 +95,7 @@ export class UserManagerComponent implements OnInit {
     this.sortDirString = sortEvent.direction;
     this.getUserPage(this.pageNumber, this.pageSize, this.sortString, sortEvent.active).subscribe(
       () => {
-      }// , error => this.onError('Błąd przy pobieraniu strony', error)
+      }
     );
   }
 
@@ -138,7 +129,7 @@ export class UserManagerComponent implements OnInit {
         this.dataSource.data = this.dataSource.data.filter(element => {
           return element !== user;
         });
-      }// , error => this.onError('Błąd przy usuwaniu użytkownika', error)
+      }
     );
   }
 

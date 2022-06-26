@@ -23,6 +23,7 @@ class PersonDocument(
     @Column(name = "SYGNATURA", length = 100, nullable = false)
     var signature: String,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_WYDANIA", nullable = false)
     var issueDate: Date,
 
@@ -38,6 +39,7 @@ class PersonDocument(
     @Column(name = "DOKUMENT", nullable = true)
     var document: ByteArray? = null,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "DATA_POTW_ODBIORU", nullable = true)
     var receiptDate: Date,
 

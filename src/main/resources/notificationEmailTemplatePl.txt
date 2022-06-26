@@ -11,14 +11,3 @@ W wypadku problemów z logowaniem prosimy o kontakt – helpdesk@ue.poznan.pl
 Pozdrawiamy!
 
 Zespół Centrum Informatyki UEP
-
-Dear Student,
-Your login number (called UID or NIU) used to register to PUEB IT systems is: {{NIU}}
-Your passport number used in the application system is your temporary password to the system.
-When you log in for the first time to USOSweb  the system will ask to change the password.
-Please keep this message or remember your login number (UID/NIU)
-If you have any problems logging in please contact us at: helpdesk@ue.poznan.pl
-
-with best regards
-
-PUEB IT Centre

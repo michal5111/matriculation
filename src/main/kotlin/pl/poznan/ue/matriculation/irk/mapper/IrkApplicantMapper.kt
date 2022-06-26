@@ -89,57 +89,54 @@ class IrkApplicantMapper {
         }
     }
 
-    fun update(applicant: Applicant, applicantDto: IrkApplicantDto): Applicant {
-        applicant.apply {
-            email = applicantDto.email
-            indexNumber = applicantDto.indexNumber
-            password = applicantDto.password
-            middle = applicantDto.name.middle?.nameCapitalize()
-            family = applicantDto.name.family.nameCapitalize()
-            maiden = applicantDto.name.maiden?.nameCapitalize()
-            given = applicantDto.name.given.nameCapitalize()
-            citizenship = applicantDto.citizenship
-            photo = applicantDto.photo
-            photoPermission = applicantDto.photoPermission
-            modificationDate = applicantDto.modificationDate
-            cityOfBirth = applicantDto.basicData.cityOfBirth?.trim()
-            countryOfBirth = applicantDto.basicData.countryOfBirth
-            dateOfBirth = applicantDto.basicData.dateOfBirth
-            pesel = applicantDto.basicData.pesel?.trim()
-            sex = applicantDto.basicData.sex
-            applicantDto.contactData.let {
-                addAddresses(applicant, it)
-                addPhoneNumbers(applicant, it)
-            }
-            fathersName = applicantDto.additionalData.fathersName?.trim()
-            militaryCategory = applicantDto.additionalData.militaryCategory
-            militaryStatus = applicantDto.additionalData.militaryStatus
-            mothersName = applicantDto.additionalData.mothersName?.trim()
-            wku = applicantDto.additionalData.wku
-            applicantDto.foreignerData?.let {
-                applicant.applicantForeignerData?.apply {
-                    baseOfStay = it.baseOfStay
-                    foreignerStatus.addAll(it.foreignerStatus.map { statusDto ->
-                        Status(
-                            status = statusDto
-                        )
-                    })
-                    polishCardIssueCountry = it.polishCardIssueCountry
-                    polishCardIssueDate = it.polishCardIssueDate
-                    polishCardNumber = it.polishCardNumber?.trim()
-                    polishCardValidTo = it.polishCardValidTo
-                }
-            }
-            applicantDto.educationData.let {
-                addDocuments(this, applicantDto)
-                highSchoolCity = it.highSchoolCity?.trim()
-                highSchoolName = it.highSchoolName?.trim()
-                highSchoolType = it.highSchoolType
-                highSchoolUsosCode = it.highSchoolUsosCode
+    fun update(applicant: Applicant, applicantDto: IrkApplicantDto): Applicant = applicant.apply {
+        email = applicantDto.email
+        indexNumber = applicantDto.indexNumber
+        password = applicantDto.password
+        middle = applicantDto.name.middle?.nameCapitalize()
+        family = applicantDto.name.family.nameCapitalize()
+        maiden = applicantDto.name.maiden?.nameCapitalize()
+        given = applicantDto.name.given.nameCapitalize()
+        citizenship = applicantDto.citizenship
+        photo = applicantDto.photo
+        photoPermission = applicantDto.photoPermission
+        modificationDate = applicantDto.modificationDate
+        cityOfBirth = applicantDto.basicData.cityOfBirth?.trim()
+        countryOfBirth = applicantDto.basicData.countryOfBirth
+        dateOfBirth = applicantDto.basicData.dateOfBirth
+        pesel = applicantDto.basicData.pesel?.trim()
+        sex = applicantDto.basicData.sex
+        applicantDto.contactData.let {
+            addAddresses(applicant, it)
+            addPhoneNumbers(applicant, it)
+        }
+        fathersName = applicantDto.additionalData.fathersName?.trim()
+        militaryCategory = applicantDto.additionalData.militaryCategory
+        militaryStatus = applicantDto.additionalData.militaryStatus
+        mothersName = applicantDto.additionalData.mothersName?.trim()
+        wku = applicantDto.additionalData.wku
+        applicantDto.foreignerData?.let {
+            applicant.applicantForeignerData?.apply {
+                baseOfStay = it.baseOfStay
+                foreignerStatus.addAll(it.foreignerStatus.map { statusDto ->
+                    Status(
+                        status = statusDto
+                    )
+                })
+                polishCardIssueCountry = it.polishCardIssueCountry
+                polishCardIssueDate = it.polishCardIssueDate
+                polishCardNumber = it.polishCardNumber?.trim()
+                polishCardValidTo = it.polishCardValidTo
             }
         }
+        applicantDto.educationData.let {
+            addDocuments(this, applicantDto)
+            highSchoolCity = it.highSchoolCity?.trim()
+            highSchoolName = it.highSchoolName?.trim()
+            highSchoolType = it.highSchoolType
+            highSchoolUsosCode = it.highSchoolUsosCode
+        }
         addIdentityDocuments(applicant, applicantDto.additionalData)
-        return applicant
     }
 
     private fun addIdentityDocuments(applicant: Applicant, additionalDataDTO: AdditionalDataDTO) {

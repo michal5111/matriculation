@@ -1,15 +1,18 @@
 package pl.poznan.ue.matriculation.local.job
 
+import org.springframework.stereotype.Component
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.job.startConditions.ArchivePersonsStartConditions
 import pl.poznan.ue.matriculation.local.job.startConditions.IStartConditions
 import pl.poznan.ue.matriculation.local.service.ProcessService
 
+@Component
 class ArchiveApplicationsJob(
-    private val processService: ProcessService,
-    private val importId: Long
+    private val processService: ProcessService
 ) : IJob {
+    override val jobType: JobType = JobType.ARCHIVE
+
     override var status: JobStatus = JobStatus.PENDING
 
     override val startCondition: IStartConditions
@@ -19,6 +22,7 @@ class ArchiveApplicationsJob(
     }
 
     override fun doWork(import: Import) {
+        val importId = import.id ?: throw IllegalArgumentException("Import id is null")
         processService.archivePersons(importId)
     }
 

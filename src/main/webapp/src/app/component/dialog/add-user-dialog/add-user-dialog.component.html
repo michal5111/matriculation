@@ -1,11 +1,11 @@
-<div>
+<div class="container">
   <form [formGroup]="addUserFormGroup" (ngSubmit)="onSubmit()">
     <mat-form-field>
       <mat-label>Podaj UID (NIU)</mat-label>
       <input type="text" matInput formControlName="uid" required="true">
     </mat-form-field>
     <mat-selection-list *ngIf="rolesList" #roleSelectionList>
-      <mat-list-option *ngFor="let role of rolesList" [value]="role">
+      <mat-list-option class="item" *ngFor="let role of rolesList" [value]="role">
         {{role.name}}
       </mat-list-option>
     </mat-selection-list>

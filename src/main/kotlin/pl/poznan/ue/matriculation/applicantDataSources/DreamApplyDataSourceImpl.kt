@@ -40,20 +40,19 @@ open class DreamApplyDataSourceImpl(
                 "byCourseIDs" to programmeForeignId,
                 "byOfferType" to status
             )
-        ) ?: throw java.lang.IllegalArgumentException("Unable to get applicants")
+        ) ?: throw IllegalArgumentException("Unable to get applicants")
         val applications = applicationMap.values.filter { dreamApplyApplicationDto ->
             val applicationOffers = dreamApplyService.getApplicationOffers(dreamApplyApplicationDto.offers)
             applicationOffers!!.any {
-                it.value.course == "/api/courses/$programmeForeignId"
-                    && it.value.type == status
+                it.value.course == "/api/courses/$programmeForeignId" && it.value.type == status
             }
         }
         return object : IPage<DreamApplyApplicationDto> {
-            override fun getSize(): Int {
+            override fun getTotalSize(): Int {
                 return applications.size
             }
 
-            override fun getResultsList(): List<DreamApplyApplicationDto> {
+            override fun getContent(): List<DreamApplyApplicationDto> {
                 return applications
             }
 
@@ -63,8 +62,10 @@ open class DreamApplyDataSourceImpl(
         }
     }
 
-    override fun getApplicantById(applicantId: Long): DreamApplyApplicantDto {
-        return dreamApplyService.getApplicantById(applicantId) ?: throw IllegalArgumentException("Applicant not found")
+    override fun getApplicantById(applicantId: Long, applicationDto: DreamApplyApplicationDto): DreamApplyApplicantDto {
+        return dreamApplyService.getApplicantById(applicantId)?.apply {
+            dreamApplyApplication = dreamApplyService.getApplicationById(applicationDto.id)
+        } ?: throw IllegalArgumentException("Applicant not found")
     }
 
     override fun getPhoto(photoUrl: String): ByteArray? {
@@ -105,7 +106,10 @@ open class DreamApplyDataSourceImpl(
         }
     }
 
-    override fun getApplicationById(applicationId: Long): DreamApplyApplicationDto? {
+    override fun getApplicationById(
+        applicationId: Long,
+        applicationDto: DreamApplyApplicationDto
+    ): DreamApplyApplicationDto? {
         return dreamApplyService.getApplicationById(applicationId)
     }
 
@@ -121,12 +125,12 @@ open class DreamApplyDataSourceImpl(
         return applicationMapper.update(application, applicationDto)
     }
 
-    override fun updateApplicant(applicant: Applicant, applicantDto: DreamApplyApplicantDto): Applicant {
+    override fun updateApplicant(
+        applicant: Applicant,
+        applicantDto: DreamApplyApplicantDto,
+        applicationDto: DreamApplyApplicationDto
+    ): Applicant {
         return applicantMapper.update(applicant, applicantDto)
-    }
-
-    override fun preprocess(applicationDto: DreamApplyApplicationDto, applicantDto: DreamApplyApplicantDto) {
-        applicantDto.dreamApplyApplication = getApplicationById(applicationDto.id)
     }
 
     override fun getApplicationEditUrl(applicationId: Long): String {
@@ -151,8 +155,8 @@ open class DreamApplyDataSourceImpl(
 
     override fun sendNotification(foreignApplicantId: Long, notificationDto: NotificationDto) {
         val emailDto = EmailDto(
-            subject = notificationDto.header,
-            message = notificationDto.message
+            subject = notificationDto.headerPl,
+            message = notificationDto.messagePl
         )
         dreamApplyService.sendEmail(foreignApplicantId, emailDto)
     }
