@@ -1,20 +1,22 @@
 package pl.poznan.ue.matriculation.configuration
 
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 
 
 @Configuration
 @Order(1)
-class ApiSecurityConfiguration : WebSecurityConfigurerAdapter() {
+class ApiSecurityConfiguration {
 
-    override fun configure(http: HttpSecurity) {
+    @Bean
+    fun apiFilterChain(http: HttpSecurity): SecurityFilterChain {
         http.authorizeRequests()
             .antMatchers("/api/user").permitAll()
             .antMatchers(HttpMethod.POST, "/api/user").hasRole("ADMIN")
@@ -43,5 +45,6 @@ class ApiSecurityConfiguration : WebSecurityConfigurerAdapter() {
             .exceptionHandling()
             .authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
         http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+        return http.build()
     }
 }

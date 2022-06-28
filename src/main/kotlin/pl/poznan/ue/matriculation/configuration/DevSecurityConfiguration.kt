@@ -4,15 +4,16 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.core.annotation.Order
-import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.core.userdetails.User
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.provisioning.InMemoryUserDetailsManager
+import org.springframework.security.provisioning.UserDetailsManager
 import org.springframework.security.web.AuthenticationEntryPoint
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint
 
 
@@ -20,37 +21,46 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationEn
 @EnableWebSecurity
 @Order(2)
 @Profile("dev", "dev-frontend-build")
-class DevSecurityConfiguration : WebSecurityConfigurerAdapter() {
+class DevSecurityConfiguration {
 
     @Bean
     fun passwordEncoder(): PasswordEncoder {
         return BCryptPasswordEncoder()
     }
 
-    override fun configure(auth: AuthenticationManagerBuilder) {
-        auth.inMemoryAuthentication()
-            .withUser("admin")
-            .password(passwordEncoder().encode("admin"))
+    @Bean
+    fun inMemoryUserDetailsManager(
+        auth: AuthenticationManagerBuilder,
+        passwordEncoder: PasswordEncoder
+    ): UserDetailsManager {
+        val user = User.builder()
+            .username("admin")
+            .passwordEncoder {
+                passwordEncoder.encode(it)
+            }.password("admin")
             .roles("ADMIN")
+            .build()
+        val inMemoryUserDetailsManager = InMemoryUserDetailsManager()
+        inMemoryUserDetailsManager.createUser(user)
+        return inMemoryUserDetailsManager
     }
 
-    override fun configure(web: WebSecurity) {
-        web.ignoring()
-            .antMatchers(HttpMethod.OPTIONS, "/**")
-            .antMatchers("/h2-console/**")
-    }
-
-    override fun configure(http: HttpSecurity) {
+    @Bean
+    fun devFilterChain(
+        http: HttpSecurity,
+        authenticationEntryPoint: AuthenticationEntryPoint
+    ): SecurityFilterChain {
         http
             .csrf().disable()
             .antMatcher("/login*")
             .authorizeRequests().anyRequest().authenticated()
-            .and().httpBasic().authenticationEntryPoint(authenticationEntryPoint())
+            .and().httpBasic().authenticationEntryPoint(authenticationEntryPoint)
             .and().logout()
+        return http.build()
     }
 
     @Bean
-    fun authenticationEntryPoint(): AuthenticationEntryPoint? {
+    fun authenticationEntryPoint(): AuthenticationEntryPoint {
         val entryPoint = BasicAuthenticationEntryPoint()
         entryPoint.realmName = "test realm"
         return entryPoint

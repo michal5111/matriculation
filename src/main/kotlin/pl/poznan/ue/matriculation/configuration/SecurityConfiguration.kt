@@ -13,10 +13,9 @@ import org.springframework.security.cas.authentication.CasAuthenticationProvider
 import org.springframework.security.cas.web.CasAuthenticationEntryPoint
 import org.springframework.security.cas.web.CasAuthenticationFilter
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.web.AuthenticationEntryPoint
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 
@@ -30,16 +29,17 @@ class SecurityConfiguration(
     val casAuthenticationProvider: CasAuthenticationProvider,
     val singleSignOutFilter: SingleSignOutFilter,
     val logoutFilter: LogoutFilter
-) : WebSecurityConfigurerAdapter() {
+) {
 
     @Bean
-    override fun authenticationManager(): AuthenticationManager {
+    fun authenticationManager(): AuthenticationManager {
         return ProviderManager(listOf(casAuthenticationProvider))
     }
 
     @Value("\${cas.service.login}")
     private lateinit var casUrlLogin: String
 
+    @Bean
     fun casAuthenticationEntryPoint(): AuthenticationEntryPoint {
         val casAuthenticationEntryPoint = CasAuthenticationEntryPoint()
         casAuthenticationEntryPoint.loginUrl = casUrlLogin
@@ -47,20 +47,23 @@ class SecurityConfiguration(
         return casAuthenticationEntryPoint
     }
 
-    override fun configure(http: HttpSecurity) {
+    @Bean
+    fun loginFilterChain(
+        http: HttpSecurity,
+        authenticationEntryPoint: AuthenticationEntryPoint
+    ): SecurityFilterChain {
         http.httpBasic().disable()
         http
             .authorizeRequests()
             .antMatchers("/login").authenticated()
             .and()
             .exceptionHandling()
-            .authenticationEntryPoint(casAuthenticationEntryPoint())
+            .authenticationEntryPoint(authenticationEntryPoint)
             .and()
             .addFilterBefore(singleSignOutFilter, CasAuthenticationFilter::class.java)
             .addFilterBefore(logoutFilter, LogoutFilter::class.java)
         http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
         http.headers().frameOptions().disable()
+        return http.build()
     }
-
-    override fun configure(web: WebSecurity) {}
 }
