@@ -266,7 +266,7 @@ class PersonService(
     private fun createOrUpdatePhoneNumbers(person: Person, applicant: Applicant) {
         applicant.phoneNumbers.forEach { phoneNumber ->
             val personPhoneNumber = person.phoneNumbers.find {
-                phoneNumber.number == it.number && phoneNumber.phoneNumberType == it.phoneNumberType.code
+                phoneNumber.phoneNumberType == it.phoneNumberType.code
             }
             if (personPhoneNumber != null) {
                 personPhoneNumber.phoneNumberType = phoneNumberTypeRepository.getById(phoneNumber.phoneNumberType)
@@ -498,10 +498,10 @@ class PersonService(
             applicant.identityDocuments.filterNot {
                 it.number.isNullOrBlank()
             }.map {
-                it.number?.uppercase(Locale.getDefault()).orEmpty()
+                it.number.orEmpty()
             },
-            applicant.email.uppercase(),
-            applicant.email.uppercase()
+            applicant.email,
+            applicant.email
         )
 
         person = if (person != null) {

@@ -84,7 +84,7 @@ class ExcelFileDataSourceImpl(
         pageNumber: Int
     ): IPage<ExcelFileApplicationDto> {
         val excelFileApplicationDtoList: MutableList<ExcelFileApplicationDto> = mutableListOf()
-        val dataFileBase64 = (import.additionalProperties?.get("dataFile") as String?)?.substringAfter("base64,")
+        val dataFileBase64 = (import.additionalProperties?.get("dataFileSource") as String?)?.substringAfter("base64,")
             ?: throw IllegalStateException("Data file is null")
         val importDataFile = Base64.getDecoder().decode(dataFileBase64)
         XSSFWorkbook(importDataFile.inputStream()).use {

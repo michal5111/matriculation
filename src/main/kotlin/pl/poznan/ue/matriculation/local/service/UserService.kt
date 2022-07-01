@@ -58,8 +58,16 @@ class UserService(
 
     @Transactional
     fun update(user: User): User {
+        println(user.roles)
         val id = user.id ?: throw IllegalArgumentException("User id is null")
         userRepository.findByIdOrNull(id) ?: throw EntityNotFoundException("User not found")
+        val ldapUser = ldapUserRepository.findByUid(user.uid) ?: throw UidNotFoundException()
+        user.apply {
+            usosId = ldapUser.usosId
+            givenName = ldapUser.givenName
+            surname = ldapUser.surname
+            email = ldapUser.email
+        }
         return userRepository.save(user)
     }
 

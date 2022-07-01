@@ -160,13 +160,24 @@ class RestController(
     fun deleteUser(@PathVariable("id") id: Long) = userService.delete(id)
 
     @GetMapping("/users")
-    fun getAllUsers(pageable: Pageable): Page<User> = userService.getAll(pageable).let {
+    fun getAllUsers(pageable: Pageable): Page<UserDto> = userService.getAll(pageable).let { page ->
         Page(
-            content = it.content,
-            number = it.number,
-            totalElements = it.totalElements,
-            totalPages = it.totalPages,
-            size = it.size
+            content = page.content.map {
+                UserDto(
+                    id = it.id,
+                    uid = it.uid,
+                    roles = emptyList(),
+                    givenName = it.givenName,
+                    surname = it.surname,
+                    email = it.email,
+                    usosId = it.usosId,
+                    version = it.version
+                )
+            },
+            number = page.number,
+            totalElements = page.totalElements,
+            totalPages = page.totalPages,
+            size = page.size
         )
     }
 

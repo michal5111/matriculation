@@ -20,13 +20,16 @@
           </mat-form-field>
           <div *ngSwitchCase="'FILE'">
             <a mat-button href="{{getUrlWithBaseHref(parameter.fileTemplate)}}">Pobierz szablon</a>
-            <mat-form-field class="form-field wide-field">
-              <ngx-mat-file-input [formControlName]="parameter.name" [placeholder]="parameter.placeholderValue"
-                                  [accept]="parameter.accept"
-                                  multiple="false">
-                <mat-icon matSuffix>folder</mat-icon>
-              </ngx-mat-file-input>
-            </mat-form-field>
+            <input [formControlName]="parameter.name" [accept]="parameter.accept"
+                   (change)="onFileSelected($event, parameter.name)"
+                   multiple="false" type="file" class="file-input" #fileUpload>
+            <div class="file-upload">
+              <button mat-mini-fab type="button" color="primary" class="upload-btn" (click)="fileUpload.click()">
+                <mat-icon>attach_file</mat-icon>
+              </button>
+              Dodaj plik
+            </div>
+            {{formGroup.controls.additionalParameters.value[parameter.name]}}
           </div>
         </div>
       </div>

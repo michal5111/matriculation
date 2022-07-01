@@ -20,6 +20,5 @@ interface UserRepository : PagingAndSortingRepository<User, Long> {
     @EntityGraph("user.roles")
     fun getByUsosId(usosId: Long): User?
 
-    @EntityGraph("user.roles")
     override fun findAll(pageable: Pageable): Page<User>
 }

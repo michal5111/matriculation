@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.local.domain.user
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import javax.persistence.*
 
@@ -20,7 +19,6 @@ class User(
 
     var email: String? = null,
 
-    @get:JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     val roles: MutableSet<Role> = HashSet(),
 

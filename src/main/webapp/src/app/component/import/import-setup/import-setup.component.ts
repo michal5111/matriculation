@@ -122,9 +122,11 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.import.dataSourceId = this.formGroup.value.dataSource.id;
     this.import.additionalProperties = this.formGroup.controls.additionalParameters.value;
     const observables: Observable<string>[] = [];
+    console.log(this.formGroup.controls.additionalParameters.value);
     Object.keys(this.import.additionalProperties).forEach(key => {
       const ap = this.import.additionalProperties[key];
       if (ap instanceof File) {
+        console.log(ap);
         observables.push(
           this.getBase64FromFile(ap).pipe(
             tap(base64string => this.import.additionalProperties[key] = base64string)
@@ -176,7 +178,12 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     dataSource.additionalParameters.forEach(additionalParameter => {
       const fc = new FormControl(additionalParameter.value, Validators.required);
       additionalParametersFG.addControl(additionalParameter.name, fc);
+      if (additionalParameter.type === 'FILE') {
+        const fc2 = new FormControl(null, Validators.required);
+        additionalParametersFG.addControl(additionalParameter.name + 'Source', fc2);
+      }
     });
+    console.log(additionalParametersFG);
     this.areRegistrationLoading = true;
     this.subs.push(
       this.importService.getAvailableRegistrations(dataSource.id).pipe(
@@ -210,5 +217,15 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
       return `${this.baseHref}${url}`;
     }
     return url;
+  }
+
+  onFileSelected(event, parameterName: string) {
+    const file: File = event.target.files[0];
+    if (file) {
+      const additionalParametersFG: FormGroup = this.formGroup.controls.additionalParameters as FormGroup;
+      const pw = {};
+      pw[parameterName + 'Source'] = file;
+      additionalParametersFG.patchValue(pw);
+    }
   }
 }

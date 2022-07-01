@@ -35,9 +35,8 @@ class DevSecurityConfiguration {
     ): UserDetailsManager {
         val user = User.builder()
             .username("admin")
-            .passwordEncoder {
-                passwordEncoder.encode(it)
-            }.password("admin")
+            .passwordEncoder(passwordEncoder::encode)
+            .password("admin")
             .roles("ADMIN")
             .build()
         val inMemoryUserDetailsManager = InMemoryUserDetailsManager()
