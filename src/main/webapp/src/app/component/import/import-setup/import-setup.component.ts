@@ -1,7 +1,14 @@
 import {Component, EventEmitter, Inject, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
-import {FormControl, FormGroup, FormGroupDirective, Validators} from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormGroupDirective,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators
+} from '@angular/forms';
 import {concat, Observable, Observer, Subscription} from 'rxjs';
 import {filter, flatMap, switchMap, tap} from 'rxjs/operators';
 import {IndexType} from '../../../model/oracle/index-type';
@@ -29,7 +36,17 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   $indexPoolsObservable: Observable<[IndexType]> = this.usosService.getAvailableIndexPools();
   stages: string[];
   didacticCycles: string[];
-  formGroup: FormGroup;
+  formGroup: FormGroup<{
+    dataSource: FormControl<DataSource | null>,
+    registration: FormControl<string | null>,
+    registrationProgramme: FormControl<Programme | null>,
+    indexPoolCode: FormControl<IndexType | null>,
+    stage: FormControl<string | null>,
+    didacticCycle: FormControl<string | null>,
+    startDate: FormControl<Date | null>,
+    dateOfAddmision: FormControl<Date | null>,
+    additionalParameters: UntypedFormGroup
+  }>;
   isButtonDisabled = false;
   areRegistrationLoading = false;
   areProgrammesLoading = false;
@@ -42,8 +59,6 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     private usosService: UsosService,
     private snackBar: MatSnackBar,
     @Inject(APP_BASE_HREF) public baseHref
-    // private dialog: MatDialog,
-    // private cd: ChangeDetectorRef
   ) {
   }
 
@@ -52,15 +67,15 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.formGroup = new FormGroup({
-      dataSource: new FormControl(this.import.dataSourceId, Validators.required),
-      registration: new FormControl(this.import.registration, Validators.required),
-      registrationProgramme: new FormControl(this.import.programmeForeignId, Validators.required),
-      indexPoolCode: new FormControl(this.import.indexPoolCode, Validators.required),
-      stage: new FormControl(this.import.stageCode, Validators.required),
-      didacticCycle: new FormControl(this.import.didacticCycleCode, Validators.required),
-      startDate: new FormControl(this.import.startDate, Validators.required),
-      dateOfAddmision: new FormControl(this.import.dateOfAddmision, Validators.required),
-      additionalParameters: new FormGroup({})
+      dataSource: new FormControl<DataSource | null>(null, Validators.required),
+      registration: new FormControl<string | null>(this.import.registration, Validators.required),
+      registrationProgramme: new FormControl<Programme | null>(null, Validators.required),
+      indexPoolCode: new FormControl<IndexType | null>(null, Validators.required),
+      stage: new FormControl<string | null>(this.import.stageCode, Validators.required),
+      didacticCycle: new FormControl<string | null>(this.import.didacticCycleCode, Validators.required),
+      startDate: new FormControl<Date | null>(this.import.startDate, Validators.required),
+      dateOfAddmision: new FormControl<Date | null>(this.import.dateOfAddmision, Validators.required),
+      additionalParameters: new UntypedFormGroup({})
     });
     this.onDidacticCycleInputChanges();
   }
@@ -169,17 +184,17 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
 
   onDataSourceSelectionChange(event: MatSelectChange) {
     const dataSource: DataSource = event.value;
-    const additionalParametersFG: FormGroup = this.formGroup.controls.additionalParameters as FormGroup;
+    const additionalParametersFG: UntypedFormGroup = this.formGroup.controls.additionalParameters as UntypedFormGroup;
     this.dataSourceId = dataSource.id;
     this.additionalParameters.forEach(additionalParameter => {
       additionalParametersFG.removeControl(additionalParameter.name);
     });
     this.additionalParameters = dataSource.additionalParameters;
     dataSource.additionalParameters.forEach(additionalParameter => {
-      const fc = new FormControl(additionalParameter.value, Validators.required);
+      const fc = new UntypedFormControl(additionalParameter.value, Validators.required);
       additionalParametersFG.addControl(additionalParameter.name, fc);
       if (additionalParameter.type === 'FILE') {
-        const fc2 = new FormControl(null, Validators.required);
+        const fc2 = new FormControl<File>(null, Validators.required);
         additionalParametersFG.addControl(additionalParameter.name + 'Source', fc2);
       }
     });
@@ -222,7 +237,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   onFileSelected(event, parameterName: string) {
     const file: File = event.target.files[0];
     if (file) {
-      const additionalParametersFG: FormGroup = this.formGroup.controls.additionalParameters as FormGroup;
+      const additionalParametersFG: UntypedFormGroup = this.formGroup.controls.additionalParameters as UntypedFormGroup;
       const pw = {};
       pw[parameterName + 'Source'] = file;
       additionalParametersFG.patchValue(pw);

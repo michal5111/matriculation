@@ -27,7 +27,6 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatCheckboxModule} from '@angular/material/checkbox';
-import {NgxMatFileInputModule} from '@angular-material-components/file-input';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
@@ -61,7 +60,6 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
     MatDialogModule,
     MatSidenavModule,
     MatTooltipModule,
-    NgxMatFileInputModule,
     MatCheckboxModule,
     MatMomentDateModule,
     MatProgressSpinnerModule
@@ -93,7 +91,6 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
     MatDialogModule,
     MatSidenavModule,
     MatTooltipModule,
-    NgxMatFileInputModule,
     MatCheckboxModule,
     MatMomentDateModule,
     MatProgressSpinnerModule

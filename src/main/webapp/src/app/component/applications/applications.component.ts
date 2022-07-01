@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ApplicationsService} from '../../service/application-service/applications.service';
 import {ApplicantService} from '../../service/applicant-service/applicant.service';
 import {Page} from '../../model/applications/page';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {MatTableDataSource} from '@angular/material/table';
 import {Application} from '../../model/applications/application';
 
@@ -13,12 +13,12 @@ import {Application} from '../../model/applications/application';
 })
 export class ApplicationsComponent implements OnInit {
 
-  filterFormGroup: FormGroup;
+  filterFormGroup: UntypedFormGroup;
 
   constructor(
     private applicationsService: ApplicationsService,
     private applicantService: ApplicantService,
-    private formBuilder: FormBuilder
+    private formBuilder: UntypedFormBuilder
     ) { }
 
   page: Page<Application>;

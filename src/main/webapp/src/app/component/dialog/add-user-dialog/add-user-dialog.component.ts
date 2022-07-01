@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {User} from '../../../model/user/user';
 import {UserService} from '../../../service/user-service/user.service';
 import {Role} from '../../../model/user/role';
@@ -14,7 +14,7 @@ import {MatSelectionList} from '@angular/material/list';
 })
 export class AddUserDialogComponent implements OnInit {
 
-  addUserFormGroup: FormGroup;
+  addUserFormGroup: FormGroup<{ uid: FormControl<number | null> }>;
   user: User;
   rolesList: Role[];
   isButtonDisabled: boolean;
@@ -23,7 +23,6 @@ export class AddUserDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<AddUserDialogComponent>,
-    private formBuilder: FormBuilder,
     private userService: UserService,
     private dialog: MatDialog,
     private roleService: RoleService
@@ -31,8 +30,8 @@ export class AddUserDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.addUserFormGroup = this.formBuilder.group({
-      uid: ['', Validators.required]
+    this.addUserFormGroup = new FormGroup({
+      uid: new FormControl<number>(null, Validators.required)
     });
     this.roleService.getRoles().subscribe(
       result => {

@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {ApplicantService} from '../../service/applicant-service/applicant.service';
 import {Applicant} from '../../model/applications/applicant';
 import {flatMap, map, tap} from 'rxjs/operators';
@@ -12,13 +12,14 @@ import {MatTableDataSource} from '@angular/material/table';
 })
 export class ApplicantSearchComponent implements OnInit {
 
-  selectSearchMethodFormGroup: FormGroup;
-  inputDataFormGroup: FormGroup;
-  applicantFromGroup: FormGroup;
+  selectSearchMethodFormGroup: UntypedFormGroup;
+  inputDataFormGroup: UntypedFormGroup;
+  applicantFromGroup: UntypedFormGroup;
   dataSource = new MatTableDataSource<Applicant>();
   displayedColumns: string[] = ['name', 'surname', 'email'];
 
-  constructor(private formBuilder: FormBuilder, private applicantService: ApplicantService) { }
+  constructor(private formBuilder: UntypedFormBuilder, private applicantService: ApplicantService) {
+  }
 
   ngOnInit() {
     this.selectSearchMethodFormGroup = this.formBuilder.group({

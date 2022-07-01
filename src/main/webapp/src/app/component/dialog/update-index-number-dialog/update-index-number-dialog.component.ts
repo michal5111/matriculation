@@ -1,7 +1,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {UpdateIndexNumberDialogData} from '../../../model/dialog/update-index-number-dialog-data';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {UsosService} from '../../../service/usos-service/usos.service';
 
 @Component({
@@ -11,12 +11,11 @@ import {UsosService} from '../../../service/usos-service/usos.service';
 })
 export class UpdateIndexNumberDialogComponent implements OnInit {
 
-  updateIndexNumberFormGroup: FormGroup;
+  updateIndexNumberFormGroup: FormGroup<{ indexNumber: FormControl<string> }>;
 
   constructor(
     public dialogRef: MatDialogRef<UpdateIndexNumberDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: UpdateIndexNumberDialogData,
-    private formBuilder: FormBuilder,
     private usosService: UsosService
   ) {
   }
@@ -24,8 +23,8 @@ export class UpdateIndexNumberDialogComponent implements OnInit {
   sqlError: string;
 
   ngOnInit(): void {
-    this.updateIndexNumberFormGroup = this.formBuilder.group({
-      indexNumber: ['', Validators.required],
+    this.updateIndexNumberFormGroup = new FormGroup({
+      indexNumber: new FormControl<string>('', Validators.required)
     });
   }
 
