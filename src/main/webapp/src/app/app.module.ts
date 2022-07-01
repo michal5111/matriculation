@@ -7,12 +7,9 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from './module/material/material.module';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {ReactiveFormsModule} from '@angular/forms';
-import {ApplicantSearchComponent} from './component/applicant-search/applicant-search.component';
 import {ApplicationsComponent} from './component/applications/applications.component';
 import {ApplicantComponent} from './component/applicant/applicant.component';
 import {HomeComponent} from './component/home/home.component';
-import {PersonComponent} from './component/oracle/person/person.component';
-import {PersonsComponent} from './component/oracle/persons/persons.component';
 import {ImportSetupComponent} from './component/import/import-setup/import-setup.component';
 import {ImportComponent} from './component/import/import/import.component';
 import {ImportViewComponent} from './component/import/import-view/import-view.component';
@@ -48,12 +45,9 @@ import {DatesValidatorDirective} from './validator/dates-validator.directive';
 @NgModule({
   declarations: [
     AppComponent,
-    ApplicantSearchComponent,
     ApplicantComponent,
     ApplicationsComponent,
     HomeComponent,
-    PersonComponent,
-    PersonsComponent,
     ImportSetupComponent,
     ImportComponent,
     ImportViewComponent,

@@ -9,8 +9,8 @@ import {
   UntypedFormGroup,
   Validators
 } from '@angular/forms';
-import {concat, Observable, Observer, Subscription} from 'rxjs';
-import {filter, flatMap, switchMap, tap} from 'rxjs/operators';
+import {concat, from, mergeMap, Observable, Observer, Subscription} from 'rxjs';
+import {filter, switchMap, tap} from 'rxjs/operators';
 import {IndexType} from '../../../model/oracle/index-type';
 import {Registration} from '../../../model/applications/registration';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -18,7 +18,6 @@ import {MatSelectChange} from '@angular/material/select';
 import {DataSource, DataSourceAdditionalParameter} from '../../../model/import/dataSource';
 import {Programme} from '../../../model/applications/programme';
 import {UsosService} from '../../../service/usos-service/usos.service';
-import {fromArray} from 'rxjs/internal/observable/fromArray';
 import {APP_BASE_HREF} from '@angular/common';
 
 @Component({
@@ -150,8 +149,8 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
       }
     });
     concat(
-      fromArray(observables).pipe(
-        flatMap(ob => ob)
+      from(observables).pipe(
+        mergeMap((ob: Observable<string>) => ob)
       ),
       this.importService.createImport(this.import).pipe(
         tap((importObj: Import) => this.onImportCreated(importObj))
