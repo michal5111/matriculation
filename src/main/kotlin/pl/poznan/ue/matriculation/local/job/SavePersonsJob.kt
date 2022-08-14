@@ -28,7 +28,6 @@ class SavePersonsJob(
         val importId = import.id ?: throw IllegalArgumentException("Import id is null")
         processService.processApplications(
             importId = importId,
-            import = import,
             applicationDtoDataSource = applicationDataSourceFactory.getDataSource(import.dataSourceId)
         )
     }

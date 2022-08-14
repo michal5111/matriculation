@@ -11,7 +11,6 @@ import pl.poznan.ue.matriculation.cem.service.CemStudentService
 import pl.poznan.ue.matriculation.cem.service.CourseService
 import pl.poznan.ue.matriculation.exception.ApplicantMappingException
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
-import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.kotlinExtensions.parseAddressFromString
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPhoneNumber
 import pl.poznan.ue.matriculation.local.domain.applicants.*
@@ -38,7 +37,7 @@ class CemApplicationDataSourceImpl(
     private val citizenshipService: CitizenshipService
 ) : IApplicationDataSource<CemApplication, CemStudent> {
 
-    private val nonAlfabeticalCharactersRegex = " *[-.,] *".toRegex()
+    private val nonAlphabeticalCharactersRegex = " *[-.,] *".toRegex()
 
     override fun getApplicationsPage(
         import: Import,
@@ -104,25 +103,23 @@ class CemApplicationDataSourceImpl(
             foreignId = applicantDto.foreignId,
             dataSourceId = id,
             email = applicantDto.email ?: throw ApplicantMappingException("Email is null"),
-            given = applicantDto.firstName?.nameCapitalize()?.trim()
+            given = applicantDto.firstName?.trim()
                 ?: throw ApplicantMappingException("First name is null"),
-            maiden = applicantDto.maidenName?.nameCapitalize()
-                ?.takeIf { it.isNotBlank() && !it.matches(nonAlfabeticalCharactersRegex) }?.trim(),
-            middle = applicantDto.secondName?.nameCapitalize()
-                ?.takeIf { it.isNotBlank() && !it.matches(nonAlfabeticalCharactersRegex) }?.trim(),
-            family = applicantDto.lastName?.nameCapitalize()?.trim()
+            maiden = applicantDto.maidenName
+                ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim(),
+            middle = applicantDto.secondName
+                ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim(),
+            family = applicantDto.lastName?.trim()
                 ?: throw ApplicantMappingException("Last name is null"),
             pesel = applicantDto.pesel?.takeIf { it.isNotBlank() }?.trim(),
             fathersName = applicantDto.fatherName
-                ?.takeIf { it.isNotBlank() && !it.matches(nonAlfabeticalCharactersRegex) }
-                ?.nameCapitalize()?.trim(),
+                ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim(),
             mothersName = applicantDto.motherName
-                ?.takeIf { it.isNotBlank() && !it.matches(nonAlfabeticalCharactersRegex) }
-                ?.nameCapitalize()?.trim(),
+                ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim(),
             modificationDate = Date(),
             dateOfBirth = applicantDto.birthdate,
-            cityOfBirth = applicantDto.birthPlace?.nameCapitalize()
-                ?.takeIf { it.isNotBlank() && !it.matches(nonAlfabeticalCharactersRegex) }?.trim(),
+            cityOfBirth = applicantDto.birthPlace
+                ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim(),
             photoPermission = PhotoPermissionType.NOBODY,
             sex = if (applicantDto.sex == 1) 'M' else 'K',
         ).apply {
@@ -156,7 +153,7 @@ class CemApplicationDataSourceImpl(
             Address(
                 applicant = applicant,
                 addressType = addressType,
-                city = city?.substringAfter(',')?.takeIf { it.isNotBlank() }?.trim()?.nameCapitalize(),
+                city = city?.substringAfter(',')?.takeIf { it.isNotBlank() }?.trim(),
                 postalCode = postalCode?.takeIf { it.isNotBlank() },
                 cityIsCity = false,
                 countryCode = country?.let {
@@ -235,23 +232,23 @@ class CemApplicationDataSourceImpl(
     ): Applicant {
         return applicant.apply {
             email = applicantDto.email ?: throw ApplicantMappingException("Email is null")
-            given = applicantDto.firstName?.nameCapitalize()?.trim()
+            given = applicantDto.firstName?.trim()
                 ?: throw ApplicantMappingException("First name is null")
-            maiden = applicantDto.maidenName?.nameCapitalize()
-                ?.takeIf { it.isNotBlank() && !it.matches(nonAlfabeticalCharactersRegex) }?.trim()
-            middle = applicantDto.secondName?.nameCapitalize()
-                ?.takeIf { it.isNotBlank() && !it.matches(nonAlfabeticalCharactersRegex) }?.trim()
+            maiden = applicantDto.maidenName
+                ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim()
+            middle = applicantDto.secondName
+                ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim()
             family =
-                applicantDto.lastName?.nameCapitalize()?.trim() ?: throw ApplicantMappingException("Last name is null")
+                applicantDto.lastName?.trim() ?: throw ApplicantMappingException("Last name is null")
             pesel = applicantDto.pesel
-            fathersName = applicantDto.fatherName?.nameCapitalize()
-                ?.takeIf { it.isNotBlank() && !it.matches(nonAlfabeticalCharactersRegex) }?.trim()
-            mothersName = applicantDto.motherName?.nameCapitalize()
-                ?.takeIf { it.isNotBlank() && !it.matches(nonAlfabeticalCharactersRegex) }?.trim()
+            fathersName = applicantDto.fatherName
+                ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim()
+            mothersName = applicantDto.motherName
+                ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim()
             modificationDate = Date()
             dateOfBirth = applicantDto.birthdate
-            cityOfBirth = applicantDto.birthPlace?.nameCapitalize()
-                ?.takeIf { it.isNotBlank() && !it.matches(nonAlfabeticalCharactersRegex) }?.trim()
+            cityOfBirth = applicantDto.birthPlace
+                ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim()
             photoPermission = PhotoPermissionType.NOBODY
             sex = if (applicantDto.sex == 1) 'M' else 'K'
             createAddresses(this, applicantDto)

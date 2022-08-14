@@ -21,10 +21,10 @@ import {RxStompService} from '@stomp/ng2-stompjs';
 export class ImportComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
-  page: Page<Import>;
+  page: Page<Import> | null = null;
   totalElements = 0;
   pageNumber = 0;
-  pageSize = parseInt(localStorage.getItem('importPageSize'), 10) ?? 10;
+  pageSize = parseInt(localStorage.getItem('importPageSize') ?? '10', 10);
   dataSource = new MatTableDataSource<Import>();
   sortString = 'id';
   sortDirString = 'desc';
@@ -36,7 +36,6 @@ export class ImportComponent implements OnInit, OnDestroy {
     'programmeForeignName',
     'stageCode',
     'didacticCycleCode',
-    // 'indexPoolCode',
     'indexPoolName',
     'startDate',
     'dateOfAddmision',
@@ -48,9 +47,9 @@ export class ImportComponent implements OnInit, OnDestroy {
     'selectImport'
   ];
 
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
-  @ViewChild(MatExpansionPanel, {static: true}) importCreateExpansionPanel: MatExpansionPanel;
+  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator | null = null;
+  @ViewChild(MatSort, {static: true}) sort: MatSort | null = null;
+  @ViewChild(MatExpansionPanel, {static: true}) importCreateExpansionPanel: MatExpansionPanel | null = null;
 
   constructor(
     private importService: ImportService,
@@ -107,7 +106,7 @@ export class ImportComponent implements OnInit, OnDestroy {
       ).subscribe(),
       this.rxStompService.watch('/topic/insert/import').pipe(
         map((message: Message) => JSON.parse(message.body)),
-        switchMap(importObj => this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString))
+        switchMap(() => this.getPage(this.page?.number ?? 0, this.page?.size ?? 10, this.sortString, this.sortDirString))
       ).subscribe()
     );
 
@@ -136,7 +135,6 @@ export class ImportComponent implements OnInit, OnDestroy {
         relativeTo: this.route,
         queryParams: {
           page: this.pageNumber,
-          // sort: this.sortingMap.get(sortEvent.active),
           sort: sortEvent.active,
           dir: sortEvent.direction,
           pageSize: this.pageSize
@@ -147,11 +145,14 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   onImportCreated(event: Import): void {
     this.subs.push(
-      this.getPage(this.page.number, this.page.size, this.sortString, this.sortDirString).subscribe()
+      this.getPage(this.page?.number ?? 0, this.page?.size ?? 10, this.sortString, this.sortDirString).subscribe()
     );
   }
 
   deleteImport(importObject: Import): Observable<any> {
+    if (importObject.id == null) {
+      throw Error('Import id is null');
+    }
     return this.importService.deleteImport(importObject.id).pipe(
       tap(() => this.removeImportFromData(importObject))
     );
@@ -162,6 +163,9 @@ export class ImportComponent implements OnInit, OnDestroy {
   }
 
   onDeleteImportClick(importObj: Import): void {
+    if (importObj.id == null) {
+      throw Error('Import id is null');
+    }
     this.subs.push(
       this.importService.deleteImport(importObj.id).subscribe()
     );

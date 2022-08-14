@@ -27,11 +27,7 @@ class CheckForPotentialDuplicatesJob(
         processService.findPotentialDuplicates(importId)
     }
 
-    override fun getCompletionStatus(import: Import): ImportStatus {
-        return ImportStatus.IMPORTED
-    }
+    override fun getCompletionStatus(import: Import): ImportStatus = ImportStatus.IMPORTED
 
-    override fun getInProgressStatus(): ImportStatus {
-        return ImportStatus.CHECKING_POTENTIAL_DUPLICATES
-    }
+    override fun getInProgressStatus(): ImportStatus = ImportStatus.CHECKING_POTENTIAL_DUPLICATES
 }

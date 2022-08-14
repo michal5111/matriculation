@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Inject, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
 import {
@@ -9,8 +9,8 @@ import {
   UntypedFormGroup,
   Validators
 } from '@angular/forms';
-import {concat, from, mergeMap, Observable, Observer, Subscription} from 'rxjs';
-import {filter, switchMap, tap} from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged, from, Observable, Subscription} from 'rxjs';
+import {map, switchMap, tap} from 'rxjs/operators';
 import {IndexType} from '../../../model/oracle/index-type';
 import {Registration} from '../../../model/applications/registration';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -27,14 +27,13 @@ import {APP_BASE_HREF} from '@angular/common';
 })
 export class ImportSetupComponent implements OnInit, OnDestroy {
 
-  import: Import = new Import();
-  dataSourceId = '';
+  dataSourceId = '?';
   $availableDataSourcesObservable: Observable<[DataSource]> = this.importService.getAvailableDataSources();
-  registrations: Registration[];
-  registrationProgrammes: Programme[];
+  registrations: Registration[] = [];
+  registrationProgrammes: Programme[] = [];
   $indexPoolsObservable: Observable<[IndexType]> = this.usosService.getAvailableIndexPools();
-  stages: string[];
-  didacticCycles: string[];
+  stages: string[] = [];
+  didacticCycles: string[] = [];
   formGroup: FormGroup<{
     dataSource: FormControl<DataSource | null>,
     registration: FormControl<string | null>,
@@ -57,26 +56,30 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     private importService: ImportService,
     private usosService: UsosService,
     private snackBar: MatSnackBar,
-    @Inject(APP_BASE_HREF) public baseHref
+    @Inject(APP_BASE_HREF) public baseHref: string
   ) {
+    this.formGroup = new FormGroup({
+      dataSource: new FormControl<DataSource | null>(null, Validators.required),
+      registration: new FormControl<string | null>(null, Validators.required),
+      registrationProgramme: new FormControl<Programme | null>(null, Validators.required),
+      indexPoolCode: new FormControl<IndexType | null>(null, Validators.required),
+      stage: new FormControl<string | null>(null, Validators.required),
+      didacticCycle: new FormControl<string | null>(null, Validators.required),
+      startDate: new FormControl<Date | null>(null, Validators.required),
+      dateOfAddmision: new FormControl<Date | null>(null, Validators.required),
+      additionalParameters: new UntypedFormGroup({})
+    });
   }
 
   @Output() importCreated = new EventEmitter<Import>();
-  @ViewChild(FormGroupDirective) formGroupDirective: FormGroupDirective;
+  @Input() import: Import | null = new Import();
+  @ViewChild(FormGroupDirective) formGroupDirective: FormGroupDirective | null = null;
 
   ngOnInit(): void {
-    this.formGroup = new FormGroup({
-      dataSource: new FormControl<DataSource | null>(null, Validators.required),
-      registration: new FormControl<string | null>(this.import.registration, Validators.required),
-      registrationProgramme: new FormControl<Programme | null>(null, Validators.required),
-      indexPoolCode: new FormControl<IndexType | null>(null, Validators.required),
-      stage: new FormControl<string | null>(this.import.stageCode, Validators.required),
-      didacticCycle: new FormControl<string | null>(this.import.didacticCycleCode, Validators.required),
-      startDate: new FormControl<Date | null>(this.import.startDate, Validators.required),
-      dateOfAddmision: new FormControl<Date | null>(this.import.dateOfAddmision, Validators.required),
-      additionalParameters: new UntypedFormGroup({})
-    });
-    this.onDidacticCycleInputChanges();
+    this.subs.push(this.onDidacticCycleInputChanges().subscribe());
+    if (this.import != null && this.import.id != null) {
+      this.subs.push(this.initForm(this.import.id).subscribe());
+    }
   }
 
   onRegistrationSelectionChange(event: MatSelectChange): void {
@@ -111,52 +114,46 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     );
   }
 
-  onDidacticCycleInputChanges(): void {
-    this.subs.push(
-      this.formGroup.get('didacticCycle').valueChanges.pipe(
-        filter(value => value !== undefined && value !== '' && value !== null && value.length >= 2),
-        switchMap(value => this.usosService.findDidacticCycleCodes(value)),
-        tap(didacticCycles => this.didacticCycles = didacticCycles)
-      ).subscribe()
-    );
+  onDidacticCycleInputChanges(): Observable<[string]> {
+    return this.formGroup.get('didacticCycle')?.valueChanges.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      switchMap(value => this.usosService.findDidacticCycleCodes(value ?? '')),
+      tap(didacticCycles => this.didacticCycles = didacticCycles)
+    ) ?? from([]);
   }
 
   onSubmit() {
     this.isButtonDisabled = true;
-    this.import.registration = this.formGroup.value.registration;
-    this.import.programmeCode = this.formGroup.value.registrationProgramme.usosId;
-    this.import.programmeForeignId = this.formGroup.value.registrationProgramme.id;
-    this.import.programmeForeignName = this.formGroup.value.registrationProgramme.name;
-    this.import.didacticCycleCode = this.formGroup.value.didacticCycle;
-    this.import.dateOfAddmision = this.formGroup.value.dateOfAddmision;
-    this.import.startDate = this.formGroup.value.startDate;
-    this.import.indexPoolCode = this.formGroup.value.indexPoolCode.code;
-    this.import.indexPoolName = this.formGroup.value.indexPoolCode.description;
-    this.import.stageCode = this.formGroup.value.stage;
-    this.import.dataSourceId = this.formGroup.value.dataSource.id;
+    if (this.import == null) {
+      throw Error();
+    }
+    this.import.registration = this.formGroup.value.registration ?? null;
+    this.import.programmeCode = this.formGroup.value.registrationProgramme?.usosId ?? null;
+    this.import.programmeForeignId = this.formGroup.value.registrationProgramme?.id ?? null;
+    this.import.programmeForeignName = this.formGroup.value.registrationProgramme?.name ?? null;
+    this.import.didacticCycleCode = this.formGroup.value.didacticCycle ?? null;
+    this.import.dateOfAddmision = this.formGroup.value.dateOfAddmision ?? null;
+    this.import.startDate = this.formGroup.value.startDate ?? null;
+    this.import.indexPoolCode = this.formGroup.value.indexPoolCode?.code ?? null;
+    this.import.indexPoolName = this.formGroup.value.indexPoolCode?.description ?? null;
+    this.import.stageCode = this.formGroup.value.stage ?? null;
+    this.import.dataSourceId = this.formGroup.value.dataSource?.id ?? null;
+    this.import.dataSourceName = this.formGroup.value.dataSource?.name ?? null;
     this.import.additionalProperties = this.formGroup.controls.additionalParameters.value;
-    const observables: Observable<string>[] = [];
     console.log(this.formGroup.controls.additionalParameters.value);
-    Object.keys(this.import.additionalProperties).forEach(key => {
-      const ap = this.import.additionalProperties[key];
-      if (ap instanceof File) {
-        console.log(ap);
-        observables.push(
-          this.getBase64FromFile(ap).pipe(
-            tap(base64string => this.import.additionalProperties[key] = base64string)
-          )
-        );
-      }
-    });
-    concat(
-      from(observables).pipe(
-        mergeMap((ob: Observable<string>) => ob)
-      ),
-      this.importService.createImport(this.import).pipe(
-        tap((importObj: Import) => this.onImportCreated(importObj))
-      )
+    let obs;
+    if (this.import?.id == null) {
+      obs = this.importService.createImport(this.import);
+    } else {
+      obs = this.importService.updateImport(this.import);
+    }
+    obs?.pipe(
+      tap((importObj: Import) => this.onImportCreated(importObj))
     ).subscribe({
-        error: () => {
+        next: () => this.import = new Import(),
+        error: e => {
+          console.log(e);
           this.isButtonDisabled = false;
         }
       }
@@ -170,7 +167,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.subs.push(
       snackBarRef.onAction().subscribe(() => snackBarRef.dismiss())
     );
-    this.formGroupDirective.resetForm();
+    this.formGroupDirective?.resetForm();
     this.import = importObject;
     this.importCreated.next(this.import);
     this.isButtonDisabled = false;
@@ -183,21 +180,8 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
 
   onDataSourceSelectionChange(event: MatSelectChange) {
     const dataSource: DataSource = event.value;
-    const additionalParametersFG: UntypedFormGroup = this.formGroup.controls.additionalParameters as UntypedFormGroup;
     this.dataSourceId = dataSource.id;
-    this.additionalParameters.forEach(additionalParameter => {
-      additionalParametersFG.removeControl(additionalParameter.name);
-    });
-    this.additionalParameters = dataSource.additionalParameters;
-    dataSource.additionalParameters.forEach(additionalParameter => {
-      const fc = new UntypedFormControl(additionalParameter.value, Validators.required);
-      additionalParametersFG.addControl(additionalParameter.name, fc);
-      if (additionalParameter.type === 'FILE') {
-        const fc2 = new FormControl<File>(null, Validators.required);
-        additionalParametersFG.addControl(additionalParameter.name + 'Source', fc2);
-      }
-    });
-    console.log(additionalParametersFG);
+    this.initAdditionalParameters(dataSource);
     this.areRegistrationLoading = true;
     this.subs.push(
       this.importService.getAvailableRegistrations(dataSource.id).pipe(
@@ -213,33 +197,84 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
       ));
   }
 
-  getBase64FromFile(file: File): Observable<string> {
-    return new Observable<string>((observer: Observer<string>) => {
-      const reader = new FileReader();
-      if (file) {
-        reader.onload = () => {
-          observer.next(reader.result.toString());
-          observer.complete();
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  }
-
-  getUrlWithBaseHref(url: string): string {
+  getUrlWithBaseHref(url: string | undefined): string {
     if (this.baseHref) {
       return `${this.baseHref}${url}`;
     }
-    return url;
+    return url ?? '';
   }
 
-  onFileSelected(event, parameterName: string) {
-    const file: File = event.target.files[0];
-    if (file) {
-      const additionalParametersFG: UntypedFormGroup = this.formGroup.controls.additionalParameters as UntypedFormGroup;
-      const pw = {};
-      pw[parameterName + 'Source'] = file;
-      additionalParametersFG.patchValue(pw);
+  datasourceCompare(ds1: DataSource, ds2: DataSource): boolean {
+    return ds1 && ds2 ? ds1.id === ds2.id : false;
+  }
+
+  registrationCompare(rg1: Registration, rg2: Registration): boolean {
+    return rg1 && rg2 ? rg1.id === rg2.id : false;
+  }
+
+  registrationProgrammeCompare(rgp1: Programme, rgp2: Programme): boolean {
+    return rgp1 && rgp2 ? rgp1.id === rgp2.id : false;
+  }
+
+  indexTypeCompare(it1: IndexType, it2: IndexType): boolean {
+    return it1.code === it2.code;
+  }
+
+  initForm(importId: number): Observable<Import> {
+    return this.importService.findById(importId).pipe(
+      tap(value => this.import = value),
+      switchMap(value =>
+        this.$availableDataSourcesObservable.pipe(
+          map(dataSources => dataSources.find(d => d.id === value.dataSourceId)),
+          tap(datasource => this.initAdditionalParameters(datasource)),
+          switchMap(() => this.importService.getAvailableRegistrations(value.dataSourceId ?? '')),
+          tap(results => this.registrations = results),
+          switchMap(() => this.importService.getAvailableRegistrationProgrammes(
+            value.registration ?? '',
+            value.dataSourceId ?? ''
+          )),
+          tap(results => this.registrationProgrammes = results),
+          switchMap(() => this.usosService.getAvailableStages(value.programmeCode ?? '').pipe(
+            tap(results => this.stages = results)
+          )),
+          tap(results => this.stages = results),
+          map(() => value)
+        )
+      ),
+      tap(value => {
+        this.formGroup.patchValue(
+          {
+            dataSource: new DataSource(value.dataSourceName ?? '?', value.dataSourceId ?? '?'),
+            registration: value.registration,
+            registrationProgramme: new Programme(
+              value.programmeForeignId ?? '?',
+              value.programmeForeignName ?? '?',
+              value.programmeCode ?? '?'
+            ),
+            indexPoolCode: new IndexType(value.indexPoolCode ?? '', value.indexPoolName ?? '?'),
+            stage: value.stageCode,
+            didacticCycle: value.didacticCycleCode,
+            startDate: value.startDate,
+            dateOfAddmision: value.dateOfAddmision,
+            additionalParameters: value.additionalProperties
+          }
+        );
+      })
+    );
+  }
+
+  initAdditionalParameters(dataSource: DataSource | undefined) {
+    if (dataSource == null) {
+      return;
     }
+    const additionalParametersFG: UntypedFormGroup = this.formGroup.controls.additionalParameters as UntypedFormGroup;
+    this.additionalParameters.forEach(additionalParameter => {
+      additionalParametersFG.removeControl(additionalParameter.name);
+    });
+    this.additionalParameters = dataSource.additionalParameters;
+    dataSource.additionalParameters.forEach(additionalParameter => {
+      const fc = new UntypedFormControl(additionalParameter.value, Validators.required);
+      additionalParametersFG.addControl(additionalParameter.name, fc);
+    });
   }
 }

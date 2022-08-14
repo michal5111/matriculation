@@ -12,7 +12,7 @@ export class UnauthorizedDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<UnauthorizedDialogComponent>,
-    public _router: Router,
+    public router: Router,
     @Inject(APP_BASE_HREF) public baseHref: string, public location: Location
   ) { }
 

@@ -18,7 +18,8 @@ import java.util.stream.Stream
 
 @Service
 class ApplicationService(
-    private val applicationRepository: ApplicationRepository
+    private val applicationRepository: ApplicationRepository,
+    private val applicantService: ApplicantService
 ) {
     fun findAllApplicationsByImportId(pageable: Pageable, importId: Long): Page<Application> {
         return applicationRepository.findAllByImportId(pageable, importId)
@@ -83,5 +84,17 @@ class ApplicationService(
     @Transactional
     fun findAllForArchive(importId: Long): Stream<Application> {
         return applicationRepository.findAllForArchive(importId)
+    }
+
+    @Transactional
+    fun delete(applicationId: Long) {
+        val application = applicationRepository.findByIdOrNull(applicationId)
+        val import = application?.import ?: throw ImportNotFoundException()
+        applicationRepository.deleteById(applicationId)
+        application.applicant?.id?.let {
+            applicantService.deleteOrphanedById(it)
+        }
+        import.importedApplications--
+        import.totalCount = (import.totalCount ?: return) - 1
     }
 }

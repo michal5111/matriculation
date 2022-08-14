@@ -98,4 +98,8 @@ export class ImportService {
   getPotentialDuplicates(applicantId: number): Observable<Array<Person>> {
     return this.http.get<[Person]>(`${this.apiUrl}/applicant/${applicantId}/potentialDuplicates`);
   }
+
+  updateImport(importObject: Import): Observable<Import> {
+    return this.http.put<Import>(`${this.apiUrl}/import`, importObject, httpOptions);
+  }
 }

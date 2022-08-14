@@ -26,6 +26,7 @@ import {MatCheckboxChange} from '@angular/material/checkbox';
 import {RxStompService} from '@stomp/ng2-stompjs';
 import {Message} from '@stomp/stompjs';
 import {WS_URL} from '../../../injectableTokens/WS_URL';
+import {ImportEditorComponent} from '../../dialog/import-editor/import-editor.component';
 
 @Component({
   selector: 'app-import-view',
@@ -34,14 +35,14 @@ import {WS_URL} from '../../../injectableTokens/WS_URL';
 })
 export class ImportViewComponent implements OnInit, OnDestroy {
 
-  importId: number;
-  import: Import;
-  progressSubscription: Subscription;
-  usosUrl: UrlDto;
-  pageSize = parseInt(localStorage.getItem('importViewPageSize'), 10) ?? 5;
+  importId = -1;
+  import: Import | null = null;
+  progressSubscription: Subscription | null = null;
+  usosUrl: UrlDto | null = null;
+  pageSize = parseInt(localStorage.getItem('importViewPageSize') ?? '5', 10);
   pageNumber = 0;
   totalElements = 0;
-  page: Page<Application>;
+  page: Page<Application> | null = null;
   dataSource = new MatTableDataSource<Application>();
   sortString = 'applicant.family';
   sortDirString = 'asc';
@@ -60,7 +61,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['indexNumber', true],
     ['applicationImportStatus', true],
     ['duplicateStatus', true],
-    // ['importError', true]
+    ['delete', true]
   ]);
   sortingMap: Map<string, string> = new Map<string, string>([
     ['id', 'id'],
@@ -72,16 +73,15 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['pesel', 'applicant.pesel'],
     ['indexNumber', 'applicant.assignedIndexNumber'],
     ['applicationImportStatus', 'importStatus'],
-    // ['importError', 'importError'],
     ['duplicateStatus', 'applicant.potentialDuplicateStatus']
   ]);
 
   subs: Subscription[] = [];
 
-  private importObservable$: Observable<Import>;
+  private importObservable$: Observable<Import> | null = null;
 
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator | null = null;
+  @ViewChild(MatSort, {static: true}) sort: MatSort | null = null;
 
   constructor(
     private importService: ImportService,
@@ -197,7 +197,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       height: '250px',
       data: {
         personId: application.applicant.usosId,
-        indexTypeCode: this.import.indexPoolCode,
+        indexTypeCode: this.import?.indexPoolCode,
         indexNumber: application.applicant.assignedIndexNumber
       }
     });
@@ -211,7 +211,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   getElementNumber(application: Application): number {
-    return this.page.content.indexOf(application) + this.pageSize * this.pageNumber + 1;
+    return (this.page?.content.indexOf(application) ?? 0) + this.pageSize * this.pageNumber + 1;
   }
 
   onArchiveClick(): void {
@@ -228,7 +228,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   getPersonUsosUrl(application: Application): string {
-    return `${this.usosUrl.url}/studenci/programyOsob.jsf?osobaId=${application.applicant.usosId}`;
+    return `${this.usosUrl?.url}/studenci/programyOsob.jsf?osobaId=${application.applicant.usosId}`;
   }
 
   ngOnDestroy(): void {
@@ -266,7 +266,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   isStartImportButtonDisabled(): boolean {
-    switch (this.import.importStatus) {
+    switch (this.import?.importStatus) {
       case 'ARCHIVED':
       case 'SAVING':
       case 'STARTED':
@@ -283,7 +283,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   isSavePersonsButtonDisabled(): boolean {
-    switch (this.import.importStatus) {
+    switch (this.import?.importStatus) {
       case 'COMPLETED_WITH_ERRORS':
       case 'IMPORTED':
         return false;
@@ -293,11 +293,11 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   isArchiveButtonDisabled(): boolean {
-    return this.import.importStatus !== 'COMPLETE';
+    return this.import?.importStatus !== 'COMPLETE';
   }
 
   isFindUidsButtonDisabled(): boolean {
-    switch (this.import.importStatus) {
+    switch (this.import?.importStatus) {
       case 'COMPLETE':
       case 'COMPLETED_WITH_ERRORS':
       case 'ERROR':
@@ -317,7 +317,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   isSendNotificationsDisabled(): boolean {
-    switch (this.import.importStatus) {
+    switch (this.import?.importStatus) {
       case 'COMPLETE':
       case 'COMPLETED_WITH_ERRORS':
         return this.import.savedApplicants !== this.import.totalCount
@@ -328,7 +328,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   isCheckForDuplicatesDisabled(): boolean {
-    switch (this.import.importStatus) {
+    switch (this.import?.importStatus) {
       case 'IMPORTED':
         return false;
       default:
@@ -355,7 +355,9 @@ export class ImportViewComponent implements OnInit, OnDestroy {
             usosId: (result.notDuplicate ? undefined : result.person.id),
             potentialDuplicateStatus: (result.notDuplicate ? 'CONFIRMED_NOT_DUPLICATE' : 'OK')
           }).subscribe(updatedApplication => {
-            this.import.potentialDuplicates--;
+            if (this.import?.potentialDuplicates !== undefined) {
+              this.import.potentialDuplicates--;
+            }
             application.applicant.potentialDuplicateStatus = updatedApplication.applicant.potentialDuplicateStatus;
             application.applicant.usosId = updatedApplication.applicant.usosId;
           })
@@ -372,5 +374,37 @@ export class ImportViewComponent implements OnInit, OnDestroy {
 
   onColumnCheckboxChange(event: MatCheckboxChange, ...columnIds: string[]) {
     columnIds.forEach(id => this.displayedColumns.set(id, event.checked));
+  }
+
+  deleteApplication(id: number) {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: new ConfirmationDialogData('Jesteś pewien?', 'Czy na pewno chcesz usunąć osobę?')
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.applicationsService.delete(id).subscribe({
+          next: () => {
+            this.dataSource.data = this.dataSource.data.filter(application => application.id !== id);
+          }
+        });
+      }
+    });
+  }
+
+  openEditorDialog() {
+    this.dialog.open(ImportEditorComponent, {
+      data: {
+        import: this.import
+      }
+    });
+  }
+
+  isEditButtonDisabled(): boolean {
+    return this.import?.importStatus != null ? !(
+      this.import?.importStatus === 'PENDING'
+      || this.import?.importStatus === 'IMPORTED'
+      || this.import?.importStatus === 'COMPLETED_WITH_ERRORS'
+      || (this.import?.importStatus === 'ERROR' && this.import.totalCount !== this.import.savedApplicants)
+    ) : true;
   }
 }

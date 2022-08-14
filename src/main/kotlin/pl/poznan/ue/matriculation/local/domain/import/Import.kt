@@ -61,6 +61,8 @@ class Import(
 
     val dataSourceId: String,
 
+    val dataSourceName: String,
+
     @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
     @Column(columnDefinition = "json")
     val additionalProperties: Map<String, Any>?,

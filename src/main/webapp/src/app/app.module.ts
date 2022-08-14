@@ -7,8 +7,6 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from './module/material/material.module';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {ReactiveFormsModule} from '@angular/forms';
-import {ApplicationsComponent} from './component/applications/applications.component';
-import {ApplicantComponent} from './component/applicant/applicant.component';
 import {HomeComponent} from './component/home/home.component';
 import {ImportSetupComponent} from './component/import/import-setup/import-setup.component';
 import {ImportComponent} from './component/import/import/import.component';
@@ -41,12 +39,12 @@ import {WS_URL} from './injectableTokens/WS_URL';
 import {MAT_DATE_FORMATS} from '@angular/material/core';
 import {MY_DATE_FORMATS} from './service/configConsts/MY_DATE_FORMATS';
 import {DatesValidatorDirective} from './validator/dates-validator.directive';
+import {ReactiveFileInputComponent} from './component/reactive-file-input/reactive-file-input.component';
+import {ImportEditorComponent} from './component/dialog/import-editor/import-editor.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ApplicantComponent,
-    ApplicationsComponent,
     HomeComponent,
     ImportSetupComponent,
     ImportComponent,
@@ -63,7 +61,9 @@ import {DatesValidatorDirective} from './validator/dates-validator.directive';
     ImportStatusIndicatorComponent,
     AddUserDialogComponent,
     SelectPersonDialogComponent,
-    DatesValidatorDirective
+    DatesValidatorDirective,
+    ReactiveFileInputComponent,
+    ImportEditorComponent
   ],
   imports: [
     BrowserModule,

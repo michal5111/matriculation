@@ -20,7 +20,6 @@ import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
-import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
 import java.util.stream.Stream
@@ -121,7 +120,6 @@ class ProcessService(
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     fun processApplications(
         importId: Long,
-        import: Import,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
     ) {
         logger.trace("Pobieram strumień zgłoszeń ze statusem nie zaimportowany i błąd")
@@ -149,7 +147,6 @@ class ProcessService(
                         applicationProcessor.processApplication(
                             importId = importId,
                             application = application,
-                            importDto = import,
                             applicationDtoDataSource = applicationDtoDataSource
                         )
                     }

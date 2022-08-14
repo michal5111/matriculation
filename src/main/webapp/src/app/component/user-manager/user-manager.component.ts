@@ -21,13 +21,13 @@ import {UserEditorData} from '../../model/user/UserEditorData';
 })
 export class UserManagerComponent implements OnInit {
 
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator | null = null;
+  @ViewChild(MatSort, {static: true}) sort: MatSort | null = null;
 
   pageSize = 5;
   pageNumber = 0;
   totalElements = 0;
-  page: Page<User>;
+  page: Page<User> | undefined;
   sortString = 'id';
   sortDirString = 'asc';
 
@@ -124,6 +124,9 @@ export class UserManagerComponent implements OnInit {
   }
 
   deleteUser(user: User) {
+    if (user.id === null) {
+      throw Error('User id is null');
+    }
     this.userService.delete(user.id).subscribe(
       () => {
         this.dataSource.data = this.dataSource.data.filter(element => {

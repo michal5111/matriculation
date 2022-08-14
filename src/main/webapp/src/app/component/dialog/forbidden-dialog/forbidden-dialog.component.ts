@@ -14,7 +14,7 @@ export class ForbiddenDialogComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onClick(event) {
+  onClick() {
     this.dialogRef.close();
   }
 }

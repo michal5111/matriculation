@@ -1,0 +1,15 @@
+<a mat-button href="{{templateHref}}">
+  <mat-icon>file_download</mat-icon>
+  Pobierz szablon</a>
+<input accept="{{accept}}" (change)="onFileSelected($event)" multiple="false" type="file" class="file-input"
+       #fileUpload>
+<span class="file-upload">
+  <button mat-mini-fab type="button" color="primary" class="upload-btn"
+          (click)="fileUpload.click(); onTouched()" [disabled]="disabled">
+    <mat-icon>attach_file</mat-icon>
+  </button>
+  Dodaj plik
+</span>
+<ng-template [ngIf]="file">
+  {{file?.name}}
+</ng-template>

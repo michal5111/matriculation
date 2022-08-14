@@ -15,10 +15,10 @@ export class ExceptionHandler implements ErrorHandler {
   }
 
   openedDialogs = 0;
-  title: string;
-  message: string;
-  path: string;
-  stacktrace: string;
+  title = '?';
+  message = '?';
+  path: string | null = '?';
+  stacktrace: string | undefined;
 
   handleError(error: any): void {
     this.title = 'Error ';
@@ -61,7 +61,7 @@ export class ExceptionHandler implements ErrorHandler {
 
   openDialog() {
     const dialogRef = this.dialog.open(ErrorDialogComponent, {
-      data: new ErrorDialogData(this.title, this.message, this.stacktrace, this.path)
+      data: new ErrorDialogData(this.title, this.message, this.stacktrace, this.path ?? '?')
     });
     this.openedDialogs++;
     dialogRef.afterClosed().subscribe(

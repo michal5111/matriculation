@@ -9,7 +9,7 @@ export class MatPaginatorIntlPl extends MatPaginatorIntl {
   lastPageLabel = 'Ostatnia strona';
   firstPageLabel = 'Pierwsza strona';
 
-  getRangeLabel = function (page, pageSize, length) {
+  getRangeLabel = (page: number, pageSize: number, length: number) => {
     if (length === 0 || pageSize === 0) {
       return '0 z ' + length;
     }
@@ -19,6 +19,6 @@ export class MatPaginatorIntlPl extends MatPaginatorIntl {
       Math.min(startIndex + pageSize, length) :
       startIndex + pageSize;
     return startIndex + 1 + ' - ' + endIndex + ' z ' + length;
-  };
+  }
 
 }

@@ -40,7 +40,5 @@ class SendNotificationsJob(
         }
     }
 
-    override fun getInProgressStatus(): ImportStatus {
-        return ImportStatus.SENDING_NOTIFICATIONS
-    }
+    override fun getInProgressStatus(): ImportStatus = ImportStatus.SENDING_NOTIFICATIONS
 }

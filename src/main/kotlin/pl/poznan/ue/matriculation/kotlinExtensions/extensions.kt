@@ -1,11 +1,11 @@
 package pl.poznan.ue.matriculation.kotlinExtensions
 
+import org.apache.poi.ss.formula.functions.T
 import pl.poznan.ue.matriculation.local.domain.user.User
 import pl.poznan.ue.matriculation.local.dto.RoleDto
 import pl.poznan.ue.matriculation.local.dto.UserDto
 import pl.poznan.ue.matriculation.local.service.AsyncService
 import java.sql.Blob
-import java.util.*
 import javax.sql.rowset.serial.SerialBlob
 import javax.sql.rowset.serial.SerialClob
 
@@ -13,11 +13,11 @@ fun Exception.stackTraceToHtmlString(): String = this.stackTraceToString()
     .replace("\n", "<br>")
     .replace("\t", "&emsp;")
 
-fun String.nameCapitalize(): String {
-    return this.trim().lowercase(Locale.getDefault()).split(" -").joinToString(" ") { s ->
-        s.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-    }
-}
+//fun String.nameCapitalize(): String {
+//    return this.trim().lowercase(Locale.getDefault()).split(" -").joinToString(" ") { s ->
+//        s.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+//    }
+//}
 
 inline fun <T> MutableList<T>.mutate(mutator: (T) -> Unit) {
     val iterate = this.listIterator()

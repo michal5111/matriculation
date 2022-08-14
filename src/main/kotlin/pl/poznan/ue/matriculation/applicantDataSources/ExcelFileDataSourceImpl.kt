@@ -11,7 +11,6 @@ import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicantDto
 import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicationDto
 import pl.poznan.ue.matriculation.excelfile.mapper.ExcelFileApplicantMapper
 import pl.poznan.ue.matriculation.excelfile.mapper.ExcelFileApplicationMapper
-import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPhoneNumber
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPostalCode
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
@@ -84,14 +83,14 @@ class ExcelFileDataSourceImpl(
         pageNumber: Int
     ): IPage<ExcelFileApplicationDto> {
         val excelFileApplicationDtoList: MutableList<ExcelFileApplicationDto> = mutableListOf()
-        val dataFileBase64 = (import.additionalProperties?.get("dataFileSource") as String?)?.substringAfter("base64,")
+        val dataFileBase64 = (import.additionalProperties?.get("dataFile") as String?)?.substringAfter("base64,")
             ?: throw IllegalStateException("Data file is null")
         val importDataFile = Base64.getDecoder().decode(dataFileBase64)
         XSSFWorkbook(importDataFile.inputStream()).use {
             val sheet = it.getSheetAt(0)
             val rows = sheet.iterator()
             val header = rows.next()
-            val fileHashCode = importDataFile.hashCode()
+            val fileHashCode = dataFileBase64.hashCode()
             while (rows.hasNext()) {
                 val currentRow = rows.next()
                 if (currentRow.getCellStringOrNull(SURNAME_CELL) == null) {
@@ -198,9 +197,9 @@ class ExcelFileDataSourceImpl(
                     row.getCellStringOrNull(PESEL_CELL)?.replace(" ", "").hashCode().toLong()
                 else
                     row.getCellStringOrNull(PASSPORT_NUMBER_CELL)?.replace(" ", "").hashCode().toLong(),
-                given = row.getCellString(NAME_CELL).nameCapitalize(),
-                middle = row.getCellStringOrNull(MIDDLE_NAME_CELL)?.nameCapitalize(),
-                family = row.getCellString(SURNAME_CELL).nameCapitalize(),
+                given = row.getCellString(NAME_CELL),
+                middle = row.getCellStringOrNull(MIDDLE_NAME_CELL),
+                family = row.getCellString(SURNAME_CELL),
                 sex = row.getCellString(SEX_CELL).first().uppercaseChar(),
                 email = row.getCellString(EMAIL_CELL),
                 pesel = row.getCellStringOrNull(PESEL_CELL),
@@ -215,8 +214,8 @@ class ExcelFileDataSourceImpl(
                     row.getCell(BIRTH_DATE_CELL).dateCellValue
                 else simpleDateFormat.parse(row.getCell(BIRTH_DATE_CELL)?.toString()),
                 birthPlace = row.getCellString(BIRTH_PLACE_CELL),
-                fathersName = row.getCellStringOrNull(FATHERS_NAME_CELL)?.nameCapitalize(),
-                mothersName = row.getCellStringOrNull(MOTHERS_NAME_CELL)?.nameCapitalize(),
+                fathersName = row.getCellStringOrNull(FATHERS_NAME_CELL),
+                mothersName = row.getCellStringOrNull(MOTHERS_NAME_CELL),
                 citizenship = row.getCellString(CITIZENSHIP_CELL),
                 address = Address(
                     countryCode = row.getCellStringOrNull(ADDRESS_COUNTRY_CELL),

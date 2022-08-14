@@ -26,11 +26,7 @@ class ArchiveApplicationsJob(
         processService.archivePersons(importId)
     }
 
-    override fun getCompletionStatus(import: Import): ImportStatus {
-        return ImportStatus.ARCHIVED
-    }
+    override fun getCompletionStatus(import: Import): ImportStatus = ImportStatus.ARCHIVED
 
-    override fun getInProgressStatus(): ImportStatus {
-        return ImportStatus.STARTED
-    }
+    override fun getInProgressStatus(): ImportStatus = ImportStatus.STARTED
 }

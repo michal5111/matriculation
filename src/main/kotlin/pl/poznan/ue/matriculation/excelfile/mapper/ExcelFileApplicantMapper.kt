@@ -1,7 +1,6 @@
 package pl.poznan.ue.matriculation.excelfile.mapper
 
 import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicantDto
-import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPhoneNumber
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPostalCode
 import pl.poznan.ue.matriculation.local.domain.applicants.Address
@@ -79,17 +78,17 @@ class ExcelFileApplicantMapper {
         excelFileApplicant: ExcelFileApplicantDto
     ): Applicant {
         return applicant.apply {
-            given = excelFileApplicant.given.nameCapitalize()
-            middle = excelFileApplicant.middle?.nameCapitalize()
-            family = excelFileApplicant.family.nameCapitalize()
+            given = excelFileApplicant.given
+            middle = excelFileApplicant.middle
+            family = excelFileApplicant.family
             email = excelFileApplicant.email.trim()
             cityOfBirth = excelFileApplicant.birthPlace.trim()
             countryOfBirth = null
             dateOfBirth = excelFileApplicant.birthDate
             pesel = excelFileApplicant.pesel?.trim()
             sex = excelFileApplicant.sex
-            fathersName = excelFileApplicant.fathersName?.nameCapitalize()
-            mothersName = excelFileApplicant.mothersName?.nameCapitalize()
+            fathersName = excelFileApplicant.fathersName
+            mothersName = excelFileApplicant.mothersName
             citizenship = excelFileApplicant.citizenship.trim()
             modificationDate = Date()
             excelFileApplicant.phoneNumber?.trimPhoneNumber()?.let {

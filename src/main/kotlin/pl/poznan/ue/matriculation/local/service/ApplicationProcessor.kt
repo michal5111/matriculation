@@ -11,18 +11,16 @@ import pl.poznan.ue.matriculation.applicantDataSources.IPhotoDownloader
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
-import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
-import pl.poznan.ue.matriculation.local.repo.ImportRepository
-import pl.poznan.ue.matriculation.oracle.service.PersonService
+import pl.poznan.ue.matriculation.oracle.service.PersonProcessorService
 
 @Component
 class ApplicationProcessor(
     private val applicantService: ApplicantService,
-    private val importRepository: ImportRepository,
+    private val importService: ImportService,
     private val asyncService: AsyncService,
-    private val personService: PersonService,
+    private val personProcessorService: PersonProcessorService,
     private val applicationService: ApplicationService
 ) {
 
@@ -37,7 +35,6 @@ class ApplicationProcessor(
     fun processApplication(
         importId: Long,
         application: Application,
-        importDto: Import,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
     ) {
         logger.trace("------------------------------------------------Przetwarzam ${application.id}---------------------------------------------")
@@ -45,7 +42,7 @@ class ApplicationProcessor(
         logger.trace("Sprawdzam aplikanta")
         applicantService.check(applicant)
         logger.trace("Pobieram progres importu")
-        val importProgress = importRepository.getById(importId)
+        val import = importService.findById(importId)
         logger.trace("Sprawdzam czy źródło danych implementuje pobieranie zdjęć")
         if (applicationDtoDataSource is IPhotoDownloader) {
             applicant.photo?.let {
@@ -56,10 +53,9 @@ class ApplicationProcessor(
             }
         }
         logger.trace("Przetwarzam pobranego aplikanta")
-        val personAndStudent = personService.process(
+        val personAndStudent = personProcessorService.process(
             application = application,
-            importDto = importDto,
-            postMatriculation = applicationDtoDataSource::postMatriculation
+            import = import
         )
         logger.trace("Przypisuje aplikantowi nadany numer indeksu i usosId")
         application.apply {
@@ -73,7 +69,7 @@ class ApplicationProcessor(
         applicantService.save(applicant)
         logger.trace("Zapisuję zgłoszenie")
         applicationService.save(application)
-        importProgress.savedApplicants++
+        import.savedApplicants++
         logger.trace("------------------------------------------------koniec ${application.id}---------------------------------------------")
     }
 }

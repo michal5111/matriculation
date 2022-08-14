@@ -1,19 +1,19 @@
 <mat-drawer-container fullscreen>
   <div class="wrapper">
     <mat-toolbar color="primary" class="mat-elevation-z5">
-      <button mat-button routerLink="/"><img src="./assets/header_logo.svg" height="50" alt="Logo" class="logo"/>
+      <a mat-button routerLink="/"><img src="./assets/header_logo.svg" height="50" alt="Logo" class="logo"/>
         Immatrykulator 5000
-      </button>
+      </a>
       <ng-template [ngIf]="userService.isAuthenticated">
-        <button mat-stroked-button class="toolbarButton" routerLink="/import"
-                [disabled]="!userService.hasAnyRole('ROLE_IMPORT_VIEW','ROLE_ADMIN')">Importy
-        </button>
+        <a mat-stroked-button class="toolbarButton" routerLink="/import"
+           [disabled]="!userService.hasAnyRole('ROLE_IMPORT_VIEW','ROLE_ADMIN')">Importy
+        </a>
       </ng-template>
       <ng-template [ngIf]="userService.hasRole('ROLE_ADMIN')">
-        <button mat-stroked-button class="toolbarButton" routerLink="/userManager">
+        <a mat-stroked-button class="toolbarButton" routerLink="/userManager">
           <mat-icon>admin_panel_settings</mat-icon>
           Zarządzaj użytkownikami
-        </button>
+        </a>
       </ng-template>
       <span class="fill-remaining-space"></span>
       <ng-template [ngIf]="userService.isAuthenticated" [ngIfElse]="loggedOut">

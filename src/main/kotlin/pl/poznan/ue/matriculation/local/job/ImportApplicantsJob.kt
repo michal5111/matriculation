@@ -59,11 +59,7 @@ class ImportApplicantsJob(
         }
     }
 
-    override fun getCompletionStatus(import: Import): ImportStatus {
-        return ImportStatus.IMPORTED
-    }
+    override fun getCompletionStatus(import: Import): ImportStatus = ImportStatus.IMPORTED
 
-    override fun getInProgressStatus(): ImportStatus {
-        return ImportStatus.STARTED
-    }
+    override fun getInProgressStatus(): ImportStatus = ImportStatus.STARTED
 }

@@ -39,30 +39,10 @@ class ImportService(
         stageCode: String,
         didacticCycleCode: String,
         dataSourceType: String,
+        dataSourceName: String,
         additionalProperties: Map<String, Any>? = null
     ): Import {
         logger.info("additionalProperties $additionalProperties")
-        if (!UserService.checkDataSourcePermission(dataSourceType)) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
-//        if (importRepository.existsByProgrammeForeignIdAndRegistrationAndStageCodeAndDidacticCycleCode(
-//                programmeForeignId,
-//                registration,
-//                stageCode,
-//                didacticCycleCode
-//            )
-//        ) {
-//            throw ImportCreationException("Import tego programu już istnieje.")
-//        }
-        if (!programmeRepository.existsById(programmeCode)) {
-            throw ImportCreationException("Wybrany program nie istnieje w USOSie.")
-        }
-        if (!didacticCycleRepository.existsById(didacticCycleCode)) {
-            throw ImportCreationException("Podany cykl dydaktyczny nie istnieje.")
-        }
-        if (dateOfAddmision < startDate) {
-            throw ImportCreationException("Data przyjęcia na program musi być mniejsza bądź równa dacie rozpoczęcia.")
-        }
         val import = Import(
             dateOfAddmision = dateOfAddmision,
             didacticCycleCode = didacticCycleCode,
@@ -75,9 +55,35 @@ class ImportService(
             startDate = startDate,
             stageCode = stageCode,
             dataSourceId = dataSourceType,
+            dataSourceName = dataSourceName,
             additionalProperties = additionalProperties,
         )
+        validateImport(import)
         return importRepository.save(import)
+    }
+
+    fun validateImport(import: Import) {
+        if (!UserService.checkDataSourcePermission(import.dataSourceId)) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+        }
+//        if (importRepository.existsByProgrammeForeignIdAndRegistrationAndStageCodeAndDidacticCycleCode(
+//                programmeForeignId,
+//                registration,
+//                stageCode,
+//                didacticCycleCode
+//            )
+//        ) {
+//            throw ImportCreationException("Import tego programu już istnieje.")
+//        }
+        if (!programmeRepository.existsById(import.programmeCode)) {
+            throw ImportCreationException("Wybrany program nie istnieje w USOSie.")
+        }
+        if (!didacticCycleRepository.existsById(import.didacticCycleCode)) {
+            throw ImportCreationException("Podany cykl dydaktyczny nie istnieje.")
+        }
+        if (import.dateOfAddmision < import.startDate) {
+            throw ImportCreationException("Data przyjęcia na program musi być mniejsza bądź równa dacie rozpoczęcia.")
+        }
     }
 
     fun findById(importId: Long): Import {
@@ -97,7 +103,7 @@ class ImportService(
 
     fun delete(importId: Long) {
         try {
-            val import = importRepository.getById(importId)
+            val import = importRepository.findByIdOrNull(importId) ?: throw ImportNotFoundException()
             when (import.importStatus) {
                 ImportStatus.ARCHIVED -> throw ImportException(importId, "Import został zarchiwizowany.")
                 ImportStatus.STARTED,
@@ -134,7 +140,15 @@ class ImportService(
         }
 
     fun setImportStatus(importStatus: ImportStatus, importId: Long) =
-        importRepository.getById(importId).apply {
+        importRepository.findByIdOrNull(importId)?.apply {
             this.importStatus = importStatus
         }
+
+    fun updateImport(import: Import): Import {
+        if (import.importStatus !in arrayOf(ImportStatus.PENDING, ImportStatus.IMPORTED)) {
+            throw IllegalStateException("Nie można edytować importu w tym stanie")
+        }
+        validateImport(import)
+        return importRepository.save(import)
+    }
 }

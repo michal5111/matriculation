@@ -2,7 +2,7 @@
   <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
     <mat-form-field class="form-field wide-field">
       <mat-label>Źródło danych</mat-label>
-      <mat-select formControlName="dataSource" required="true"
+      <mat-select [compareWith]="datasourceCompare" formControlName="dataSource" required="true"
                   (selectionChange)="onDataSourceSelectionChange($event)">
         <mat-option
           *ngFor="let dataSource of $availableDataSourcesObservable | async"
@@ -19,18 +19,31 @@
             <input type="text" matInput [formControlName]="parameter.name" required="true">
           </mat-form-field>
           <div *ngSwitchCase="'FILE'">
-            <a mat-button href="{{getUrlWithBaseHref(parameter.fileTemplate)}}">Pobierz szablon</a>
-            <input [formControlName]="parameter.name" [accept]="parameter.accept"
-                   (change)="onFileSelected($event, parameter.name)"
-                   multiple="false" type="file" class="file-input" #fileUpload>
-            <div class="file-upload">
-              <button mat-mini-fab type="button" color="primary" class="upload-btn" (click)="fileUpload.click()">
-                <mat-icon>attach_file</mat-icon>
-              </button>
-              Dodaj plik
-            </div>
-            {{formGroup.controls.additionalParameters.value[parameter.name]}}
+            <app-reactive-file-input [formControlName]="parameter.name" [accept]="parameter.accept"
+                                     [templateHref]="getUrlWithBaseHref(parameter.fileTemplate)">
+            </app-reactive-file-input>
+
+            <!--            <a mat-button href="{{getUrlWithBaseHref(parameter.fileTemplate)}}">Pobierz szablon</a>-->
+            <!--            <input [formControlName]="parameter.name" [accept]="parameter.accept"-->
+            <!--                   (change)="onFileSelected($event, parameter.name)"-->
+            <!--                   multiple="false" type="file" class="file-input" #fileUpload>-->
+            <!--            <div class="file-upload">-->
+            <!--              <button mat-mini-fab type="button" color="primary" class="upload-btn" (click)="fileUpload.click()">-->
+            <!--                <mat-icon>attach_file</mat-icon>-->
+            <!--              </button>-->
+            <!--              Dodaj plik-->
+            <!--            </div>-->
+            <!--            {{formGroup.controls.additionalParameters.value[parameter.name]}}-->
           </div>
+          <mat-form-field *ngSwitchCase="'SELECTION_LIST'" class="form-field wide-field">
+            <mat-label>{{parameter.name}}</mat-label>
+            <mat-select [formControlName]="parameter.name" required="true">
+              <mat-option
+                *ngFor="let selectionListValue of parameter.selectionListSource"
+                [value]="selectionListValue.value">{{selectionListValue.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
         </div>
       </div>
     </div>
@@ -38,6 +51,7 @@
     <mat-form-field class="form-field wide-field">
       <mat-label>Rekrutacja</mat-label>
       <mat-select formControlName="registration" required="true"
+                  [compareWith]="registrationCompare"
                   (selectionChange)="onRegistrationSelectionChange($event)"
                   [disabled]="areRegistrationLoading">
         <mat-option
@@ -52,6 +66,7 @@
     <mat-form-field class="form-field wide-field">
       <mat-label>Program</mat-label>
       <mat-select formControlName="registrationProgramme" required="true"
+                  [compareWith]="registrationProgrammeCompare"
                   (selectionChange)="onRegistrationProgrammeChange($event)"
                   [disabled]="areRegistrationLoading || areProgrammesLoading">
         <mat-option
@@ -92,7 +107,7 @@
       </mat-form-field>
       <mat-form-field class="form-field flex-form-field">
         <mat-label>Pula indeksów</mat-label>
-        <mat-select formControlName="indexPoolCode" required="true">
+        <mat-select formControlName="indexPoolCode" required="true" [compareWith]="indexTypeCompare">
           <mat-option
             *ngFor="let indexPool of $indexPoolsObservable | async"
             [value]="indexPool">{{indexPool.description}}
@@ -113,8 +128,14 @@
       </mat-form-field>
     </div>
     <button mat-button type="submit" [disabled]="!formGroup.valid || isButtonDisabled">
-      <mat-icon>add</mat-icon>
-      Utwórz
+      <div *ngIf="this.import?.id == null; else elseButton">
+        <mat-icon>add</mat-icon>
+        Utwórz
+      </div>
+      <ng-template #elseButton>
+        <mat-icon>edit</mat-icon>
+        Aktualizuj
+      </ng-template>
     </button>
   </form>
 </div>

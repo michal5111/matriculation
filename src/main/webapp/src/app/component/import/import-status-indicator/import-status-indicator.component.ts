@@ -8,7 +8,7 @@ import {ImportStatus} from '../../../model/import/import-status.enum';
 })
 export class ImportStatusIndicatorComponent implements OnInit {
 
-  @Input() importStatus: ImportStatus;
+  @Input() importStatus: ImportStatus | null = null;
   @Input() tooltip = false;
 
   constructor() {

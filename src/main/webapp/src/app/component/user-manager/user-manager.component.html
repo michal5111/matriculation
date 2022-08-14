@@ -53,6 +53,6 @@
                  showFirstLastButtons
                  [length]="totalElements"
                  [pageSize]="pageSize"
-                 (page)="switchPage($event)">
+                 (page)="switchPage($any($event))">
   </mat-paginator>
 </div>

@@ -1,6 +1,6 @@
 export class ErrorDialogData {
 
-  constructor(title: string, message: string, stacktrace?: string, path?: string) {
+  constructor(title: string, message: string | null, stacktrace?: string | null, path?: string) {
     this.title = title;
     this.message = message;
     this.stacktrace = stacktrace;
@@ -8,7 +8,7 @@ export class ErrorDialogData {
   }
 
   title: string;
-  message: string;
-  stacktrace: string;
-  path: string;
+  message: string | null;
+  stacktrace: string | null | undefined;
+  path: string | undefined;
 }

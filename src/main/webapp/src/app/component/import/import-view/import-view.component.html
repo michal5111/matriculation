@@ -13,6 +13,14 @@
           <p>Data rozpoczęcia programu: {{import.startDate | date: 'dd.MM.yyyy'}}</p>
           <p>Data przyjęcia na program: {{import.dateOfAddmision | date: 'dd.MM.yyyy'}}</p>
         </mat-card-subtitle>
+        <mat-card-actions>
+          <button mat-button
+                  (click)="openEditorDialog()"
+                  [disabled]="isEditButtonDisabled()">
+            <mat-icon>edit</mat-icon>
+            Edytuj
+          </button>
+        </mat-card-actions>
       </mat-card>
       <mat-card class="card-centered">
         <mat-card-content *ngIf="import && rxStompService.connected()">
@@ -208,7 +216,7 @@
         <td mat-cell *matCellDef="let element" class="mat-cell">
           <div *ngIf="element.applicant.assignedIndexNumber">
             <button mat-button (click)="updateIndexNumber(element)"
-                    [disabled]="import.importStatus === 'ARCHIVED'
+                    [disabled]="import?.importStatus === 'ARCHIVED'
                     || !(userService.hasRole('ROLE_IMPORT_CHANGE_INDEX') || userService.hasRole('ROLE_ADMIN'))">
               {{element.applicant.assignedIndexNumber}}
             </button>
@@ -266,6 +274,15 @@
       <!--          </button>-->
       <!--        </td>-->
       <!--      </ng-container>-->
+
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef> Usuń</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">
+          <button mat-button (click)="deleteApplication(element.id)" [disabled]="isStartImportButtonDisabled()">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()"></tr>
       <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();"></tr>

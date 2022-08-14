@@ -15,9 +15,9 @@ import {MatCheckboxChange} from '@angular/material/checkbox';
 })
 export class SelectPersonDialogComponent implements OnInit {
 
-  persons: Person[];
-  applicant: Applicant;
-  selected: Array<Selectable<Person>>;
+  persons: Person[] = [];
+  applicant: Applicant | null = null;
+  selected: Array<Selectable<Person>> = [];
   displayedColumns: string[] = [
     'checkbox',
     'id',

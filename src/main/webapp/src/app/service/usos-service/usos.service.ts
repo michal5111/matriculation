@@ -1,5 +1,5 @@
 import {Inject, Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
+import {Observable, shareReplay} from 'rxjs';
 import {APP_BASE_HREF} from '@angular/common';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {UrlDto} from '../../model/import/urlDto';
@@ -26,7 +26,9 @@ export class UsosService {
   }
 
   getUsosUrl(): Observable<UrlDto> {
-    return this.http.get<UrlDto>(`${this.apiUrl}/url`);
+    return this.http.get<UrlDto>(`${this.apiUrl}/url`).pipe(
+      shareReplay()
+    );
   }
 
   getAvailableIndexPools(): Observable<[IndexType]> {

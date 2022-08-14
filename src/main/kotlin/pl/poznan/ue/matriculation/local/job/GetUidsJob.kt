@@ -35,7 +35,5 @@ class GetUidsJob(
         }
     }
 
-    override fun getInProgressStatus(): ImportStatus {
-        return ImportStatus.SEARCHING_UIDS
-    }
+    override fun getInProgressStatus(): ImportStatus = ImportStatus.SEARCHING_UIDS
 }

@@ -5,23 +5,18 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import pl.poznan.ue.matriculation.annotation.LogExecutionTime
-import pl.poznan.ue.matriculation.local.domain.applicants.Document
-import pl.poznan.ue.matriculation.local.domain.import.Import
-import pl.poznan.ue.matriculation.oracle.domain.*
-import pl.poznan.ue.matriculation.oracle.repo.*
-import java.util.*
+import pl.poznan.ue.matriculation.oracle.domain.Person
+import pl.poznan.ue.matriculation.oracle.domain.Student
+import pl.poznan.ue.matriculation.oracle.repo.IndexTypeRepository
+import pl.poznan.ue.matriculation.oracle.repo.OrganizationalUnitRepository
+import pl.poznan.ue.matriculation.oracle.repo.StudentRepository
 
 
 @Service
 class StudentService(
     private val indexTypeRepository: IndexTypeRepository,
     private val organizationalUnitRepository: OrganizationalUnitRepository,
-    private val programmeRepository: ProgrammeRepository,
-    private val didacticCycleRepository: DidacticCycleRepository,
-    private val programmeStageRepository: ProgrammeStageRepository,
     private val studentRepository: StudentRepository,
-    private val sourceOfFinancingRepository: SourceOfFinancingRepository,
-    private val basisOfAdmissionRepository: BasisOfAdmissionRepository
 ) {
     val logger: Logger = LoggerFactory.getLogger(StudentService::class.java)
 
@@ -37,8 +32,8 @@ class StudentService(
         }
         val indexNumberDto = studentRepository.getNewIndexNumber(indexPoolCode)
         val organizationalUnit = if (indexNumberDto.organizationalUnitCode != null)
-            organizationalUnitRepository.getById(indexNumberDto.organizationalUnitCode)
-        else organizationalUnitRepository.getById(defaultStudentOrganizationalUnitCode)
+            organizationalUnitRepository.getReferenceById(indexNumberDto.organizationalUnitCode)
+        else organizationalUnitRepository.getReferenceById(defaultStudentOrganizationalUnitCode)
         if (organizationalUnit.code == defaultStudentOrganizationalUnitCode) {
             person.students.find {
                 it.mainIndex
@@ -47,7 +42,7 @@ class StudentService(
             }
         }
         val student = Student(
-            indexType = indexTypeRepository.getById(indexPoolCode),
+            indexType = indexTypeRepository.getReferenceById(indexPoolCode),
             organizationalUnit = organizationalUnit,
             indexNumber = indexNumberDto.number,
             mainIndex = indexNumberDto.organizationalUnitCode == defaultStudentOrganizationalUnitCode
@@ -56,97 +51,5 @@ class StudentService(
         )
         person.addStudent(student)
         return studentRepository.save(student)
-    }
-
-    fun createPersonProgramme(
-        person: Person,
-        importDto: Import,
-        student: Student,
-        certificate: Document?,
-        sourceOfFinancing: String?,
-        basisOfAdmission: String?,
-        isDefault: Boolean
-    ): PersonProgramme {
-        val programme = programmeRepository.getById(importDto.programmeCode)
-        val didacticCycle = didacticCycleRepository.getById(importDto.didacticCycleCode)
-        val entitlementDocument = getEntitlementDocument(certificate, person)
-        val personProgramme = PersonProgramme(
-            person = person,
-            programme = programme,
-            student = student,
-            startDate = importDto.startDate,
-            dateOfAddmision = importDto.dateOfAddmision,
-            dateToNextPass = didacticCycle.dateTo,
-            isDefault = isDefault
-        )
-        entitlementDocument?.addPersonProgramme(personProgramme)
-        addSourceOfFinancing(sourceOfFinancing, personProgramme, importDto.dateOfAddmision)
-        addBasisOfAdmission(basisOfAdmission, personProgramme, importDto.dateOfAddmision)
-        addPersonStage(personProgramme, didacticCycle, programme, importDto.stageCode)
-        person.addPersonProgramme(personProgramme)
-        return personProgramme
-    }
-
-    private fun getEntitlementDocument(
-        certificate: Document?,
-        person: Person
-    ) = certificate?.let {
-        person.entitlementDocuments.find {
-            it.number == certificate.documentNumber
-                && it.type == certificate.certificateUsosCode
-        }
-    }
-
-
-    private fun addPersonStage(
-        personProgramme: PersonProgramme,
-        didacticCycle: DidacticCycle,
-        programme: Programme,
-        stageCode: String
-    ) = personProgramme.addPersonStage(
-        PersonStage(
-            didacticCycle = didacticCycle,
-            passStatus = 'X',
-            personProgramme = personProgramme,
-            programmeStage = programmeStageRepository.getById(
-                ProgrammeStageId(
-                    programmeId = programme.code,
-                    stageId = stageCode
-                )
-            ),
-            didacticCycleRequirement = didacticCycle,
-            order = 1,
-            endDate = didacticCycle.endDate,
-        ).apply {
-            conditionCount = programmeStage.conditionCount
-        }
-    )
-
-    private fun addBasisOfAdmission(
-        basisOfAdmission: String?,
-        personProgramme: PersonProgramme,
-        dateOfAddmision: Date
-    ) = basisOfAdmission?.let {
-        personProgramme.addPersonProgrammeBasisOfAdmission(
-            PersonProgrammeBasisOfAdmission(
-                basisOfAdmission = basisOfAdmissionRepository.getById(it),
-                dateFrom = dateOfAddmision,
-                personProgramme = personProgramme
-            )
-        )
-    }
-
-    private fun addSourceOfFinancing(
-        sourceOfFinancing: String?,
-        personProgramme: PersonProgramme,
-        dateOfAddmision: Date
-    ) = sourceOfFinancing?.let {
-        personProgramme.addPersonProgrammeSourceOfFinancing(
-            PersonProgrammeSourceOfFinancing(
-                sourceOfFinancing = sourceOfFinancingRepository.getById(it),
-                dateFrom = dateOfAddmision,
-                personProgramme = personProgramme
-            )
-        )
     }
 }

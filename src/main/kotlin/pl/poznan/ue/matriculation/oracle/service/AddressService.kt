@@ -27,14 +27,14 @@ class AddressService(
     ): Address {
         return Address(
             person = person,
-            addressType = addressTypeRepository.getById(addressTypeCode),
+            addressType = addressTypeRepository.getReferenceById(addressTypeCode),
             city = city,
             street = street,
             houseNumber = houseNumber,
             flatNumber = apartmentNumber,
             cityIsCity = cityIsCity,
             country = countryCode?.let {
-                citizenshipRepository.getById(it)
+                citizenshipRepository.getReferenceById(it)
             }
         ).apply {
             countryCode?.let {
@@ -64,7 +64,7 @@ class AddressService(
             this.flatNumber = apartmentNumber
             this.cityIsCity = cityIsCity
             this.country = countryCode?.let {
-                citizenshipRepository.getById(it)
+                citizenshipRepository.getReferenceById(it)
             }
             countryCode?.let {
                 if (it == "PL" && zipCode?.length == 5) {

@@ -20,7 +20,7 @@ const httpOptions = {
 export class UserService implements CanActivate {
 
   userUrl = `${this.baseHref}api/user`;
-  user: UserDetails;
+  user: UserDetails | null = null;
   isAuthenticated = false;
 
   constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) {
@@ -57,7 +57,7 @@ export class UserService implements CanActivate {
   }
 
   hasRole(role: string): boolean {
-    if (this.user === undefined || this.user.authorities === undefined) {
+    if (this.user === undefined || this.user?.authorities === undefined) {
       return false;
     }
     return this.user.authorities.find(x => x.authority === role) !== undefined;

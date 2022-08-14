@@ -7,14 +7,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.exception.ApplicantCheckException
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
-import pl.poznan.ue.matriculation.local.mapper.ApplicantToPersonMapper
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
-import pl.poznan.ue.matriculation.oracle.domain.Person
 import java.util.*
 
 @Service
 class ApplicantService(
-    private val applicantToPersonMapper: ApplicantToPersonMapper,
     private val applicantRepository: ApplicantRepository
 ) {
 
@@ -22,10 +19,6 @@ class ApplicantService(
 
     fun findById(applicantId: Long): Applicant? {
         return applicantRepository.findByIdOrNull(applicantId)
-    }
-
-    fun createPersonFromApplicant(applicant: Applicant): Person {
-        return applicantToPersonMapper.map(applicant)
     }
 
     fun check(applicant: Applicant) {
@@ -111,6 +104,13 @@ class ApplicantService(
 
     @Transactional
     fun deleteOrphaned() {
-        return applicantRepository.deleteOrphaned()
+        val applicants = applicantRepository.findOrphaned()
+        applicantRepository.deleteAll(applicants)
+    }
+
+    @Transactional
+    fun deleteOrphanedById(id: Long) {
+        val applicant = applicantRepository.findOrphanedById(id)
+        return applicantRepository.delete(applicant)
     }
 }

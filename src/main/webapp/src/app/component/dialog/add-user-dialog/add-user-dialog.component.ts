@@ -15,11 +15,11 @@ import {MatSelectionList} from '@angular/material/list';
 export class AddUserDialogComponent implements OnInit {
 
   addUserFormGroup: FormGroup<{ uid: FormControl<number | null> }>;
-  user: User;
-  rolesList: Role[];
-  isButtonDisabled: boolean;
+  user: User = new User();
+  rolesList: Role[] = [];
+  isButtonDisabled = false;
 
-  @ViewChild('roleSelectionList') roleSelectionList: MatSelectionList;
+  @ViewChild('roleSelectionList') roleSelectionList: MatSelectionList | null = null;
 
   constructor(
     public dialogRef: MatDialogRef<AddUserDialogComponent>,
@@ -27,33 +27,36 @@ export class AddUserDialogComponent implements OnInit {
     private dialog: MatDialog,
     private roleService: RoleService
   ) {
+    this.addUserFormGroup = new FormGroup({
+      uid: new FormControl<number | null>(null, Validators.required)
+    });
   }
 
   ngOnInit(): void {
-    this.addUserFormGroup = new FormGroup({
-      uid: new FormControl<number>(null, Validators.required)
-    });
     this.roleService.getRoles().subscribe(
       result => {
         this.rolesList = result;
-      }// , error => this.onError('Błąd przy pobieraniu listy ról', error)
+      }
     );
   }
 
   onSubmit() {
-    this.user = new User();
-    this.user.uid = this.addUserFormGroup.value.uid;
-    this.user.roles = this.roleSelectionList.selectedOptions.selected.map(selectedOption => {
-      return selectedOption.value;
+    const selectedRoles = this.roleSelectionList?.selectedOptions.selected.map(selectedOption => {
+      return selectedOption.value as Role;
     });
+    this.user.uid = this.addUserFormGroup.controls.uid.value;
+    if (selectedRoles !== undefined) {
+      this.user.roles = selectedRoles;
+    }
     this.isButtonDisabled = true;
-    this.userService.create(this.user).subscribe(
-      user => {
+    this.userService.create(this.user).subscribe({
+      next: (user) => {
         this.dialogRef.close(user);
-      }, error => {
+      },
+      error: (error) => {
         this.isButtonDisabled = false;
         throw error;
       }
-    );
+    });
   }
 }

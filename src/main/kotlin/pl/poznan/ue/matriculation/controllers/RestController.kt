@@ -72,10 +72,16 @@ class RestController(
         stageCode = importDto.stageCode,
         didacticCycleCode = importDto.didacticCycleCode,
         dataSourceType = importDto.dataSourceId,
+        dataSourceName = importDto.dataSourceName,
         additionalProperties = importDto.additionalProperties,
         programmeForeignName = importDto.programmeForeignName,
         indexPoolName = importDto.indexPoolName
     )
+
+    @PutMapping("/import")
+    fun updateImport(
+        @RequestBody import: Import
+    ): Import = importService.updateImport(import)
 
     @PutMapping("/import/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -119,7 +125,6 @@ class RestController(
             size = it.size
         )
     }
-
 
     @GetMapping("/usos/indexPool")
     fun getAvailableIndexPools(): List<IndexTypeDto> = usosService.getAvailableIndexPoolsCodes()
@@ -227,5 +232,12 @@ class RestController(
         @RequestBody potentialDuplicateStatusDto: ApplicantUsosIdAndPotentialDuplicateStatusDto
     ): Application {
         return applicationService.updatePotentialDuplicateStatus(applicationId, potentialDuplicateStatusDto)
+    }
+
+    @DeleteMapping("/application/{id}")
+    fun deleteApplication(
+        @PathVariable("id") applicationId: Long
+    ) {
+        return applicationService.delete(applicationId)
     }
 }

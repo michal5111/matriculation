@@ -19,7 +19,7 @@ import pl.poznan.ue.matriculation.local.domain.enum.DurationType
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.repo.PersonRepository
-import pl.poznan.ue.matriculation.oracle.service.PersonService
+import pl.poznan.ue.matriculation.oracle.service.PersonProcessorService
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executor
@@ -29,7 +29,7 @@ class PersonServiceTest : AbstractIT() {
     val logger: Logger = LoggerFactory.getLogger(PersonServiceTest::class.java)
 
     @Autowired
-    lateinit var personService: PersonService
+    lateinit var personProcessorService: PersonProcessorService
 
     @Autowired
     lateinit var personRepository: PersonRepository
@@ -58,6 +58,7 @@ class PersonServiceTest : AbstractIT() {
             stageCode = "s1-S1-E",
             startDate = Date(),
             dataSourceId = "IRK_TEST",
+            dataSourceName = "IRK test",
             programmeForeignId = "S1-E",
             programmeForeignName = "S1_PL_SZ_202021",
             indexPoolName = "Centralna",
@@ -191,9 +192,7 @@ class PersonServiceTest : AbstractIT() {
         val startTime = System.nanoTime()
         var person: Person
         try {
-            person = personService.process(application, import) {
-                1
-            }.first
+            person = personProcessorService.process(application, import).first
         } catch (e: ObjectOptimisticLockingFailureException) {
             val exceptionPerson = (e.identifier as Long?)?.let { personRepository.getById(it) }
             logger.info("Exception Person: {}", exceptionPerson?.modificationDate)

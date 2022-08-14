@@ -3,7 +3,6 @@ package pl.poznan.ue.matriculation.dreamApply.mapper
 import pl.poznan.ue.matriculation.dreamApply.dto.applicant.DreamApplyApplicantDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
 import pl.poznan.ue.matriculation.dreamApply.dto.application.EducationLevelType
-import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPhoneNumber
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPostalCode
 import pl.poznan.ue.matriculation.local.domain.applicants.*
@@ -34,11 +33,11 @@ open class DreamApplyApplicantMapper(private val schoolRepository: SchoolReposit
         val profile = application.profile ?: throw IllegalStateException("Profile is null")
         return Applicant(
             foreignId = dreamApplyApplicantDto.id,
-            given = dreamApplyApplicantDto.name.given.nameCapitalize(),
+            given = dreamApplyApplicantDto.name.given,
             middle = dreamApplyApplicantDto.name.middle.takeUnless {
                 it.isNullOrBlank()
-            }?.nameCapitalize(),
-            family = dreamApplyApplicantDto.name.family.nameCapitalize(),
+            },
+            family = dreamApplyApplicantDto.name.family,
             maiden = null,
             email = dreamApplyApplicantDto.email.trim(),
             photo = dreamApplyApplicantDto.photo,
@@ -86,9 +85,9 @@ open class DreamApplyApplicantMapper(private val schoolRepository: SchoolReposit
         val profile = application.profile ?: throw java.lang.IllegalStateException("Profile is null")
         return applicant.apply {
 
-            given = applicant.given.nameCapitalize()
-            middle = applicant.middle?.nameCapitalize()
-            family = applicant.family.nameCapitalize()
+            given = applicant.given
+            middle = applicant.middle
+            family = applicant.family
 
             email = dreamApplyApplicantDto.email.trim()
             photo = dreamApplyApplicantDto.photo

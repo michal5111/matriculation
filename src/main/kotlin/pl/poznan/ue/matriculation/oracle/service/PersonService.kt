@@ -7,45 +7,165 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.annotation.LogExecutionTime
-import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.kotlinExtensions.toSerialBlob
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.ApplicantForeignerData
-import pl.poznan.ue.matriculation.local.domain.applications.Application
-import pl.poznan.ue.matriculation.local.domain.import.Import
-import pl.poznan.ue.matriculation.local.service.ApplicantService
-import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
 import pl.poznan.ue.matriculation.oracle.domain.*
 import pl.poznan.ue.matriculation.oracle.entityRepresentations.PersonBasicData
 import pl.poznan.ue.matriculation.oracle.repo.*
 import java.util.*
-import javax.persistence.EntityNotFoundException
 
 @Service
 class PersonService(
     private val personRepository: PersonRepository,
-    private val studentService: StudentService,
-    private val personProgrammeRepository: PersonProgrammeRepository,
     private val citizenshipRepository: CitizenshipRepository,
     private val schoolRepository: SchoolRepository,
     private val wkuRepository: WkuRepository,
     private val phoneNumberTypeRepository: PhoneNumberTypeRepository,
-    private val applicantService: ApplicantService,
     private val addressService: AddressService,
     private val documentTypeRepository: DocumentTypeRepository,
     private val ownedDocumentRepository: OwnedDocumentRepository,
-    private val applicationDataSourceFactory: ApplicationDataSourceFactory,
-    private val didacticCycleRepository: DidacticCycleRepository,
-    private val erasmusService: ErasmusService
+    private val organizationalUnitRepository: OrganizationalUnitRepository
 ) {
     private val logger: Logger = LoggerFactory.getLogger(PersonService::class.java)
+
+    @Value("\${pl.poznan.ue.matriculation.defaultStudentOrganizationalUnit}")
+    lateinit var defaultStudentOrganizationalUnitString: String
 
     @Value("\${pl.poznan.ue.matriculation.universityEmailSuffix}")
     lateinit var universityEmailSuffix: String
 
     @LogExecutionTime
     fun create(applicant: Applicant): Person {
-        val person = applicantService.createPersonFromApplicant(applicant)
+        val person = Person(
+            email = applicant.email.takeIf {
+                it.endsWith(universityEmailSuffix)
+            },
+            privateEmail = applicant.email.takeUnless {
+                it.endsWith(universityEmailSuffix)
+            },
+            name = applicant.given,
+            middleName = applicant.middle,
+            surname = applicant.family,
+            citizenship = applicant.citizenship?.let {
+                citizenshipRepository.getReferenceById(it)
+            },
+            birthDate = applicant.dateOfBirth,
+            birthCity = applicant.cityOfBirth,
+            birthCountry = applicant.countryOfBirth?.let {
+                citizenshipRepository.getReferenceById(it)
+            },
+            pesel = applicant.pesel,
+            sex = applicant.sex,
+            nationality = applicant.nationality?.let {
+                citizenshipRepository.getReferenceById(it)
+            },
+            organizationalUnit = organizationalUnitRepository.getReferenceById(defaultStudentOrganizationalUnitString),
+            middleSchool = applicant.highSchoolUsosCode?.let {
+                schoolRepository.getReferenceById(it)
+            },
+            idNumber = applicant.primaryIdentityDocument?.number,
+            documentType = applicant.primaryIdentityDocument?.number?.let {
+                applicant.primaryIdentityDocument?.type
+            },
+            identityDocumentExpirationDate = applicant.primaryIdentityDocument?.expDate,
+            identityDocumentIssuerCountry = applicant.primaryIdentityDocument?.country?.let {
+                citizenshipRepository.getReferenceById(it)
+            },
+            mothersName = applicant.mothersName,
+            fathersName = applicant.fathersName,
+            wku = applicant.wku?.let {
+                wkuRepository.getReferenceById(it)
+            },
+            militaryCategory = applicant.militaryCategory,
+            militaryStatus = applicant.militaryStatus,
+            personPhoto = applicant.photoByteArrayFuture?.get()?.let {
+                PersonPhoto(
+                    photoBlob = it.toSerialBlob()
+                )
+            }
+        ).apply {
+            applicant.addresses.map {
+                addressService.create(
+                    addressTypeCode = it.addressType.usosValue,
+                    city = it.city,
+                    street = it.street,
+                    houseNumber = it.streetNumber,
+                    apartmentNumber = it.flatNumber,
+                    zipCode = it.postalCode,
+                    cityIsCity = it.cityIsCity,
+                    countryCode = it.countryCode
+                )
+            }.forEach {
+                addAddress(it)
+            }
+            if (addresses.none { it.addressType.code == "KOR" }) {
+                val foundAddress = addresses.find { it.addressType.code == "POB" }
+                    ?: addresses.find { it.addressType.code == "STA" }
+                foundAddress?.let {
+                    val ca = addressService.create(
+                        person = this,
+                        addressTypeCode = "KOR",
+                        city = it.city,
+                        street = it.street,
+                        houseNumber = it.houseNumber,
+                        apartmentNumber = it.flatNumber,
+                        zipCode = it.zipCode,
+                        cityIsCity = it.cityIsCity,
+                        countryCode = it.country?.code
+                    )
+                    addAddress(ca)
+                }
+            }
+            applicant.documents.filter { document ->
+                document.certificateUsosCode != null
+            }.map {
+                EntitlementDocument(
+                    issueDate = it.issueDate,
+                    description = it.issueInstitution.takeIf { _ ->
+                        it.issueInstitutionUsosCode == null
+                    },
+                    number = it.documentNumber,
+                    type = it.certificateUsosCode!!,
+                    school = it.issueInstitutionUsosCode?.let { schoolId ->
+                        schoolRepository.getReferenceById(schoolId)
+                    }
+                )
+            }.forEach {
+                addEntitlementDocument(it)
+            }
+            applicant.phoneNumbers.map {
+                PhoneNumber(
+                    number = it.number,
+                    phoneNumberType = phoneNumberTypeRepository.getReferenceById(it.phoneNumberType),
+                    comments = it.comment
+                )
+            }.forEach {
+                addPhoneNumber(it)
+            }
+            personPhoto?.let {
+                it.person = this
+                addPersonPreference(
+                    PersonPreference(person = this, attribute = "photo_visibility", value = applicant.photoPermission)
+                )
+            }
+            applicant.applicantForeignerData?.let {
+                if (it.baseOfStay != "OKP") {
+                    return@let
+                }
+                val od = OwnedDocument(
+                    documentType = documentTypeRepository.getReferenceById(it.baseOfStay ?: return@let),
+                    person = this,
+                    issueDate = it.polishCardIssueDate,
+                    issueCountry = it.polishCardIssueCountry?.let { countryCode ->
+                        citizenshipRepository.getReferenceById(countryCode)
+                    },
+                    number = it.polishCardNumber,
+                    expirationDate = it.polishCardValidTo
+                )
+                addOwnedDocument(od)
+            }
+        }
         return personRepository.save(person)
     }
 
@@ -107,7 +227,7 @@ class PersonService(
             if (citizenship?.code != applicant.citizenship) {
                 changed = true
                 citizenship = applicant.citizenship?.let {
-                    citizenshipRepository.getById(it)
+                    citizenshipRepository.getReferenceById(it)
                 }
             }
             applicant.dateOfBirth?.let {
@@ -117,7 +237,7 @@ class PersonService(
                 birthCity = applicant.cityOfBirth
             }
             applicant.countryOfBirth?.let {
-                birthCountry = citizenshipRepository.getById(it)
+                birthCountry = citizenshipRepository.getReferenceById(it)
             }
             if (sex != applicant.sex) {
                 changed = true
@@ -125,10 +245,10 @@ class PersonService(
             }
             if (nationality?.code != applicant.nationality && applicant.nationality != null) {
                 changed = true
-                nationality = citizenshipRepository.getById(applicant.nationality!!)
+                nationality = citizenshipRepository.getReferenceById(applicant.nationality!!)
             }
             applicant.highSchoolUsosCode?.let {
-                middleSchool = schoolRepository.getById(it)
+                middleSchool = schoolRepository.getReferenceById(it)
             }
             applicant.mothersName?.let {
                 mothersName = applicant.mothersName
@@ -137,7 +257,7 @@ class PersonService(
                 fathersName = applicant.fathersName
             }
             applicant.wku?.let {
-                wku = wkuRepository.getById(it)
+                wku = wkuRepository.getReferenceById(it)
             }
             applicant.militaryCategory?.let {
                 militaryCategory = applicant.militaryCategory
@@ -184,7 +304,7 @@ class PersonService(
             person.documentType = identityDocument.type
             person.identityDocumentExpirationDate = identityDocument.expDate
             person.identityDocumentIssuerCountry = identityDocument.country?.let { documentCountry ->
-                citizenshipRepository.getById(documentCountry)
+                citizenshipRepository.getReferenceById(documentCountry)
             }
         }
         return changed
@@ -269,13 +389,14 @@ class PersonService(
                 phoneNumber.phoneNumberType == it.phoneNumberType.code
             }
             if (personPhoneNumber != null) {
-                personPhoneNumber.phoneNumberType = phoneNumberTypeRepository.getById(phoneNumber.phoneNumberType)
+                personPhoneNumber.phoneNumberType =
+                    phoneNumberTypeRepository.getReferenceById(phoneNumber.phoneNumberType)
                 personPhoneNumber.comments = phoneNumber.comment
             } else {
                 person.addPhoneNumber(
                     PhoneNumber(
                         person = person,
-                        phoneNumberType = phoneNumberTypeRepository.getById(phoneNumber.phoneNumberType),
+                        phoneNumberType = phoneNumberTypeRepository.getReferenceById(phoneNumber.phoneNumberType),
                         number = phoneNumber.number,
                         comments = phoneNumber.comment
                     )
@@ -303,7 +424,7 @@ class PersonService(
                     number = it.documentNumber,
                     type = certificateUsosCode,
                     school = it.issueInstitutionUsosCode?.let { schoolId ->
-                        schoolRepository.getById(schoolId)
+                        schoolRepository.getReferenceById(schoolId)
                     }
                 )
             )
@@ -350,7 +471,7 @@ class PersonService(
         val bof = afd.baseOfStay ?: throw IllegalArgumentException("Base of stay is null")
         val ownedDocument = ownedDocumentRepository.findByPersonAndDocumentType(
             person,
-            documentTypeRepository.getById(bof)
+            documentTypeRepository.getReferenceById(bof)
         )
         if (ownedDocument != null) {
             updateOkp(ownedDocument, bof, afd)
@@ -366,11 +487,11 @@ class PersonService(
         val baseOfStay = it.baseOfStay ?: return
         person.addOwnedDocument(
             OwnedDocument(
-                documentType = documentTypeRepository.getById(baseOfStay),
+                documentType = documentTypeRepository.getReferenceById(baseOfStay),
                 person = person,
                 issueDate = it.polishCardIssueDate,
                 issueCountry = it.polishCardIssueCountry?.let { countryCode ->
-                    citizenshipRepository.getById(countryCode)
+                    citizenshipRepository.getReferenceById(countryCode)
                 },
                 number = it.polishCardNumber,
                 expirationDate = it.polishCardValidTo
@@ -383,114 +504,16 @@ class PersonService(
         bof: String,
         afd: ApplicantForeignerData
     ) = ownedDocument.apply {
-        documentType = documentTypeRepository.getById(bof)
+        documentType = documentTypeRepository.getReferenceById(bof)
         issueDate = afd.polishCardIssueDate
         issueCountry = afd.polishCardIssueCountry?.let { countryCode ->
-            citizenshipRepository.getById(countryCode)
+            citizenshipRepository.getReferenceById(countryCode)
         }
         number = afd.polishCardNumber
         expirationDate = afd.polishCardValidTo
     }
 
-    @LogExecutionTime
-    @Transactional(
-        rollbackFor = [java.lang.Exception::class, java.lang.RuntimeException::class],
-        propagation = Propagation.REQUIRED,
-        transactionManager = "oracleTransactionManager"
-    )
-    fun immatriculate(
-        person: Person,
-        importDto: Import,
-        irkApplication: IrkApplication,
-        application: Application
-    ): Student {
-        val personId = person.id ?: throw IllegalStateException("Person id is null")
-        val student = studentService.createOrFindStudent(person, importDto.indexPoolCode)
-        val isDefaultProgramme = if (person.personProgrammes.any { it.isDefault == true }) {
-            personProgrammeRepository.updateToNotDefault(personId, importDto.dateOfAddmision) == 1
-        } else true
-        val personProgramme = studentService.createPersonProgramme(
-            person = person,
-            importDto = importDto,
-            student = student,
-            certificate = application.certificate,
-            sourceOfFinancing = application.sourceOfFinancing,
-            basisOfAdmission = application.basisOfAdmission,
-            isDefault = isDefaultProgramme
-        )
-        student.addPersonProgramme(personProgramme)
-        irkApplication.personProgramme = personProgramme
-        personProgramme.irkApplication = irkApplication
-        addPersonArrival(person, application, importDto.didacticCycleCode, personProgramme, importDto.startDate)
-        personProgrammeRepository.save(personProgramme)
-        return student
-    }
-
-    private fun addPersonArrival(
-        person: Person,
-        application: Application,
-        didacticCycleCode: String,
-        personProgramme: PersonProgramme,
-        startDate: Date
-    ) = application.applicant?.erasmusData?.let {
-        val didacticCycle = didacticCycleRepository.getById(didacticCycleCode)
-        val didacticCycleYear = didacticCycleRepository.findDidacticCycleYearBySemesterDates(
-            didacticCycle.dateFrom,
-            didacticCycle.endDate
-        ) ?: throw EntityNotFoundException("Nie można znaleźć cyklu dydaktycznego")
-        val arrival = erasmusService.createArrival(
-            erasmusData = it,
-            didacticCycle = didacticCycle,
-            didacticCycleYear = didacticCycleYear,
-            didacticCycleCode = didacticCycleCode,
-            startDate = startDate
-        )
-        personProgramme.addArrival(arrival)
-        person.addPersonArrivals(arrival)
-        arrival
-    }
-
-    @LogExecutionTime
-    @Transactional(
-        rollbackFor = [java.lang.Exception::class, RuntimeException::class],
-        propagation = Propagation.REQUIRED,
-        transactionManager = "oracleTransactionManager"
-    )
-    fun process(
-        application: Application, importDto: Import, postMatriculation: (applicationId: Long) -> Int
-    ): Pair<Person, Student> {
-        logger.trace("Tworzę lub aktualizuję osobę")
-        val applicant = application.applicant ?: throw ApplicantNotFoundException()
-        val person: Person = createOrUpdatePerson(applicant)
-        logger.trace("Tworzę potwierdzenie immatrykulacji")
-        val dataSourceId = application.dataSourceId
-        val irkApplication = IrkApplication(
-            applicationId = application.foreignId,
-            confirmationStatus = 0,
-            irkInstance = dataSourceId?.let {
-                applicationDataSourceFactory.getDataSource(dataSourceId).instanceUrl + '/'
-            } ?: "Nieznany"
-        )
-        logger.trace("Tworzę lub wybieram studenta")
-        val student = immatriculate(
-            person = person,
-            importDto = importDto,
-            irkApplication = irkApplication,
-            application = application
-        )
-        logger.trace("Wykonuję operacje poimmatrykulacyjne")
-        irkApplication.confirmationStatus = try {
-            val result = postMatriculation(application.foreignId)
-            logger.debug("postmatriculation result = {}", result)
-            result
-        } catch (e: Exception) {
-            logger.error("Error in post matriculation method", e)
-            0
-        }
-        return Pair(person, student)
-    }
-
-    private fun createOrUpdatePerson(applicant: Applicant): Person {
+    fun createOrUpdatePerson(applicant: Applicant): Person {
         logger.trace("Szukam osoby w bazie")
         var person = personRepository.findOneByPeselOrIdNumberOrEmailOrPrivateEmail(
             applicant.usosId,

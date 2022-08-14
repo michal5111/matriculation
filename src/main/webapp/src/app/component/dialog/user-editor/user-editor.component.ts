@@ -15,10 +15,10 @@ import {tap} from 'rxjs/operators';
 })
 export class UserEditorComponent implements OnInit {
 
-  user: User;
-  rolesList: Role[];
+  user: User = new User();
+  rolesList: Role[] = [];
 
-  @ViewChild('roleSelectionList') roleSelectionList: MatSelectionList;
+  @ViewChild('roleSelectionList') roleSelectionList: MatSelectionList | null = null;
 
   constructor(
     public dialogRef: MatDialogRef<UserEditorComponent>,
@@ -29,7 +29,7 @@ export class UserEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userService.findById(this.data.user.id).pipe(
+    this.userService.findById(this.data.user.id ?? -1).pipe(
       tap(user => console.log(user))
     ).subscribe(user => this.user = user);
     this.roleService.getRoles().subscribe(results => {
@@ -39,9 +39,12 @@ export class UserEditorComponent implements OnInit {
   }
 
   onUpdateUserClick() {
-    this.user.roles = this.roleSelectionList.selectedOptions.selected.map(selectedRole => {
-      return selectedRole.value;
+    const roles = this.roleSelectionList?.selectedOptions.selected.map(selectedRole => {
+      return selectedRole.value as Role;
     });
+    if (roles != null) {
+      this.user.roles = roles;
+    }
     this.updateUser(this.user);
   }
 

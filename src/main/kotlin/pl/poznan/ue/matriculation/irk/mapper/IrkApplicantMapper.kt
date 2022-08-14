@@ -3,7 +3,6 @@ package pl.poznan.ue.matriculation.irk.mapper
 import pl.poznan.ue.matriculation.irk.dto.applicants.AdditionalDataDTO
 import pl.poznan.ue.matriculation.irk.dto.applicants.ContactDataDTO
 import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
-import pl.poznan.ue.matriculation.kotlinExtensions.nameCapitalize
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPhoneNumber
 import pl.poznan.ue.matriculation.kotlinExtensions.trimPostalCode
 import pl.poznan.ue.matriculation.local.domain.applicants.*
@@ -18,10 +17,10 @@ class IrkApplicantMapper {
             email = applicantDto.email.trim(),
             indexNumber = applicantDto.indexNumber?.trim(),
             password = applicantDto.password,
-            middle = applicantDto.name.middle?.nameCapitalize(),
-            family = applicantDto.name.family.nameCapitalize(),
-            maiden = applicantDto.name.maiden?.nameCapitalize(),
-            given = applicantDto.name.given.nameCapitalize(),
+            middle = applicantDto.name.middle,
+            family = applicantDto.name.family,
+            maiden = applicantDto.name.maiden,
+            given = applicantDto.name.given,
             citizenship = applicantDto.citizenship,
             photo = applicantDto.photo,
             photoPermission = applicantDto.photoPermission,
@@ -93,10 +92,10 @@ class IrkApplicantMapper {
         email = applicantDto.email
         indexNumber = applicantDto.indexNumber
         password = applicantDto.password
-        middle = applicantDto.name.middle?.nameCapitalize()
-        family = applicantDto.name.family.nameCapitalize()
-        maiden = applicantDto.name.maiden?.nameCapitalize()
-        given = applicantDto.name.given.nameCapitalize()
+        middle = applicantDto.name.middle
+        family = applicantDto.name.family
+        maiden = applicantDto.name.maiden
+        given = applicantDto.name.given
         citizenship = applicantDto.citizenship
         photo = applicantDto.photo
         photoPermission = applicantDto.photoPermission

@@ -23,7 +23,7 @@ class AsyncService(
             importService.setImportStatus(importId = importId, importStatus = job.getCompletionStatus(import2))
         } catch (e: Exception) {
             job.status = JobStatus.ERROR
-            throw ImportException(import.id, "Import job error: ${e.message}", e)
+            throw ImportException(import.id, e.message, e)
         }
         job.status = JobStatus.DONE
     }

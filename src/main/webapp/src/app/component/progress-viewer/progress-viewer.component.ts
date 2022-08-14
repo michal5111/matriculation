@@ -7,9 +7,9 @@ import {Component, Input, OnInit} from '@angular/core';
 })
 export class ProgressViewerComponent implements OnInit {
 
-  @Input() value: number;
-  @Input() total: number;
-  @Input() header: string;
+  @Input() value = 0;
+  @Input() total: number | null = null;
+  @Input() header: string | undefined;
   @Input() errorsCount = 0;
 
   constructor() {
@@ -19,6 +19,9 @@ export class ProgressViewerComponent implements OnInit {
   }
 
   calculatePercentage(): number {
+    if (this.total == null) {
+      return 0;
+    }
     return (this.value + this.errorsCount) * 100 / this.total;
   }
 

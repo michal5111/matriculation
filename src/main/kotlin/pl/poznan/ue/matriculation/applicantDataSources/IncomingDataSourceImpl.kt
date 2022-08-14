@@ -6,7 +6,10 @@ import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicantMapper
 import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicationMapper
 import pl.poznan.ue.matriculation.dreamApply.service.DreamApplyService
 import pl.poznan.ue.matriculation.local.domain.import.Import
+import pl.poznan.ue.matriculation.local.dto.DataSourceAdditionalParameter
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
+import pl.poznan.ue.matriculation.local.dto.SelectionListDataSourceAdditionalParameter
+import pl.poznan.ue.matriculation.local.dto.SelectionListValue
 
 class IncomingDataSourceImpl(
     name: String,
@@ -23,8 +26,20 @@ class IncomingDataSourceImpl(
     dreamApplyService = dreamApplyService,
     id = id
 ) {
+    companion object {
+        private val PROGRAMME_PATTERN = "^([SN])([123])-\\w*".toRegex()
+    }
 
-    private val programmePattern = "^([SN])([123])-\\w*".toRegex()
+    override val additionalParameters: List<DataSourceAdditionalParameter>
+        get() = listOf(
+            SelectionListDataSourceAdditionalParameter("Kurs", null) {
+                val courses = dreamApplyService.getCourses(statuses = "Online", types = "Studies", modes = "FT")
+                    ?: throw IllegalStateException("Unable to get courses list.")
+                courses.map {
+                    SelectionListValue(it.value.name, it.value.id.toString())
+                }
+            }
+        )
 
     override fun getApplicationsPage(
         import: Import,
@@ -32,9 +47,7 @@ class IncomingDataSourceImpl(
         programmeForeignId: String,
         pageNumber: Int
     ): IPage<DreamApplyApplicationDto> {
-        val programmeForeignIdSplit = programmeForeignId.split(";")
-        val programmeId = programmeForeignIdSplit[0]
-        val flagId = programmeForeignIdSplit[1]
+        val programmeId = import.additionalProperties?.get("Kurs") as String
         val semester = import.stageCode.substring(0, 2)
         val semesterFlagId = dreamApplyService.getAllFlags()?.filter {
             it.value.name == "${semester[0]}-${semester[1]}"
@@ -46,7 +59,7 @@ class IncomingDataSourceImpl(
             additionalFilters = mapOf(
                 "byCourseIDs" to programmeId,
                 "byOfferTypes" to status,
-                "byFlagIDs" to flagId
+                "byFlagIDs" to programmeForeignId
             )
         ) ?: throw java.lang.IllegalArgumentException("Unable to get applicants")
         val applications = applicationMap.values.filter { dreamApplyApplicationDto ->
@@ -75,24 +88,17 @@ class IncomingDataSourceImpl(
     }
 
     override fun getAvailableRegistrationProgrammes(registration: String): List<ProgrammeDto> {
-        val courses = dreamApplyService.getCourses(statuses = "Online", types = "Studies", modes = "FT")
-            ?: throw IllegalStateException("Unable to get courses list.")
         var flags = dreamApplyService.getAllFlags()
             ?: throw java.lang.IllegalStateException("Unable to get flags list.")
         flags = flags.filter {
-            it.value.name.matches(programmePattern)
+            it.value.name.matches(PROGRAMME_PATTERN)
         }
-        val programmeList = mutableListOf<ProgrammeDto>()
-        courses.values.forEach { courseDto ->
-            flags.forEach { (key, value) ->
-                programmeList.add(
-                    ProgrammeDto(
-                        id = "${courseDto.id};${key}",
-                        name = "${courseDto.name} ${value.name}",
-                        usosId = value.name
-                    )
-                )
-            }
+        val programmeList = flags.map { (key, value) ->
+            ProgrammeDto(
+                id = key.toString(),
+                name = value.name,
+                usosId = value.name
+            )
         }
         return programmeList
     }

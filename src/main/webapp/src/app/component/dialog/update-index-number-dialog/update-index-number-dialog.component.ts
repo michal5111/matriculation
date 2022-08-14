@@ -11,21 +11,22 @@ import {UsosService} from '../../../service/usos-service/usos.service';
 })
 export class UpdateIndexNumberDialogComponent implements OnInit {
 
-  updateIndexNumberFormGroup: FormGroup<{ indexNumber: FormControl<string> }>;
+  updateIndexNumberFormGroup: FormGroup<{ indexNumber: FormControl<string | null> }>;
 
   constructor(
     public dialogRef: MatDialogRef<UpdateIndexNumberDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: UpdateIndexNumberDialogData,
     private usosService: UsosService
   ) {
-  }
-
-  sqlError: string;
-
-  ngOnInit(): void {
     this.updateIndexNumberFormGroup = new FormGroup({
       indexNumber: new FormControl<string>('', Validators.required)
     });
+  }
+
+  sqlError: string | null = null;
+
+  ngOnInit(): void {
+
   }
 
   onSubmit() {
@@ -33,12 +34,15 @@ export class UpdateIndexNumberDialogComponent implements OnInit {
     this.usosService.updateIndexNumberByUsosIdAndIndexType(
       this.data.personId,
       this.data.indexTypeCode,
-      newIndexNumber
-    ).subscribe(() => {
-      this.dialogRef.close(newIndexNumber);
-    }, error => {
-      this.updateIndexNumberFormGroup.controls.indexNumber.setErrors({sqlError: true});
-      this.sqlError = error.error.message;
+      newIndexNumber ?? ''
+    ).subscribe({
+      next: () => {
+        this.dialogRef.close(newIndexNumber);
+      },
+      error: (error) => {
+        this.updateIndexNumberFormGroup.controls.indexNumber.setErrors({sqlError: true});
+        this.sqlError = error.error.message;
+      }
     });
   }
 
