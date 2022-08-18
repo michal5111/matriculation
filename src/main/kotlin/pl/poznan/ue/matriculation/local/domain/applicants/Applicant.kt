@@ -57,23 +57,23 @@ class Applicant(
     var modificationDate: Date? = null,
 
     @JsonIgnore
-    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var applicantForeignerData: ApplicantForeignerData? = null,
 
     @JsonIgnore
-    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val phoneNumbers: MutableSet<PhoneNumber> = HashSet(),
 
     @JsonIgnore
-    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val addresses: MutableSet<Address> = HashSet(),
 
     @JsonIgnore
-    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var identityDocuments: MutableSet<IdentityDocument> = HashSet(),
 
     @JsonIgnore
-    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var erasmusData: ErasmusData? = null,
 
     var usosId: Long? = null,
@@ -84,7 +84,7 @@ class Applicant(
     var potentialDuplicateStatus: DuplicateStatus = DuplicateStatus.NOT_CHECKED,
 
     @JsonIgnore
-    @OneToMany(mappedBy = "applicant", fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "applicant", fetch = FetchType.LAZY)
     var applications: MutableSet<Application> = HashSet(),
 
     var uid: String? = null,
@@ -111,7 +111,7 @@ class Applicant(
     var countryOfBirth: String? = null,
 
     @JsonIgnore
-    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val documents: MutableSet<Document> = HashSet(),
 
     var highSchoolCity: String? = null,

@@ -53,14 +53,14 @@ class ApplicationProcessor(
             }
         }
         logger.trace("Przetwarzam pobranego aplikanta")
-        val personAndStudent = personProcessorService.process(
+        val processResult = personProcessorService.process(
             application = application,
             import = import
         )
         logger.trace("Przypisuje aplikantowi nadany numer indeksu i usosId")
         application.apply {
-            applicant.usosId = personAndStudent.first.id
-            applicant.assignedIndexNumber = personAndStudent.second.indexNumber
+            applicant.usosId = processResult.systemId
+            applicant.assignedIndexNumber = processResult.assignedIndexNumber
             importError = null
             stackTrace = null
             importStatus = ApplicationImportStatus.IMPORTED

@@ -104,7 +104,7 @@ class ApplicantService(
 
     @Transactional
     fun deleteOrphaned() {
-        val applicants = applicantRepository.findOrphaned()
+        val applicants = applicantRepository.findAllOrphaned()
         applicantRepository.deleteAll(applicants)
     }
 

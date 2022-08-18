@@ -9,8 +9,8 @@ import pl.poznan.ue.matriculation.annotation.LogExecutionTime
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
+import pl.poznan.ue.matriculation.local.dto.ProcessResult
 import pl.poznan.ue.matriculation.oracle.domain.Person
-import pl.poznan.ue.matriculation.oracle.domain.Student
 
 @Service
 class PersonProcessorService(
@@ -28,10 +28,29 @@ class PersonProcessorService(
     )
     fun process(
         application: Application, import: Import
-    ): Pair<Person, Student> {
+    ): ProcessResult<Person> {
         logger.trace("Tworzę lub aktualizuję osobę")
         val applicant = application.applicant ?: throw ApplicantNotFoundException()
-        val person: Person = personService.createOrUpdatePerson(applicant)
+        val person: Person? = personService.findOneByPeselOrIdNumberOrEmailOrPrivateEmail(
+            applicant.usosId,
+            applicant.pesel.orEmpty(),
+            applicant.identityDocuments.filterNot {
+                it.number.isNullOrBlank()
+            }.map {
+                it.number.orEmpty()
+            },
+            applicant.email,
+            applicant.email
+        )
+        if (person != null) {
+            logger.trace("Osoba istnieje. Aktualizuję")
+            applicant.personExisted = true
+            personService.update(applicant, person)
+        } else {
+            logger.trace("Osoba nie istnieje. Tworzę")
+            personService.create(applicant)
+        }
+        person!!
         logger.trace("Tworzę potwierdzenie immatrykulacji")
         val student = immatriculationService.immatriculate(
             person = person,
@@ -39,6 +58,6 @@ class PersonProcessorService(
             application = application
         )
         logger.trace("Wykonuję operacje poimmatrykulacyjne")
-        return Pair(person, student)
+        return ProcessResult(person.id ?: throw IllegalStateException(), student.indexNumber, person)
     }
 }

@@ -513,21 +513,24 @@ class PersonService(
         expirationDate = afd.polishCardValidTo
     }
 
-    fun createOrUpdatePerson(applicant: Applicant): Person {
-        logger.trace("Szukam osoby w bazie")
-        var person = personRepository.findOneByPeselOrIdNumberOrEmailOrPrivateEmail(
-            applicant.usosId,
-            applicant.pesel.orEmpty(),
-            applicant.identityDocuments.filterNot {
-                it.number.isNullOrBlank()
-            }.map {
-                it.number.orEmpty()
-            },
-            applicant.email,
-            applicant.email
+    fun findOneByPeselOrIdNumberOrEmailOrPrivateEmail(
+        personId: Long?,
+        pesel: String,
+        idNumbers: List<String>,
+        email: String,
+        privateEmail: String
+    ): Person? {
+        return personRepository.findOneByPeselOrIdNumberOrEmailOrPrivateEmail(
+            personId,
+            pesel,
+            idNumbers,
+            email,
+            privateEmail
         )
+    }
 
-        person = if (person != null) {
+    fun createOrUpdatePerson(applicant: Applicant, person: Person?): Person {
+        return if (person != null) {
             logger.trace("Osoba istnieje. Aktualizuję")
             applicant.personExisted = true
             update(applicant, person)
@@ -535,7 +538,6 @@ class PersonService(
             logger.trace("Osoba nie istnieje. Tworzę")
             create(applicant)
         }
-        return person
     }
 
     fun findPotentialDuplicate(

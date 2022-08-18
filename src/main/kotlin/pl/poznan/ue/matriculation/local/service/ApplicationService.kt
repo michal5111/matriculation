@@ -95,6 +95,6 @@ class ApplicationService(
             applicantService.deleteOrphanedById(it)
         }
         import.importedApplications--
-        import.totalCount = (import.totalCount ?: return) - 1
+        import.totalCount = (import.totalCount ?: throw IllegalStateException()) - 1
     }
 }

@@ -15,7 +15,7 @@ interface ApplicantRepository : JpaRepository<Applicant, Long> {
     fun findByUsosId(usosId: Long): Applicant?
 
     @Query("select a from Applicant a where a.id not in (select ap.applicant.id from Application ap)")
-    fun findOrphaned(): List<Applicant>
+    fun findAllOrphaned(): List<Applicant>
 
     @Query("select a from Applicant a where a.id not in (select ap.applicant.id from Application ap) and a.id = :id")
     fun findOrphanedById(id: Long): Applicant
