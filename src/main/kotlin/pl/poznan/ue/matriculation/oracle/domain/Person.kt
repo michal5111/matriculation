@@ -91,7 +91,7 @@ class Person(
     val familyName: String? = null,
 
     @Column(name = "SZKOLA", length = 200, nullable = true)
-    val school: String? = null,
+    var school: String? = null,
 
     @Column(name = "SR_NR_DOWODU", length = 20, nullable = true)
     var idNumber: String? = null,

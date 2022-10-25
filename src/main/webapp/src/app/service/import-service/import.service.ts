@@ -1,7 +1,7 @@
 import {Inject, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Page} from '../../model/oracle/page/page';
+import {Page} from '../../model/dto/page/page';
 import {Import} from '../../model/import/import';
 import {Application} from '../../model/applications/application';
 import {Registration} from '../../model/applications/registration';
@@ -9,6 +9,7 @@ import {APP_BASE_HREF} from '@angular/common';
 import {DataSource} from '../../model/import/dataSource';
 import {Programme} from '../../model/applications/programme';
 import {Person} from '../../model/oracle/Person';
+import {CrudService} from '../crud-service';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -20,11 +21,15 @@ const httpOptions = {
   providedIn: 'root'
 })
 
-export class ImportService {
+export class ImportService implements CrudService<Import> {
 
   private apiUrl = `${this.baseHref}api`;
 
   constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) {
+  }
+
+  findAll(page: number, size: number, filers: any, sort?: string | undefined, sortDir?: string | undefined): Observable<Page<Import>> {
+    throw new Error('Method not implemented.');
   }
 
   getImportsPage(page: number, size: number, sort?: string, sortDir?: string): Observable<Page<Import>> {
@@ -42,12 +47,16 @@ export class ImportService {
     return this.http.get<[Programme]>(`${this.apiUrl}/registrations/${dataSourceType}/codes/${encodeURIComponent(registrationCode)}`);
   }
 
-  createImport(importObject: Import): Observable<Import> {
+  create(importObject: Import): Observable<Import> {
     return this.http.post<Import>(`${this.apiUrl}/import`, importObject, httpOptions);
   }
 
-  deleteImport(importId: number) {
-    return this.http.delete(`${this.apiUrl}/import/${importId}`, httpOptions);
+  update(importObject: Import): Observable<Import> {
+    return this.http.put<Import>(`${this.apiUrl}/import`, importObject, httpOptions);
+  }
+
+  delete(importId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/import/${importId}`, httpOptions);
   }
 
   findById(importId: number) {
@@ -97,9 +106,5 @@ export class ImportService {
 
   getPotentialDuplicates(applicantId: number): Observable<Array<Person>> {
     return this.http.get<[Person]>(`${this.apiUrl}/applicant/${applicantId}/potentialDuplicates`);
-  }
-
-  updateImport(importObject: Import): Observable<Import> {
-    return this.http.put<Import>(`${this.apiUrl}/import`, importObject, httpOptions);
   }
 }

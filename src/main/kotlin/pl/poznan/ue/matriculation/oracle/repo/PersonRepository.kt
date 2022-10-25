@@ -63,16 +63,12 @@ interface PersonRepository : JpaRepository<Person, Long> {
         or p.pesel = :pesel
         or UPPER(FUNCTION('REGEXP_REPLACE',p.idNumber,'[^a-zA-Z0-9]+','')) in (:idNumbers)
         or p.id = (select distinct h.person.id from PersonChangeHistory h where UPPER(FUNCTION('REGEXP_REPLACE',h.idNumber,'[^a-zA-Z0-9]+','')) in (:idNumbers))
-        or UPPER(FUNCTION('REPLACE',p.email,' ','')) = UPPER(:email)
-        or UPPER(FUNCTION('REPLACE',p.privateEmail,' ','')) = UPPER(:privateEmail)
     """
     )
-    fun findOneByPeselOrIdNumberOrEmailOrPrivateEmail(
+    fun findOneByPeselOrIdNumberOrPersonId(
         personId: Long?,
         pesel: String,
-        idNumbers: List<String>,
-        email: String,
-        privateEmail: String
+        idNumbers: List<String>
     ): Person?
 
     @Query(

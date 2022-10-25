@@ -18,7 +18,7 @@ class OracleDateType : AbstractVersionableUserType<DateTime, Timestamp, Timestam
     ParameterizedType,
     IntegratorConfiguredType {
 
-    val logger: Logger = LoggerFactory.getLogger(OracleDateType::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(OracleDateType::class.java)
 
     override fun compare(date1: Any?, date2: Any?): Int {
         return (date1 as DateTime).compareTo(date2 as DateTime)

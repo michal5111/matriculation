@@ -7,23 +7,22 @@ import pl.poznan.ue.matriculation.annotation.LogExecutionTime
 import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applications.Application
+import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
 import pl.poznan.ue.matriculation.local.job.startConditions.ApplicantsImportStartCondition
 import pl.poznan.ue.matriculation.local.job.startConditions.IStartConditions
-import pl.poznan.ue.matriculation.local.service.ApplicantService
-import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
-import pl.poznan.ue.matriculation.local.service.ApplicationService
-import pl.poznan.ue.matriculation.local.service.ImportService
+import pl.poznan.ue.matriculation.local.service.*
 
 @Component
 class ImportApplicantsJob(
     private val importService: ImportService,
     private val applicationDataSourceFactory: ApplicationDataSourceFactory,
     private val applicantService: ApplicantService,
-    private val applicationService: ApplicationService
+    private val applicationService: ApplicationService,
+    private val potentialDuplicateFinder: PotentialDuplicateFinder
 ) : IJob {
     override val jobType: JobType = JobType.IMPORT
 
@@ -82,10 +81,13 @@ class ImportApplicantsJob(
         importId: Long,
         applicationDto: IApplicationDto,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
-    ): Application {
+    ) {
         val import = importService.get(importId)
         val applicantDto = applicationDtoDataSource.getApplicantById(applicationDto.foreignApplicantId, applicationDto)
-        var application = createOrUpdateApplication(applicationDto, applicationDtoDataSource)
+        var application = createOrUpdateApplication(applicationDto, applicationDtoDataSource, import)
+        if (application.import != null && application.import != import) {
+            return
+        }
         var applicant = createOrUpdateApplicant(applicantDto, applicationDtoDataSource, applicationDto)
         applicant.primaryIdentityDocument = applicationDtoDataSource.getPrimaryIdentityDocument(
             applicant = applicant,
@@ -104,20 +106,51 @@ class ImportApplicantsJob(
             import = import
         )
         application.import = import
+        processWarnings(applicant, application)
+        potentialDuplicateFinder.findPotentialDuplicate(applicant, importId)
         application = applicationService.save(application)
         import.importedApplications++
-        return application
+    }
+
+    private fun processWarnings(applicant: Applicant, application: Application) {
+        val warnings = mutableListOf<String>()
+        if (applicant.documents.size == 0) {
+            warnings += "Brak dokumentów uprawniających do podjęcia studiów."
+        }
+        if (applicant.addresses.size == 0) {
+            warnings += "Brak adresów."
+        }
+        if (applicant.highSchoolName == null && applicant.highSchoolUsosCode == null) {
+            warnings += "Brak informacji o szkole średniej."
+        }
+        if (applicant.phoneNumbers.size == 0) {
+            warnings += "Brak numerów telefonóœ."
+        }
+        if (applicant.photo.isNullOrBlank()) {
+            warnings += "Brak zdjęcia."
+        }
+        if (applicant.dateOfBirth == null) {
+            warnings += "Brak daty urodzenia."
+        }
+        application.warnings = warnings.joinToString("\n").takeIf {
+            it.isNotBlank()
+        }
     }
 
     @LogExecutionTime
     private fun createOrUpdateApplication(
         applicationDto: IApplicationDto,
-        applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
+        applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>,
+        import: Import
     ): Application {
         val foundApplication = applicationService.findByForeignIdAndDataSourceId(
             applicationDto.foreignId,
             applicationDtoDataSource.id
         )
+        if (foundApplication?.importStatus == ApplicationImportStatus.IMPORTED) {
+            import.totalCount = import.totalCount!! - 1
+            return foundApplication
+        }
         return if (foundApplication != null) {
             applicationDtoDataSource.updateApplication(foundApplication, applicationDto)
         } else {

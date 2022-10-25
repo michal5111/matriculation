@@ -54,10 +54,10 @@ open class DreamApplyApplicantMapper(private val schoolRepository: SchoolReposit
             sex = if (profile.gender == "M") 'M' else 'K',
             mothersName = profile.family?.mother ?: application.extras?.find {
                 it.name == "Mother's name"
-            }?.value?.trim(),
+            }?.value?.toString()?.trim(),
             fathersName = profile.family?.father ?: application.extras?.find {
                 it.name == "Father's name"
-            }?.value?.trim(),
+            }?.value?.toString()?.trim(),
             wku = null,
             militaryCategory = null,
             militaryStatus = null,
@@ -103,10 +103,10 @@ open class DreamApplyApplicantMapper(private val schoolRepository: SchoolReposit
 
             mothersName = profile.family?.mother ?: application.extras?.find {
                 it.name == "Mother's name"
-            }?.value?.trim()
+            }?.value?.toString()?.trim()
             fathersName = profile.family?.father ?: application.extras?.find {
                 it.name == "Father's name"
-            }?.value?.trim()
+            }?.value?.toString()?.trim()
 
             createPhoneNumbers(
                 applicant = this,
@@ -278,12 +278,11 @@ open class DreamApplyApplicantMapper(private val schoolRepository: SchoolReposit
                     street = addressDto.correspondence?.street?.replace("\n", " "),
                     streetNumber = addressDto.correspondence?.house ?: dreamApplyApplication.extras?.find {
                         it.name == "House number"
-                    }?.value,
+                    }?.value.toString(),
                     flatNumber = addressDto.correspondence?.apartment?.trim()
                 )
             ).filterNot {
-                it.city.isNullOrBlank() && it.countryCode.isNullOrBlank() && it.flatNumber.isNullOrBlank()
-                    && it.postalCode.isNullOrBlank() && it.street.isNullOrBlank() && it.streetNumber.isNullOrBlank()
+                it.city.isNullOrBlank() && it.street.isNullOrBlank()
             }.forEach {
                 applicant.addAddress(it)
             }

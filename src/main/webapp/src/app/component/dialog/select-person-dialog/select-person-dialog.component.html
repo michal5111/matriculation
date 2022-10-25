@@ -101,6 +101,11 @@
         <td mat-cell *matCellDef="let element" class="mat-cell">{{element.value.idNumber}}</td>
       </ng-container>
 
+      <ng-container matColumnDef="pesel">
+        <th mat-header-cell *matHeaderCellDef>PESEL</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.pesel}}</td>
+      </ng-container>
+
       <ng-container matColumnDef="sex">
         <th mat-header-cell *matHeaderCellDef>Płeć</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">{{element.value.sex}}</td>

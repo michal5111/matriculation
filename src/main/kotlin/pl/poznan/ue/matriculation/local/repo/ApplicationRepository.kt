@@ -35,7 +35,11 @@ interface ApplicationRepository : PagingAndSortingRepository<Application, Long> 
 
     fun findByForeignIdAndDataSourceId(foreignId: Long, dataSourceId: String): Application?
 
-    fun findAllByImportIdAndNotificationSentAndApplicantUidNotNull(importId: Long, sent: Boolean): Stream<Application>
+    fun findAllByImportIdAndNotificationSentAndApplicantUidNotNullAndImportStatus(
+        importId: Long,
+        sent: Boolean,
+        importStatus: ApplicationImportStatus
+    ): Stream<Application>
 
     @EntityGraph("application.applicant")
     //@QueryHints(value = [QueryHint(name = HINT_FETCH_SIZE, value = "" + Integer.MIN_VALUE)]) //MySql

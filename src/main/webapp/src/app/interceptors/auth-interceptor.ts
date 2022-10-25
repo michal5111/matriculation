@@ -15,26 +15,27 @@ export class AuthInterceptor implements HttpInterceptor {
 
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return next.handle(request).pipe(tap(() => {
-      },
-      (err: any) => {
-        if (this.dialog.openDialogs.length > 0) {
-          return;
-        }
-        if (err instanceof HttpErrorResponse) {
-          if (err.status !== 401 && err.status !== 403) {
+    return next.handle(request).pipe(
+      tap({
+        error: (err: any) => {
+          if (this.dialog.openDialogs.length > 0) {
             return;
           }
-          if (err.status === 401) {
-            const dialogRef = this.dialog.open(UnauthorizedDialogComponent, {
-              width: '250px'
-            });
-            this.userService.isAuthenticated = false;
-          }
-          if (err.status === 403) {
-            const dialogRef = this.dialog.open(ForbiddenDialogComponent, {
-              width: '250px'
-            });
+          if (err instanceof HttpErrorResponse) {
+            if (err.status !== 401 && err.status !== 403) {
+              return;
+            }
+            if (err.status === 401) {
+              const dialogRef = this.dialog.open(UnauthorizedDialogComponent, {
+                width: '250px'
+              });
+              this.userService.isAuthenticated = false;
+            }
+            if (err.status === 403) {
+              const dialogRef = this.dialog.open(ForbiddenDialogComponent, {
+                width: '250px'
+              });
+            }
           }
         }
       }));

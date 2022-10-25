@@ -24,7 +24,6 @@ class PersonService(
     private val phoneNumberTypeRepository: PhoneNumberTypeRepository,
     private val addressService: AddressService,
     private val documentTypeRepository: DocumentTypeRepository,
-    private val ownedDocumentRepository: OwnedDocumentRepository,
     private val organizationalUnitRepository: OrganizationalUnitRepository
 ) {
     private val logger: Logger = LoggerFactory.getLogger(PersonService::class.java)
@@ -64,6 +63,11 @@ class PersonService(
             middleSchool = applicant.highSchoolUsosCode?.let {
                 schoolRepository.getReferenceById(it)
             },
+            school = "${applicant.highSchoolType.orEmpty()} ${applicant.highSchoolName.orEmpty()} ${applicant.highSchoolCity.orEmpty()}"
+                .trim()
+                .takeIf {
+                    applicant.highSchoolUsosCode == null && it.isNotBlank()
+                },
             idNumber = applicant.primaryIdentityDocument?.number,
             documentType = applicant.primaryIdentityDocument?.number?.let {
                 applicant.primaryIdentityDocument?.type
@@ -78,93 +82,9 @@ class PersonService(
                 wkuRepository.getReferenceById(it)
             },
             militaryCategory = applicant.militaryCategory,
-            militaryStatus = applicant.militaryStatus,
-            personPhoto = applicant.photoByteArrayFuture?.get()?.let {
-                PersonPhoto(
-                    photoBlob = it.toSerialBlob()
-                )
-            }
+            militaryStatus = applicant.militaryStatus
         ).apply {
-            applicant.addresses.map {
-                addressService.create(
-                    addressTypeCode = it.addressType.usosValue,
-                    city = it.city,
-                    street = it.street,
-                    houseNumber = it.streetNumber,
-                    apartmentNumber = it.flatNumber,
-                    zipCode = it.postalCode,
-                    cityIsCity = it.cityIsCity,
-                    countryCode = it.countryCode
-                )
-            }.forEach {
-                addAddress(it)
-            }
-            if (addresses.none { it.addressType.code == "KOR" }) {
-                val foundAddress = addresses.find { it.addressType.code == "POB" }
-                    ?: addresses.find { it.addressType.code == "STA" }
-                foundAddress?.let {
-                    val ca = addressService.create(
-                        person = this,
-                        addressTypeCode = "KOR",
-                        city = it.city,
-                        street = it.street,
-                        houseNumber = it.houseNumber,
-                        apartmentNumber = it.flatNumber,
-                        zipCode = it.zipCode,
-                        cityIsCity = it.cityIsCity,
-                        countryCode = it.country?.code
-                    )
-                    addAddress(ca)
-                }
-            }
-            applicant.documents.filter { document ->
-                document.certificateUsosCode != null
-            }.map {
-                EntitlementDocument(
-                    issueDate = it.issueDate,
-                    description = it.issueInstitution.takeIf { _ ->
-                        it.issueInstitutionUsosCode == null
-                    },
-                    number = it.documentNumber,
-                    type = it.certificateUsosCode!!,
-                    school = it.issueInstitutionUsosCode?.let { schoolId ->
-                        schoolRepository.getReferenceById(schoolId)
-                    }
-                )
-            }.forEach {
-                addEntitlementDocument(it)
-            }
-            applicant.phoneNumbers.map {
-                PhoneNumber(
-                    number = it.number,
-                    phoneNumberType = phoneNumberTypeRepository.getReferenceById(it.phoneNumberType),
-                    comments = it.comment
-                )
-            }.forEach {
-                addPhoneNumber(it)
-            }
-            personPhoto?.let {
-                it.person = this
-                addPersonPreference(
-                    PersonPreference(person = this, attribute = "photo_visibility", value = applicant.photoPermission)
-                )
-            }
-            applicant.applicantForeignerData?.let {
-                if (it.baseOfStay != "OKP") {
-                    return@let
-                }
-                val od = OwnedDocument(
-                    documentType = documentTypeRepository.getReferenceById(it.baseOfStay ?: return@let),
-                    person = this,
-                    issueDate = it.polishCardIssueDate,
-                    issueCountry = it.polishCardIssueCountry?.let { countryCode ->
-                        citizenshipRepository.getReferenceById(countryCode)
-                    },
-                    number = it.polishCardNumber,
-                    expirationDate = it.polishCardValidTo
-                )
-                addOwnedDocument(od)
-            }
+            createOrUpdateData(this, applicant)
         }
         return personRepository.save(person)
     }
@@ -194,19 +114,9 @@ class PersonService(
             )
         var changed: Boolean
         person.apply {
-            logger.trace("Tworzę lub aktualizuję adresy")
-            createOrUpdateAddresses(this, applicant)
-            logger.trace("Tworzę lub aktualizuję numery telefonów")
-            createOrUpdatePhoneNumbers(this, applicant)
-            logger.trace("Tworzę lub aktualizuję dokumenty tożsamości")
+            createOrUpdateData(this, applicant)
             changed = createOrUpdateIdentityDocument(this, applicant)
             logger.trace("Tworzę lub aktualizuję dokumenty uprawniające do podjęcia studiów")
-            createOrUpdateEntitlementDocument(person, applicant)
-            logger.trace("Tworzę lub aktualizuję dokumenty posiadane")
-            createOrUpdateOwnedDocuments(person, applicant)
-            logger.trace("Tworzę lub aktualizuję zdjęcie")
-            createOrUpdatePersonPhoto(person, applicant)
-            logger.trace("Tworzę lub aktualizuję dane osobowe")
             if (applicant.email.endsWith(universityEmailSuffix)) {
                 email = applicant.email
             } else {
@@ -250,6 +160,9 @@ class PersonService(
             applicant.highSchoolUsosCode?.let {
                 middleSchool = schoolRepository.getReferenceById(it)
             }
+            school = "${applicant.highSchoolType} ${applicant.highSchoolName} ${applicant.highSchoolCity}".takeIf {
+                applicant.highSchoolUsosCode == null
+            }
             applicant.mothersName?.let {
                 mothersName = applicant.mothersName
             }
@@ -273,6 +186,20 @@ class PersonService(
             }
         }
         return person
+    }
+
+    private fun createOrUpdateData(person: Person, applicant: Applicant) {
+        logger.trace("Tworzę lub aktualizuję adresy")
+        createOrUpdateAddresses(person, applicant)
+        logger.trace("Tworzę lub aktualizuję numery telefonów")
+        createOrUpdatePhoneNumbers(person, applicant)
+        logger.trace("Tworzę lub aktualizuję dokumenty tożsamości")
+        createOrUpdateEntitlementDocument(person, applicant)
+        logger.trace("Tworzę lub aktualizuję dokumenty posiadane")
+        createOrUpdateOwnedDocuments(person, applicant)
+        logger.trace("Tworzę lub aktualizuję zdjęcie")
+        createOrUpdatePersonPhoto(person, applicant)
+        logger.trace("Tworzę lub aktualizuję dane osobowe")
     }
 
     private fun createOrUpdateIdentityDocument(
@@ -460,41 +387,50 @@ class PersonService(
     }
 
     private fun createOrUpdateOwnedDocuments(person: Person, applicant: Applicant) {
-        when (applicant.applicantForeignerData?.baseOfStay) {
-            "OKP" -> createOrUpdateOkp(person, applicant)
+        val bos = applicant.applicantForeignerData?.baseOfStay ?: return
+        when (bos) {
+            "OKP" -> createOrUpdateOkp(person, applicant, bos)
+            else -> createOther(person, applicant, bos)
         }
 
     }
 
-    private fun createOrUpdateOkp(person: Person, applicant: Applicant) {
-        val afd = applicant.applicantForeignerData ?: throw IllegalArgumentException("Applicant foreigner data is null")
-        val bof = afd.baseOfStay ?: throw IllegalArgumentException("Base of stay is null")
-        val ownedDocument = ownedDocumentRepository.findByPersonAndDocumentType(
-            person,
-            documentTypeRepository.getReferenceById(bof)
-        )
+    private fun createOther(person: Person, applicant: Applicant, bos: String) {
+        val ownedDocument = person.ownedDocuments.find { it.documentType.code == bos }
+        if (ownedDocument == null) {
+            person.addOwnedDocument(
+                OwnedDocument(
+                    documentType = documentTypeRepository.getReferenceById(bos),
+                    person = person,
+                )
+            )
+        }
+    }
+
+    private fun createOrUpdateOkp(person: Person, applicant: Applicant, bos: String) {
+        val ownedDocument = person.ownedDocuments.find { it.documentType.code == bos }
         if (ownedDocument != null) {
-            updateOkp(ownedDocument, bof, afd)
+            updateOkp(ownedDocument, bos, applicant.applicantForeignerData ?: return)
         } else {
-            createOkp(person, afd)
+            createOkp(person, applicant.applicantForeignerData ?: return, bos)
         }
     }
 
     private fun createOkp(
         person: Person,
-        it: ApplicantForeignerData
+        applicantForeignerData: ApplicantForeignerData,
+        baseOfStay: String
     ) {
-        val baseOfStay = it.baseOfStay ?: return
         person.addOwnedDocument(
             OwnedDocument(
                 documentType = documentTypeRepository.getReferenceById(baseOfStay),
                 person = person,
-                issueDate = it.polishCardIssueDate,
-                issueCountry = it.polishCardIssueCountry?.let { countryCode ->
+                issueDate = applicantForeignerData.polishCardIssueDate,
+                issueCountry = applicantForeignerData.polishCardIssueCountry?.let { countryCode ->
                     citizenshipRepository.getReferenceById(countryCode)
                 },
-                number = it.polishCardNumber,
-                expirationDate = it.polishCardValidTo
+                number = applicantForeignerData.polishCardNumber,
+                expirationDate = applicantForeignerData.polishCardValidTo
             )
         )
     }
@@ -513,23 +449,28 @@ class PersonService(
         expirationDate = afd.polishCardValidTo
     }
 
-    fun findOneByPeselOrIdNumberOrEmailOrPrivateEmail(
+    fun findOneByPeselOrIdNumberOrPersonId(
         personId: Long?,
         pesel: String,
-        idNumbers: List<String>,
-        email: String,
-        privateEmail: String
+        idNumbers: List<String>
     ): Person? {
-        return personRepository.findOneByPeselOrIdNumberOrEmailOrPrivateEmail(
+        return personRepository.findOneByPeselOrIdNumberOrPersonId(
             personId,
             pesel,
-            idNumbers,
-            email,
-            privateEmail
+            idNumbers
         )
     }
 
-    fun createOrUpdatePerson(applicant: Applicant, person: Person?): Person {
+    fun createOrUpdatePerson(applicant: Applicant): Person {
+        val person = findOneByPeselOrIdNumberOrPersonId(
+            applicant.usosId,
+            applicant.pesel.orEmpty(),
+            applicant.identityDocuments.filterNot {
+                it.number.isNullOrBlank()
+            }.map {
+                it.number.orEmpty()
+            }
+        )
         return if (person != null) {
             logger.trace("Osoba istnieje. Aktualizuję")
             applicant.personExisted = true

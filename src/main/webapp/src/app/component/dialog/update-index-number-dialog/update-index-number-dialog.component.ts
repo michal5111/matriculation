@@ -50,5 +50,6 @@ export class UpdateIndexNumberDialogComponent implements OnInit {
     if (this.updateIndexNumberFormGroup.controls.indexNumber.hasError('sqlError')) {
       return this.sqlError;
     }
+    return 'ERROR';
   }
 }

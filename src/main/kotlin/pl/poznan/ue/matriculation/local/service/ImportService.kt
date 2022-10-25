@@ -113,6 +113,7 @@ class ImportService(
                 ImportStatus.SENDING_NOTIFICATIONS,
                 ImportStatus.CHECKING_POTENTIAL_DUPLICATES,
                 ImportStatus.SEARCHING_UIDS -> throw ImportStartException(importId, "Zły stan importu.")
+
                 ImportStatus.IMPORTED,
                 ImportStatus.ERROR,
                 ImportStatus.PENDING -> {
@@ -145,7 +146,7 @@ class ImportService(
         }
 
     fun updateImport(import: Import): Import {
-        if (import.importStatus !in arrayOf(ImportStatus.PENDING, ImportStatus.IMPORTED)) {
+        if (import.importStatus !in arrayOf(ImportStatus.PENDING, ImportStatus.IMPORTED, ImportStatus.ERROR)) {
             throw IllegalStateException("Nie można edytować importu w tym stanie")
         }
         validateImport(import)

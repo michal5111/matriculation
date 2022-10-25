@@ -1,7 +1,7 @@
 import {Component, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {ImportService} from '../../../service/import-service/import.service';
-import {Page} from '../../../model/oracle/page/page';
+import {Page} from '../../../model/dto/page/page';
 import {filter, map, switchMap, tap} from 'rxjs/operators';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, Sort} from '@angular/material/sort';
@@ -61,6 +61,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['indexNumber', true],
     ['applicationImportStatus', true],
     ['duplicateStatus', true],
+    ['warnings', true],
     ['delete', true]
   ]);
   sortingMap: Map<string, string> = new Map<string, string>([
@@ -73,7 +74,8 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['pesel', 'applicant.pesel'],
     ['indexNumber', 'applicant.assignedIndexNumber'],
     ['applicationImportStatus', 'importStatus'],
-    ['duplicateStatus', 'applicant.potentialDuplicateStatus']
+    ['duplicateStatus', 'applicant.potentialDuplicateStatus'],
+    ['warnings', 'warnings']
   ]);
 
   subs: Subscription[] = [];
@@ -116,7 +118,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    this.importId = this.route.snapshot.params.id;
+    this.importId = this.route.snapshot.params['id'];
     this.subs.push(
       this.getImport(this.importId).subscribe(),
       this.usosService.getUsosUrl().subscribe(
@@ -124,10 +126,10 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       ),
       this.route.queryParams.pipe(
         tap(params => {
-          this.pageNumber = params.page ?? this.pageNumber;
-          this.sortString = params.sort ?? this.sortString;
-          this.sortDirString = params.dir ?? this.sortDirString;
-          this.pageSize = params.pageSize ?? this.pageSize;
+          this.pageNumber = params['page'] ?? this.pageNumber;
+          this.sortString = params['sort'] ?? this.sortString;
+          this.sortDirString = params['dir'] ?? this.sortDirString;
+          this.pageSize = params['pageSize'] ?? this.pageSize;
         }),
         switchMap(() => this.getPage(
           this.pageNumber,
@@ -283,6 +285,9 @@ export class ImportViewComponent implements OnInit, OnDestroy {
   }
 
   isSavePersonsButtonDisabled(): boolean {
+    if (this.import?.potentialDuplicates != null && this.import?.potentialDuplicates > 0) {
+      return true;
+    }
     switch (this.import?.importStatus) {
       case 'COMPLETED_WITH_ERRORS':
       case 'IMPORTED':
@@ -301,8 +306,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       case 'COMPLETE':
       case 'COMPLETED_WITH_ERRORS':
       case 'ERROR':
-        return this.import.savedApplicants !== this.import.totalCount
-          || this.import.importedUids === this.import.totalCount;
+        return false;
       default:
         return true;
     }
@@ -320,8 +324,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     switch (this.import?.importStatus) {
       case 'COMPLETE':
       case 'COMPLETED_WITH_ERRORS':
-        return this.import.savedApplicants !== this.import.totalCount
-          || this.import.notificationsSend === this.import.totalCount;
+        return this.import.notificationsSend === this.import.totalCount;
       default:
         return true;
     }
@@ -355,9 +358,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
             usosId: (result.notDuplicate ? undefined : result.person.id),
             potentialDuplicateStatus: (result.notDuplicate ? 'CONFIRMED_NOT_DUPLICATE' : 'OK')
           }).subscribe(updatedApplication => {
-            if (this.import?.potentialDuplicates !== undefined) {
-              this.import.potentialDuplicates--;
-            }
             application.applicant.potentialDuplicateStatus = updatedApplication.applicant.potentialDuplicateStatus;
             application.applicant.usosId = updatedApplication.applicant.usosId;
           })
@@ -406,5 +406,12 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       || this.import?.importStatus === 'COMPLETED_WITH_ERRORS'
       || (this.import?.importStatus === 'ERROR' && this.import.totalCount !== this.import.savedApplicants)
     ) : true;
+  }
+
+  isDeleteButtonDisabled(application: Application): boolean {
+    if (application.importStatus === 'IMPORTED') {
+      return true;
+    }
+    return this.isStartImportButtonDisabled();
   }
 }

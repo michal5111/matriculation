@@ -5,7 +5,7 @@ import {map, tap} from 'rxjs/operators';
 import {APP_BASE_HREF} from '@angular/common';
 import {User} from '../../model/user/user';
 import {Observable} from 'rxjs';
-import {Page} from '../../model/oracle/page/page';
+import {Page} from '../../model/dto/page/page';
 import {ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot, UrlTree} from '@angular/router';
 
 const httpOptions = {
@@ -70,7 +70,7 @@ export class UserService implements CanActivate {
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    const authorities: string[] = route.data?.authorities;
+    const authorities: string[] = route.data?.['authorities'];
     if (!authorities || authorities.length === 0) {
       return true;
     } else {

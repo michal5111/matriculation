@@ -8,12 +8,6 @@ class DreamApplyApplicationMapper {
     fun map(dreamApplyApplicationDto: DreamApplyApplicationDto): Application {
         return Application(
             foreignId = dreamApplyApplicationDto.id,
-            admitted = dreamApplyApplicationDto.status,
-            payment = "paid",
-            comment = null,
-            position = null,
-            qualified = "qualified",
-            score = null,
             baseOfStay = null,
             basisOfAdmission = null,
             sourceOfFinancing = null
@@ -21,8 +15,6 @@ class DreamApplyApplicationMapper {
     }
 
     fun update(application: Application, dreamApplyApplicationDto: DreamApplyApplicationDto): Application {
-        return application.apply {
-            admitted = dreamApplyApplicationDto.status
-        }
+        return application
     }
 }

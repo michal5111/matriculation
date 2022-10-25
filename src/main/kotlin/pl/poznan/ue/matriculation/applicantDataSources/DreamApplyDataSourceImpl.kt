@@ -14,8 +14,7 @@ import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applicants.IdentityDocument
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
-import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
-import pl.poznan.ue.matriculation.local.dto.RegistrationDto
+import pl.poznan.ue.matriculation.local.dto.*
 
 open class DreamApplyDataSourceImpl(
     override val name: String,
@@ -28,12 +27,24 @@ open class DreamApplyDataSourceImpl(
 
     override val instanceUrl = dreamApplyService.instanceUrl
 
+    override val additionalParameters: List<DataSourceAdditionalParameter>
+        get() = listOf(
+            SelectionListDataSourceAdditionalParameter("Status", null) {
+                val courses = dreamApplyService.getOfferTypes()
+                    ?: throw IllegalStateException("Unable to get offer type list.")
+                courses.map {
+                    SelectionListValue(it.value.title, it.value.title)
+                }
+            }
+        )
+
     override fun getApplicationsPage(
         import: Import,
         registrationCode: String,
         programmeForeignId: String,
         pageNumber: Int
     ): IPage<DreamApplyApplicationDto> {
+        val status = import.additionalProperties?.get("Status") as String
         val applicationMap = dreamApplyService.getApplicationsByFilter(
             academicTermID = registrationCode,
             additionalFilters = mapOf(
@@ -87,7 +98,7 @@ open class DreamApplyDataSourceImpl(
         }.map {
             ProgrammeDto(
                 id = it.id.toString(),
-                name = "${it.code} ${it.name}",
+                name = it.name,
                 usosId = it.code!!
             )
         }

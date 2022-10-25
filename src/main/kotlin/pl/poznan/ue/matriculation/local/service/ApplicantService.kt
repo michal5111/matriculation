@@ -21,6 +21,10 @@ class ApplicantService(
         return applicantRepository.findByIdOrNull(applicantId)
     }
 
+    fun findWithIdentityDocumentsById(applicantId: Long): Applicant? {
+        return applicantRepository.findWithIdentityDocumentsById(applicantId)
+    }
+
     fun check(applicant: Applicant) {
         if (applicant.pesel.isNullOrBlank() && !applicant.identityDocuments.any { it.number != null }) {
             throw ApplicantCheckException("Brak peselu lub dokumentu tożsamości")

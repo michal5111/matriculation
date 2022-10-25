@@ -3,7 +3,7 @@ import {UserService} from '../../service/user-service/user.service';
 import {User} from '../../model/user/user';
 import {MatTableDataSource} from '@angular/material/table';
 import {map, tap} from 'rxjs/operators';
-import {Page} from '../../model/oracle/page/page';
+import {Page} from '../../model/dto/page/page';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, Sort} from '@angular/material/sort';
 import {MatDialog} from '@angular/material/dialog';

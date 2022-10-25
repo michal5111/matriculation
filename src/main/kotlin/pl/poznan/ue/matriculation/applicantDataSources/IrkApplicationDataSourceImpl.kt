@@ -57,11 +57,17 @@ open class IrkApplicationDataSourceImpl(
     }
 
     override fun getApplicantById(applicantId: Long, applicationDto: IrkApplicationDTO): IrkApplicantDto {
-        return irkService.getApplicantById(applicantId) ?: throw IllegalArgumentException("Unable to get applicant")
+        return irkService.getApplicantById(applicantId)?.also {
+            applicationDto.certificate?.let { documentDto -> it.educationData.documents.add(documentDto) }
+        } ?: throw IllegalArgumentException("Unable to get applicant")
     }
 
     override fun getPhoto(photoUrl: String): ByteArray? {
-        return irkService.getPhoto(photoUrl)
+        return try {
+            irkService.getPhoto(photoUrl)
+        } catch (e: HttpClientErrorException.NotFound) {
+            null
+        }
     }
 
     override fun postMatriculation(foreignApplicationId: Long): Int {
@@ -142,7 +148,7 @@ open class IrkApplicationDataSourceImpl(
         applicantDto: IrkApplicantDto,
         import: Import
     ): Document? {
-        val pc = irkService.getPrimaryCertificate(applicationDto.id) ?: return null
+        val pc = applicationDto.certificate ?: return null
         return applicant.documents.find {
             it.documentNumber == pc.documentNumber && it.certificateTypeCode == pc.certificateTypeCode
         }

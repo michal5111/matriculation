@@ -14,6 +14,7 @@ class SendNotificationsStartConditions : IStartConditions {
             ImportStatus.SEARCHING_UIDS,
             ImportStatus.CHECKING_POTENTIAL_DUPLICATES,
             ImportStatus.SENDING_NOTIFICATIONS -> return StateTransitionFailure("Zły stan importu.")
+
             ImportStatus.ERROR,
             ImportStatus.COMPLETE,
             ImportStatus.COMPLETED_WITH_ERRORS -> {
@@ -21,9 +22,6 @@ class SendNotificationsStartConditions : IStartConditions {
                     ?: return StateTransitionFailure("Liczba aplikantów to null")
                 if (totalCount < 1) {
                     return StateTransitionFailure("Liczba aplikantów wynosi 0")
-                }
-                if (import.savedApplicants != totalCount) {
-                    return StateTransitionFailure("Nie wszyscy kandydaci zostali zapisani")
                 }
                 if (import.notificationsSend == totalCount) {
                     return StateTransitionFailure("Wszystkie powiadomienia są już wysłane")

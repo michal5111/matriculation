@@ -187,6 +187,7 @@ class ExcelFileDataSourceImpl(
 
     private fun mapExcelRowToDto(row: Row, fileHashCode: Int): ExcelFileApplicationDto {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+        row.getCell(PESEL_CELL).cellType = CellType.STRING
         return ExcelFileApplicationDto(
             id = if (row.getCellStringOrNull(PESEL_CELL) != null)
                 row.getCellString(PESEL_CELL).replace(" ", "").hashCode().toLong() + fileHashCode
@@ -200,7 +201,9 @@ class ExcelFileDataSourceImpl(
                 given = row.getCellString(NAME_CELL),
                 middle = row.getCellStringOrNull(MIDDLE_NAME_CELL),
                 family = row.getCellString(SURNAME_CELL),
-                sex = row.getCellString(SEX_CELL).first().uppercaseChar(),
+                sex = if (row.getCellString(SEX_CELL).first().uppercaseChar() == 'K' || row.getCellString(SEX_CELL)
+                        .first().uppercaseChar() == 'F'
+                ) 'K' else 'M',
                 email = row.getCellString(EMAIL_CELL),
                 pesel = row.getCellStringOrNull(PESEL_CELL),
                 passport = row.getCellStringOrNull(PASSPORT_NUMBER_CELL),

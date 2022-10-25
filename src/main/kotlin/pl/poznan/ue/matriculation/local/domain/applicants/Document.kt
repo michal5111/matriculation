@@ -52,9 +52,9 @@ class Document(
 
     var modificationDate: Date?,
 
-    @JsonIgnore
+    @get:JsonIgnore
     @OneToMany(mappedBy = "certificate", fetch = FetchType.LAZY)
-    var Applications: MutableList<Application> = mutableListOf()
+    val Applications: MutableList<Application> = mutableListOf()
 
 ) : BaseEntityLongId(), Serializable {
 

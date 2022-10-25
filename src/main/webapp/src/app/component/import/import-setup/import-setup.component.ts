@@ -9,7 +9,7 @@ import {
   UntypedFormGroup,
   Validators
 } from '@angular/forms';
-import {debounceTime, distinctUntilChanged, forkJoin, from, Observable, of, Subscription} from 'rxjs';
+import {debounceTime, distinctUntilChanged, finalize, forkJoin, Observable, of, Subscription} from 'rxjs';
 import {map, switchMap, tap} from 'rxjs/operators';
 import {IndexType} from '../../../model/oracle/index-type';
 import {Registration} from '../../../model/applications/registration';
@@ -28,10 +28,10 @@ import {APP_BASE_HREF} from '@angular/common';
 export class ImportSetupComponent implements OnInit, OnDestroy {
 
   dataSourceId = '?';
-  $availableDataSourcesObservable: Observable<[DataSource]> = this.importService.getAvailableDataSources();
+  $availableDataSources: Observable<[DataSource]> = this.importService.getAvailableDataSources();
   registrations: Registration[] = [];
   registrationProgrammes: Programme[] = [];
-  $indexPoolsObservable: Observable<[IndexType]> = this.usosService.getAvailableIndexPools();
+  $indexPools: Observable<[IndexType]> = this.usosService.getAvailableIndexPools();
   stages: string[] = [];
   didacticCycles: string[] = [];
   formGroup: FormGroup<{
@@ -83,40 +83,32 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   }
 
   onRegistrationSelectionChange(event: MatSelectChange): void {
-    this.areProgrammesLoading = true;
     this.subs.push(
-      this.getAvailableRegistrationProgrammes(event.value, this.dataSourceId).subscribe({
-        next: () => {
-          this.formGroup.patchValue({registrationProgramme: null, stage: null});
-        },
-        complete: () => {
-          this.areProgrammesLoading = false;
-        }
-      })
+      this.getAvailableRegistrationProgrammes(event.value, this.dataSourceId).pipe(
+        tap(() => this.areProgrammesLoading = true),
+        tap(() => this.formGroup.patchValue({registrationProgramme: null, stage: null})),
+        finalize(() => this.areProgrammesLoading = false)
+      ).subscribe()
     );
   }
 
   onRegistrationProgrammeChange(event: MatSelectChange): void {
-    this.areStagesLoading = true;
     this.subs.push(
-      this.getProgrammeStages(event.value.usosId).subscribe({
-        next: () => {
-          this.formGroup.patchValue({stage: null});
-        },
-        complete: () => {
-          this.areStagesLoading = false;
-        }
-      })
+      this.getProgrammeStages(event.value.usosId).pipe(
+        tap(() => this.areStagesLoading = true),
+        tap(() => this.formGroup.patchValue({stage: null})),
+        finalize(() => this.areStagesLoading = false)
+      ).subscribe()
     );
   }
 
   onDidacticCycleInputChanges(): Observable<[string]> {
-    return this.formGroup.get('didacticCycle')?.valueChanges.pipe(
+    return this.formGroup.controls.didacticCycle.valueChanges.pipe(
       debounceTime(200),
       distinctUntilChanged(),
       switchMap(value => this.usosService.findDidacticCycleCodes(value ?? '')),
       tap(didacticCycles => this.didacticCycles = didacticCycles)
-    ) ?? from([]);
+    );
   }
 
   onSubmit() {
@@ -140,9 +132,9 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     console.log(this.formGroup.controls.additionalParameters.value);
     let obs;
     if (this.import?.id == null) {
-      obs = this.importService.createImport(this.import);
+      obs = this.importService.create(this.import);
     } else {
-      obs = this.importService.updateImport(this.import);
+      obs = this.importService.update(this.import);
     }
     obs?.pipe(
       tap((importObj: Import) => this.onImportCreated(importObj))
@@ -178,17 +170,13 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     const dataSource: DataSource = event.value;
     this.dataSourceId = dataSource.id;
     this.initAdditionalParameters(dataSource);
-    this.areRegistrationLoading = true;
     this.subs.push(
-      this.getAvailableRegistrations(dataSource.id).subscribe({
-          next: () => {
-            this.formGroup.patchValue({registration: null, registrationProgramme: null, stage: null});
-          },
-          complete: () => {
-            this.areRegistrationLoading = false;
-          }
-        }
-      ));
+      this.getAvailableRegistrations(dataSource.id).pipe(
+        tap(() => this.areRegistrationLoading = true),
+        tap(() => this.formGroup.patchValue({registration: null, registrationProgramme: null, stage: null})),
+        finalize(() => this.areRegistrationLoading = false)
+      ).subscribe()
+    );
   }
 
   getUrlWithBaseHref(url: string | undefined): string {
@@ -198,20 +186,20 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     return url ?? '';
   }
 
-  datasourceCompare(ds1: DataSource, ds2: DataSource): boolean {
+  datasourceCompare(ds1?: DataSource, ds2?: DataSource): boolean {
     return ds1 && ds2 ? ds1.id === ds2.id : false;
   }
 
-  registrationCompare(rg1: Registration, rg2: Registration): boolean {
+  registrationCompare(rg1?: Registration, rg2?: Registration): boolean {
     return rg1 && rg2 ? rg1.id === rg2.id : false;
   }
 
-  registrationProgrammeCompare(rgp1: Programme, rgp2: Programme): boolean {
+  registrationProgrammeCompare(rgp1?: Programme, rgp2?: Programme): boolean {
     return rgp1 && rgp2 ? rgp1.id === rgp2.id : false;
   }
 
-  indexTypeCompare(it1: IndexType, it2: IndexType): boolean {
-    return it1.code === it2.code;
+  indexTypeCompare(it1?: IndexType, it2?: IndexType): boolean {
+    return it1 && it2 ? it1.code === it2.code : false;
   }
 
   initForm(importId: number) {
@@ -220,17 +208,17 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
       switchMap(importObj =>
         forkJoin([
           of(importObj),
-          this.$availableDataSourcesObservable.pipe(
+          this.$availableDataSources.pipe(
             map(dataSources => dataSources.find(d => d.id === importObj.dataSourceId)),
             tap(datasource => this.initAdditionalParameters(datasource))
           ),
-          this.getAvailableRegistrations(importObj.dataSourceId ?? ''),
-          this.getAvailableRegistrationProgrammes(importObj.registration ?? '', importObj.dataSourceId ?? ''),
-          this.getProgrammeStages(importObj.programmeCode ?? '')
+          this.getAvailableRegistrations(importObj.dataSourceId ?? '?'),
+          this.getAvailableRegistrationProgrammes(importObj.registration ?? '?', importObj.dataSourceId ?? '?'),
+          this.getProgrammeStages(importObj.programmeCode ?? '?')
         ])),
       tap(data => {
-        const importObj = data[0];
-        const dataSource = data[1];
+        const importObj: Import = data[0];
+        const dataSource: DataSource | undefined = data[1];
         this.formGroup.patchValue(
           {
             dataSource,

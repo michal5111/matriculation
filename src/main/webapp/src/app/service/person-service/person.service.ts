@@ -2,7 +2,7 @@ import {Inject, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Person} from '../../model/oracle/Person';
 import {Observable} from 'rxjs';
-import {Page} from '../../model/oracle/page/page';
+import {Page} from '../../model/dto/page/page';
 import {APP_BASE_HREF} from '@angular/common';
 
 const httpOptions = {
@@ -18,7 +18,8 @@ export class PersonService {
 
   private apiUrl = `${this.baseHref}api/person`;
 
-  constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) { }
+  constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) {
+  }
 
   getPersonById(id: number): Observable<Person> {
     return this.http.get<Person>(`${this.apiUrl}/${id}`, httpOptions);

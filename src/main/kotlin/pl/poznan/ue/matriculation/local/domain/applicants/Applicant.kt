@@ -9,12 +9,20 @@ import java.util.concurrent.Future
 import javax.persistence.*
 import javax.validation.constraints.Email
 
-@NamedEntityGraph(
-    name = "applicant.data",
-    attributeNodes = [
-        NamedAttributeNode("applicantForeignerData"),
-        NamedAttributeNode("documents")
-    ]
+@NamedEntityGraphs(
+    NamedEntityGraph(
+        name = "applicant.data",
+        attributeNodes = [
+            NamedAttributeNode("applicantForeignerData"),
+            NamedAttributeNode("documents")
+        ]
+    ),
+    NamedEntityGraph(
+        name = "applicant.identityDocuments",
+        attributeNodes = [
+            NamedAttributeNode("identityDocuments")
+        ]
+    )
 )
 @Entity
 @Table(

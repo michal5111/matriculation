@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.SqlOutParameter
 import org.springframework.jdbc.core.SqlParameter
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.simple.SimpleJdbcCall
-import pl.poznan.ue.matriculation.annotation.LogExecutionTime
 import pl.poznan.ue.matriculation.oracle.dto.IndexNumberDto
 import java.sql.Types
 
@@ -24,7 +23,6 @@ open class IndexNumberRepositoryImpl(
             SqlOutParameter("p_jed_org_kod", Types.VARCHAR)
         )
 
-    @LogExecutionTime
     override fun getNewIndexNumber(indexPoolCode: String): IndexNumberDto {
         val paramMap = MapSqlParameterSource().addValue("p_typ", indexPoolCode)
         val resultMap = jdbcCall.execute(paramMap)

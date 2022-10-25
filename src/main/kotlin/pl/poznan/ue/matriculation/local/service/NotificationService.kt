@@ -40,7 +40,7 @@ class NotificationService(
             headerEn = "Your USOS account has been activated."
             ClassPathResource("notificationEmailTemplateExistingEn.txt").file
         } else {
-            ClassPathResource("notificationEmailTemplate.txtEn").file
+            ClassPathResource("notificationEmailTemplateEn.txt").file
         }
         val applicant = application.applicant ?: throw ApplicantNotFoundException()
 

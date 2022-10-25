@@ -1,6 +1,7 @@
 package pl.poznan.ue.matriculation.exception.exceptionHandler
 
 import org.hibernate.JDBCException
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -26,7 +27,7 @@ class SaveExceptionHandler(
         transactionManager = "transactionManager"
     )
     override fun handle(exception: Exception, application: Application, importId: Long) {
-        val importProgress = importRepository.getById(importId)
+        val import = importRepository.findByIdOrNull(importId) ?: error("Import not found")
         application.importError = ""
         var e: Throwable? = exception
         do {
@@ -37,13 +38,14 @@ class SaveExceptionHandler(
                         "Sql: ${e.sql} " +
                         "Sql state: ${e.sqlState} "
                 }
+
                 else -> application.importError += "${e?.javaClass?.simpleName}: ${e?.message.orEmpty()}"
             }
             e = e?.cause
         } while (e != null)
         application.importStatus = ApplicationImportStatus.ERROR
         application.stackTrace = exception.stackTraceToHtmlString()
-        importProgress.saveErrors++
+        import.saveErrors++
         val applicant = application.applicant ?: throw ApplicantNotFoundException()
         applicantRepository.save(applicant)
         applicationRepository.save(application)

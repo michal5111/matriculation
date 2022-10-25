@@ -47,6 +47,7 @@ class AsyncExceptionHandler : AsyncUncaughtExceptionHandler {
                     e.stackTraceToHtmlString()
                 )
             }
+
             else -> importService.setError(
                 importId,
                 e.message ?: "Unknown error",

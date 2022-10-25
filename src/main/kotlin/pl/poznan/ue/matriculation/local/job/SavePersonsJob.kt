@@ -46,6 +46,9 @@ class SavePersonsJob(
     @LogExecutionTime
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
     override fun doWork(import: Import) {
+        if (import.potentialDuplicates > 0) {
+            throw IllegalStateException("Istnieją nierozwiązane potencjalne duplikaty.")
+        }
         val importId = import.id ?: throw IllegalArgumentException("Import id is null")
         val applicationDtoDataSource = applicationDataSourceFactory.getDataSource(import.dataSourceId)
         logger.trace("Pobieram strumień zgłoszeń ze statusem nie zaimportowany i błąd")

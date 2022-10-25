@@ -8,6 +8,7 @@ interface PersonBasicData {
     val middleName: String?
     val surname: String
     val idNumber: String?
+    val pesel: String?
     val birthDate: Date
     val privateEmail: String?
     val email: String?

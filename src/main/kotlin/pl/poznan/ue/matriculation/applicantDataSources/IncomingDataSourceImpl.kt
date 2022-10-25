@@ -62,12 +62,13 @@ class IncomingDataSourceImpl(
                 "byFlagIDs" to programmeForeignId
             )
         ) ?: throw java.lang.IllegalArgumentException("Unable to get applicants")
+        val statuses = status.split(',')
         val applications = applicationMap.values.filter { dreamApplyApplicationDto ->
             val applicationOffers = dreamApplyService.getApplicationOffers(dreamApplyApplicationDto.offers)
             val applicationFlags = dreamApplyService.getApplicationFlags(dreamApplyApplicationDto.flags)
             applicationOffers!!.any {
                 it.value.course == "/api/courses/$programmeId"
-                    && it.value.type == status
+                    && it.value.type in statuses
             } && applicationFlags!!.any {
                 it.key == semesterFlagId
             }

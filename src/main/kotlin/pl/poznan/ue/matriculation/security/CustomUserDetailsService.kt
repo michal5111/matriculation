@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import pl.poznan.ue.matriculation.local.service.UserService
 import java.util.*
 
-internal class CustomUserDetailsService(
+class CustomUserDetailsService(
     private val admins: Set<String>,
     private val userService: UserService
 ) : AuthenticationUserDetailsService<CasAssertionAuthenticationToken> {

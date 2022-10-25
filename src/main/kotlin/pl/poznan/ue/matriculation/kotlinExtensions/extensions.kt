@@ -1,7 +1,9 @@
 package pl.poznan.ue.matriculation.kotlinExtensions
 
 import org.apache.poi.ss.formula.functions.T
+import org.springframework.data.domain.Page
 import pl.poznan.ue.matriculation.local.domain.user.User
+import pl.poznan.ue.matriculation.local.dto.PageDto
 import pl.poznan.ue.matriculation.local.dto.RoleDto
 import pl.poznan.ue.matriculation.local.dto.UserDto
 import pl.poznan.ue.matriculation.local.service.AsyncService
@@ -99,5 +101,25 @@ fun User.toUserDto() = let {
         email = it.email,
         usosId = it.usosId,
         version = it.version
+    )
+}
+
+fun <T, Z> Page<T>.toPageDto(mapping: (T) -> Z): PageDto<Z> {
+    return PageDto(
+        content = content.map(mapping),
+        number = number,
+        totalElements = totalElements,
+        totalPages = totalPages,
+        size = size
+    )
+}
+
+fun <T> Page<T>.toPageDto(): PageDto<T> {
+    return PageDto(
+        content = content,
+        number = number,
+        totalElements = totalElements,
+        totalPages = totalPages,
+        size = size
     )
 }

@@ -26,6 +26,7 @@ export class SelectPersonDialogComponent implements OnInit {
     'surname',
     'birthDate',
     'idNumber',
+    'pesel',
     'sex',
     'email',
     'privateEmail'

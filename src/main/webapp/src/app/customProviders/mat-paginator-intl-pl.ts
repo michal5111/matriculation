@@ -3,13 +3,13 @@ import {Injectable} from '@angular/core';
 
 @Injectable()
 export class MatPaginatorIntlPl extends MatPaginatorIntl {
-  itemsPerPageLabel = 'Elementów na stronę';
-  nextPageLabel = 'Następna strona';
-  previousPageLabel = 'Poprzednia strona';
-  lastPageLabel = 'Ostatnia strona';
-  firstPageLabel = 'Pierwsza strona';
+  override itemsPerPageLabel = 'Elementów na stronę';
+  override nextPageLabel = 'Następna strona';
+  override previousPageLabel = 'Poprzednia strona';
+  override lastPageLabel = 'Ostatnia strona';
+  override firstPageLabel = 'Pierwsza strona';
 
-  getRangeLabel = (page: number, pageSize: number, length: number) => {
+  override getRangeLabel = (page: number, pageSize: number, length: number) => {
     if (length === 0 || pageSize === 0) {
       return '0 z ' + length;
     }

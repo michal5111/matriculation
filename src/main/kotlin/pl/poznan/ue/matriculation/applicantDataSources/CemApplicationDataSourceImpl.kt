@@ -102,7 +102,7 @@ class CemApplicationDataSourceImpl(
         return Applicant(
             foreignId = applicantDto.foreignId,
             dataSourceId = id,
-            email = applicantDto.email ?: throw ApplicantMappingException("Email is null"),
+            email = applicantDto.email?.trim() ?: throw ApplicantMappingException("Email is null"),
             given = applicantDto.firstName?.trim()
                 ?: throw ApplicantMappingException("First name is null"),
             maiden = applicantDto.maidenName
@@ -231,7 +231,7 @@ class CemApplicationDataSourceImpl(
         applicationDto: CemApplication
     ): Applicant {
         return applicant.apply {
-            email = applicantDto.email ?: throw ApplicantMappingException("Email is null")
+            email = applicantDto.email?.trim() ?: throw ApplicantMappingException("Email is null")
             given = applicantDto.firstName?.trim()
                 ?: throw ApplicantMappingException("First name is null")
             maiden = applicantDto.maidenName

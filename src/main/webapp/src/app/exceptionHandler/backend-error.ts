@@ -16,8 +16,6 @@ export class BackendError {
   }
 
   static [Symbol.hasInstance](obj: { error: any; message: any; path: any; status: any; timestamp: any; trace: any; }) {
-    if (obj.error && obj.message && obj.path && obj.status && obj.timestamp && obj.trace) {
-      return true;
-    }
+    return !!(obj.error && obj.message && obj.path && obj.status && obj.timestamp && obj.trace);
   }
 }

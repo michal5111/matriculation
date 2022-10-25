@@ -16,7 +16,6 @@ class DidacticCycleRepositoryCustomImpl : DidacticCycleRepositoryCustom {
                     dc.code
                 FROM DidacticCycle dc
                 WHERE dc.code LIKE :didacticCycleCode
-                AND dc.didacticCycleType.code = 'SEM'
                 ORDER BY dc.dateTo DESC
             """.trimIndent(), String::class.java
             )

@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Page} from '../../../model/oracle/page/page';
+import {Page} from '../../../model/dto/page/page';
 import {Import} from '../../../model/import/import';
 import {MatTableDataSource} from '@angular/material/table';
 import {ImportService} from '../../../service/import-service/import.service';
@@ -77,13 +77,13 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.subs.push(
       this.route.queryParams.pipe(
         tap(params => {
-          this.pageNumber = params.page ?? this.pageNumber;
-          this.sortString = params.sort ?? this.sortString;
-          this.sortDirString = params.dir ?? this.sortDirString;
-          this.pageSize = params.pageSize ?? this.pageSize;
+          this.pageNumber = params['page'] ?? this.pageNumber;
+          this.sortString = params['sort'] ?? this.sortString;
+          this.sortDirString = params['dir'] ?? this.sortDirString;
+          this.pageSize = params['pageSize'] ?? this.pageSize;
         }),
         switchMap(params => this.getPage(
-          params.page ?? this.pageNumber,
+          params['page'] ?? this.pageNumber,
           this.pageSize,
           this.sortString,
           this.sortDirString
@@ -153,7 +153,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     if (importObject.id == null) {
       throw Error('Import id is null');
     }
-    return this.importService.deleteImport(importObject.id).pipe(
+    return this.importService.delete(importObject.id).pipe(
       tap(() => this.removeImportFromData(importObject))
     );
   }
@@ -167,7 +167,7 @@ export class ImportComponent implements OnInit, OnDestroy {
       throw Error('Import id is null');
     }
     this.subs.push(
-      this.importService.deleteImport(importObj.id).subscribe()
+      this.importService.delete(importObj.id).subscribe()
     );
   }
 

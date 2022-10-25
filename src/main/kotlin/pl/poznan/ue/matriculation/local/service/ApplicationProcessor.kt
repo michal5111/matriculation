@@ -13,6 +13,7 @@ import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
+import pl.poznan.ue.matriculation.local.processor.ProcessRequest
 import pl.poznan.ue.matriculation.oracle.service.PersonProcessorService
 
 @Component
@@ -53,10 +54,12 @@ class ApplicationProcessor(
             }
         }
         logger.trace("Przetwarzam pobranego aplikanta")
-        val processResult = personProcessorService.process(
+        val processRequest = ProcessRequest(
             application = application,
-            import = import
+            import = import,
+            person = null
         )
+        val processResult = personProcessorService.process(processRequest)
         logger.trace("Przypisuje aplikantowi nadany numer indeksu i usosId")
         application.apply {
             applicant.usosId = processResult.systemId

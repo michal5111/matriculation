@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
+import pl.poznan.ue.matriculation.kotlinExtensions.toPageDto
 import pl.poznan.ue.matriculation.kotlinExtensions.toUserDto
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.import.Import
@@ -95,15 +96,7 @@ class RestController(
     fun savePersons(@PathVariable("id") importId: Long) = jobService.runJob(JobType.SAVE, importId)
 
     @GetMapping("/import")
-    fun getImportsPage(pageable: Pageable): Page<Import> = importService.getAll(pageable).let {
-        Page(
-            content = it.content,
-            number = it.number,
-            totalElements = it.totalElements,
-            totalPages = it.totalPages,
-            size = it.size
-        )
-    }
+    fun getImportsPage(pageable: Pageable): PageDto<Import> = importService.getAll(pageable).toPageDto()
 
     @DeleteMapping("/import/{id}")
     fun deleteImport(@PathVariable("id") importId: Long) {
@@ -116,15 +109,7 @@ class RestController(
     fun findAllApplicationsByImportId(
         pageable: Pageable,
         @PathVariable("id") importId: Long
-    ): Page<Application> = applicationService.findAllApplicationsByImportId(pageable, importId).let {
-        Page(
-            content = it.content,
-            number = it.number,
-            totalElements = it.totalElements,
-            totalPages = it.totalPages,
-            size = it.size
-        )
-    }
+    ): PageDto<Application> = applicationService.findAllApplicationsByImportId(pageable, importId).toPageDto()
 
     @GetMapping("/usos/indexPool")
     fun getAvailableIndexPools(): List<IndexTypeDto> = usosService.getAvailableIndexPoolsCodes()
@@ -165,24 +150,16 @@ class RestController(
     fun deleteUser(@PathVariable("id") id: Long) = userService.delete(id)
 
     @GetMapping("/users")
-    fun getAllUsers(pageable: Pageable): Page<UserDto> = userService.getAll(pageable).let { page ->
-        Page(
-            content = page.content.map {
-                UserDto(
-                    id = it.id,
-                    uid = it.uid,
-                    roles = emptyList(),
-                    givenName = it.givenName,
-                    surname = it.surname,
-                    email = it.email,
-                    usosId = it.usosId,
-                    version = it.version
-                )
-            },
-            number = page.number,
-            totalElements = page.totalElements,
-            totalPages = page.totalPages,
-            size = page.size
+    fun getAllUsers(pageable: Pageable): PageDto<UserDto> = userService.getAll(pageable).toPageDto {
+        UserDto(
+            id = it.id,
+            uid = it.uid,
+            roles = emptyList(),
+            givenName = it.givenName,
+            surname = it.surname,
+            email = it.email,
+            usosId = it.usosId,
+            version = it.version
         )
     }
 
@@ -205,7 +182,8 @@ class RestController(
     @GetMapping("/applicant/{id}/potentialDuplicates")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun getPotentialDuplicates(@PathVariable("id") applicantId: Long): List<PersonBasicData> {
-        val applicant = applicantService.findById(applicantId) ?: throw ApplicantNotFoundException()
+        val applicant =
+            applicantService.findWithIdentityDocumentsById(applicantId) ?: throw ApplicantNotFoundException()
         return personRepository.findPotentialDuplicate(
             name = applicant.given,
             surname = applicant.family,

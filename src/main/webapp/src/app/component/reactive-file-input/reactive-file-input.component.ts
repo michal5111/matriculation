@@ -28,10 +28,10 @@ export class ReactiveFileInputComponent implements OnInit, ControlValueAccessor 
   disabled = false;
 
   onChange = (fileDataUrl: string | null) => {
-  };
+  }
 
   onTouched = () => {
-  };
+  }
 
   constructor() {
   }

@@ -33,11 +33,11 @@ import {
 import {AddUserDialogComponent} from './component/dialog/add-user-dialog/add-user-dialog.component';
 import {ExceptionHandler} from './exceptionHandler/exception-handler';
 import {SelectPersonDialogComponent} from './component/dialog/select-person-dialog/select-person-dialog.component';
-import {MyRxStompConfig} from './service/configConsts/my-rx-stomp-config';
+import {MyRxStompConfig} from './configConsts/my-rx-stomp-config';
 import {InjectableRxStompConfig, RxStompService, rxStompServiceFactory} from '@stomp/ng2-stompjs';
 import {WS_URL} from './injectableTokens/WS_URL';
 import {MAT_DATE_FORMATS} from '@angular/material/core';
-import {MY_DATE_FORMATS} from './service/configConsts/MY_DATE_FORMATS';
+import {MY_DATE_FORMATS} from './configConsts/MY_DATE_FORMATS';
 import {DatesValidatorDirective} from './validator/dates-validator.directive';
 import {ReactiveFileInputComponent} from './component/reactive-file-input/reactive-file-input.component';
 import {ImportEditorComponent} from './component/dialog/import-editor/import-editor.component';
@@ -71,7 +71,7 @@ import {ImportEditorComponent} from './component/dialog/import-editor/import-edi
     BrowserAnimationsModule,
     MaterialModule,
     HttpClientModule,
-    ReactiveFormsModule,
+    ReactiveFormsModule
   ],
   providers: [
     {

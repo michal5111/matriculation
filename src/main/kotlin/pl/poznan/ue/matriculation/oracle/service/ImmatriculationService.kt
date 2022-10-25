@@ -2,6 +2,7 @@ package pl.poznan.ue.matriculation.oracle.service
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -13,7 +14,6 @@ import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
 import pl.poznan.ue.matriculation.oracle.domain.*
 import pl.poznan.ue.matriculation.oracle.repo.*
 import java.util.*
-import javax.persistence.EntityNotFoundException
 
 @Service
 class ImmatriculationService(
@@ -83,11 +83,12 @@ class ImmatriculationService(
         personProgramme: PersonProgramme,
         startDate: Date
     ) = application.applicant?.erasmusData?.let {
-        val didacticCycle = didacticCycleRepository.getReferenceById(didacticCycleCode)
+        val didacticCycle = didacticCycleRepository.findByIdOrNull(didacticCycleCode)
+            ?: error("Nie można znaleźć cyklu dydaktycznego")
         val didacticCycleYear = didacticCycleRepository.findDidacticCycleYearBySemesterDates(
             didacticCycle.dateFrom,
             didacticCycle.endDate
-        ) ?: throw EntityNotFoundException("Nie można znaleźć cyklu dydaktycznego")
+        ) ?: error("Nie można znaleźć cyklu dydaktycznego")
         val arrival = erasmusService.createArrival(
             erasmusData = it,
             didacticCycle = didacticCycle,
@@ -110,7 +111,8 @@ class ImmatriculationService(
     ): PersonProgramme {
         val personId = person.id ?: throw IllegalStateException("Person id is null")
         val programme = programmeRepository.getReferenceById(import.programmeCode)
-        val didacticCycle = didacticCycleRepository.getReferenceById(import.didacticCycleCode)
+        val didacticCycle = didacticCycleRepository.findByIdOrNull(import.didacticCycleCode)
+            ?: error("Nie można znaleźć cyklu dydaktycznego")
         val entitlementDocument = getEntitlementDocument(certificate, person)
         val isDefaultProgramme = if (person.personProgrammes.any { it.isDefault == true }) {
             personProgrammeRepository.updateToNotDefault(personId, import.dateOfAddmision) == 1

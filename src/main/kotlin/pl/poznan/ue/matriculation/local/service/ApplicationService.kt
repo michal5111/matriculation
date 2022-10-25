@@ -31,7 +31,9 @@ class ApplicationService(
         potentialDuplicateStatusDto: ApplicantUsosIdAndPotentialDuplicateStatusDto
     ): Application {
         val application = applicationRepository.findByIdOrNull(applicationId) ?: throw ApplicationNotFoundException()
-        val applicant = application.applicant ?: throw ApplicantNotFoundException()
+        val applicantId = application.applicant?.id ?: throw ApplicantNotFoundException()
+        val applicant = applicantService.findWithIdentityDocumentsById(applicantId)
+            ?: throw ApplicantNotFoundException()
         applicant.potentialDuplicateStatus = potentialDuplicateStatusDto.potentialDuplicateStatus
         applicant.usosId = potentialDuplicateStatusDto.usosId
         val import = application.import ?: throw ImportNotFoundException()
@@ -66,8 +68,16 @@ class ApplicationService(
     }
 
     @Transactional
-    fun findAllByImportIdAndNotificationSent(importId: Long, sent: Boolean): Stream<Application> {
-        return applicationRepository.findAllByImportIdAndNotificationSentAndApplicantUidNotNull(importId, sent)
+    fun findAllByImportIdAndNotificationSent(
+        importId: Long,
+        sent: Boolean,
+        importStatus: ApplicationImportStatus
+    ): Stream<Application> {
+        return applicationRepository.findAllByImportIdAndNotificationSentAndApplicantUidNotNullAndImportStatus(
+            importId,
+            sent,
+            importStatus
+        )
     }
 
     @Transactional

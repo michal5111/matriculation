@@ -24,7 +24,7 @@ class PotentialDuplicateFinder(
 
     @Transactional(
         rollbackFor = [Exception::class, RuntimeException::class],
-        propagation = Propagation.REQUIRES_NEW,
+        propagation = Propagation.REQUIRED,
         transactionManager = "transactionManager"
     )
     fun findPotentialDuplicate(applicant: Applicant, importId: Long) {

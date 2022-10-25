@@ -19,4 +19,7 @@ interface ApplicantRepository : JpaRepository<Applicant, Long> {
 
     @Query("select a from Applicant a where a.id not in (select ap.applicant.id from Application ap) and a.id = :id")
     fun findOrphanedById(id: Long): Applicant
+
+    @EntityGraph("applicant.identityDocuments")
+    fun findWithIdentityDocumentsById(id: Long): Applicant?
 }

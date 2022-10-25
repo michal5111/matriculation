@@ -9,10 +9,7 @@ import pl.poznan.ue.matriculation.dreamApply.dto.academicTerms.AcademicTermDto
 import pl.poznan.ue.matriculation.dreamApply.dto.academicTerms.CourseDto
 import pl.poznan.ue.matriculation.dreamApply.dto.applicant.ApplicationCourseDto
 import pl.poznan.ue.matriculation.dreamApply.dto.applicant.DreamApplyApplicantDto
-import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
-import pl.poznan.ue.matriculation.dreamApply.dto.application.FlagDto
-import pl.poznan.ue.matriculation.dreamApply.dto.application.FlagInfoDto
-import pl.poznan.ue.matriculation.dreamApply.dto.application.OfferDto
+import pl.poznan.ue.matriculation.dreamApply.dto.application.*
 import pl.poznan.ue.matriculation.dreamApply.dto.email.EmailDto
 
 class DreamApplyService(
@@ -66,7 +63,7 @@ class DreamApplyService(
         expandOffer: Boolean = false
     ): Map<Long, DreamApplyApplicationDto>? {
         if (academicTermID == null && academicYear == null) {
-            throw IllegalArgumentException("AcademicTerm adn academicYear are null")
+            throw IllegalArgumentException("AcademicTerm and academicYear are null")
         }
         val uriComponentBuilder: UriComponentsBuilder = getUriComponentBuilder()
         academicTermID?.run {
@@ -237,6 +234,18 @@ class DreamApplyService(
             httpEntity,
             Any::class.java
         )
+    }
+
+    fun getOfferTypes(): Map<String, OfferTypeDto>? {
+        val uriComponentBuilder: UriComponentsBuilder =
+            UriComponentsBuilder.fromHttpUrl("${apiUrl}applications/offers/types")
+        val response: ResponseEntity<Map<String, OfferTypeDto>> = restTemplate.exchange(
+            uriComponentBuilder.build().toUri(),
+            HttpMethod.GET,
+            httpEntity,
+            object : ParameterizedTypeReference<Map<String, OfferTypeDto>>() {}
+        )
+        return response.body
     }
 
     private fun getUriComponentBuilder() = UriComponentsBuilder.fromHttpUrl("${apiUrl}applications")

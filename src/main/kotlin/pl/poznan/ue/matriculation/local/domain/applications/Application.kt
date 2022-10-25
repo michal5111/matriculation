@@ -44,19 +44,6 @@ class Application(
     @Column(nullable = false, name = "datasourceId")
     var dataSourceId: String? = null,
 
-    var admitted: String? = null,
-
-    @Column(length = 500)
-    var comment: String? = null,
-
-    var payment: String? = null,
-
-    var position: String? = null,
-
-    var qualified: String? = null,
-
-    var score: String? = null,
-
     var editUrl: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -87,14 +74,12 @@ class Application(
 
     var sourceOfFinancing: String? = null,
 
-    var notificationSent: Boolean = false
+    var notificationSent: Boolean = false,
+
+    @Lob
+    var warnings: String? = null
 ) : BaseEntityLongId(), Serializable {
 
-    override fun toString(): String {
-        return "Application(id=$id, irkId=$foreignId, admitted=$admitted, comment=$comment, payment=$payment, " +
-            "position=$position, qualified=$qualified, score=$score, importError=$importError, " +
-            "stackTrace=$stackTrace)"
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -112,5 +97,9 @@ class Application(
         var result = foreignId.hashCode()
         result = 31 * result + (dataSourceId?.hashCode() ?: 0)
         return result
+    }
+
+    override fun toString(): String {
+        return "Application(foreignId=$foreignId, dataSourceId=$dataSourceId, editUrl=$editUrl, importStatus=$importStatus, importError=$importError, stackTrace=$stackTrace, baseOfStay=$baseOfStay, basisOfAdmission=$basisOfAdmission, sourceOfFinancing=$sourceOfFinancing, notificationSent=$notificationSent, warnings=$warnings)"
     }
 }

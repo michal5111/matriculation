@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.applicantDataSources.INotificationSender
+import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.job.startConditions.IStartConditions
@@ -25,7 +26,7 @@ class SendNotificationsJob(
         get() = SendNotificationsStartConditions()
 
     override fun prepare(import: Import) {
-        import.notificationsSend = 0
+
     }
 
     @Transactional(propagation = Propagation.REQUIRED, transactionManager = "transactionManager")
@@ -33,7 +34,11 @@ class SendNotificationsJob(
         val importId = import.id ?: throw IllegalArgumentException("Import id is null")
         val ads = applicationDataSourceFactory.getDataSource(import.dataSourceId)
         if (ads is INotificationSender) {
-            val applicationStream = applicationService.findAllByImportIdAndNotificationSent(importId, false)
+            val applicationStream = applicationService.findAllByImportIdAndNotificationSent(
+                importId,
+                false,
+                ApplicationImportStatus.IMPORTED
+            )
             applicationStream.use {
                 it.forEach { application ->
                     notificationService.sendNotification(application, importId, ads)

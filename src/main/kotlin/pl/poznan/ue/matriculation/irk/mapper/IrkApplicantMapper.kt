@@ -204,12 +204,7 @@ class IrkApplicantMapper {
                     streetNumber = realStreetNumber?.trim()
                 )
             ).filterNot {
-                it.city.isNullOrBlank()
-                    && it.countryCode.isNullOrBlank()
-                    && it.flatNumber.isNullOrBlank()
-                    && it.postalCode.isNullOrBlank()
-                    && it.street.isNullOrBlank()
-                    && it.streetNumber.isNullOrBlank()
+                it.city.isNullOrBlank() && it.street.isNullOrBlank()
             }.forEach {
                 applicant.addAddress(it)
             }

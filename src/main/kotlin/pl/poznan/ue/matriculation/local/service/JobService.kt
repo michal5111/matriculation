@@ -1,6 +1,9 @@
 package pl.poznan.ue.matriculation.local.service
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import pl.poznan.ue.matriculation.exception.ImportException
@@ -16,6 +19,8 @@ class JobService(
     jobs: List<IJob>
 ) {
 
+    val logger: Logger = LoggerFactory.getLogger(JobService::class.java)
+
     private val jobsMap: MutableMap<JobType, IJob> = EnumMap(JobType::class.java)
 
     init {
@@ -25,6 +30,7 @@ class JobService(
     }
 
     fun runJob(jobType: JobType, importId: Long) {
+        logger.info("Job of $jobType started by ${SecurityContextHolder.getContext().authentication.name}")
         try {
             var import = importService.get(importId)
             if (!UserService.checkDataSourcePermission(import.dataSourceId)) {
