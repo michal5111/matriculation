@@ -14,14 +14,16 @@ import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
 import pl.poznan.ue.matriculation.local.processor.ProcessRequest
-import pl.poznan.ue.matriculation.oracle.service.PersonProcessorService
+import pl.poznan.ue.matriculation.local.processor.TargetSystemProcessor
+import pl.poznan.ue.matriculation.oracle.domain.Person
 
 @Component
 class ApplicationProcessor(
     private val applicantService: ApplicantService,
     private val importService: ImportService,
     private val asyncService: AsyncService,
-    private val personProcessorService: PersonProcessorService,
+    //private val personProcessorService: PersonProcessorService,
+    private val targetSystemProcessor: TargetSystemProcessor<Person>,
     private val applicationService: ApplicationService
 ) {
 
@@ -59,7 +61,7 @@ class ApplicationProcessor(
             import = import,
             person = null
         )
-        val processResult = personProcessorService.process(processRequest)
+        val processResult = targetSystemProcessor.process(processRequest)
         logger.trace("Przypisuje aplikantowi nadany numer indeksu i usosId")
         application.apply {
             applicant.usosId = processResult.systemId

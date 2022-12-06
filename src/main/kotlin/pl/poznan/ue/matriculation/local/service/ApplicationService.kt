@@ -12,6 +12,7 @@ import pl.poznan.ue.matriculation.exception.ImportNotFoundException
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
+import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.dto.ApplicantUsosIdAndPotentialDuplicateStatusDto
 import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
 import java.util.stream.Stream
@@ -106,5 +107,11 @@ class ApplicationService(
         }
         import.importedApplications--
         import.totalCount = (import.totalCount ?: throw IllegalStateException()) - 1
+        if (application.importStatus == ApplicationImportStatus.ERROR) {
+            import.saveErrors--
+        }
+        if (import.importStatus == ImportStatus.COMPLETED_WITH_ERRORS && import.saveErrors == 0) {
+            import.importStatus = ImportStatus.COMPLETE
+        }
     }
 }

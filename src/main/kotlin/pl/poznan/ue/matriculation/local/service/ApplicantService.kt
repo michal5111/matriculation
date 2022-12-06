@@ -115,6 +115,8 @@ class ApplicantService(
     @Transactional
     fun deleteOrphanedById(id: Long) {
         val applicant = applicantRepository.findOrphanedById(id)
-        return applicantRepository.delete(applicant)
+        applicant?.let {
+            applicantRepository.delete(applicant)
+        }
     }
 }

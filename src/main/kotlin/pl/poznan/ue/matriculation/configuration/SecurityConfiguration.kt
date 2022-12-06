@@ -14,6 +14,7 @@ import org.springframework.security.cas.web.CasAuthenticationEntryPoint
 import org.springframework.security.cas.web.CasAuthenticationFilter
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutFilter
@@ -50,20 +51,25 @@ class SecurityConfiguration(
     @Bean
     fun loginFilterChain(
         http: HttpSecurity,
-        authenticationEntryPoint: AuthenticationEntryPoint
+        entryPoint: AuthenticationEntryPoint
     ): SecurityFilterChain {
-        http.httpBasic().disable()
-        http
-            .authorizeRequests()
-            .antMatchers("/login").authenticated()
-            .and()
-            .exceptionHandling()
-            .authenticationEntryPoint(authenticationEntryPoint)
-            .and()
-            .addFilterBefore(singleSignOutFilter, CasAuthenticationFilter::class.java)
-            .addFilterBefore(logoutFilter, LogoutFilter::class.java)
-        http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-        http.headers().frameOptions().disable()
+        http.invoke {
+            httpBasic { disable() }
+            authorizeHttpRequests {
+                authorize("/login", authenticated)
+            }
+            addFilterBefore<CasAuthenticationFilter>(singleSignOutFilter)
+            addFilterBefore<LogoutFilter>(logoutFilter)
+            exceptionHandling {
+                authenticationEntryPoint = entryPoint
+            }
+            csrf {
+                csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
+            }
+            headers {
+                frameOptions { disable() }
+            }
+        }
         return http.build()
     }
 }

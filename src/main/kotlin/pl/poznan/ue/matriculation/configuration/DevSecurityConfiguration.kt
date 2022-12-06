@@ -7,6 +7,7 @@ import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -47,14 +48,21 @@ class DevSecurityConfiguration {
     @Bean
     fun devFilterChain(
         http: HttpSecurity,
-        authenticationEntryPoint: AuthenticationEntryPoint
+        entryPoint: AuthenticationEntryPoint
     ): SecurityFilterChain {
-        http
-            .csrf().disable()
-            .antMatcher("/login*")
-            .authorizeRequests().anyRequest().authenticated()
-            .and().httpBasic().authenticationEntryPoint(authenticationEntryPoint)
-            .and().logout()
+        http.invoke {
+            csrf { disable() }
+            securityMatcher("/login*")
+            authorizeHttpRequests {
+                authorize(anyRequest, authenticated)
+            }
+            httpBasic {
+                authenticationEntryPoint = entryPoint
+            }
+            logout {
+
+            }
+        }
         return http.build()
     }
 

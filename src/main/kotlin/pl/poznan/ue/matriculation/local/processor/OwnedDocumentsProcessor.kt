@@ -1,5 +1,7 @@
 package pl.poznan.ue.matriculation.local.processor
 
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.ApplicantForeignerData
 import pl.poznan.ue.matriculation.local.dto.ProcessResult
@@ -9,17 +11,23 @@ import pl.poznan.ue.matriculation.oracle.repo.CitizenshipRepository
 import pl.poznan.ue.matriculation.oracle.repo.DocumentTypeRepository
 import pl.poznan.ue.matriculation.oracle.repo.OwnedDocumentRepository
 
-class OwnedDocumentsProcessor(
+open class OwnedDocumentsProcessor(
     private val documentTypeRepository: DocumentTypeRepository,
     private val ownedDocumentRepository: OwnedDocumentRepository,
     private val citizenshipRepository: CitizenshipRepository,
-    private val targetSystemProcessor: TargetSystemProcessor<Person?>
-) : TargetSystemProcessor<Person?> {
-    override fun process(processRequest: ProcessRequest): ProcessResult<Person?> {
-        when (processRequest.application.applicant?.applicantForeignerData?.baseOfStay) {
-            "OKP" -> createOrUpdateOkp(processRequest.person!!, processRequest.application.applicant!!)
+    targetSystemProcessor: TargetSystemProcessor<Person>
+) : ProcessDecorator<Person>(targetSystemProcessor) {
+    @Transactional(
+        rollbackFor = [java.lang.Exception::class, RuntimeException::class],
+        propagation = Propagation.REQUIRED,
+        transactionManager = "oracleTransactionManager"
+    )
+    override fun process(processRequest: ProcessRequest): ProcessResult<Person> {
+        return super.process(processRequest).also {
+            when (processRequest.application.applicant?.applicantForeignerData?.baseOfStay) {
+                "OKP" -> createOrUpdateOkp(it.person, processRequest.application.applicant ?: return@also)
+            }
         }
-        return targetSystemProcessor.process(processRequest)
     }
 
     private fun createOrUpdateOkp(person: Person, applicant: Applicant) {
