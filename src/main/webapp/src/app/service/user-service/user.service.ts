@@ -51,9 +51,9 @@ export class UserService implements CanActivate {
 
   getAll(page: number, size: number, sort?: string, sortDir?: string): Observable<Page<User>> {
     if (sort && sortDir) {
-      return this.http.get<Page<User>>(`${this.userUrl}s?page=${page}&size=${size}&sort=${sort},${sortDir}`, httpOptions);
+      return this.http.get<Page<User>>(`${this.userUrl}?page=${page}&size=${size}&sort=${sort},${sortDir}`, httpOptions);
     }
-    return this.http.get<Page<User>>(`${this.userUrl}s?page=${page}&size=${size}`, httpOptions);
+    return this.http.get<Page<User>>(`${this.userUrl}?page=${page}&size=${size}`, httpOptions);
   }
 
   hasRole(role: string): boolean {

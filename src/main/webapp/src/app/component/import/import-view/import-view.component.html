@@ -1,7 +1,7 @@
 <ng-template [ngIf]="userService.isAuthenticated">
   <ng-template [ngIf]="import && rxStompService.connected()">
     <header *ngIf="import" class="card-wrapper">
-      <mat-card class="card-centered">
+      <mat-card appearance="outlined" class="card-centered">
         <mat-card-title>
           <p>Import rekrutacji {{import.registration}}</p>
         </mat-card-title>
@@ -20,7 +20,7 @@
           </button>
         </mat-card-actions>
       </mat-card>
-      <mat-card class="card-centered">
+      <mat-card appearance="outlined" class="card-centered">
         <mat-card-content *ngIf="import && rxStompService.connected()">
           <app-import-status-indicator [importStatus]="import.importStatus"></app-import-status-indicator>
           <ng-template [ngIf]="import.error">
@@ -57,7 +57,7 @@
           </button>
         </mat-card-actions>
       </mat-card>
-      <mat-card class="card-centered">
+      <mat-card appearance="outlined" class="card-centered">
         <mat-card-content>
           <app-progress-viewer
             header="Znalezione UIDy:"
@@ -83,7 +83,7 @@
           </button>
         </mat-card-actions>
       </mat-card>
-      <mat-card class="card-centered">
+      <mat-card appearance="outlined" class="card-centered">
         <mat-card-content>
           Potencjalne duplikaty: <span
           [class.red_backgroud]="import.potentialDuplicates > 0">{{import.potentialDuplicates}}</span>
@@ -97,7 +97,7 @@
     </header>
   </ng-template>
   <div>
-    <mat-card>
+    <mat-card appearance="outlined">
       <section class="checkbox-section">
         Wyświetlaj:
         <mat-checkbox class="card-centered" [checked]="displayedColumns.get('id')"
