@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.local.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.AsyncResult
 import org.springframework.stereotype.Service
@@ -13,19 +14,25 @@ import java.util.concurrent.Future
 class AsyncService(
     private val importService: ImportService
 ) {
+    private val logger = LoggerFactory.getLogger(AsyncService::class.java)
+
     @Async("defaultTaskExecutor")
     fun doWorkAsync(job: IJob, import: Import) {
         job.status = JobStatus.WORKING
+        logger.info("Job started with status ${job.status} for import $import")
         try {
             job.doWork(import)
-            val importId: Long = import.id ?: throw IllegalArgumentException("Import id is null")
-            val import2 = importService.get(importId)
-            importService.setImportStatus(importId = importId, importStatus = job.getCompletionStatus(import2))
+            val importId = import.id ?: throw IllegalArgumentException("Import id is null")
+            val import2 = importService.findById(importId)
+            import2.importStatus = job.getCompletionStatus(import2)
+            importService.save(import2)
         } catch (e: Exception) {
             job.status = JobStatus.ERROR
+            logger.error("Job completed with status ${job.status} for import $import", e)
             throw ImportException(import.id, e.message, e)
         }
         job.status = JobStatus.DONE
+        logger.info("Job completed with status ${job.status} for import $import")
     }
 
     @Async("processTaskExecutor")

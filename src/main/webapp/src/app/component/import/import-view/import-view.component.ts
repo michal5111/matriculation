@@ -1,13 +1,11 @@
 import {Component, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {MatTableDataSource} from '@angular/material/table';
 import {ImportService} from '../../../service/import-service/import.service';
-import {Page} from '../../../model/dto/page/page';
 import {filter, map, switchMap, tap} from 'rxjs/operators';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatSort, Sort} from '@angular/material/sort';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatSort} from '@angular/material/sort';
 import {Application} from '../../../model/applications/application';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Observable, Subscription} from 'rxjs';
+import {BehaviorSubject, merge, Observable, Subscription} from 'rxjs';
 import {Import} from '../../../model/import/import';
 import {UserService} from '../../../service/user-service/user.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -27,25 +25,27 @@ import {RxStompService} from '@stomp/ng2-stompjs';
 import {Message} from '@stomp/stompjs';
 import {WS_URL} from '../../../injectableTokens/WS_URL';
 import {ImportEditorComponent} from '../../dialog/import-editor/import-editor.component';
+import {AbstractListWithPathParamsComponent} from '../../abstract-list-with-path-params.component';
+import {BasicDataSource} from 'src/app/dataSource/basic-data-source';
+
+type filterType = { importId: number };
 
 @Component({
   selector: 'app-import-view',
   templateUrl: './import-view.component.html',
   styleUrls: ['./import-view.component.sass']
 })
-export class ImportViewComponent implements OnInit, OnDestroy {
-
+export class ImportViewComponent extends AbstractListWithPathParamsComponent<Application, number, filterType> implements OnInit, OnDestroy {
+  dataSource: BasicDataSource<Application, number, filterType>;
+  filtersSubject: BehaviorSubject<filterType>;
   importId = -1;
   import: Import | null = null;
   progressSubscription: Subscription | null = null;
   usosUrl: UrlDto | null = null;
-  pageSize = parseInt(localStorage.getItem('importViewPageSize') ?? '5', 10);
-  pageNumber = 0;
-  totalElements = 0;
-  page: Page<Application> | null = null;
-  dataSource = new MatTableDataSource<Application>();
-  sortString = 'applicant.family';
-  sortDirString = 'asc';
+  // override pageSize = parseInt(localStorage.getItem('importViewPageSize') ?? '5', 10);
+  // page: Page<Application> | null = null;
+  // override sortString = 'applicant.family';
+  // override sortDirString = 'asc';
   displayedColumns: Map<string, boolean> = new Map<string, boolean>([
     ['lp', true],
     ['id', true],
@@ -78,106 +78,45 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     ['warnings', 'warnings']
   ]);
 
-  subs: Subscription[] = [];
-
-  private importObservable$: Observable<Import> | null = null;
-
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator | null = null;
-  @ViewChild(MatSort, {static: true}) sort: MatSort | null = null;
+  public import$: Observable<Import>;
+  @ViewChild(MatPaginator) override paginator: MatPaginator | null = null;
+  @ViewChild(MatSort) override sort: MatSort | null = null;
 
   constructor(
     private importService: ImportService,
     private usosService: UsosService,
-    private route: ActivatedRoute,
-    private router: Router,
+    protected override route: ActivatedRoute,
+    protected override router: Router,
     public userService: UserService,
     private dialog: MatDialog,
     private applicationsService: ApplicationsService,
     public rxStompService: RxStompService,
     @Inject(WS_URL) private wsUrl: string
   ) {
-  }
-
-  getPage(page: number, size: number, sort?: string, sortDir?: string) {
-    return this.importService.findAllApplicationsByImportId(this.importId, page, size, sort, sortDir).pipe(
-      tap(applicationsPage => {
-        this.page = applicationsPage;
-        this.totalElements = applicationsPage.totalElements;
-      }),
-      map(applicationsPage => applicationsPage.content),
-      tap(content => this.dataSource.data = content)
-    );
-  }
-
-  getImport(importId: number): Observable<Import> {
-    return this.importService.findById(importId).pipe(
-      tap(importObject => this.import = importObject)
+    super(route, router);
+    this.importId = this.route.snapshot.params['id'];
+    this.filtersSubject = new BehaviorSubject<filterType>({
+      importId: this.importId
+    });
+    this.dataSource = new BasicDataSource<Application, number, filterType>(applicationsService);
+    this.import$ = merge(
+      this.importService.findById(this.importId),
+      this.rxStompService.watch(`/topic/import/${this.importId}`).pipe(
+        map((message: Message) => JSON.parse(message.body))
+      )
+    ).pipe(
+      tap((importObject: Import) => this.import = importObject),
+      // distinctUntilChanged((previous, current) => previous.importStatus === current.importStatus),
+      tap(() => this.getPage())
     );
   }
 
   ngOnInit(): void {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-    this.importId = this.route.snapshot.params['id'];
     this.subs.push(
-      this.getImport(this.importId).subscribe(),
+      this.import$.subscribe(),
       this.usosService.getUsosUrl().subscribe(
         result => this.usosUrl = result
-      ),
-      this.route.queryParams.pipe(
-        tap(params => {
-          this.pageNumber = params['page'] ?? this.pageNumber;
-          this.sortString = params['sort'] ?? this.sortString;
-          this.sortDirString = params['dir'] ?? this.sortDirString;
-          this.pageSize = params['pageSize'] ?? this.pageSize;
-        }),
-        switchMap(() => this.getPage(
-          this.pageNumber,
-          this.pageSize,
-          this.sortString,
-          this.sortDirString
-        ))
-      ).subscribe()
-    );
-    this.importObservable$ = this.rxStompService.watch(`/topic/import/${this.importId}`).pipe(
-      map((message: Message) => JSON.parse(message.body)),
-      tap((importObject: Import) => this.import = importObject)
-    );
-    this.subs.push(
-      this.importObservable$.pipe(
-        switchMap(() => this.getPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString))
-      ).subscribe()
-    );
-  }
-
-  switchPage(pageEvent: PageEvent): void {
-    localStorage.setItem('importViewPageSize', pageEvent.pageSize.toString());
-    this.router.navigate(
-      [],
-      {
-        relativeTo: this.route,
-        queryParams: {
-          page: pageEvent.pageIndex,
-          sort: this.sortString,
-          dir: this.sortDirString,
-          pageSize: pageEvent.pageSize
-        }
-      }
-    );
-  }
-
-  sortEvent(sortEvent: Sort): void {
-    this.router.navigate(
-      [],
-      {
-        relativeTo: this.route,
-        queryParams: {
-          page: this.pageNumber,
-          sort: this.sortingMap.get(sortEvent.active),
-          dir: sortEvent.direction,
-          pageSize: this.pageSize
-        }
-      }
+      )
     );
   }
 
@@ -212,10 +151,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  getElementNumber(application: Application): number {
-    return (this.page?.content.indexOf(application) ?? 0) + this.pageSize * this.pageNumber + 1;
-  }
-
   onArchiveClick(): void {
     const data = new ConfirmationDialogData('Archiwizuj import', 'Czy na pewno chcesz zarchiwizować import? Procesu nie można odwrócić!');
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
@@ -231,10 +166,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
 
   getPersonUsosUrl(application: Application): string {
     return `${this.usosUrl?.url}/studenci/programyOsob.jsf?osobaId=${application.applicant.usosId}`;
-  }
-
-  ngOnDestroy(): void {
-    this.subs.forEach(subscription => subscription.unsubscribe());
   }
 
   showApplicationErrorDialog(application: Application): void {
@@ -366,12 +297,6 @@ export class ImportViewComponent implements OnInit, OnDestroy {
     });
   }
 
-  getDisplayedColumns(): string[] {
-    return [...this.displayedColumns.entries()]
-      .filter(column => column[1])
-      .map(column => column[0]);
-  }
-
   onColumnCheckboxChange(event: MatCheckboxChange, ...columnIds: string[]) {
     columnIds.forEach(id => this.displayedColumns.set(id, event.checked));
   }
@@ -384,7 +309,7 @@ export class ImportViewComponent implements OnInit, OnDestroy {
       if (result) {
         this.applicationsService.delete(id).subscribe({
           next: () => {
-            this.dataSource.data = this.dataSource.data.filter(application => application.id !== id);
+            this.dataSource.filterElements(application => application.id !== id);
           }
         });
       }

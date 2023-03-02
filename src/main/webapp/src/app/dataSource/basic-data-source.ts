@@ -1,9 +1,9 @@
 import {CollectionViewer, DataSource} from '@angular/cdk/collections';
 import {BehaviorSubject, finalize, map, Observable, tap} from 'rxjs';
-import {Page} from '../model/dto/page/page';
 import {BasicService} from '../service/basic-service';
+import {Page} from '../model/dto/page/page';
 
-export class BasicDataSource<T, F> implements DataSource<T> {
+export class BasicDataSource<T, ID, F> implements DataSource<T> {
   private elementsSubject = new BehaviorSubject<T[]>([]);
   private loadingSubject = new BehaviorSubject<boolean>(false);
 
@@ -11,7 +11,7 @@ export class BasicDataSource<T, F> implements DataSource<T> {
 
   public page: Page<T> | null = null;
 
-  constructor(private service: BasicService<T>) {
+  constructor(private service: BasicService<T, ID>) {
   }
 
   connect(collectionViewer: CollectionViewer): Observable<T[]> {
@@ -21,6 +21,21 @@ export class BasicDataSource<T, F> implements DataSource<T> {
   disconnect(collectionViewer: CollectionViewer): void {
     this.elementsSubject.complete();
     this.loadingSubject.complete();
+  }
+
+  updateElement(newElement: T, comparator: (element: T, newElement: T) => boolean) {
+    const newList = this.elementsSubject.getValue().map(oldElement => {
+      if (comparator(oldElement, newElement)) {
+        return newElement;
+      }
+      return oldElement;
+    });
+    this.elementsSubject.next(newList);
+  }
+
+  filterElements(comparator: (element: T, index: number, array: T[]) => boolean) {
+    const newList = this.elementsSubject.getValue().filter(comparator);
+    this.elementsSubject.next(newList);
   }
 
   loadElements(pageNumber: number, size: number, filters: F, sort?: string, sortDir?: string) {

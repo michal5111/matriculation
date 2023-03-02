@@ -124,26 +124,26 @@ open class DreamApplyApplicantMapper(private val schoolRepository: SchoolReposit
     }
 
     private fun createIdentityDocuments(applicant: Applicant, applicationDto: DreamApplyApplicationDto) {
-        applicationDto.profile?.passport?.let {
-            it.idcard?.run {
+        applicationDto.profile?.passport?.let { (number, _, expiry, country, _, _, idcard) ->
+            idcard?.let {
                 applicant.addIdentityDocument(
                     IdentityDocument(
                         type = IdentityDocumentType.ID_CARD,
-                        number = this.replace("[^a-zA-Z0-9]+", ""),
+                        number = it.replace("[^a-zA-Z0-9]+", ""),
                         country = null,
                         expDate = null,
                         applicant = applicant
                     )
                 )
             }
-            it.number?.run {
+            number?.let {
                 applicant.addIdentityDocument(
                     IdentityDocument(
                         type = IdentityDocumentType.PASSPORT,
-                        country = it.country,
-                        expDate = it.expiry,
+                        country = country,
+                        expDate = expiry,
                         applicant = applicant,
-                        number = this.replace("[^a-zA-Z0-9]+", "")
+                        number = it.replace("[^a-zA-Z0-9]+", "")
                     )
                 )
             }

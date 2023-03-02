@@ -1,7 +1,6 @@
 package pl.poznan.ue.matriculation.local.domain.applications
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
@@ -63,7 +62,6 @@ class Application(
     @JoinColumn(name = "applicant_id", referencedColumnName = "id")
     var applicant: Applicant? = null,
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "import_id", referencedColumnName = "id")
     var import: Import? = null,

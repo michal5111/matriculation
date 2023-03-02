@@ -41,6 +41,7 @@ import {MY_DATE_FORMATS} from './configConsts/MY_DATE_FORMATS';
 import {DatesValidatorDirective} from './validator/dates-validator.directive';
 import {ReactiveFileInputComponent} from './component/reactive-file-input/reactive-file-input.component';
 import {ImportEditorComponent} from './component/dialog/import-editor/import-editor.component';
+import {ApplicationListComponent} from './component/application-list/application-list.component';
 
 @NgModule({
   declarations: [
@@ -63,7 +64,8 @@ import {ImportEditorComponent} from './component/dialog/import-editor/import-edi
     SelectPersonDialogComponent,
     DatesValidatorDirective,
     ReactiveFileInputComponent,
-    ImportEditorComponent
+    ImportEditorComponent,
+    ApplicationListComponent
   ],
   imports: [
     BrowserModule,

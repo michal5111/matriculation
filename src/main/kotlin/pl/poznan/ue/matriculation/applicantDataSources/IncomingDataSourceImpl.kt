@@ -105,13 +105,16 @@ class IncomingDataSourceImpl(
     }
 
     override fun getApplicantById(applicantId: Long, applicationDto: DreamApplyApplicationDto): DreamApplyApplicantDto {
-        return super.getApplicantById(applicantId, applicationDto).also {
+        return super.getApplicantById(applicantId, applicationDto).let {
             val applicationCourses = dreamApplyService.getApplicantCourse(applicationDto.courses)
             val course = applicationCourses?.values?.first()?.course?.let { applicationCourse ->
                 dreamApplyService.getCourseByPath(applicationCourse)
             }
-            applicationDto.courseType = course?.type
-            applicationDto.duration = course?.duration
+            it.copy(
+                dreamApplyApplication = it.dreamApplyApplication?.copy(
+                    coursesDto = if (course != null) listOf(course) else emptyList()
+                )
+            )
         }
     }
 }

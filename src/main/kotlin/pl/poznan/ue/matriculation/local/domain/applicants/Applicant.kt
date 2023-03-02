@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
@@ -57,30 +56,28 @@ class Applicant(
     var photo: String? = null,
 
     @Transient
-    @JsonIgnore
     var photoByteArrayFuture: Future<ByteArray?>? = null,
 
     var photoPermission: String? = null,
 
     var modificationDate: Date? = null,
 
-    @JsonIgnore
     @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var applicantForeignerData: ApplicantForeignerData? = null,
 
-    @JsonIgnore
+
     @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val phoneNumbers: MutableSet<PhoneNumber> = HashSet(),
 
-    @JsonIgnore
+
     @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val addresses: MutableSet<Address> = HashSet(),
 
-    @JsonIgnore
+
     @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var identityDocuments: MutableSet<IdentityDocument> = HashSet(),
 
-    @JsonIgnore
+
     @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var erasmusData: ErasmusData? = null,
 
@@ -91,7 +88,7 @@ class Applicant(
     @Enumerated(EnumType.STRING)
     var potentialDuplicateStatus: DuplicateStatus = DuplicateStatus.NOT_CHECKED,
 
-    @JsonIgnore
+
     @OneToMany(mappedBy = "applicant", fetch = FetchType.LAZY)
     var applications: MutableSet<Application> = HashSet(),
 
@@ -118,7 +115,6 @@ class Applicant(
 
     var countryOfBirth: String? = null,
 
-    @JsonIgnore
     @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val documents: MutableSet<Document> = HashSet(),
 

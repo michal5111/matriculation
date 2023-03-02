@@ -3,6 +3,7 @@ package pl.poznan.ue.matriculation.local.service
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,9 +16,14 @@ import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.dto.ApplicantUsosIdAndPotentialDuplicateStatusDto
 import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
+import pl.poznan.ue.matriculation.local.specification.ApplicationsByImportId
+import pl.poznan.ue.matriculation.local.specification.ApplicationsByName
+import pl.poznan.ue.matriculation.local.specification.ApplicationsByPesel
+import pl.poznan.ue.matriculation.local.specification.ApplicationsBySurname
 import java.util.stream.Stream
 
 @Service
+@Transactional(rollbackFor = [Exception::class])
 class ApplicationService(
     private val applicationRepository: ApplicationRepository,
     private val applicantService: ApplicantService
@@ -26,7 +32,6 @@ class ApplicationService(
         return applicationRepository.findAllByImportId(pageable, importId)
     }
 
-    @Transactional
     fun updatePotentialDuplicateStatus(
         applicationId: Long,
         potentialDuplicateStatusDto: ApplicantUsosIdAndPotentialDuplicateStatusDto
@@ -58,17 +63,39 @@ class ApplicationService(
         return applicationRepository.getAllByImportIdAndImportStatusIn(importId, statusList, sort)
     }
 
-    @Transactional
-    fun findAllByImportId(importId: Long): List<Application> {
-        return applicationRepository.findAllByImportId(importId)
+    fun findAll(
+        importId: Long?,
+        name: String?,
+        surname: String?,
+        pesel: String?,
+        pageable: Pageable
+    ): Page<Application> {
+        val byImportId = ApplicationsByImportId(importId)
+        val byName = ApplicationsByName(name)
+        val bySurname = ApplicationsBySurname(surname)
+        val byPesel = ApplicationsByPesel(pesel)
+        val spec: Specification<Application> = Specification
+            .where(byImportId)
+            .and(byName)
+            .and(bySurname)
+            .and(byPesel)
+        return applicationRepository.findAll(spec, pageable)
     }
 
-    @Transactional
+    fun findAll(importId: Long?, pageable: Pageable): Page<Application> {
+        val byImportId = if (importId != null) ApplicationsByImportId(importId) else null
+        val spec = Specification.where(byImportId)
+        return applicationRepository.findAll(spec, pageable)
+    }
+
     fun findAllStreamByImportId(importId: Long): Stream<Application> {
         return applicationRepository.findAllStreamByImportId(importId)
     }
 
-    @Transactional
+    fun findById(id: Long): Application? {
+        return applicationRepository.findByIdOrNull(id)
+    }
+
     fun findAllByImportIdAndNotificationSent(
         importId: Long,
         sent: Boolean,
@@ -81,7 +108,6 @@ class ApplicationService(
         )
     }
 
-    @Transactional
     fun findAllStreamByImportIdAndApplicantPotentialDuplicateStatusIn(
         importId: Long,
         duplicateStatusList: List<DuplicateStatus>
@@ -92,12 +118,10 @@ class ApplicationService(
         )
     }
 
-    @Transactional
     fun findAllForArchive(importId: Long): Stream<Application> {
         return applicationRepository.findAllForArchive(importId)
     }
 
-    @Transactional
     fun delete(applicationId: Long) {
         val application = applicationRepository.findByIdOrNull(applicationId)
         val import = application?.import ?: throw ImportNotFoundException()

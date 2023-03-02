@@ -9,6 +9,11 @@
            [disabled]="!userService.hasAnyRole('ROLE_IMPORT_VIEW','ROLE_ADMIN')">Importy
         </a>
       </ng-template>
+      <ng-template [ngIf]="userService.isAuthenticated">
+        <a mat-stroked-button class="toolbarButton" routerLink="/applications"
+           [disabled]="!userService.hasAnyRole('ROLE_IMPORT_VIEW','ROLE_ADMIN')">Zgłoszenia rekrutacyjne
+        </a>
+      </ng-template>
       <ng-template [ngIf]="userService.hasRole('ROLE_ADMIN')">
         <a mat-stroked-button class="toolbarButton" routerLink="/userManager">
           <mat-icon>admin_panel_settings</mat-icon>

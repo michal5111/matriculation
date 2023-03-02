@@ -1,6 +1,7 @@
 package pl.poznan.ue.matriculation.dreamApply.dto.application
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import pl.poznan.ue.matriculation.dreamApply.dto.academicTerms.CourseDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
 import java.util.*
 
@@ -30,8 +31,7 @@ data class DreamApplyApplicationDto(
     //val misc: List<MiscDto>?,
     val extras: List<ExtraDto>?,
     val home: HomeDto?,
-    var courseType: String?,
-    var duration: String?
+    val coursesDto: List<CourseDto>
 ) : IApplicationDto {
 
     override val foreignApplicantId: Long

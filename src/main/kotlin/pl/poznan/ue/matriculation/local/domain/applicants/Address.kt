@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.enum.AddressType
 import java.io.Serializable
@@ -8,7 +7,6 @@ import javax.persistence.*
 
 @Entity
 class Address(
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", referencedColumnName = "id")
     var applicant: Applicant? = null,

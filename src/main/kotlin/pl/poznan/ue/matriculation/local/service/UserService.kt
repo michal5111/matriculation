@@ -15,6 +15,7 @@ import pl.poznan.ue.matriculation.local.repo.UserRepository
 import javax.persistence.EntityNotFoundException
 
 @Service
+@Transactional(rollbackFor = [Exception::class])
 class UserService(
     val userRepository: UserRepository,
     val ldapUserRepository: LdapUserRepository
@@ -44,7 +45,6 @@ class UserService(
         return userRepository.getByUsosId(usosId)
     }
 
-    @Transactional
     fun save(user: User): User {
         val ldapUser = ldapUserRepository.findByUid(user.uid) ?: throw UidNotFoundException()
         user.apply {
@@ -56,7 +56,6 @@ class UserService(
         return userRepository.save(user)
     }
 
-    @Transactional
     fun update(user: User): User {
         println(user.roles)
         val id = user.id ?: throw IllegalArgumentException("User id is null")
@@ -71,7 +70,6 @@ class UserService(
         return userRepository.save(user)
     }
 
-    @Transactional
     fun delete(id: Long) {
         val user = userRepository.findByIdOrNull(id) ?: throw EntityNotFoundException("User not found")
         return userRepository.delete(user)

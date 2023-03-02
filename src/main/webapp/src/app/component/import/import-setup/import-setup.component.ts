@@ -202,7 +202,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     return it1 && it2 ? it1.code === it2.code : false;
   }
 
-  initForm(importId: number) {
+  initForm(importId: number): Observable<any> {
     return this.importService.findById(importId).pipe(
       tap(importObj => this.import = importObj),
       switchMap(importObj =>

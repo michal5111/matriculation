@@ -2,10 +2,10 @@ import {Observable} from 'rxjs';
 import {Page} from '../model/dto/page/page';
 import {BasicService} from './basic-service';
 
-export interface CrudService<T> extends BasicService<T> {
+export interface CrudService<T, ID> extends BasicService<T, ID> {
   findAll(page: number, size: number, filers: any, sort?: string, sortDir?: string): Observable<Page<T>>;
 
-  findById(id: number): Observable<T>;
+  findById(id: ID): Observable<T>;
 
   update(t: T): Observable<T>;
 

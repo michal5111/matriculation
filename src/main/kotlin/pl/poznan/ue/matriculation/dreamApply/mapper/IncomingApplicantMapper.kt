@@ -41,8 +41,8 @@ class IncomingApplicantMapper(schoolRepository: SchoolRepository) : DreamApplyAp
                         departmentName = homeData.institution?.department?.name,
                         erasmusCode = homeData.institution?.erasmus
                     )
-                    type = (dreamApplyApplicantDto.dreamApplyApplication ?: return@apply).courseType
-                    duration = when (dreamApplyApplicantDto.dreamApplyApplication?.duration) {
+                    type = (dreamApplyApplicantDto.dreamApplyApplication?.coursesDto ?: return@apply).first().type
+                    duration = when (dreamApplyApplicantDto.dreamApplyApplication?.coursesDto?.first()?.duration) {
                         "2 semesters" -> DurationType.TWO_SEMESTERS
                         else -> DurationType.ONE_SEMESTER
                     }
@@ -88,8 +88,8 @@ class IncomingApplicantMapper(schoolRepository: SchoolRepository) : DreamApplyAp
                 departmentName = homeDto.institution?.department?.name,
                 erasmusCode = homeDto.institution?.erasmus
             ),
-            type = dreamApplyApplicantDto.dreamApplyApplication?.courseType,
-            duration = when (dreamApplyApplicantDto.dreamApplyApplication?.duration) {
+            type = dreamApplyApplicantDto.dreamApplyApplication?.coursesDto?.first()?.type,
+            duration = when (dreamApplyApplicantDto.dreamApplyApplication?.coursesDto?.first()?.duration) {
                 "2 semesters" -> DurationType.TWO_SEMESTERS
                 else -> DurationType.ONE_SEMESTER
             }

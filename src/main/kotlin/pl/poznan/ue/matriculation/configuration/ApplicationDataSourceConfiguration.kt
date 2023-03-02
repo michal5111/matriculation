@@ -56,12 +56,12 @@ class ApplicationDataSourceConfiguration {
         matchIfMissing = false
     )
     fun incomingApplicantDataSource(
-        @Autowired @Qualifier("IncomingService") IncomingService: DreamApplyService,
+        @Autowired @Qualifier("IncomingService") incomingService: DreamApplyService,
         @Autowired schoolRepository: SchoolRepository,
         properties: IncomingProperties
     ): IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
         return IncomingDataSourceImpl(
-            dreamApplyService = IncomingService,
+            dreamApplyService = incomingService,
             name = "Incoming",
             id = "INCOMING",
             applicantMapper = IncomingApplicantMapper(schoolRepository),

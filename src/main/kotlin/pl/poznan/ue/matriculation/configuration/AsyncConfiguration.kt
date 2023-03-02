@@ -22,7 +22,7 @@ class AsyncConfiguration(private val asyncExceptionHandler: AsyncExceptionHandle
         val executor = ThreadPoolTaskExecutor()
         executor.corePoolSize = 1
         executor.maxPoolSize = 1
-        executor.setQueueCapacity(50)
+        executor.queueCapacity = 50
         executor.setThreadNamePrefix("ASYNC-WORKER-")
         executor.initialize()
         return executor
@@ -33,7 +33,7 @@ class AsyncConfiguration(private val asyncExceptionHandler: AsyncExceptionHandle
         val executor = ThreadPoolTaskExecutor()
         executor.corePoolSize = 5
         executor.maxPoolSize = 30
-        executor.setQueueCapacity(100)
+        executor.queueCapacity = 100
         executor.setThreadNamePrefix("PROCESS-ASYNC-WORKER-")
         executor.initialize()
         return executor

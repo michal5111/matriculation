@@ -1,11 +1,13 @@
 package pl.poznan.ue.matriculation.kotlinExtensions
 
-import org.apache.poi.ss.formula.functions.T
 import org.springframework.data.domain.Page
+import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
+import pl.poznan.ue.matriculation.local.domain.applicants.Document
+import pl.poznan.ue.matriculation.local.domain.applicants.IdentityDocument
+import pl.poznan.ue.matriculation.local.domain.applications.Application
+import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.domain.user.User
-import pl.poznan.ue.matriculation.local.dto.PageDto
-import pl.poznan.ue.matriculation.local.dto.RoleDto
-import pl.poznan.ue.matriculation.local.dto.UserDto
+import pl.poznan.ue.matriculation.local.dto.*
 import pl.poznan.ue.matriculation.local.service.AsyncService
 import java.sql.Blob
 import javax.sql.rowset.serial.SerialBlob
@@ -122,4 +124,114 @@ fun <T> Page<T>.toPageDto(): PageDto<T> {
         totalPages = totalPages,
         size = size
     )
+}
+
+fun Import.toDto(): ImportDto {
+    return ImportDto(
+        id = id,
+        programmeCode = programmeCode,
+        programmeForeignId = programmeForeignId,
+        programmeForeignName = programmeForeignName,
+        registration = registration,
+        indexPoolCode = indexPoolCode,
+        indexPoolName = indexPoolName,
+        startDate = startDate,
+        dateOfAddmision = dateOfAddmision,
+        stageCode = stageCode,
+        didacticCycleCode = didacticCycleCode,
+        dataSourceId = dataSourceId,
+        dataSourceName = dataSourceName,
+        additionalProperties = additionalProperties,
+        importedApplications = importedApplications,
+        saveErrors = saveErrors,
+        savedApplicants = savedApplicants,
+        totalCount = totalCount,
+        importedUids = importedUids,
+        notificationsSend = notificationsSend,
+        potentialDuplicates = potentialDuplicates,
+        importStatus = importStatus,
+        error = error,
+        stackTrace = stackTrace,
+    )
+}
+
+fun Application.toDto(): ApplicationDto {
+    return ApplicationDto(
+        id = id,
+        foreignId = foreignId,
+        dataSourceId = dataSourceId,
+        editUrl = editUrl,
+        certificate = certificate?.toDto(),
+        applicant = applicant?.toDto(),
+        importStatus = importStatus,
+        importError = importError,
+        stackTrace = stackTrace,
+        baseOfStay = baseOfStay,
+        basisOfAdmission = basisOfAdmission,
+        sourceOfFinancing = sourceOfFinancing,
+        notificationSent = notificationSent,
+        warnings = warnings,
+        importId = import?.id
+    )
+}
+
+fun Document.toDto(): DocumentDto {
+    return DocumentDto(
+        applicantId = applicant?.id,
+        certificateType = certificateType,
+        certificateTypeCode = certificateTypeCode,
+        certificateUsosCode = certificateUsosCode,
+        comment = comment,
+        documentNumber = documentNumber,
+        documentYear = documentYear,
+        issueCity = issueCity,
+        issueCountry = issueCountry,
+        issueDate = issueDate,
+        issueInstitution = issueInstitution,
+        issueInstitutionUsosCode = issueInstitutionUsosCode,
+        modificationDate = modificationDate,
+    )
+}
+
+fun Applicant.toDto(): ApplicantDto {
+    return ApplicantDto(
+        foreignId = foreignId,
+        dataSourceId = dataSourceId,
+        email = email,
+        indexNumber = indexNumber,
+        password = password,
+        citizenship = citizenship,
+        nationality = nationality,
+        photo = photo,
+        photoPermission = photoPermission,
+        modificationDate = modificationDate,
+        usosId = usosId,
+        assignedIndexNumber = assignedIndexNumber,
+        potentialDuplicateStatus = potentialDuplicateStatus,
+        uid = uid,
+        fathersName = fathersName,
+        militaryCategory = militaryCategory,
+        militaryStatus = militaryStatus,
+        mothersName = mothersName,
+        wku = wku,
+        sex = sex,
+        pesel = pesel,
+        dateOfBirth = dateOfBirth,
+        cityOfBirth = cityOfBirth,
+        countryOfBirth = countryOfBirth,
+        highSchoolCity = highSchoolCity,
+        highSchoolName = highSchoolName,
+        highSchoolType = highSchoolType,
+        highSchoolUsosCode = highSchoolUsosCode,
+        middle = middle,
+        family = family,
+        given = given,
+        maiden = maiden,
+        personExisted = personExisted,
+        primaryIdentityDocument = primaryIdentityDocument?.toDto(),
+    )
+}
+
+fun IdentityDocument.toDto(): IdentityDocumentDto {
+    return IdentityDocumentDto(id = id, country = country, expDate = expDate, number = number, type = type)
 }

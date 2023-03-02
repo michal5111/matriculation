@@ -74,7 +74,7 @@ class IrkApplicantMapper {
                 certificateTypeCode = documentDTO.certificateTypeCode,
                 certificateUsosCode = documentDTO.certificateUsosCode,
                 comment = documentDTO.comment,
-                documentNumber = documentDTO.documentNumber.trim(),
+                documentNumber = documentDTO.documentNumber.replace("[^a-zA-Z0-9]+", ""),
                 documentYear = documentDTO.documentYear,
                 issueCity = documentDTO.issueCity?.trim(),
                 issueCountry = documentDTO.issueCountry,

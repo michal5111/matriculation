@@ -26,6 +26,7 @@ class ErasmusData(
 
     var type: String?,
 
+    @Enumerated(EnumType.STRING)
     var duration: DurationType?,
 
     applicant: Applicant? = null

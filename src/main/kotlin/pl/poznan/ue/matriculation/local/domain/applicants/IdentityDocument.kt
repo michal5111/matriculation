@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import java.util.*
 import javax.persistence.*
@@ -16,7 +15,6 @@ import javax.persistence.*
 )
 class IdentityDocument(
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", referencedColumnName = "id")
     var applicant: Applicant? = null,
@@ -30,7 +28,7 @@ class IdentityDocument(
 
     var type: Char?,
 
-    @JsonIgnore
+
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "primaryIdentityDocument")
     var primaryIdApplicant: Applicant? = null
 ) : BaseEntityLongId() {

@@ -5,6 +5,7 @@ import {ImportComponent} from './component/import/import/import.component';
 import {ImportViewComponent} from './component/import/import-view/import-view.component';
 import {UserManagerComponent} from './component/user-manager/user-manager.component';
 import {UserService} from './service/user-service/user.service';
+import {ApplicationListComponent} from './component/application-list/application-list.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -22,6 +23,11 @@ const routes: Routes = [
     path: 'import/:id', component: ImportViewComponent, canActivate: [UserService], data: {
       authorities: ['ROLE_IMPORT_VIEW', 'ROLE_ADMIN']
     }
+  },
+  {
+    path: 'applications', component: ApplicationListComponent, canActivate: [UserService], data: {
+      authorities: ['ROLE_IMPORT_VIEW', 'ROLE_ADMIN']
+    }
   }
 ];
 
@@ -29,4 +35,5 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {
+}

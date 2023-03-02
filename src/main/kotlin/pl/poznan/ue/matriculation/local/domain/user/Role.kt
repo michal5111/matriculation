@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.local.domain.user
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.Id
@@ -14,7 +13,6 @@ class Role(
 
     val name: String,
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     val users: MutableSet<User> = mutableSetOf()
 ) {

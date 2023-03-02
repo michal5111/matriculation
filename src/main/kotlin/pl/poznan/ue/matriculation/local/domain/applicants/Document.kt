@@ -19,7 +19,6 @@ import javax.persistence.*
 )
 class Document(
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", referencedColumnName = "id")
     var applicant: Applicant? = null,
@@ -30,7 +29,7 @@ class Document(
 
     val certificateUsosCode: Char?,
 
-    @JsonIgnore
+
     @Basic(fetch = FetchType.LAZY)
     @Lob
     var comment: String?,

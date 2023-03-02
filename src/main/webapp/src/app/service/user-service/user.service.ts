@@ -19,7 +19,7 @@ const httpOptions = {
 })
 export class UserService implements CanActivate {
 
-  userUrl = `${this.baseHref}api/user`;
+  userUrl = `${this.baseHref}api/users`;
   user: UserDetails | null = null;
   isAuthenticated = false;
 
@@ -27,7 +27,7 @@ export class UserService implements CanActivate {
   }
 
   getUser() {
-    return this.http.get<UserDetails>(this.userUrl, httpOptions).pipe(
+    return this.http.get<UserDetails>('api/user', httpOptions).pipe(
       tap(user => this.user = user),
       tap(user => this.isAuthenticated = user?.username !== undefined)
     );

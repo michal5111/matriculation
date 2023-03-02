@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import javax.persistence.*
 
@@ -15,7 +14,6 @@ import javax.persistence.*
 )
 class PhoneNumber(
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", referencedColumnName = "id")
     var applicant: Applicant? = null,

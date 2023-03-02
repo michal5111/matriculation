@@ -1,25 +1,48 @@
 import {Inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Page} from '../../model/applications/page';
 import {Application} from '../../model/applications/application';
 import {APP_BASE_HREF} from '@angular/common';
 import {
   ApplicantUsosIdAndPotentialDuplicateStatusDto
 } from '../../model/dto/applicant-usos-id-and-potential-duplicate-status-dto';
 import {Observable} from 'rxjs';
+import {BasicService} from '../basic-service';
+import {Router, UrlSerializer} from '@angular/router';
+import {Page} from '../../model/dto/page/page';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ApplicationsService {
+export class ApplicationsService implements BasicService<Application, number> {
 
   private apiUrl = `${this.baseHref}api/applications`;
 
-  constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) {
+  constructor(
+    @Inject(APP_BASE_HREF) public baseHref: string,
+    private http: HttpClient,
+    private router: Router,
+    private serializer: UrlSerializer
+  ) {
   }
 
-  getPage() {
-    return this.http.get<Page<Application>>(`${this.apiUrl}`);
+  findAll(
+    page: number,
+    size: number,
+    filters: any,
+    sort?: string | undefined,
+    sortDir?: string | undefined
+  ): Observable<Page<Application>> {
+    let sortString;
+    if (sort) {
+      sortString = `${sort},${sortDir}`;
+    }
+    const queryParams = {page, size, sort: sortString, ...filters};
+    const tree = this.router.createUrlTree([this.apiUrl], {queryParams});
+    return this.http.get<Page<Application>>(this.serializer.serialize(tree));
+  }
+
+  findById(id: number): Observable<Application> {
+    return this.http.get<Application>(`${this.apiUrl}/${id}`);
   }
 
   updatePotentialDuplicateStatus(
@@ -27,7 +50,7 @@ export class ApplicationsService {
     potentialDuplicateStatusDto: ApplicantUsosIdAndPotentialDuplicateStatusDto
   ): Observable<Application> {
     return this.http.put<Application>(
-      `${this.baseHref}api/application/${applicationId}/potentialDuplicateStatus`,
+      `${this.apiUrl}/${applicationId}/potentialDuplicateStatus`,
       potentialDuplicateStatusDto
     );
   }
@@ -35,6 +58,6 @@ export class ApplicationsService {
   delete(
     applicationId: number
   ): Observable<any> {
-    return this.http.delete(`${this.baseHref}api/application/${applicationId}`);
+    return this.http.delete(`${this.apiUrl}/${applicationId}`);
   }
 }

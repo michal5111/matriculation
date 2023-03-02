@@ -11,6 +11,7 @@ import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
 import java.util.*
 
 @Service
+@Transactional(rollbackFor = [Exception::class])
 class ApplicantService(
     private val applicantRepository: ApplicantRepository
 ) {
@@ -106,13 +107,11 @@ class ApplicantService(
         return applicantRepository.findByForeignIdAndDataSourceId(foreignId, dataSourceId)
     }
 
-    @Transactional
     fun deleteOrphaned() {
         val applicants = applicantRepository.findAllOrphaned()
         applicantRepository.deleteAll(applicants)
     }
 
-    @Transactional
     fun deleteOrphanedById(id: Long) {
         val applicant = applicantRepository.findOrphanedById(id)
         applicant?.let {

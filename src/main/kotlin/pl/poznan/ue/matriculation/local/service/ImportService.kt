@@ -11,14 +11,14 @@ import org.springframework.web.server.ResponseStatusException
 import pl.poznan.ue.matriculation.exception.*
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.domain.import.Import
+import pl.poznan.ue.matriculation.local.dto.ImportDto
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import pl.poznan.ue.matriculation.oracle.repo.DidacticCycleRepository
 import pl.poznan.ue.matriculation.oracle.repo.ProgrammeRepository
-import java.util.*
 
 
 @Service
-@Transactional
+@Transactional(rollbackFor = [Exception::class])
 class ImportService(
     private val importRepository: ImportRepository,
     private val programmeRepository: ProgrammeRepository,
@@ -28,35 +28,22 @@ class ImportService(
     private val logger = LoggerFactory.getLogger(ImportService::class.java)
 
     fun create(
-        programmeCode: String,
-        programmeForeignId: String,
-        programmeForeignName: String,
-        registration: String,
-        indexPoolCode: String,
-        indexPoolName: String,
-        startDate: Date,
-        dateOfAddmision: Date,
-        stageCode: String,
-        didacticCycleCode: String,
-        dataSourceType: String,
-        dataSourceName: String,
-        additionalProperties: Map<String, Any>? = null
+        importDto: ImportDto
     ): Import {
-        logger.info("additionalProperties $additionalProperties")
         val import = Import(
-            dateOfAddmision = dateOfAddmision,
-            didacticCycleCode = didacticCycleCode,
-            indexPoolCode = indexPoolCode,
-            indexPoolName = indexPoolName,
-            programmeCode = programmeCode,
-            programmeForeignId = programmeForeignId,
-            programmeForeignName = programmeForeignName,
-            registration = registration,
-            startDate = startDate,
-            stageCode = stageCode,
-            dataSourceId = dataSourceType,
-            dataSourceName = dataSourceName,
-            additionalProperties = additionalProperties,
+            dateOfAddmision = importDto.dateOfAddmision!!,
+            didacticCycleCode = importDto.didacticCycleCode!!,
+            indexPoolCode = importDto.indexPoolCode!!,
+            indexPoolName = importDto.indexPoolName!!,
+            programmeCode = importDto.programmeCode!!,
+            programmeForeignId = importDto.programmeForeignId!!,
+            programmeForeignName = importDto.programmeForeignName!!,
+            registration = importDto.registration!!,
+            startDate = importDto.startDate!!,
+            stageCode = importDto.stageCode!!,
+            dataSourceId = importDto.dataSourceId!!,
+            dataSourceName = importDto.dataSourceName!!,
+            additionalProperties = importDto.additionalProperties,
         )
         validateImport(import)
         return importRepository.save(import)
@@ -145,8 +132,16 @@ class ImportService(
             this.importStatus = importStatus
         }
 
-    fun updateImport(import: Import): Import {
-        if (import.importStatus !in arrayOf(ImportStatus.PENDING, ImportStatus.IMPORTED, ImportStatus.ERROR)) {
+    fun updateImport(importDto: ImportDto): Import {
+        val import = importRepository.findByIdOrNull(importDto.id)
+            ?: throw ImportNotFoundException("Nie znaleziono importu")
+        if (import.importStatus !in arrayOf(
+                ImportStatus.PENDING,
+                ImportStatus.IMPORTED,
+                ImportStatus.ERROR,
+                ImportStatus.COMPLETED_WITH_ERRORS
+            )
+        ) {
             throw IllegalStateException("Nie można edytować importu w tym stanie")
         }
         validateImport(import)

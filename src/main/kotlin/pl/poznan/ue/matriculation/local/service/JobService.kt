@@ -32,7 +32,7 @@ class JobService(
     fun runJob(jobType: JobType, importId: Long) {
         logger.info("Job of $jobType started by ${SecurityContextHolder.getContext().authentication.name}")
         try {
-            var import = importService.get(importId)
+            var import = importService.findById(importId)
             if (!UserService.checkDataSourcePermission(import.dataSourceId)) {
                 throw ResponseStatusException(HttpStatus.FORBIDDEN)
             }

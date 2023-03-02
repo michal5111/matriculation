@@ -128,7 +128,7 @@ class CemApplicationDataSourceImpl(
                     applicant = this,
                     country = null,
                     expDate = null,
-                    number = applicantDto.idNumber,
+                    number = applicantDto.idNumber?.replace("[^a-zA-Z0-9]+", ""),
                     type = 'C',
                     primaryIdApplicant = this
                 )

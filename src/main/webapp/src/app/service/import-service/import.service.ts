@@ -21,7 +21,7 @@ const httpOptions = {
   providedIn: 'root'
 })
 
-export class ImportService implements CrudService<Import> {
+export class ImportService implements CrudService<Import, number> {
 
   private apiUrl = `${this.baseHref}api`;
 
@@ -29,10 +29,6 @@ export class ImportService implements CrudService<Import> {
   }
 
   findAll(page: number, size: number, filers: any, sort?: string | undefined, sortDir?: string | undefined): Observable<Page<Import>> {
-    throw new Error('Method not implemented.');
-  }
-
-  getImportsPage(page: number, size: number, sort?: string, sortDir?: string): Observable<Page<Import>> {
     if (sort && sortDir) {
       return this.http.get<Page<Import>>(`${this.apiUrl}/import?page=${page}&size=${size}&sort=${sort},${sortDir}`, httpOptions);
     }
@@ -40,11 +36,11 @@ export class ImportService implements CrudService<Import> {
   }
 
   getAvailableRegistrations(dataSourceType: string): Observable<[Registration]> {
-    return this.http.get<[Registration]>(`${this.apiUrl}/registrations/${dataSourceType}/codes`, httpOptions);
+    return this.http.get<[Registration]>(`${this.apiUrl}/dataSources/${dataSourceType}/registrations/codes`, httpOptions);
   }
 
   getAvailableRegistrationProgrammes(registrationCode: string, dataSourceType: string): Observable<[Programme]> {
-    return this.http.get<[Programme]>(`${this.apiUrl}/registrations/${dataSourceType}/codes/${encodeURIComponent(registrationCode)}`);
+    return this.http.get<[Programme]>(`${this.apiUrl}/dataSources/${dataSourceType}/registrations/codes/${encodeURIComponent(registrationCode)}`);
   }
 
   create(importObject: Import): Observable<Import> {
@@ -89,7 +85,7 @@ export class ImportService implements CrudService<Import> {
   }
 
   getAvailableDataSources(): Observable<[DataSource]> {
-    return this.http.get<[DataSource]>(`${this.apiUrl}/import/dataSources`);
+    return this.http.get<[DataSource]>(`${this.apiUrl}/dataSources`);
   }
 
   findUids(importId: number): Observable<void> {

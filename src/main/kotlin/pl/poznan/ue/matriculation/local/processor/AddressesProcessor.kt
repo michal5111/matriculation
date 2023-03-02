@@ -32,7 +32,7 @@ open class AddressesProcessor(
                     countryCode = it.countryCode
                 )
             }
-            if (person.addresses.none { it.addressType.code == "KOR" }) {
+            if (applicant.addresses.none { it.addressType.usosValue == "KOR" }) {
                 val foundAddress = person.addresses.find { it.addressType.code == "POB" }
                     ?: person.addresses.find { it.addressType.code == "STA" }
                 foundAddress?.let {

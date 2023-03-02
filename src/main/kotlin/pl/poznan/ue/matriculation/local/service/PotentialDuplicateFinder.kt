@@ -29,19 +29,21 @@ class PotentialDuplicateFinder(
     )
     fun findPotentialDuplicate(applicant: Applicant, importId: Long) {
         val importProgress = importRepository.findByIdOrNull(importId) ?: throw ImportNotFoundException()
-        val dateOfBirth = applicant.dateOfBirth ?: throw IllegalArgumentException("Date of birth is null")
+        val dateOfBirth = applicant.dateOfBirth
+            ?: throw IllegalArgumentException("Date of birth is null. Applicant foreign id: ${applicant.foreignId}")
         val potentialDuplicatesList = personService.findPotentialDuplicate(
             name = applicant.given,
             surname = applicant.family,
             birthDate = dateOfBirth,
             idNumbers = applicant.identityDocuments.map {
-                it.number ?: throw IllegalArgumentException("Identity document number is null")
+                it.number
+                    ?: throw IllegalArgumentException("Identity document number is null. Applicant foreign id: ${applicant.foreignId}")
             },
             email = applicant.email,
             privateEmail = applicant.email
         )
         if (potentialDuplicatesList.isNotEmpty()) {
-            logger.warn("Wykryto potencjalny duplikat!")
+            logger.warn("Wykryto potencjalny duplikat! Applicant foreign id: ${applicant.foreignId}")
             applicant.potentialDuplicateStatus = DuplicateStatus.POTENTIAL_DUPLICATE
             importProgress.potentialDuplicates++
         } else {

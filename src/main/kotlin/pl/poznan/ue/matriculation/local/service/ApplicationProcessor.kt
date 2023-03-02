@@ -22,7 +22,6 @@ class ApplicationProcessor(
     private val applicantService: ApplicantService,
     private val importService: ImportService,
     private val asyncService: AsyncService,
-    //private val personProcessorService: PersonProcessorService,
     private val targetSystemProcessor: TargetSystemProcessor<Person>,
     private val applicationService: ApplicationService
 ) {

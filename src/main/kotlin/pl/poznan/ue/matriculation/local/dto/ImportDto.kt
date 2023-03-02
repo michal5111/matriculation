@@ -1,19 +1,54 @@
 package pl.poznan.ue.matriculation.local.dto
 
+import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import java.util.*
+import javax.validation.constraints.NotNull
 
 class ImportDto(
-    val programmeCode: String,
-    val programmeForeignId: String,
-    val programmeForeignName: String,
-    val registration: String,
-    val indexPoolCode: String,
-    val indexPoolName: String,
-    val startDate: Date,
-    val dateOfAddmision: Date,
-    val stageCode: String,
-    val didacticCycleCode: String,
-    val dataSourceId: String,
-    val dataSourceName: String,
-    val additionalProperties: Map<String, Any>?
+    val id: Long? = null,
+    @NotNull
+    val programmeCode: String? = null,
+    @NotNull
+    val programmeForeignId: String? = null,
+    @NotNull
+    val programmeForeignName: String? = null,
+    @NotNull
+    val registration: String? = null,
+    @NotNull
+    val indexPoolCode: String? = null,
+    @NotNull
+    val indexPoolName: String? = null,
+    @NotNull
+    val startDate: Date? = null,
+    @NotNull
+    val dateOfAddmision: Date? = null,
+    @NotNull
+    val stageCode: String? = null,
+    @NotNull
+    val didacticCycleCode: String? = null,
+    @NotNull
+    val dataSourceId: String? = null,
+    @NotNull
+    val dataSourceName: String? = null,
+    val additionalProperties: Map<String, Any>? = null,
+
+    val importedApplications: Int? = null,
+
+    val saveErrors: Int? = null,
+
+    val savedApplicants: Int? = null,
+
+    val totalCount: Int? = null,
+
+    val importedUids: Int? = null,
+
+    val notificationsSend: Int? = null,
+
+    val potentialDuplicates: Int? = null,
+
+    val importStatus: ImportStatus? = null,
+
+    val error: String? = null,
+
+    val stackTrace: String? = null,
 )

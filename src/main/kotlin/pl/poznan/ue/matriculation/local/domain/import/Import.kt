@@ -1,6 +1,5 @@
 package pl.poznan.ue.matriculation.local.domain.import
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import org.hibernate.annotations.Type
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
@@ -99,7 +98,6 @@ class Import(
     @Lob
     var stackTrace: String? = null,
 
-    @JsonIgnore
     @OneToMany(mappedBy = "import", fetch = FetchType.LAZY, cascade = [CascadeType.MERGE, CascadeType.REMOVE])
     val applications: MutableSet<Application> = HashSet()
 ) : BaseEntityLongId() {
