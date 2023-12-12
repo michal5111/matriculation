@@ -69,8 +69,8 @@
         <appender-ref ref="Console"/>
         <appender-ref ref="RollingFile"/>
     </logger>
-    <!--    <logger name="org.hibernate.type.descriptor.sql" level="trace" additivity="false">-->
-    <!--        <appender-ref ref="Console"/>-->
-    <!--    </logger>-->
+    <logger name="org.hibernate.type.descriptor.sql" level="trace" additivity="false">
+        <appender-ref ref="Console"/>
+    </logger>
 
 </configuration>

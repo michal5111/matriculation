@@ -147,7 +147,9 @@ class ImportApplicantsJob(
             applicationDto.foreignId,
             applicationDtoDataSource.id
         )
-        if (foundApplication?.importStatus == ApplicationImportStatus.IMPORTED) {
+        if (foundApplication?.importStatus == ApplicationImportStatus.IMPORTED
+            && foundApplication.import?.id != import.id
+        ) {
             import.totalCount = import.totalCount!! - 1
             return foundApplication
         }
@@ -172,6 +174,7 @@ class ImportApplicantsJob(
             applicationDtoDataSource.id
         )
         return if (foundApplicant != null) {
+            foundApplicant.primaryIdentityDocument = null
             applicationDtoDataSource.updateApplicant(foundApplicant, applicantDto, applicationDto)
         } else {
             applicationDtoDataSource.mapApplicantDtoToApplicant(applicantDto).also {

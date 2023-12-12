@@ -30,7 +30,7 @@ interface IApplicationDataSource<applicationDTO : IApplicationDto, applicantDTO 
 
     fun getAvailableRegistrationProgrammes(registration: String): List<ProgrammeDto>
 
-    fun getAvailableRegistrations(): List<RegistrationDto>
+    fun getAvailableRegistrations(filter: String?): List<RegistrationDto>
 
     fun getApplicationById(applicationId: Long, applicationDto: applicationDTO): applicationDTO?
 

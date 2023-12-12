@@ -3,15 +3,15 @@
     <header *ngIf="import" class="card-wrapper">
       <mat-card appearance="outlined" class="card-centered">
         <mat-card-title>
-          <p>Import rekrutacji {{import.registration}}</p>
+          <p>Import rekrutacji {{ import.registration }}</p>
         </mat-card-title>
         <mat-card-subtitle>
-          <p>Kod programu: {{import.programmeCode}}</p>
-          <p>Kod etapu: {{import.stageCode}}</p>
-          <p>Kod cyklu dydaktycznego: {{import.didacticCycleCode}}</p>
-          <p>Kod puli indeksów: {{import.indexPoolCode}}</p>
-          <p>Data rozpoczęcia programu: {{import.startDate | date: 'dd.MM.yyyy'}}</p>
-          <p>Data przyjęcia na program: {{import.dateOfAddmision | date: 'dd.MM.yyyy'}}</p>
+          <p>Kod programu: {{ import.programmeCode }}</p>
+          <p>Kod etapu: {{ import.stageCode }}</p>
+          <p>Kod cyklu dydaktycznego: {{ import.didacticCycleCode }}</p>
+          <p>Kod puli indeksów: {{ import.indexPoolCode }}</p>
+          <p>Data rozpoczęcia programu: {{ import.startDate | date: 'dd.MM.yyyy' }}</p>
+          <p>Data przyjęcia na program: {{ import.dateOfAddmision | date: 'dd.MM.yyyy' }}</p>
         </mat-card-subtitle>
         <mat-card-actions>
           <button mat-button (click)="openEditorDialog()" [disabled]="isEditButtonDisabled()">
@@ -25,7 +25,7 @@
           <app-import-status-indicator [importStatus]="import.importStatus"></app-import-status-indicator>
           <ng-template [ngIf]="import.error">
             <p class="error-container">Błąd importu:
-              <mark class="error-color">{{import.error}}</mark>
+              <mark class="error-color">{{ import.error }}</mark>
             </p>
             <button mat-button (click)="showImportErrorDialog(import)">Pokaż błąd</button>
           </ng-template>
@@ -40,7 +40,7 @@
             [total]="import.totalCount"
             [errorsCount]="import.saveErrors">
           </app-progress-viewer>
-          <p>Błędy przy zapisywaniu: {{import.saveErrors}}</p>
+          <p>Błędy przy zapisywaniu: {{ import.saveErrors }}</p>
         </mat-card-content>
         <mat-card-actions>
           <button mat-button (click)="startImport()" [disabled]="isStartImportButtonDisabled()">
@@ -86,13 +86,8 @@
       <mat-card appearance="outlined" class="card-centered">
         <mat-card-content>
           Potencjalne duplikaty: <span
-          [class.red_backgroud]="import.potentialDuplicates > 0">{{import.potentialDuplicates}}</span>
+          [class.red_backgroud]="import.potentialDuplicates > 0">{{ import.potentialDuplicates }}</span>
         </mat-card-content>
-        <mat-card-actions>
-          <button mat-button (click)="onCheckForPotentialDuplicates()" [disabled]="isCheckForDuplicatesDisabled()">
-            Sprawdź potencjalne duplikaty
-          </button>
-        </mat-card-actions>
       </mat-card>
     </header>
   </ng-template>
@@ -100,19 +95,19 @@
     <mat-card appearance="outlined">
       <section class="checkbox-section">
         Wyświetlaj:
-        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('id')"
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('id') ?? false"
                       (change)="onColumnCheckboxChange($event, 'id')">id
         </mat-checkbox>
-        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('foreignId')"
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('foreignId') ?? false"
                       (change)="onColumnCheckboxChange($event, 'foreignId')">obcy id
         </mat-checkbox>
-        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('usosId')"
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('usosId') ?? false"
                       (change)="onColumnCheckboxChange($event, 'usosId')">usos id
         </mat-checkbox>
-        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('uid')"
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('uid') ?? false"
                       (change)="onColumnCheckboxChange($event, 'uid')">uid
         </mat-checkbox>
-        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('certificateDocumentNumber')"
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('certificateDocumentNumber') ?? false"
                       (change)="onColumnCheckboxChange($event,
                       'certificateDocumentNumber',
                       'certificateDocumentIssueDateAndPlace',
@@ -122,10 +117,10 @@
         <!--        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('importError')"-->
         <!--                      (change)="onColumnCheckboxChange($event, 'importError')">błąd przy importowaniu-->
         <!--        </mat-checkbox>-->
-        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('duplicateStatus')"
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('duplicateStatus') ?? false"
                       (change)="onColumnCheckboxChange($event, 'duplicateStatus')">potencjalny duplikat
         </mat-checkbox>
-        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('warnings')"
+        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('warnings') ?? false"
                       (change)="onColumnCheckboxChange($event, 'warnings')">Ostrzeżenia
         </mat-checkbox>
       </section>
@@ -141,19 +136,19 @@
 
         <ng-container matColumnDef="lp">
           <th mat-header-cell *matHeaderCellDef>L.p.</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">  {{getElementNumber(element)}}  </td>
+          <td mat-cell *matCellDef="let element" class="mat-cell"> {{ getElementNumber(element) }}</td>
         </ng-container>
 
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Id</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">  {{element.id}}  </td>
+          <td mat-cell *matCellDef="let element" class="mat-cell"> {{ element.id }}</td>
         </ng-container>
 
         <ng-container matColumnDef="foreignId">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Obcy id</th>
           <td mat-cell *matCellDef="let element" class="mat-cell">
             <a mat-button href="{{element.editUrl}}" target="_blank"
-               [disabled]="!element.editUrl">{{element.foreignId}}</a>
+               [disabled]="!element.editUrl">{{ element.foreignId }}</a>
           </td>
         </ng-container>
 
@@ -161,39 +156,41 @@
           <th mat-header-cell *matHeaderCellDef mat-sort-header> usos id</th>
           <td mat-cell *matCellDef="let element" class="mat-cell">
             <a *ngIf="usosUrl" mat-button href="{{getPersonUsosUrl(element)}}"
-               target="_blank">{{element.applicant.usosId}}</a>
+               target="_blank">{{ element.applicant.usosId }}</a>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="uid">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> uid</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">{{element.applicant.uid}}</td>
+          <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.applicant.uid }}</td>
         </ng-container>
 
         <ng-container matColumnDef="names">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Nazwisko i imię/imiona</th>
           <td mat-cell
               *matCellDef="let element"
-              class="mat-cell">{{element.applicant.family}} {{element.applicant.given}} {{element.applicant.middle}}</td>
+              class="mat-cell">{{ element.applicant.family }} {{ element.applicant.given }} {{ element.applicant.middle }}
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="birthDateAndPlace">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Data urodzenia Miejsce urodzenia</th>
           <td mat-cell
               *matCellDef="let element"
-              class="mat-cell">{{element.applicant.dateOfBirth | date:'dd.MM.yyyy'}} {{element.applicant.cityOfBirth}}</td>
+              class="mat-cell">{{ element.applicant.dateOfBirth | date:'dd.MM.yyyy' }} {{ element.applicant.cityOfBirth }}
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="pesel">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Pesel / Nr. dokumentu</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">{{getPeselOrIdNumber(element)}} </td>
+          <td mat-cell *matCellDef="let element" class="mat-cell">{{ getPeselOrIdNumber(element) }}</td>
         </ng-container>
 
         <ng-container matColumnDef="certificateDocumentNumber">
           <th mat-header-cell *matHeaderCellDef> Dyplom</th>
           <td mat-cell *matCellDef="let element" class="mat-cell">
             <div *ngIf="element.certificate">
-              {{element.certificate.documentNumber}}
+              {{ element.certificate.documentNumber }}
             </div>
           </td>
         </ng-container>
@@ -202,7 +199,7 @@
           <th mat-header-cell *matHeaderCellDef> Data wyd. Miejsce</th>
           <td mat-cell *matCellDef="let element" class="mat-cell">
             <div *ngIf="element.certificate">
-              {{element.certificate.issueDate | date:'dd.MM.yyyy'}} {{element.certificate.issueCity}}
+              {{ element.certificate.issueDate | date:'dd.MM.yyyy' }} {{ element.certificate.issueCity }}
             </div>
           </td>
         </ng-container>
@@ -211,7 +208,7 @@
           <th mat-header-cell *matHeaderCellDef> Wystawiający</th>
           <td mat-cell *matCellDef="let element" class="mat-cell">
             <div *ngIf="element.certificate">
-              {{element.certificate.issueInstitution}}
+              {{ element.certificate.issueInstitution }}
             </div>
           </td>
         </ng-container>
@@ -223,7 +220,7 @@
               <button mat-button (click)="updateIndexNumber(element)"
                       [disabled]="import?.importStatus === 'ARCHIVED'
                     || !(userService.hasRole('ROLE_IMPORT_CHANGE_INDEX') || userService.hasRole('ROLE_ADMIN'))">
-                {{element.applicant.assignedIndexNumber}}
+                {{ element.applicant.assignedIndexNumber }}
               </button>
             </div>
           </td>
@@ -282,7 +279,7 @@
 
         <ng-container matColumnDef="warnings">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Ostrzeżenia</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">{{element.warnings}}</td>
+          <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.warnings }}</td>
         </ng-container>
 
         <ng-container matColumnDef="delete">

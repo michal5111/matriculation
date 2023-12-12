@@ -37,11 +37,6 @@
         <appender-ref ref="RollingFile"/>
     </root>
 
-    <!-- LOG "com.baeldung*" at TRACE level -->
-    <logger name="com.baeldung" level="trace" additivity="false">
-        <appender-ref ref="RollingFile"/>
-    </logger>
-
     <logger name="pl.poznan.ue.matriculation.configuration.LogAspect" level="debug" additivity="false">
         <appender-ref ref="Console"/>
     </logger>

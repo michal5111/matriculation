@@ -22,7 +22,7 @@ class Stage(
     val descriptionEng: String? = null,
 
     @OneToMany(mappedBy = "stage", fetch = FetchType.LAZY)
-    var programmeStages: MutableList<ProgrammeStage>
+    var programmeStages: MutableList<ProgrammeStage>,
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

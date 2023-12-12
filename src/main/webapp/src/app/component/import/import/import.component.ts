@@ -26,7 +26,7 @@ export class ImportComponent extends AbstractListWithPathParamsComponent<Import,
   filtersSubject: BehaviorSubject<{}>;
   sortingMap: Map<string, string> = new Map<string, string>([
     ['id', 'id'],
-    ['dataSourceType', 'dataSourceType'],
+    ['dataSourceType', 'dataSourceName'],
     ['registration', 'registration'],
     ['programmeCode', 'programmeCode'],
     ['programmeForeignName', 'programmeForeignName'],

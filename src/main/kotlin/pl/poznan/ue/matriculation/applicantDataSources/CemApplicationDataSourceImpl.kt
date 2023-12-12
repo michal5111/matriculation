@@ -81,7 +81,7 @@ class CemApplicationDataSourceImpl(
         }
     }
 
-    override fun getAvailableRegistrations(): List<RegistrationDto> {
+    override fun getAvailableRegistrations(filter: String?): List<RegistrationDto> {
         return courseService.findAllByStatus(CourseEditionStatus.ACTIVE, Sort.by("name")).map {
             RegistrationDto(it.id.toString(), "${it.name} Numer: ${it.number}")
         }

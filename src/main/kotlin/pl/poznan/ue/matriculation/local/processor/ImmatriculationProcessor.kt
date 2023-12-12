@@ -23,7 +23,7 @@ open class ImmatriculationProcessor(
                 import = processRequest.import,
                 application = processRequest.application
             )
-            it.assignedIndexNumber = student.indexNumber
+            it.assignedIndexNumber = student?.indexNumber
         }
     }
 }

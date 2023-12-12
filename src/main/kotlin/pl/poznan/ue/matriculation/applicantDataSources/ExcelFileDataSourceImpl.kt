@@ -132,7 +132,7 @@ class ExcelFileDataSourceImpl(
         }
     }
 
-    override fun getAvailableRegistrations(): List<RegistrationDto> {
+    override fun getAvailableRegistrations(filter: String?): List<RegistrationDto> {
         return listOf(
             RegistrationDto(
                 id = "EXCEL_FILE",

@@ -55,8 +55,6 @@ interface ApplicationRepository : JpaRepository<Application, Long>, JpaSpecifica
         sort: Sort
     ): Stream<Application>
 
-    fun deleteAllByImportId(importId: Long)
-
     fun findAllByImportId(importId: Long): List<Application>
 
     fun findAllByImportId(importId: Long, pageable: Pageable): Page<Application>
@@ -88,4 +86,18 @@ interface ApplicationRepository : JpaRepository<Application, Long>, JpaSpecifica
     """
     )
     fun findAllForArchive(importId: Long): Stream<Application>
+
+    fun findWithApplicantById(id: Long): Application
+
+    @Query(
+        """
+        select a.id
+        from Application a
+        join a.applicant ap
+        where a.import.id = :importId
+        and a.importStatus in :statusList
+        order by ap.family, ap.given, ap.middle
+    """
+    )
+    fun findAllIdsByImportIdAndImportStatusIn(importId: Long, statusList: List<ApplicationImportStatus>): List<Long>
 }

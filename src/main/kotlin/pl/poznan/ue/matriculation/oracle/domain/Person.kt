@@ -211,7 +211,7 @@ class Person(
     @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     val addresses: MutableList<Address> = mutableListOf(),
 
-    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     val phoneNumbers: MutableList<PhoneNumber> = mutableListOf(),
 
     @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
@@ -248,7 +248,10 @@ class Person(
     val personContracts: MutableList<Contract> = mutableListOf(),
 
     @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val personEmployee: MutableList<Employee> = mutableListOf()
+    val personEmployee: MutableList<Employee> = mutableListOf(),
+
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
+    val clauseAndRegulationConfirmations: MutableList<ClauseAndRegulationConfirmation> = mutableListOf(),
 ) : BaseEntity() {
 
 

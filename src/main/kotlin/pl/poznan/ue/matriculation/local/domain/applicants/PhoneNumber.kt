@@ -1,17 +1,12 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.FetchType
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 
 @Entity
-@Table(
-    uniqueConstraints = [
-        UniqueConstraint(
-            name = "phoneNumberUniqueConstraint",
-            columnNames = ["applicant_id", "number", "phoneNumberType"]
-        )
-    ]
-)
 class PhoneNumber(
 
     @ManyToOne(fetch = FetchType.LAZY)

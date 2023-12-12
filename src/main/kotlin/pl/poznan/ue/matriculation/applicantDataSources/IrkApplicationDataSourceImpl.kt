@@ -74,7 +74,7 @@ open class IrkApplicationDataSourceImpl(
         if (!setAsAccepted) return 1
         return try {
             irkService.completeImmatriculation(foreignApplicationId)
-            1
+            0
         } catch (e: HttpClientErrorException.BadRequest) {
             val errorMessageDto =
                 jacksonObjectMapper().readValue(e.responseBodyAsString, ErrorMessageDto::class.java)
@@ -92,7 +92,7 @@ open class IrkApplicationDataSourceImpl(
         }
     }
 
-    override fun getAvailableRegistrations(): List<RegistrationDto> {
+    override fun getAvailableRegistrations(filter: String?): List<RegistrationDto> {
         val availableRegistrations = mutableListOf<RegistrationDto>()
         var currentPage = 1
         var hasNext: Boolean
@@ -165,6 +165,8 @@ open class IrkApplicationDataSourceImpl(
         applicantDto: IrkApplicantDto,
         import: Import
     ): IdentityDocument? {
-        return applicant.identityDocuments.firstOrNull()
+        return applicant.identityDocuments.find {
+            it.number == applicantDto.additionalData.documentNumber
+        }
     }
 }

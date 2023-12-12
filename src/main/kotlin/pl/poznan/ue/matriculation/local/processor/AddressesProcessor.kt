@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.local.dto.ProcessResult
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.service.AddressService
+import java.util.*
 
 open class AddressesProcessor(
     private val addressService: AddressService,
@@ -20,7 +21,7 @@ open class AddressesProcessor(
             val person = processResult.person
             val applicant = processRequest.application.applicant ?: return@also
             applicant.addresses.forEach {
-                createOrUpdateAddress(
+                createAddress(
                     person = person,
                     addressTypeCode = it.addressType.usosValue,
                     city = it.city,
@@ -36,7 +37,7 @@ open class AddressesProcessor(
                 val foundAddress = person.addresses.find { it.addressType.code == "POB" }
                     ?: person.addresses.find { it.addressType.code == "STA" }
                 foundAddress?.let {
-                    createOrUpdateAddress(
+                    createAddress(
                         person = person,
                         addressTypeCode = "KOR",
                         city = it.city,
@@ -52,7 +53,7 @@ open class AddressesProcessor(
         }
     }
 
-    private fun createOrUpdateAddress(
+    private fun createAddress(
         person: Person,
         addressTypeCode: String,
         city: String?,
@@ -63,32 +64,32 @@ open class AddressesProcessor(
         cityIsCity: Boolean?,
         countryCode: String?
     ) {
-        val address = person.addresses.find { it.addressType.code == addressTypeCode }
-        if (address != null) {
-            addressService.update(
-                address = address,
+        val existingAddress = person.addresses.filter {
+            val date = it.dateTo
+            date == null || date <= Date()
+        }.find { it.addressType.code == addressTypeCode }
+        if (
+            existingAddress?.city == city
+            && existingAddress?.country?.code == countryCode
+            && existingAddress?.flatNumber == apartmentNumber
+            && existingAddress?.houseNumber == houseNumber
+            && existingAddress?.street == street
+            && ((countryCode == "PL" && existingAddress?.zipCode == zipCode)) || (countryCode != "PL" && existingAddress?.foreignZipCode == zipCode)
+        )
+            existingAddress?.apply { dateTo = Date() }
+        person.addAddress(
+            addressService.create(
+                person = person,
+                addressTypeCode = addressTypeCode,
                 city = city,
                 street = street,
                 houseNumber = houseNumber,
                 apartmentNumber = apartmentNumber,
                 zipCode = zipCode,
                 cityIsCity = cityIsCity,
-                countryCode = countryCode
+                countryCode = countryCode,
+                dateFrom = existingAddress?.dateTo
             )
-        } else {
-            person.addAddress(
-                addressService.create(
-                    person = person,
-                    addressTypeCode = addressTypeCode,
-                    city = city,
-                    street = street,
-                    houseNumber = houseNumber,
-                    apartmentNumber = apartmentNumber,
-                    zipCode = zipCode,
-                    cityIsCity = cityIsCity,
-                    countryCode = countryCode
-                )
-            )
-        }
+        )
     }
 }

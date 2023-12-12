@@ -33,8 +33,8 @@ class ImportService(
         val import = Import(
             dateOfAddmision = importDto.dateOfAddmision!!,
             didacticCycleCode = importDto.didacticCycleCode!!,
-            indexPoolCode = importDto.indexPoolCode!!,
-            indexPoolName = importDto.indexPoolName!!,
+            indexPoolCode = importDto.indexPoolCode,
+            indexPoolName = importDto.indexPoolName,
             programmeCode = importDto.programmeCode!!,
             programmeForeignId = importDto.programmeForeignId!!,
             programmeForeignName = importDto.programmeForeignName!!,

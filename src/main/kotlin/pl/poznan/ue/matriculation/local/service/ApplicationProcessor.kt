@@ -9,7 +9,7 @@ import pl.poznan.ue.matriculation.annotation.LogExecutionTime
 import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
 import pl.poznan.ue.matriculation.applicantDataSources.IPhotoDownloader
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
-import pl.poznan.ue.matriculation.local.domain.applications.Application
+import pl.poznan.ue.matriculation.exception.ApplicationNotFoundException
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
@@ -36,10 +36,12 @@ class ApplicationProcessor(
     )
     fun processApplication(
         importId: Long,
-        application: Application,
+        applicationId: Long,
         applicationDtoDataSource: IApplicationDataSource<IApplicationDto, IApplicantDto>
     ) {
-        logger.trace("------------------------------------------------Przetwarzam ${application.id}---------------------------------------------")
+        logger.trace("------------------------------------------------Przetwarzam ${applicationId}---------------------------------------------")
+        val application =
+            applicationService.findWithApplicantById(applicationId) ?: throw ApplicationNotFoundException()
         val applicant = application.applicant ?: throw ApplicantNotFoundException()
         logger.trace("Sprawdzam aplikanta")
         applicantService.check(applicant)

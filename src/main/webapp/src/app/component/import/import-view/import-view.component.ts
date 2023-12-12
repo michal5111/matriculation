@@ -159,7 +159,7 @@ export class ImportViewComponent extends AbstractListWithPathParamsComponent<App
     this.subs.push(
       dialogRef.afterClosed().pipe(
         filter(result => result === true),
-        switchMap((result) => this.importService.archiveImport(this.importId))
+        switchMap(() => this.importService.archiveImport(this.importId))
       ).subscribe()
     );
   }
@@ -259,19 +259,6 @@ export class ImportViewComponent extends AbstractListWithPathParamsComponent<App
       default:
         return true;
     }
-  }
-
-  isCheckForDuplicatesDisabled(): boolean {
-    switch (this.import?.importStatus) {
-      case 'IMPORTED':
-        return false;
-      default:
-        return true;
-    }
-  }
-
-  onCheckForPotentialDuplicates() {
-    this.subs.push(this.progressSubscription = this.importService.checkForPotentialDuplicates(this.importId).subscribe());
   }
 
   onPotentialDuplicateClick(application: Application) {

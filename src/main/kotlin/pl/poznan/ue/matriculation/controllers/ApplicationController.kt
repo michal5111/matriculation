@@ -4,8 +4,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
 import pl.poznan.ue.matriculation.kotlinExtensions.toDto
-import pl.poznan.ue.matriculation.kotlinExtensions.toPageDto
-import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.dto.ApplicantUsosIdAndPotentialDuplicateStatusDto
 import pl.poznan.ue.matriculation.local.dto.ApplicationDto
 import pl.poznan.ue.matriculation.local.dto.PageDto
@@ -25,7 +23,7 @@ class ApplicationController(private val applicationService: ApplicationService) 
     fun updatePotentialDuplicateStatus(
         @PathVariable("id") applicationId: Long,
         @RequestBody potentialDuplicateStatusDto: ApplicantUsosIdAndPotentialDuplicateStatusDto
-    ): Application {
+    ): ApplicationDto {
         return applicationService.updatePotentialDuplicateStatus(applicationId, potentialDuplicateStatusDto)
     }
 
@@ -37,9 +35,7 @@ class ApplicationController(private val applicationService: ApplicationService) 
         @RequestParam(required = false) pesel: String?,
         pageable: Pageable,
     ): PageDto<ApplicationDto> {
-        return applicationService.findAll(importId, name, surname, pesel, pageable).toPageDto {
-            it.toDto()
-        }
+        return applicationService.findAll(importId, name, surname, pesel, pageable)
     }
 
     @GetMapping("/{id}")

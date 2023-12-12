@@ -13,6 +13,7 @@ import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
 import pl.poznan.ue.matriculation.oracle.domain.*
 import pl.poznan.ue.matriculation.oracle.repo.*
+import pl.poznan.ue.matriculation.properties.ClauseAndRegulationProperties
 import java.util.*
 
 @Service
@@ -25,10 +26,14 @@ class ImmatriculationService(
     private val programmeRepository: ProgrammeRepository,
     private val programmeStageRepository: ProgrammeStageRepository,
     private val sourceOfFinancingRepository: SourceOfFinancingRepository,
-    private val basisOfAdmissionRepository: BasisOfAdmissionRepository
+    private val basisOfAdmissionRepository: BasisOfAdmissionRepository,
+    private val clauseAndRegulationRepository: ClauseAndRegulationRepository,
+    private val clauseAndRegulationProperties: ClauseAndRegulationProperties
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(ImmatriculationService::class.java)
+
+    private val clauseAndRegulationProgrammePattern = clauseAndRegulationProperties.programmePattern.toRegex()
 
     @LogExecutionTime
     @Transactional(
@@ -40,10 +45,10 @@ class ImmatriculationService(
         person: Person,
         import: Import,
         application: Application
-    ): Student {
+    ): Student? {
         val dataSourceId = application.dataSourceId ?: error("Datasource id is null")
         val applicationDtoDataSource = applicationDataSourceFactory.getDataSource(dataSourceId)
-        val student = studentService.createOrFindStudent(person, import.indexPoolCode)
+        val student = import.indexPoolCode?.let { studentService.createOrFindStudent(person, it) }
         val personProgramme = createPersonProgramme(
             person = person,
             import = import,
@@ -52,7 +57,7 @@ class ImmatriculationService(
             sourceOfFinancing = application.sourceOfFinancing,
             basisOfAdmission = application.basisOfAdmission
         )
-        student.addPersonProgramme(personProgramme)
+        student?.addPersonProgramme(personProgramme)
         val irkApplication = IrkApplication(
             applicationId = application.foreignId,
             confirmationStatus = 0,
@@ -60,6 +65,13 @@ class ImmatriculationService(
                 applicationDtoDataSource.instanceUrl + '/'
             }
         )
+        if (clauseAndRegulationProgrammePattern.matches(import.programmeCode)) {
+            addClauseAndRegulationConfirmation(
+                person = person,
+                personProgramme = personProgramme,
+                startDate = import.startDate
+            )
+        }
         logger.trace("Tworzę lub wybieram studenta")
         irkApplication.personProgramme = personProgramme
         personProgramme.irkApplication = irkApplication
@@ -101,10 +113,31 @@ class ImmatriculationService(
         arrival
     }
 
+    private fun addClauseAndRegulationConfirmation(
+        person: Person,
+        personProgramme: PersonProgramme,
+        startDate: Date
+    ) {
+        val clauseAndRegulation = clauseAndRegulationRepository.findLatestByCode(clauseAndRegulationProperties.code)
+            ?: error("Unable to find clause and regulation with id: ${clauseAndRegulationProperties.code}")
+        val calendar = Calendar.getInstance()
+        calendar.time = startDate
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+        val clauseAndRegulationConfirmation = ClauseAndRegulationConfirmation(
+            person = person,
+            personProgramme = personProgramme,
+            decisionDeadline = calendar.time,
+            terminationDate = clauseAndRegulation.endOfApplication,
+            clauseAndRegulation = clauseAndRegulation
+        )
+        clauseAndRegulation.clauseAndRegulationConfirmations.add(clauseAndRegulationConfirmation)
+        personProgramme.clauseAndRegulationConfirmations.add(clauseAndRegulationConfirmation)
+    }
+
     private fun createPersonProgramme(
         person: Person,
         import: Import,
-        student: Student,
+        student: Student?,
         certificate: Document?,
         sourceOfFinancing: String?,
         basisOfAdmission: String?
@@ -143,7 +176,6 @@ class ImmatriculationService(
                 && it.type == certificate.certificateUsosCode
         }
     }
-
 
     private fun addPersonStage(
         personProgramme: PersonProgramme,

@@ -20,24 +20,23 @@ open class PhoneNumbersProcessor(
         return super.process(processRequest).also { processResult ->
             val person = processResult.person
             val applicant = processRequest.application.applicant ?: return@also
-            applicant.phoneNumbers.forEach { phoneNumber ->
-                val personPhoneNumber = person.phoneNumbers.find {
-                    phoneNumber.phoneNumberType == it.phoneNumberType.code
-                }
-                if (personPhoneNumber != null) {
-                    personPhoneNumber.phoneNumberType =
-                        phoneNumberTypeRepository.getReferenceById(phoneNumber.phoneNumberType)
-                    personPhoneNumber.comments = phoneNumber.comment
+
+            applicant.phoneNumbers.takeIf { it.isNotEmpty() }?.map { phoneNumber ->
+                val found = person.phoneNumbers.find { it.number == phoneNumber.number }
+                if (found != null) {
+                    found.comments = phoneNumber.comment
+                    found
                 } else {
-                    person.addPhoneNumber(
-                        PhoneNumber(
-                            person = person,
-                            phoneNumberType = phoneNumberTypeRepository.getReferenceById(phoneNumber.phoneNumberType),
-                            number = phoneNumber.number,
-                            comments = phoneNumber.comment
-                        )
+                    PhoneNumber(
+                        person = person,
+                        phoneNumberType = phoneNumberTypeRepository.getReferenceById(phoneNumber.phoneNumberType),
+                        number = phoneNumber.number,
+                        comments = phoneNumber.comment
                     )
                 }
+            }?.let {
+                person.phoneNumbers.clear()
+                person.phoneNumbers.addAll(it)
             }
         }
     }

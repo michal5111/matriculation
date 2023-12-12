@@ -9,6 +9,7 @@ import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicantMapper
 import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicationMapper
 import pl.poznan.ue.matriculation.dreamApply.service.DreamApplyService
 import pl.poznan.ue.matriculation.irk.dto.NotificationDto
+import pl.poznan.ue.matriculation.kotlinExtensions.active
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.Document
 import pl.poznan.ue.matriculation.local.domain.applicants.IdentityDocument
@@ -30,8 +31,12 @@ open class DreamApplyDataSourceImpl(
     override val additionalParameters: List<DataSourceAdditionalParameter>
         get() = listOf(
             SelectionListDataSourceAdditionalParameter("Status", null) {
-                val courses = dreamApplyService.getOfferTypes()
-                    ?: throw IllegalStateException("Unable to get offer type list.")
+                val courses = try {
+                    dreamApplyService.getOfferTypes()
+                        ?: throw IllegalStateException("Unable to get offer type list.")
+                } catch (e: Exception) {
+                    emptyMap()
+                }
                 courses.map {
                     SelectionListValue(it.value.title, it.value.title)
                 }
@@ -104,7 +109,7 @@ open class DreamApplyDataSourceImpl(
         }
     }
 
-    override fun getAvailableRegistrations(): List<RegistrationDto> {
+    override fun getAvailableRegistrations(filter: String?): List<RegistrationDto> {
         val academicTermsMap = dreamApplyService.getAcademicTerms()
             ?: throw IllegalStateException("Unable to download academic terms")
         return academicTermsMap.map {
@@ -179,6 +184,6 @@ open class DreamApplyDataSourceImpl(
         applicantDto: DreamApplyApplicantDto,
         import: Import
     ): IdentityDocument? {
-        return applicant.identityDocuments.firstOrNull()
+        return applicant.identityDocuments.active().firstOrNull()
     }
 }

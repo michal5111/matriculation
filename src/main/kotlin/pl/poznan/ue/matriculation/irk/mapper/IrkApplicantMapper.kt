@@ -106,6 +106,8 @@ class IrkApplicantMapper {
         pesel = applicantDto.basicData.pesel?.trim()
         sex = applicantDto.basicData.sex
         applicantDto.contactData.let {
+            addresses.clear()
+            phoneNumbers.clear()
             addAddresses(applicant, it)
             addPhoneNumbers(applicant, it)
         }
@@ -135,24 +137,22 @@ class IrkApplicantMapper {
             highSchoolType = it.highSchoolType
             highSchoolUsosCode = it.highSchoolUsosCode
         }
+        identityDocuments.clear()
         addIdentityDocuments(applicant, applicantDto.additionalData)
     }
 
     private fun addIdentityDocuments(applicant: Applicant, additionalDataDTO: AdditionalDataDTO) {
         additionalDataDTO.let {
-            mutableListOf(
-                IdentityDocument(
+            if (it.documentNumber != null && applicant.identityDocuments.none { id -> id.number == it.documentNumber }) {
+                val id = IdentityDocument(
                     country = it.documentCountry,
                     expDate = it.documentExpDate,
-                    number = it.documentNumber?.replace("[^a-zA-Z0-9]+", ""),
+                    number = it.documentNumber.replace("[^a-zA-Z0-9]+", ""),
                     type = it.documentType,
                     applicant = applicant
                 )
-            )
-        }.filterNot { identityDocument ->
-            identityDocument.number.isNullOrBlank()
-        }.forEach {
-            applicant.addIdentityDocument(it)
+                applicant.addIdentityDocument(id)
+            }
         }
     }
 
@@ -166,7 +166,7 @@ class IrkApplicantMapper {
                 )
             )
         }
-        if (contactDataDTO.phoneNumber == contactDataDTO.phoneNumber2) {
+        if (contactDataDTO.phoneNumber?.trimPhoneNumber() == contactDataDTO.phoneNumber2?.trimPhoneNumber()) {
             return
         }
         contactDataDTO.phoneNumber2?.trimPhoneNumber()?.let {

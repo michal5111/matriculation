@@ -22,8 +22,8 @@ class PersonProgramme(
     var programme: Programme,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ST_ID", referencedColumnName = "ID", nullable = false)
-    var student: Student,
+    @JoinColumn(name = "ST_ID", referencedColumnName = "ID")
+    var student: Student?,
 
     @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_GLOWNY", length = 1, nullable = true)
@@ -172,7 +172,10 @@ class PersonProgramme(
     var personProgrammeBasisOfAdmission: MutableList<PersonProgrammeBasisOfAdmission> = mutableListOf(),
 
     @OneToMany(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    var arrivals: MutableList<Arrival> = mutableListOf()
+    var arrivals: MutableList<Arrival> = mutableListOf(),
+
+    @OneToMany(mappedBy = "personProgramme", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    var clauseAndRegulationConfirmations: MutableList<ClauseAndRegulationConfirmation> = mutableListOf()
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

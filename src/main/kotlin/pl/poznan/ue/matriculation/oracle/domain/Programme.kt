@@ -155,7 +155,7 @@ class Programme(
     var personProgrammes: MutableList<PersonProgramme>,
 
     @OneToMany(mappedBy = "programme", fetch = FetchType.LAZY)
-    var programmeStages: MutableList<ProgrammeStage>
+    var programmeStages: MutableList<ProgrammeStage>,
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

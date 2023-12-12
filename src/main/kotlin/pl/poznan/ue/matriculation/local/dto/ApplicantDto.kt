@@ -4,10 +4,9 @@ import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
 import java.io.Serializable
 import java.util.*
 
-/**
- * A DTO for the {@link pl.poznan.ue.matriculation.local.domain.applicants.Applicant} entity
- */
 data class ApplicantDto(
+    val id: Long? = null,
+
     val foreignId: Long? = null,
 
     val dataSourceId: String? = null,

@@ -36,9 +36,13 @@ class JobService(
             if (!UserService.checkDataSourcePermission(import.dataSourceId)) {
                 throw ResponseStatusException(HttpStatus.FORBIDDEN)
             }
-            val job = jobsMap[jobType] ?: throw IllegalArgumentException("Unknown job")
+            val job = jobsMap[jobType] ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown job")
             when (val stateTransitionResult = job.startCondition.canStart(import)) {
-                is StateTransitionFailure -> throw IllegalStateException(stateTransitionResult.message)
+                is StateTransitionFailure -> throw ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    stateTransitionResult.message
+                )
+
                 else -> {}
             }
             import.importStatus = job.getInProgressStatus()

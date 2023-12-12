@@ -65,18 +65,14 @@ class Applicant(
     @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var applicantForeignerData: ApplicantForeignerData? = null,
 
-
-    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     val phoneNumbers: MutableSet<PhoneNumber> = HashSet(),
 
-
-    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     val addresses: MutableSet<Address> = HashSet(),
 
-
-    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    var identityDocuments: MutableSet<IdentityDocument> = HashSet(),
-
+    @OneToMany(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    val identityDocuments: MutableSet<IdentityDocument> = HashSet(),
 
     @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var erasmusData: ErasmusData? = null,
@@ -87,7 +83,6 @@ class Applicant(
 
     @Enumerated(EnumType.STRING)
     var potentialDuplicateStatus: DuplicateStatus = DuplicateStatus.NOT_CHECKED,
-
 
     @OneToMany(mappedBy = "applicant", fetch = FetchType.LAZY)
     var applications: MutableSet<Application> = HashSet(),

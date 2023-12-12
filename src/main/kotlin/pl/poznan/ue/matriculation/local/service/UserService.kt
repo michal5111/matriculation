@@ -46,7 +46,7 @@ class UserService(
     }
 
     fun save(user: User): User {
-        val ldapUser = ldapUserRepository.findByUid(user.uid) ?: throw UidNotFoundException()
+        val ldapUser = getLdapUserByUid(user.uid)
         user.apply {
             usosId = ldapUser.usosId
             givenName = ldapUser.givenName
@@ -60,7 +60,7 @@ class UserService(
         println(user.roles)
         val id = user.id ?: throw IllegalArgumentException("User id is null")
         userRepository.findByIdOrNull(id) ?: throw EntityNotFoundException("User not found")
-        val ldapUser = ldapUserRepository.findByUid(user.uid) ?: throw UidNotFoundException()
+        val ldapUser = getLdapUserByUid(user.uid)
         user.apply {
             usosId = ldapUser.usosId
             givenName = ldapUser.givenName
@@ -78,4 +78,6 @@ class UserService(
     fun getAll(pageable: Pageable): Page<User> {
         return userRepository.findAll(pageable)
     }
+
+    fun getLdapUserByUid(uid: String) = ldapUserRepository.findByUid(uid) ?: throw UidNotFoundException()
 }

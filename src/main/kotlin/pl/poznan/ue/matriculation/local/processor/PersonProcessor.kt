@@ -219,12 +219,7 @@ open class PersonProcessor(
                 person.pesel = it
             }
         }
-        var identityDocument = applicant.identityDocuments.find {
-            person.idNumber == it.number
-        }
-        if (identityDocument == null && applicant.identityDocuments.size > 0) {
-            identityDocument = applicant.primaryIdentityDocument
-        }
+        val identityDocument = applicant.primaryIdentityDocument
         if (identityDocument?.number != null) {
             if (person.documentType != identityDocument.type) {
                 changed = true
@@ -234,7 +229,6 @@ open class PersonProcessor(
                 changed = true
                 person.idNumber = identityDocument.number
             }
-            person.documentType = identityDocument.type
             person.identityDocumentExpirationDate = identityDocument.expDate
             person.identityDocumentIssuerCountry = identityDocument.country?.let { documentCountry ->
                 citizenshipRepository.getReferenceById(documentCountry)

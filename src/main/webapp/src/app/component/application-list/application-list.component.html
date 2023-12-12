@@ -26,26 +26,26 @@
 
       <ng-container matColumnDef="lp">
         <th mat-header-cell *matHeaderCellDef>L.p.</th>
-        <td mat-cell *matCellDef="let element" class="mat-cell">  {{getElementNumber(element)}}  </td>
+        <td mat-cell *matCellDef="let element" class="mat-cell"> {{ getElementNumber(element) }}</td>
       </ng-container>
 
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Id</th>
-        <td mat-cell *matCellDef="let element" class="mat-cell">  {{element.id}}  </td>
+        <td mat-cell *matCellDef="let element" class="mat-cell"> {{ element.id }}</td>
       </ng-container>
 
       <ng-container matColumnDef="foreignId">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Obcy id</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
           <a mat-button href="{{element.editUrl}}" target="_blank"
-             [disabled]="!element.editUrl">{{element.foreignId}}</a>
+             [disabled]="!element.editUrl">{{ element.foreignId }}</a>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="importId">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Id importu</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
-          <a mat-button href="/import/{{element.importId}}" target="_blank">{{element.importId}}</a>
+          <a mat-button href="{{baseHref}}import/{{element.importId}}" target="_blank">{{ element.importId }}</a>
         </td>
       </ng-container>
 
@@ -53,39 +53,41 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header> usos id</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
           <a *ngIf="usosUrl" mat-button href="{{getPersonUsosUrl(element)}}"
-             target="_blank">{{element.applicant.usosId}}</a>
+             target="_blank">{{ element.applicant.usosId }}</a>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="uid">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> uid</th>
-        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.applicant.uid}}</td>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.applicant.uid }}</td>
       </ng-container>
 
       <ng-container matColumnDef="names">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Nazwisko i imię/imiona</th>
         <td mat-cell
             *matCellDef="let element"
-            class="mat-cell">{{element.applicant.family}} {{element.applicant.given}} {{element.applicant.middle}}</td>
+            class="mat-cell">{{ element.applicant.family }} {{ element.applicant.given }} {{ element.applicant.middle }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="birthDateAndPlace">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Data urodzenia Miejsce urodzenia</th>
         <td mat-cell
             *matCellDef="let element"
-            class="mat-cell">{{element.applicant.dateOfBirth | date:'dd.MM.yyyy'}} {{element.applicant.cityOfBirth}}</td>
+            class="mat-cell">{{ element.applicant.dateOfBirth | date:'dd.MM.yyyy' }} {{ element.applicant.cityOfBirth }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="pesel">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Pesel / Nr. dokumentu</th>
-        <td mat-cell *matCellDef="let element" class="mat-cell">{{getPeselOrIdNumber(element)}} </td>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{ getPeselOrIdNumber(element) }}</td>
       </ng-container>
 
       <ng-container matColumnDef="certificateDocumentNumber">
         <th mat-header-cell *matHeaderCellDef> Dyplom</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
           <div *ngIf="element.certificate">
-            {{element.certificate.documentNumber}}
+            {{ element.certificate.documentNumber }}
           </div>
         </td>
       </ng-container>
@@ -94,7 +96,7 @@
         <th mat-header-cell *matHeaderCellDef> Data wyd. Miejsce</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
           <div *ngIf="element.certificate">
-            {{element.certificate.issueDate | date:'dd.MM.yyyy'}} {{element.certificate.issueCity}}
+            {{ element.certificate.issueDate | date:'dd.MM.yyyy' }} {{ element.certificate.issueCity }}
           </div>
         </td>
       </ng-container>
@@ -103,7 +105,7 @@
         <th mat-header-cell *matHeaderCellDef> Wystawiający</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
           <div *ngIf="element.certificate">
-            {{element.certificate.issueInstitution}}
+            {{ element.certificate.issueInstitution }}
           </div>
         </td>
       </ng-container>
@@ -111,7 +113,7 @@
       <ng-container matColumnDef="indexNumber">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Nr albumu</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
-          <div *ngIf="element.applicant.assignedIndexNumber">{{element.applicant.assignedIndexNumber}}</div>
+          <div *ngIf="element.applicant.assignedIndexNumber">{{ element.applicant.assignedIndexNumber }}</div>
         </td>
       </ng-container>
 
@@ -158,7 +160,7 @@
 
       <ng-container matColumnDef="importError">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Błąd przy importowaniu</th>
-        <td mat-cell *matCellDef="let element" class="mat-column-error"> {{element.importError}}
+        <td mat-cell *matCellDef="let element" class="mat-column-error"> {{ element.importError }}
           <button mat-button *ngIf="element.importError" (click)="showApplicationErrorDialog(element)">Wyświetl błąd
           </button>
         </td>
@@ -166,17 +168,17 @@
 
       <ng-container matColumnDef="warnings">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Ostrzeżenia</th>
-        <td mat-cell *matCellDef="let element" class="mat-cell">{{element.warnings}}</td>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.warnings }}</td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()"></tr>
       <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();"></tr>
     </table>
     <mat-paginator [pageSizeOptions]="[5, 10, 15, 20, 25, 50, 100]"
-                   [length]="dataSource.page?.totalElements"
-                   [pageSize]="dataSource.page?.size"
+                   [length]="dataSource.page?.totalElements ?? 0"
+                   [pageSize]="dataSource.page?.size ?? 0"
                    showFirstLastButtons
-                   [pageIndex]="dataSource.page?.number">
+                   [pageIndex]="dataSource.page?.number ?? 0">
     </mat-paginator>
   </div>
 </div>

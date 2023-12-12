@@ -6,9 +6,10 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.local.domain.user.Role
-import pl.poznan.ue.matriculation.local.dto.*
 import pl.poznan.ue.matriculation.local.job.JobType
-import pl.poznan.ue.matriculation.local.service.*
+import pl.poznan.ue.matriculation.local.service.ApplicantService
+import pl.poznan.ue.matriculation.local.service.JobService
+import pl.poznan.ue.matriculation.local.service.RoleService
 import pl.poznan.ue.matriculation.oracle.entityRepresentations.PersonBasicData
 import pl.poznan.ue.matriculation.oracle.repo.PersonRepository
 
@@ -37,11 +38,6 @@ class RestController(
     @GetMapping("/import/{id}/notifications")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun sendNotifications(@PathVariable("id") importId: Long) = jobService.runJob(JobType.SEND_NOTIFICATIONS, importId)
-
-    @GetMapping("/import/{id}/checkForDuplicates")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    fun checkForDuplicates(@PathVariable("id") importId: Long) =
-        jobService.runJob(JobType.CHECK_FOR_POTENTIAL_DUPLICATES, importId)
 
     @GetMapping("/applicant/{id}/potentialDuplicates")
     @ResponseStatus(HttpStatus.ACCEPTED)

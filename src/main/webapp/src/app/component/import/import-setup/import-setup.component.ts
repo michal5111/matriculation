@@ -62,7 +62,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
       dataSource: new FormControl<DataSource | null>(null, Validators.required),
       registration: new FormControl<string | null>(null, Validators.required),
       registrationProgramme: new FormControl<Programme | null>(null, Validators.required),
-      indexPoolCode: new FormControl<IndexType | null>(null, Validators.required),
+      indexPoolCode: new FormControl<IndexType | null>(null),
       stage: new FormControl<string | null>(null, Validators.required),
       didacticCycle: new FormControl<string | null>(null, Validators.required),
       startDate: new FormControl<Date | null>(null, Validators.required),

@@ -1,8 +1,6 @@
 package pl.poznan.ue.matriculation.controllers
 
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
 import pl.poznan.ue.matriculation.local.dto.DataSourceDto
 import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
@@ -20,10 +18,11 @@ class DataSourceController(
 
     @GetMapping("/{dataSourceType}/registrations/codes")
     fun getRegistrationCodes(
-        @PathVariable("dataSourceType") dataSourceType: String
+        @PathVariable("dataSourceType") dataSourceType: String,
+        @RequestParam(required = false) filter: String?
     ): List<RegistrationDto> = applicationDataSourceFactory
         .getDataSource(dataSourceType)
-        .getAvailableRegistrations()
+        .getAvailableRegistrations(filter)
 
     @GetMapping("/{dataSourceType}/registrations/codes/{id}")
     fun getProgrammesCodes(

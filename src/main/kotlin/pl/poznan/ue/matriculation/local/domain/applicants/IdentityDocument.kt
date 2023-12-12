@@ -5,14 +5,6 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-@Table(
-    uniqueConstraints = [
-        UniqueConstraint(
-            name = "IdentityDocumentUniqueConstraint",
-            columnNames = ["number", "type"]
-        )
-    ]
-)
 class IdentityDocument(
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -28,11 +20,9 @@ class IdentityDocument(
 
     var type: Char?,
 
-
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "primaryIdentityDocument")
     var primaryIdApplicant: Applicant? = null
 ) : BaseEntityLongId() {
-
 
     override fun toString(): String {
         return "IdentityDocument(id=$id, documentCountry=$country, documentExpDate=$expDate, documentNumber=$number, documentType=$type)"

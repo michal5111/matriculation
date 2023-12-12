@@ -46,9 +46,9 @@ class Import(
 
     val registration: String,
 
-    val indexPoolCode: String,
+    val indexPoolCode: String?,
 
-    val indexPoolName: String,
+    val indexPoolName: String?,
 
     @Temporal(TemporalType.DATE)
     val startDate: Date,

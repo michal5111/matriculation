@@ -95,7 +95,7 @@
       <mat-form-field class="form-field flex-form-field">
         <mat-label>Cykl dydaktyczny</mat-label>
         <input type="text" matInput formControlName="didacticCycle" [matAutocomplete]="auto">
-        <button mat-button *ngIf="formGroup.value.didacticCycle" matSuffix mat-icon-button
+        <button mat-button *ngIf="formGroup.value.didacticCycle" matSuffix
                 aria-label="Clear" (click)="formGroup.value.didacticCycle=''">
           <mat-icon>close</mat-icon>
         </button>
@@ -108,6 +108,7 @@
       <mat-form-field class="form-field flex-form-field">
         <mat-label>Pula indeksów</mat-label>
         <mat-select formControlName="indexPoolCode" [compareWith]="indexTypeCompare">
+          <mat-option>--</mat-option>
           <mat-option
             *ngFor="let indexPool of $indexPools | async"
             [value]="indexPool">{{indexPool.description}}

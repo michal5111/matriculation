@@ -9,7 +9,6 @@ import org.springframework.web.util.UriComponentsBuilder
 import pl.poznan.ue.matriculation.irk.dto.NotificationDto
 import pl.poznan.ue.matriculation.irk.dto.Page
 import pl.poznan.ue.matriculation.irk.dto.UserDto
-import pl.poznan.ue.matriculation.irk.dto.applicants.DocumentDTO
 import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
 import pl.poznan.ue.matriculation.irk.dto.applicants.MatriculationDataDTO
 import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
@@ -215,10 +214,6 @@ class IrkService(
             MatriculationDataDTO::class
         )
         return response.body
-    }
-
-    fun getPrimaryCertificate(applicationId: Long): DocumentDTO? {
-        return getMatriculationData(applicationId)?.application?.certificate
     }
 
     fun sendNotification(userId: Long, notificationDto: NotificationDto): ResponseEntity<Map<String, String>> {

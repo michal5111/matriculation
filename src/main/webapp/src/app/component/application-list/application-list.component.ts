@@ -1,11 +1,10 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BasicDataSource} from '../../dataSource/basic-data-source';
 import {Application} from '../../model/applications/application';
 import {BehaviorSubject, debounceTime, distinctUntilChanged, tap} from 'rxjs';
 import {UrlDto} from '../../model/import/urlDto';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
-import {ImportService} from '../../service/import-service/import.service';
 import {UsosService} from '../../service/usos-service/usos.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../service/user-service/user.service';
@@ -15,6 +14,7 @@ import {AbstractListWithPathParamsComponent} from '../abstract-list-with-path-pa
 import {ErrorDialogComponent} from '../dialog/error-dialog/error-dialog.component';
 import {ErrorDialogData} from '../../model/dialog/error-dialog-data';
 import {FormControl, FormGroup} from '@angular/forms';
+import {APP_BASE_HREF} from '@angular/common';
 
 type filterType = {
   importId?: number | null,
@@ -31,6 +31,26 @@ type filterType = {
 })
 export class ApplicationListComponent extends AbstractListWithPathParamsComponent<Application, number, filterType>
   implements OnInit, OnDestroy {
+
+  constructor(
+    private usosService: UsosService,
+    protected override route: ActivatedRoute,
+    protected override router: Router,
+    public userService: UserService,
+    private dialog: MatDialog,
+    applicationsService: ApplicationsService,
+    @Inject(APP_BASE_HREF) public baseHref: string
+  ) {
+    super(route, router);
+    this.filtersSubject = new BehaviorSubject<filterType>({});
+    this.dataSource = new BasicDataSource<Application, number, filterType>(applicationsService);
+    this.filterFormGroup = new FormGroup({
+      importId: new FormControl<number | null>(null),
+      name: new FormControl<string | null>(null),
+      surname: new FormControl<string | null>(null),
+      pesel: new FormControl<string | null>(null)
+    });
+  }
 
   dataSource: BasicDataSource<Application, number, filterType>;
   filtersSubject: BehaviorSubject<filterType>;
@@ -75,25 +95,7 @@ export class ApplicationListComponent extends AbstractListWithPathParamsComponen
     pesel: FormControl<string | null>
   }>;
 
-  constructor(
-    private importService: ImportService,
-    private usosService: UsosService,
-    protected override route: ActivatedRoute,
-    protected override router: Router,
-    public userService: UserService,
-    private dialog: MatDialog,
-    private applicationsService: ApplicationsService
-  ) {
-    super(route, router);
-    this.filtersSubject = new BehaviorSubject<filterType>({});
-    this.dataSource = new BasicDataSource<Application, number, filterType>(applicationsService);
-    this.filterFormGroup = new FormGroup({
-      importId: new FormControl<number | null>(null),
-      name: new FormControl<string | null>(null),
-      surname: new FormControl<string | null>(null),
-      pesel: new FormControl<string | null>(null)
-    });
-  }
+  protected readonly APP_BASE_HREF = APP_BASE_HREF;
 
   ngOnInit(): void {
     this.subs.push(

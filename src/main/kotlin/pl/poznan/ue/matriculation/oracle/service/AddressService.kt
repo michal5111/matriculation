@@ -6,6 +6,7 @@ import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.repo.AddressTypeRepository
 import pl.poznan.ue.matriculation.oracle.repo.CitizenshipRepository
 import pl.poznan.ue.matriculation.oracle.repo.PostalCodeRepository
+import java.util.*
 
 @Service
 class AddressService(
@@ -23,7 +24,8 @@ class AddressService(
         apartmentNumber: String?,
         zipCode: String?,
         cityIsCity: Boolean?,
-        countryCode: String?
+        countryCode: String?,
+        dateFrom: Date? = null
     ): Address {
         return Address(
             person = person,
@@ -35,7 +37,8 @@ class AddressService(
             cityIsCity = cityIsCity,
             country = countryCode?.let {
                 citizenshipRepository.getReferenceById(it)
-            }
+            },
+            dateFrom = dateFrom
         ).apply {
             countryCode?.let {
                 if (it == "PL" && zipCode?.length == 5) {

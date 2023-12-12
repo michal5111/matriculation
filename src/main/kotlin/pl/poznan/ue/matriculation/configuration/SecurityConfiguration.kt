@@ -53,7 +53,7 @@ class SecurityConfiguration(
         http: HttpSecurity,
         entryPoint: AuthenticationEntryPoint
     ): SecurityFilterChain {
-        http.invoke {
+        http {
             httpBasic { disable() }
             authorizeHttpRequests {
                 authorize("/login", authenticated)

@@ -14,9 +14,9 @@ class ImportDto(
     val programmeForeignName: String? = null,
     @NotNull
     val registration: String? = null,
-    @NotNull
+
     val indexPoolCode: String? = null,
-    @NotNull
+
     val indexPoolName: String? = null,
     @NotNull
     val startDate: Date? = null,

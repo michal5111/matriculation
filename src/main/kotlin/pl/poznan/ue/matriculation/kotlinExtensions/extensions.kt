@@ -10,6 +10,7 @@ import pl.poznan.ue.matriculation.local.domain.user.User
 import pl.poznan.ue.matriculation.local.dto.*
 import pl.poznan.ue.matriculation.local.service.AsyncService
 import java.sql.Blob
+import java.util.*
 import javax.sql.rowset.serial.SerialBlob
 import javax.sql.rowset.serial.SerialClob
 
@@ -195,6 +196,7 @@ fun Document.toDto(): DocumentDto {
 
 fun Applicant.toDto(): ApplicantDto {
     return ApplicantDto(
+        id = id,
         foreignId = foreignId,
         dataSourceId = dataSourceId,
         email = email,
@@ -234,4 +236,11 @@ fun Applicant.toDto(): ApplicantDto {
 
 fun IdentityDocument.toDto(): IdentityDocumentDto {
     return IdentityDocumentDto(id = id, country = country, expDate = expDate, number = number, type = type)
+}
+
+fun Collection<IdentityDocument>.active(): List<IdentityDocument> {
+    return filter {
+        val expDate = it.expDate
+        if (expDate != null) expDate >= Date() else true
+    }
 }

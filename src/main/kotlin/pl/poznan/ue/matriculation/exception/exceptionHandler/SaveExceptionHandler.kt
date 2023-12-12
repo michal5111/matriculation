@@ -7,9 +7,7 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
 import pl.poznan.ue.matriculation.kotlinExtensions.stackTraceToHtmlString
-import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
-import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
 import pl.poznan.ue.matriculation.local.repo.ApplicationRepository
 import pl.poznan.ue.matriculation.local.repo.ImportRepository
 import java.lang.reflect.UndeclaredThrowableException
@@ -17,7 +15,6 @@ import java.lang.reflect.UndeclaredThrowableException
 @Component
 class SaveExceptionHandler(
     private val importRepository: ImportRepository,
-    private val applicantRepository: ApplicantRepository,
     private val applicationRepository: ApplicationRepository
 ) : ISaveExceptionHandler {
 
@@ -26,8 +23,9 @@ class SaveExceptionHandler(
         propagation = Propagation.REQUIRES_NEW,
         transactionManager = "transactionManager"
     )
-    override fun handle(exception: Exception, application: Application, importId: Long) {
+    override fun handle(exception: Exception, applicationId: Long, importId: Long) {
         val import = importRepository.findByIdOrNull(importId) ?: error("Import not found")
+        val application = applicationRepository.findByIdOrNull(applicationId) ?: throw ApplicantNotFoundException()
         application.importError = ""
         var e: Throwable? = exception
         do {
@@ -46,8 +44,5 @@ class SaveExceptionHandler(
         application.importStatus = ApplicationImportStatus.ERROR
         application.stackTrace = exception.stackTraceToHtmlString()
         import.saveErrors++
-        val applicant = application.applicant ?: throw ApplicantNotFoundException()
-        applicantRepository.save(applicant)
-        applicationRepository.save(application)
     }
 }

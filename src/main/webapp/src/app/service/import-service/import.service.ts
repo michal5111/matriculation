@@ -96,10 +96,6 @@ export class ImportService implements CrudService<Import, number> {
     return this.http.get<void>(`${this.apiUrl}/import/${importId}/notifications`);
   }
 
-  checkForPotentialDuplicates(importId: number): Observable<void> {
-    return this.http.get<void>(`${this.apiUrl}/import/${importId}/checkForDuplicates`);
-  }
-
   getPotentialDuplicates(applicantId: number): Observable<Array<Person>> {
     return this.http.get<[Person]>(`${this.apiUrl}/applicant/${applicantId}/potentialDuplicates`);
   }
