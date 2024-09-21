@@ -80,14 +80,18 @@ class ProcessorConfiguration {
         citizenshipRepository: CitizenshipRepository,
         schoolRepository: SchoolRepository,
         organizationalUnitRepository: OrganizationalUnitRepository,
-        wkuRepository: WkuRepository
+        wkuRepository: WkuRepository,
+        documentTypeRepository: DocumentTypeRepository,
+        ownedDocumentRepository: OwnedDocumentRepository
     ): TargetSystemProcessor<Person> {
         return PersonProcessor(
             personRepository = personRepository,
             citizenshipRepository = citizenshipRepository,
             schoolRepository = schoolRepository,
             organizationalUnitRepository = organizationalUnitRepository,
-            wkuRepository = wkuRepository
+            wkuRepository = wkuRepository,
+            documentTypeRepository = documentTypeRepository,
+            ownedDocumentRepository = ownedDocumentRepository
         )
     }
 }

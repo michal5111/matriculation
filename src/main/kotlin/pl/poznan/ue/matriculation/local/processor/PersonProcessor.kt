@@ -7,17 +7,21 @@ import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.annotation.LogExecutionTime
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.dto.ProcessResult
+import pl.poznan.ue.matriculation.oracle.domain.OwnedDocument
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.domain.PersonChangeHistory
 import pl.poznan.ue.matriculation.oracle.repo.*
 import java.util.*
+
 
 open class PersonProcessor(
     private val personRepository: PersonRepository,
     private val citizenshipRepository: CitizenshipRepository,
     private val schoolRepository: SchoolRepository,
     private val organizationalUnitRepository: OrganizationalUnitRepository,
-    private val wkuRepository: WkuRepository
+    private val wkuRepository: WkuRepository,
+    private val documentTypeRepository: DocumentTypeRepository,
+    private val ownedDocumentRepository: OwnedDocumentRepository
 ) : TargetSystemProcessor<Person> {
 
     @Value("\${pl.poznan.ue.matriculation.defaultStudentOrganizationalUnit}")
@@ -92,8 +96,11 @@ open class PersonProcessor(
                     applicant.highSchoolUsosCode == null && it.isNotBlank()
                 },
             idNumber = applicant.primaryIdentityDocument?.number,
-            documentType = applicant.primaryIdentityDocument?.number?.let {
-                applicant.primaryIdentityDocument?.type
+            identityDocumentType = applicant.primaryIdentityDocument?.number?.let {
+                val type =
+                    if (applicant.primaryIdentityDocument?.type == "C") "DO"
+                    else applicant.primaryIdentityDocument?.type
+                type?.let { documentTypeRepository.getReferenceById(it) }
             },
             identityDocumentExpirationDate = applicant.primaryIdentityDocument?.expDate,
             identityDocumentIssuerCountry = applicant.primaryIdentityDocument?.country?.let {
@@ -128,7 +135,7 @@ open class PersonProcessor(
                 nip = person.nip,
                 nationality = person.nationality,
                 citizenship = person.citizenship,
-                documentType = person.documentType,
+                identityDocumentType = person.identityDocumentType,
                 identityDocumentIssuerCountry = person.identityDocumentIssuerCountry,
                 taxOffice = person.taxOffice,
                 sex = person.sex
@@ -220,10 +227,11 @@ open class PersonProcessor(
             }
         }
         val identityDocument = applicant.primaryIdentityDocument
+        val type = (if (identityDocument?.type == "C") "DO" else identityDocument?.type) ?: "DO"
         if (identityDocument?.number != null) {
-            if (person.documentType != identityDocument.type) {
+            if (person.identityDocumentType?.code != identityDocument.type) {
                 changed = true
-                person.documentType = identityDocument.type
+                person.identityDocumentType = documentTypeRepository.getReferenceById(type)
             }
             if (person.idNumber != identityDocument.number) {
                 changed = true
@@ -233,6 +241,33 @@ open class PersonProcessor(
             person.identityDocumentIssuerCountry = identityDocument.country?.let { documentCountry ->
                 citizenshipRepository.getReferenceById(documentCountry)
             }
+            val foundDocument =
+                person.ownedDocuments.find {
+                    it.number?.lowercase()?.trim() == identityDocument.number?.lowercase()?.trim()
+                        && it.documentType.code == type
+                }
+            if (foundDocument == null) {
+                val ownedDocument = OwnedDocument(
+                    person = person,
+                    number = identityDocument.number,
+                    issueDate = person.id?.let {
+                        ownedDocumentRepository.findMaxExpirationDateByDocumentTypeAndPersonId(
+                            type,
+                            person.id ?: -1
+                        )?.let {
+                            val c = Calendar.getInstance()
+                            c.time = it
+                            c.add(Calendar.DATE, 1)
+                            if (c.time > identityDocument.expDate) null else c.time
+                        }
+                    },
+                    documentType = documentTypeRepository.getReferenceById(type),
+                    expirationDate = identityDocument.expDate,
+                    issueCountry = person.identityDocumentIssuerCountry
+                )
+                logger.info("Dodaję dokument do osoby $ownedDocument")
+                person.ownedDocuments.add(ownedDocument)
+            }
         } else {
             person.identityDocumentExpirationDate?.let {
                 if (it < Date()) {
@@ -240,7 +275,7 @@ open class PersonProcessor(
                         identityDocumentIssuerCountry = null
                         identityDocumentExpirationDate = null
                         idNumber = null
-                        documentType = null
+                        identityDocumentType = null
                     }
                 }
             }

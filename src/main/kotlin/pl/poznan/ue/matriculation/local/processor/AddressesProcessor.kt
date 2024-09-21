@@ -74,9 +74,12 @@ open class AddressesProcessor(
             && existingAddress?.flatNumber == apartmentNumber
             && existingAddress?.houseNumber == houseNumber
             && existingAddress?.street == street
-            && ((countryCode == "PL" && existingAddress?.zipCode == zipCode)) || (countryCode != "PL" && existingAddress?.foreignZipCode == zipCode)
-        )
-            existingAddress?.apply { dateTo = Date() }
+            && (countryCode == "PL" && existingAddress?.zipCode == zipCode) || (countryCode != "PL" && existingAddress?.foreignZipCode == zipCode)
+        ) {
+            return
+        } else {
+            existingAddress?.dateTo = Date()
+        }
         person.addAddress(
             addressService.create(
                 person = person,

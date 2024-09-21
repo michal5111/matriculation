@@ -35,12 +35,15 @@ export class ImportService implements CrudService<Import, number> {
     return this.http.get<Page<Import>>(`${this.apiUrl}/import?page=${page}&size=${size}`, httpOptions);
   }
 
-  getAvailableRegistrations(dataSourceType: string): Observable<[Registration]> {
-    return this.http.get<[Registration]>(`${this.apiUrl}/dataSources/${dataSourceType}/registrations/codes`, httpOptions);
+  getAvailableRegistrations(dataSourceType: string, filter?: string): Observable<Registration[]> {
+    if (filter) {
+      return this.http.get<[Registration]>(`${this.apiUrl}/dataSources/${dataSourceType}/registrations?filter=${filter}`, httpOptions);
+    }
+    return this.http.get<[Registration]>(`${this.apiUrl}/dataSources/${dataSourceType}/registrations`, httpOptions);
   }
 
   getAvailableRegistrationProgrammes(registrationCode: string, dataSourceType: string): Observable<[Programme]> {
-    return this.http.get<[Programme]>(`${this.apiUrl}/dataSources/${dataSourceType}/registrations/codes/${encodeURIComponent(registrationCode)}`);
+    return this.http.get<[Programme]>(`${this.apiUrl}/dataSources/${dataSourceType}/registrations/${encodeURIComponent(registrationCode)}/programmes`);
   }
 
   create(importObject: Import): Observable<Import> {

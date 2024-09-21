@@ -22,6 +22,7 @@ class IrkApplicantMapper {
             maiden = applicantDto.name.maiden,
             given = applicantDto.name.given,
             citizenship = applicantDto.citizenship,
+            nationality = applicantDto.basicData.countryOfBirth,
             photo = applicantDto.photo,
             photoPermission = applicantDto.photoPermission,
             modificationDate = applicantDto.modificationDate,
@@ -63,9 +64,7 @@ class IrkApplicantMapper {
     }
 
     private fun addDocuments(applicant: Applicant, applicantDto: IrkApplicantDto) {
-        applicantDto.educationData.documents.filter { document ->
-            document.issueDate != null && !document.documentNumber.isNullOrBlank()
-        }.map { documentDTO ->
+        applicantDto.educationData.documents.map { documentDTO ->
             documentDTO.documentNumber
                 ?: throw IllegalArgumentException("Document number is null")
             documentDTO.issueDate ?: throw IllegalArgumentException("Document issue date is null")

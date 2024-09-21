@@ -5,18 +5,15 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import pl.poznan.ue.matriculation.applicantDataSources.*
+import pl.poznan.ue.matriculation.applicantDataSources.CemApplicationDataSourceImpl
+import pl.poznan.ue.matriculation.applicantDataSources.ExcelFileDataSourceImpl
+import pl.poznan.ue.matriculation.applicantDataSources.IApplicationDataSource
+import pl.poznan.ue.matriculation.applicantDataSources.IrkApplicationDataSourceImpl
 import pl.poznan.ue.matriculation.cem.domain.CemApplication
 import pl.poznan.ue.matriculation.cem.domain.CemStudent
 import pl.poznan.ue.matriculation.cem.service.CemApplicationService
 import pl.poznan.ue.matriculation.cem.service.CemStudentService
 import pl.poznan.ue.matriculation.cem.service.CourseService
-import pl.poznan.ue.matriculation.dreamApply.dto.applicant.DreamApplyApplicantDto
-import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
-import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicantMapper
-import pl.poznan.ue.matriculation.dreamApply.mapper.DreamApplyApplicationMapper
-import pl.poznan.ue.matriculation.dreamApply.mapper.IncomingApplicantMapper
-import pl.poznan.ue.matriculation.dreamApply.service.DreamApplyService
 import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicantDto
 import pl.poznan.ue.matriculation.excelfile.dto.ExcelFileApplicationDto
 import pl.poznan.ue.matriculation.excelfile.mapper.ExcelFileApplicantMapper
@@ -26,85 +23,86 @@ import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
 import pl.poznan.ue.matriculation.irk.mapper.IrkApplicantMapper
 import pl.poznan.ue.matriculation.irk.mapper.IrkApplicationMapper
 import pl.poznan.ue.matriculation.irk.service.IrkService
-import pl.poznan.ue.matriculation.oracle.repo.SchoolRepository
 import pl.poznan.ue.matriculation.oracle.service.CitizenshipService
 import pl.poznan.ue.matriculation.oracle.service.ProgrammeService
-import pl.poznan.ue.matriculation.properties.*
+import pl.poznan.ue.matriculation.properties.CemDatasourceProperties
+import pl.poznan.ue.matriculation.properties.IrkPrimaryProperties
+import pl.poznan.ue.matriculation.properties.IrkTestProperties
 
 @Configuration
 class ApplicationDataSourceConfiguration {
 
-    @Bean(name = ["IncomingService"])
-    @ConditionalOnProperty(
-        value = ["pl.poznan.ue.matriculation.incoming.enabled"],
-        havingValue = "true",
-        matchIfMissing = false
-    )
-    fun incomingService(
-        properties: IncomingProperties
-    ): DreamApplyService {
-        return DreamApplyService(
-            apiKey = properties.instanceKey,
-            instanceUrl = properties.instanceUrl
-        )
-    }
-
-    @Bean(name = ["IncomingApplicantDataSource"])
-    @ConditionalOnProperty(
-        value = ["pl.poznan.ue.matriculation.incoming.enabled"],
-        havingValue = "true",
-        matchIfMissing = false
-    )
-    fun incomingApplicantDataSource(
-        @Autowired @Qualifier("IncomingService") incomingService: DreamApplyService,
-        @Autowired schoolRepository: SchoolRepository,
-        properties: IncomingProperties
-    ): IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
-        return IncomingDataSourceImpl(
-            dreamApplyService = incomingService,
-            name = "Incoming",
-            id = "INCOMING",
-            applicantMapper = IncomingApplicantMapper(schoolRepository),
-            applicationMapper = DreamApplyApplicationMapper(),
-            status = properties.status
-        )
-    }
-
-    @Bean(name = ["DreamApplyService"])
-    @ConditionalOnProperty(
-        value = ["pl.poznan.ue.matriculation.dreamApply.enabled"],
-        havingValue = "true",
-        matchIfMissing = false
-    )
-    fun dreamApplyService(
-        properties: DreamApplyProperties
-    ): DreamApplyService {
-        return DreamApplyService(
-            apiKey = properties.instanceKey,
-            instanceUrl = properties.instanceUrl
-        )
-    }
-
-    @Bean(name = ["DreamApplyApplicantDataSource"])
-    @ConditionalOnProperty(
-        value = ["pl.poznan.ue.matriculation.dreamApply.enabled"],
-        havingValue = "true",
-        matchIfMissing = false
-    )
-    fun dreamApplyApplicantDataSource(
-        @Autowired @Qualifier("DreamApplyService") dreamApplyService: DreamApplyService,
-        @Autowired schoolRepository: SchoolRepository,
-        properties: DreamApplyProperties
-    ): IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
-        return DreamApplyDataSourceImpl(
-            dreamApplyService = dreamApplyService,
-            name = "Dream Apply",
-            id = "DREAM_APPLY",
-            applicantMapper = DreamApplyApplicantMapper(schoolRepository),
-            applicationMapper = DreamApplyApplicationMapper(),
-            status = properties.status
-        )
-    }
+//    @Bean(name = ["IncomingService"])
+//    @ConditionalOnProperty(
+//        value = ["pl.poznan.ue.matriculation.incoming.enabled"],
+//        havingValue = "true",
+//        matchIfMissing = false
+//    )
+//    fun incomingService(
+//        properties: IncomingProperties
+//    ): DreamApplyService {
+//        return DreamApplyService(
+//            apiKey = properties.instanceKey,
+//            instanceUrl = properties.instanceUrl
+//        )
+//    }
+//
+//    @Bean(name = ["IncomingApplicantDataSource"])
+//    @ConditionalOnProperty(
+//        value = ["pl.poznan.ue.matriculation.incoming.enabled"],
+//        havingValue = "true",
+//        matchIfMissing = false
+//    )
+//    fun incomingApplicantDataSource(
+//        @Autowired @Qualifier("IncomingService") incomingService: DreamApplyService,
+//        @Autowired schoolRepository: SchoolRepository,
+//        properties: IncomingProperties
+//    ): IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
+//        return IncomingDataSourceImpl(
+//            dreamApplyService = incomingService,
+//            name = "Incoming",
+//            id = "INCOMING",
+//            applicantMapper = IncomingApplicantMapper(schoolRepository),
+//            applicationMapper = DreamApplyApplicationMapper(),
+//            status = properties.status
+//        )
+//    }
+//
+//    @Bean(name = ["DreamApplyService"])
+//    @ConditionalOnProperty(
+//        value = ["pl.poznan.ue.matriculation.dreamApply.enabled"],
+//        havingValue = "true",
+//        matchIfMissing = false
+//    )
+//    fun dreamApplyService(
+//        properties: DreamApplyProperties
+//    ): DreamApplyService {
+//        return DreamApplyService(
+//            apiKey = properties.instanceKey,
+//            instanceUrl = properties.instanceUrl
+//        )
+//    }
+//
+//    @Bean(name = ["DreamApplyApplicantDataSource"])
+//    @ConditionalOnProperty(
+//        value = ["pl.poznan.ue.matriculation.dreamApply.enabled"],
+//        havingValue = "true",
+//        matchIfMissing = false
+//    )
+//    fun dreamApplyApplicantDataSource(
+//        @Autowired @Qualifier("DreamApplyService") dreamApplyService: DreamApplyService,
+//        @Autowired schoolRepository: SchoolRepository,
+//        properties: DreamApplyProperties
+//    ): IApplicationDataSource<DreamApplyApplicationDto, DreamApplyApplicantDto> {
+//        return DreamApplyDataSourceImpl(
+//            dreamApplyService = dreamApplyService,
+//            name = "Dream Apply",
+//            id = "DREAM_APPLY",
+//            applicantMapper = DreamApplyApplicantMapper(schoolRepository),
+//            applicationMapper = DreamApplyApplicationMapper(),
+//            status = properties.status
+//        )
+//    }
 
     @Bean(name = ["TestIrkService"])
     @ConditionalOnProperty(

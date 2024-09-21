@@ -54,3 +54,12 @@ spring:
 
 logging:
     config: "classpath:logback-spring.xml"
+
+pl.poznan.ue.matriculation:
+    clause.and.regulation2:
+        regulations:
+            -   code: SLU_STUD
+                programmePattern: ^S[1..2]-.*$
+            -   code: SLU_STUD_NS
+                programmePattern: ^N[1..2]-.*$
+

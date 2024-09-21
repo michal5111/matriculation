@@ -16,12 +16,12 @@ class ProgrammeStage(
     val programmeStageId: ProgrammeStageId,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("PRG_KOD")
+    @MapsId("programmeId")
     @JoinColumn(name = "PRG_KOD")
     val programme: Programme,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("ETP_KOD")
+    @MapsId("stageId")
     @JoinColumn(name = "ETP_KOD")
     val stage: Stage,
 

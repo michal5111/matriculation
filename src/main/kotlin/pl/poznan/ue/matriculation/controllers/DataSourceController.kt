@@ -16,7 +16,7 @@ class DataSourceController(
     @GetMapping
     fun getDataSources(): List<DataSourceDto> = applicationDataSourceFactory.getDataSources()
 
-    @GetMapping("/{dataSourceType}/registrations/codes")
+    @GetMapping("/{dataSourceType}/registrations")
     fun getRegistrationCodes(
         @PathVariable("dataSourceType") dataSourceType: String,
         @RequestParam(required = false) filter: String?
@@ -24,7 +24,7 @@ class DataSourceController(
         .getDataSource(dataSourceType)
         .getAvailableRegistrations(filter)
 
-    @GetMapping("/{dataSourceType}/registrations/codes/{id}")
+    @GetMapping("/{dataSourceType}/registrations/{id}/programmes")
     fun getProgrammesCodes(
         @PathVariable("id") id: String,
         @PathVariable("dataSourceType") dataSourceType: String

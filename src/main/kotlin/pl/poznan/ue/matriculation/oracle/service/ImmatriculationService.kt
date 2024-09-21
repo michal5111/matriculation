@@ -13,7 +13,7 @@ import pl.poznan.ue.matriculation.local.domain.import.Import
 import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
 import pl.poznan.ue.matriculation.oracle.domain.*
 import pl.poznan.ue.matriculation.oracle.repo.*
-import pl.poznan.ue.matriculation.properties.ClauseAndRegulationProperties
+import pl.poznan.ue.matriculation.properties.ClauseAndRegulationPropertiesList
 import java.util.*
 
 @Service
@@ -28,12 +28,10 @@ class ImmatriculationService(
     private val sourceOfFinancingRepository: SourceOfFinancingRepository,
     private val basisOfAdmissionRepository: BasisOfAdmissionRepository,
     private val clauseAndRegulationRepository: ClauseAndRegulationRepository,
-    private val clauseAndRegulationProperties: ClauseAndRegulationProperties
+    private val clauseAndRegulationProperties: ClauseAndRegulationPropertiesList
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(ImmatriculationService::class.java)
-
-    private val clauseAndRegulationProgrammePattern = clauseAndRegulationProperties.programmePattern.toRegex()
 
     @LogExecutionTime
     @Transactional(
@@ -65,12 +63,15 @@ class ImmatriculationService(
                 applicationDtoDataSource.instanceUrl + '/'
             }
         )
-        if (clauseAndRegulationProgrammePattern.matches(import.programmeCode)) {
-            addClauseAndRegulationConfirmation(
-                person = person,
-                personProgramme = personProgramme,
-                startDate = import.startDate
-            )
+        clauseAndRegulationProperties.regulations.forEach {
+            if (it.programmePattern.toRegex().matches(import.programmeCode)) {
+                addClauseAndRegulationConfirmation(
+                    person = person,
+                    personProgramme = personProgramme,
+                    startDate = import.startDate,
+                    it.code
+                )
+            }
         }
         logger.trace("Tworzę lub wybieram studenta")
         irkApplication.personProgramme = personProgramme
@@ -116,10 +117,11 @@ class ImmatriculationService(
     private fun addClauseAndRegulationConfirmation(
         person: Person,
         personProgramme: PersonProgramme,
-        startDate: Date
+        startDate: Date,
+        regulationCode: String
     ) {
-        val clauseAndRegulation = clauseAndRegulationRepository.findLatestByCode(clauseAndRegulationProperties.code)
-            ?: error("Unable to find clause and regulation with id: ${clauseAndRegulationProperties.code}")
+        val clauseAndRegulation = clauseAndRegulationRepository.findLatestByCode(regulationCode)
+            ?: error("Unable to find clause and regulation with id: $regulationCode")
         val calendar = Calendar.getInstance()
         calendar.time = startDate
         calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))

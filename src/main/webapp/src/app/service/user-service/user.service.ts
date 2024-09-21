@@ -6,7 +6,7 @@ import {APP_BASE_HREF} from '@angular/common';
 import {User} from '../../model/user/user';
 import {Observable} from 'rxjs';
 import {Page} from '../../model/dto/page/page';
-import {ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot, UrlTree} from '@angular/router';
+import {ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree} from '@angular/router';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -17,7 +17,7 @@ const httpOptions = {
 @Injectable({
   providedIn: 'root'
 })
-export class UserService implements CanActivate {
+export class UserService {
 
   userUrl = `${this.baseHref}api/users`;
   user: UserDetails | null = null;

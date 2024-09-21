@@ -63,6 +63,7 @@ interface PersonRepository : JpaRepository<Person, Long> {
         or p.pesel = :pesel
         or UPPER(FUNCTION('REGEXP_REPLACE',p.idNumber,'[^a-zA-Z0-9]+','')) in (:idNumbers)
         or p.id = (select distinct h.person.id from PersonChangeHistory h where UPPER(FUNCTION('REGEXP_REPLACE',h.idNumber,'[^a-zA-Z0-9]+','')) in (:idNumbers))
+        or p.id = (select distinct od.person.id from OwnedDocument od where UPPER(FUNCTION('REGEXP_REPLACE',od.number,'[^a-zA-Z0-9]+','')) in (:idNumbers))
     """
     )
     fun findOneByPeselOrIdNumberOrPersonId(

@@ -11,5 +11,5 @@ data class IdentityDocumentDto(
     val country: String? = null,
     val expDate: Date? = null,
     val number: String? = null,
-    val type: Char? = null
+    val type: String? = null
 ) : Serializable

@@ -34,7 +34,7 @@ class IrkService(
 
     init {
         httpHeaders.contentType = MediaType.APPLICATION_JSON
-        httpHeaders.set("Authorization", "Token $apiKey")
+        httpHeaders["Authorization"] = "Token $apiKey"
         httpEntity = HttpEntity(httpHeaders)
     }
 
@@ -88,9 +88,13 @@ class IrkService(
         return response.body
     }
 
-    fun getAvailableRegistrationsPage(pageNumber: Int): Page<RegistrationDTO>? {
+    fun getAvailableRegistrationsPage(pageNumber: Int, code: String? = null): Page<RegistrationDTO>? {
+        val url = UriComponentsBuilder.fromHttpUrl("${apiUrl}registrations/")
+            .queryParam("page", pageNumber)
+            //.queryParam("code", "^$code.*")
+            .build().toUriString()
         return restTemplate.exchange(
-            "${apiUrl}registrations/?page=$pageNumber",
+            url,
             HttpMethod.GET,
             httpEntity,
             object : ParameterizedTypeReference<Page<RegistrationDTO>>() {}
@@ -156,20 +160,6 @@ class IrkService(
         )
         return response.body!!
     }
-
-//    fun getProgramme(id: Long): Application? {
-//        val httpHeaders: HttpHeaders = HttpHeaders()
-//        httpHeaders.contentType = MediaType.APPLICATION_JSON
-//        httpHeaders.set("Authorization","Token $apiKey")
-//        val httpEntity: HttpEntity<Any> = HttpEntity(httpHeaders)
-//        val response: ResponseEntity<Programme> = restTemplate.exchange(
-//                "${apiUrl}applications/$id",
-//                HttpMethod.GET,
-//                httpEntity,
-//                Application::javaClass
-//        )
-//        return response.body
-//    }
 
     fun getProgrammesGroups(id: String): ProgrammeGroupsDTO? {
         val response: ResponseEntity<ProgrammeGroupsDTO> = restTemplate.exchange(

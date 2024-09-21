@@ -50,4 +50,10 @@ class OwnedDocument(
     override fun hashCode(): Int {
         return id?.hashCode() ?: 0
     }
+
+    override fun toString(): String {
+        return "OwnedDocument(id=$id, personId=${person.id}, documentTypeCode=${documentType.code}, issueDate=$issueDate, expirationDate=$expirationDate, number=$number, issueCountry=${issueCountry?.code})"
+    }
+
+
 }

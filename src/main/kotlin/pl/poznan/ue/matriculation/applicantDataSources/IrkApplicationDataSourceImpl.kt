@@ -97,7 +97,7 @@ open class IrkApplicationDataSourceImpl(
         var currentPage = 1
         var hasNext: Boolean
         do {
-            val page = irkService.getAvailableRegistrationsPage(currentPage)
+            val page = irkService.getAvailableRegistrationsPage(currentPage, filter)
             page?.results?.forEach {
                 val registration = RegistrationDto(it.code, it.name.pl)
                 availableRegistrations.add(registration)

@@ -170,8 +170,9 @@ class Person(
     @JoinColumn(name = "SZK_ID", referencedColumnName = "ID", nullable = true)
     var middleSchool: School? = null,
 
-    @Column(name = "TYP_DOKUMENTU", length = 1, nullable = true)
-    var documentType: Char? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TDOK_KOD", referencedColumnName = "KOD", nullable = true)
+    var identityDocumentType: DocumentType? = null,
 
     @Column(name = "NR_KARTY_BIBL", length = 30, nullable = true)
     val libraryCardNumber: String? = null,

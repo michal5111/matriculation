@@ -18,7 +18,7 @@ class IdentityDocument(
 
     var number: String?,
 
-    var type: Char?,
+    var type: String?,
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "primaryIdentityDocument")
     var primaryIdApplicant: Applicant? = null

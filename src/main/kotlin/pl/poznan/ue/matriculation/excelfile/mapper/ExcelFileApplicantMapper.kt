@@ -50,7 +50,7 @@ class ExcelFileApplicantMapper {
                 identityDocuments.add(
                     IdentityDocument(
                         applicant = this,
-                        type = 'P',
+                        type = "P",
                         number = it.replace("[^a-zA-Z0-9]+", ""),
                         country = "PL",
                         expDate = Date()
@@ -101,7 +101,7 @@ class ExcelFileApplicantMapper {
             excelFileApplicant.passport?.let {
                 identityDocuments.add(
                     IdentityDocument(
-                        type = 'P',
+                        type = "P",
                         number = it.replace("[^a-zA-Z0-9]+", ""),
                         country = "PL",
                         expDate = Date()
