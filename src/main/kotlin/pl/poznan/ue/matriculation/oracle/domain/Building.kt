@@ -1,9 +1,9 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import jakarta.persistence.*
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import org.hibernate.annotations.Immutable
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Immutable

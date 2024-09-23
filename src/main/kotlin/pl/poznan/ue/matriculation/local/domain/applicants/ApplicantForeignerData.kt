@@ -1,9 +1,9 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
+import jakarta.persistence.*
 import pl.poznan.ue.matriculation.local.domain.BaseEntityApplicantId
 import java.io.Serializable
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Table(name = "ApplicantForeignerData")

@@ -1,13 +1,14 @@
 package pl.poznan.ue.matriculation.local.domain.import
 
+import jakarta.persistence.*
 import org.hibernate.annotations.CacheConcurrencyStrategy
-import org.hibernate.annotations.Type
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.entityListeners.MessageAfterUpdateListener
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @EntityListeners(MessageAfterUpdateListener::class)
@@ -62,7 +63,7 @@ class Import(
 
     val dataSourceName: String,
 
-    @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
     val additionalProperties: Map<String, Any>?,
 

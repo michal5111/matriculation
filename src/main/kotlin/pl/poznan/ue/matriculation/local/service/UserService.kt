@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.local.service
 
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.EntityGraph
@@ -12,7 +13,6 @@ import pl.poznan.ue.matriculation.exception.UserNotFoundException
 import pl.poznan.ue.matriculation.ldap.repo.LdapUserRepository
 import pl.poznan.ue.matriculation.local.domain.user.User
 import pl.poznan.ue.matriculation.local.repo.UserRepository
-import javax.persistence.EntityNotFoundException
 
 @Service
 @Transactional(rollbackFor = [Exception::class])

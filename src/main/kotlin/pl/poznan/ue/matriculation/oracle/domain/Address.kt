@@ -1,10 +1,10 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import jakarta.persistence.*
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Parameter
 import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_ADRESY")

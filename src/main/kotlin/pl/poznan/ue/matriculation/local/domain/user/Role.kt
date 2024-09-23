@@ -1,9 +1,9 @@
 package pl.poznan.ue.matriculation.local.domain.user
 
-import javax.persistence.Entity
-import javax.persistence.FetchType
-import javax.persistence.Id
-import javax.persistence.ManyToMany
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.ManyToMany
 
 @Entity
 class Role(

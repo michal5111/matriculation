@@ -1,8 +1,8 @@
 package pl.poznan.ue.matriculation.cem.domain
 
+import jakarta.persistence.*
 import org.hibernate.annotations.Immutable
 import pl.poznan.ue.matriculation.cem.enum.CourseEditionStatus
-import javax.persistence.*
 
 @Entity
 @Immutable

@@ -1,8 +1,8 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import jakarta.persistence.*
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Cacheable

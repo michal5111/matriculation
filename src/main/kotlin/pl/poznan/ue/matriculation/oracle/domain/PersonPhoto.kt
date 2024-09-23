@@ -1,8 +1,8 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import jakarta.persistence.*
 import java.io.Serializable
 import java.sql.Blob
-import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_ZDJECIA_OSOB")

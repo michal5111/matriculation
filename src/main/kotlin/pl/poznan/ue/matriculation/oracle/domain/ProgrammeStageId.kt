@@ -1,8 +1,8 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
 import java.io.Serializable
-import javax.persistence.Column
-import javax.persistence.Embeddable
 
 @Embeddable
 open class ProgrammeStageId(

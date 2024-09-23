@@ -1,6 +1,6 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "DZ_ZGLOSZENIA_REKRUTACYJNE")

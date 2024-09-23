@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.local.job
 
+import jakarta.persistence.OptimisticLockException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.dao.OptimisticLockingFailureException
@@ -18,7 +19,6 @@ import pl.poznan.ue.matriculation.local.job.startConditions.SavePersonsStartCond
 import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
 import pl.poznan.ue.matriculation.local.service.ApplicationProcessor
 import pl.poznan.ue.matriculation.local.service.ApplicationService
-import javax.persistence.OptimisticLockException
 
 @Component
 class SavePersonsJob(

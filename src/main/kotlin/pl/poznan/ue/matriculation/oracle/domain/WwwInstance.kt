@@ -1,8 +1,8 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import jakarta.persistence.*
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import org.hibernate.annotations.Immutable
-import javax.persistence.*
 
 @Entity
 @Immutable
@@ -23,8 +23,6 @@ class WwwInstance(
     @Column(name = "DATABASENAME", length = 50, nullable = true)
     val dataBaseName: String?,
 
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DZ_INST_WWW_ID_SEQ")
-    @SequenceGenerator(sequenceName = "DZ_INST_WWW_ID_SEQ", allocationSize = 1, name = "DZ_INST_WWW_ID_SEQ")
     @Column(name = "INST_WWW_ID", nullable = false)
     val wwwInstanceId: Int,
 

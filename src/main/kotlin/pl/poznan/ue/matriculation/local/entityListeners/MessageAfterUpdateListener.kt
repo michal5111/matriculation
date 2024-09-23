@@ -2,13 +2,13 @@
 
 package pl.poznan.ue.matriculation.local.entityListeners
 
+import jakarta.persistence.PostPersist
+import jakarta.persistence.PostRemove
+import jakarta.persistence.PostUpdate
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Component
 import pl.poznan.ue.matriculation.kotlinExtensions.toDto
 import pl.poznan.ue.matriculation.local.domain.import.Import
-import javax.persistence.PostPersist
-import javax.persistence.PostRemove
-import javax.persistence.PostUpdate
 
 @Component
 class MessageAfterUpdateListener(

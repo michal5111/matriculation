@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.local.domain.user
 
+import jakarta.persistence.*
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
-import javax.persistence.*
 
 @Entity
 @NamedEntityGraph(

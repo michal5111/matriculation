@@ -1,6 +1,6 @@
 package pl.poznan.ue.matriculation.security
 
-import org.jasig.cas.client.validation.Assertion
+import org.apereo.cas.client.validation.Assertion
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 

@@ -23,9 +23,6 @@ server:
     error:
         include-message: always
 spring:
-    cache:
-        jcache:
-            config: classpath:ehcache.xml
     jpa:
         open-in-view: false
         generate-ddl: false
@@ -33,14 +30,6 @@ spring:
         #            bootstrap-mode: lazy
         properties:
             hibernate:
-                cache:
-                    region:
-                        factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
-                    use_query_cache: true
-                    use_second_level_cache: true
-                javax:
-                    cache:
-                        missing_cache_strategy: create
                 jdbc:
                     time_zone: CET
                     batch_size: 100
@@ -51,9 +40,6 @@ spring:
                     in_clause_parameter_padding: true
     profiles:
         active: '@spring.profiles.active@'
-
-logging:
-    config: "classpath:logback-spring.xml"
 
 pl.poznan.ue.matriculation:
     clause.and.regulation2:

@@ -1,9 +1,9 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
+import jakarta.persistence.*
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.enum.AddressType
 import java.io.Serializable
-import javax.persistence.*
 
 @Entity
 class Address(

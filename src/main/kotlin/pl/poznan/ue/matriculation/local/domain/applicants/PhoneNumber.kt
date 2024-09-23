@@ -1,10 +1,10 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
-import javax.persistence.Entity
-import javax.persistence.FetchType
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
 
 @Entity
 class PhoneNumber(

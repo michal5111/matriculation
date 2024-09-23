@@ -1,12 +1,12 @@
 package pl.poznan.ue.matriculation.local.domain.applicants
 
+import jakarta.persistence.*
+import jakarta.validation.constraints.Email
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
 import java.util.*
 import java.util.concurrent.Future
-import javax.persistence.*
-import javax.validation.constraints.Email
 
 @NamedEntityGraphs(
     NamedEntityGraph(

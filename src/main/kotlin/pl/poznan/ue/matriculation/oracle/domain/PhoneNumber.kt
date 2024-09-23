@@ -1,8 +1,8 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import jakarta.persistence.*
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Parameter
-import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_TELEFONY")

@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.local.repo
 
+import jakarta.persistence.QueryHint
 import org.hibernate.annotations.QueryHints.READ_ONLY
 import org.hibernate.jpa.QueryHints.HINT_CACHEABLE
 import org.hibernate.jpa.QueryHints.HINT_FETCH_SIZE
@@ -13,7 +14,6 @@ import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ApplicationImportStatus
 import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
 import java.util.stream.Stream
-import javax.persistence.QueryHint
 
 @Repository
 interface ApplicationRepository : JpaRepository<Application, Long>, JpaSpecificationExecutor<Application> {

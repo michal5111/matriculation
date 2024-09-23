@@ -1,5 +1,6 @@
 package pl.poznan.ue.matriculation.oracle.repo
 
+import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
@@ -9,7 +10,6 @@ import org.springframework.stereotype.Repository
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.entityRepresentations.PersonBasicData
 import java.util.*
-import javax.persistence.LockModeType
 
 @Repository
 interface PersonRepository : JpaRepository<Person, Long> {

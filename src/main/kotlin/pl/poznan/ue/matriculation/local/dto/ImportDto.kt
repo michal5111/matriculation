@@ -1,8 +1,8 @@
 package pl.poznan.ue.matriculation.local.dto
 
+import jakarta.validation.constraints.NotNull
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import java.util.*
-import javax.validation.constraints.NotNull
 
 class ImportDto(
     val id: Long? = null,

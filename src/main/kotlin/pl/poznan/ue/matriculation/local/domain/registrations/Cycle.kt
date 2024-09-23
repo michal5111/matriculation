@@ -1,9 +1,9 @@
 package pl.poznan.ue.matriculation.local.domain.registrations
 
 
+import jakarta.persistence.Id
 import pl.poznan.ue.matriculation.local.domain.Name
 import java.util.*
-import javax.persistence.Id
 
 open class Cycle(
 

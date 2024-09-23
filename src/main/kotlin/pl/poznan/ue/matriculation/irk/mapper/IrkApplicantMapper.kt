@@ -65,15 +65,12 @@ class IrkApplicantMapper {
 
     private fun addDocuments(applicant: Applicant, applicantDto: IrkApplicantDto) {
         applicantDto.educationData.documents.map { documentDTO ->
-            documentDTO.documentNumber
-                ?: throw IllegalArgumentException("Document number is null")
-            documentDTO.issueDate ?: throw IllegalArgumentException("Document issue date is null")
             Document(
                 certificateType = documentDTO.certificateType,
                 certificateTypeCode = documentDTO.certificateTypeCode,
                 certificateUsosCode = documentDTO.certificateUsosCode,
                 comment = documentDTO.comment,
-                documentNumber = documentDTO.documentNumber.replace("[^a-zA-Z0-9]+", ""),
+                documentNumber = documentDTO.documentNumber?.replace("[^a-zA-Z0-9]+", ""),
                 documentYear = documentDTO.documentYear,
                 issueCity = documentDTO.issueCity?.trim(),
                 issueCountry = documentDTO.issueCountry,

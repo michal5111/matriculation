@@ -1,9 +1,9 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import jakarta.persistence.*
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
 import java.util.*
-import javax.persistence.*
 
 @Entity
 //@Immutable

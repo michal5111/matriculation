@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import jakarta.persistence.*
 import java.io.Serializable
-import javax.persistence.*
 
 @Entity
 @IdClass(PersonPreferenceId::class)

@@ -15,7 +15,7 @@ class SequenceStringKeyGenerator : IdentifierGenerator {
     private lateinit var sequenceId: String
 
     override fun generate(session: SharedSessionContractImplementor, collection: Any): Serializable {
-        val connection = session.connection()
+        val connection = session.jdbcConnectionAccess.obtainConnection()
         var ps: PreparedStatement? = null
         var result = ""
         try {

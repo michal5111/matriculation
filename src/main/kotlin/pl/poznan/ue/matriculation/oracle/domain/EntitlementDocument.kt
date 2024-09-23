@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
+import jakarta.persistence.*
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Table(name = "DZ_DOKUMENTY_UPR")
@@ -19,12 +19,12 @@ class EntitlementDocument(
     @Column(name = "RODZAJ", length = 1, nullable = false)
     var type: Char,
 
-    @Column(name = "NUMER", length = 200, nullable = false)
-    var number: String,
+    @Column(name = "NUMER", length = 200)
+    var number: String?,
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "DATA_WYSTAWIENIA", nullable = false)
-    var issueDate: Date,
+    @Column(name = "DATA_WYSTAWIENIA")
+    var issueDate: Date?,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SZK_ID", referencedColumnName = "ID", nullable = true)

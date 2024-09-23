@@ -1,18 +1,20 @@
 package pl.poznan.ue.matriculation.controllers
 
+import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
 import pl.poznan.ue.matriculation.kotlinExtensions.toDto
 import pl.poznan.ue.matriculation.kotlinExtensions.toPageDto
-import pl.poznan.ue.matriculation.local.dto.*
+import pl.poznan.ue.matriculation.local.dto.ApplicationDto
+import pl.poznan.ue.matriculation.local.dto.ImportDto
+import pl.poznan.ue.matriculation.local.dto.PageDto
 import pl.poznan.ue.matriculation.local.job.JobType
 import pl.poznan.ue.matriculation.local.service.ApplicantService
 import pl.poznan.ue.matriculation.local.service.ApplicationService
 import pl.poznan.ue.matriculation.local.service.ImportService
 import pl.poznan.ue.matriculation.local.service.JobService
-import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/import")

@@ -1,9 +1,9 @@
 package pl.poznan.ue.matriculation.cem.domain
 
+import jakarta.persistence.*
 import org.hibernate.annotations.Immutable
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Immutable

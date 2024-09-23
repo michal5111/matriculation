@@ -10,7 +10,7 @@ import java.util.*
 @Repository
 interface DidacticCycleRepository : JpaRepository<DidacticCycle, String>, DidacticCycleRepositoryCustom {
 
-    @Query("select d from DidacticCycle d where (d.dateFrom = :dateFrom or d.endDate = :dateTo) and d.didacticCycleType = 'ROK'")
+    @Query("select d from DidacticCycle d where (d.dateFrom = :dateFrom or d.endDate = :dateTo) and d.didacticCycleType.code = 'ROK'")
     fun findDidacticCycleYearBySemesterDates(
         @Param("dateFrom") dateFrom: Date,
         @Param("dateTo") dateTo: Date

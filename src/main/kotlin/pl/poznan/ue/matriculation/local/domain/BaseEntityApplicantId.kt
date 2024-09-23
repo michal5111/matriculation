@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.local.domain
 
+import jakarta.persistence.*
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
-import javax.persistence.*
 
 @MappedSuperclass
 open class BaseEntityApplicantId(

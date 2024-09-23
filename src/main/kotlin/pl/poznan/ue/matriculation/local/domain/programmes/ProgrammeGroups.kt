@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.local.domain.programmes
 
+import jakarta.persistence.Id
 import pl.poznan.ue.matriculation.local.domain.Name
-import javax.persistence.Id
 
 open class ProgrammeGroups(
 

@@ -1,5 +1,7 @@
 package pl.poznan.ue.matriculation.configuration
 
+import jakarta.annotation.Resource
+import jakarta.persistence.EntityManagerFactory
 import org.hibernate.cfg.AvailableSettings
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -15,8 +17,6 @@ import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import pl.poznan.ue.matriculation.properties.CemDatasourceProperties
-import javax.annotation.Resource
-import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
 

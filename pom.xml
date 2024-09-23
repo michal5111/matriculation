@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.15</version>
+        <version>3.3.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>pl.poznan.ue</groupId>
@@ -16,8 +16,8 @@
     <packaging>war</packaging>
 
     <properties>
-        <java.version>1.8</java.version>
-        <kotlin.version>1.7.10</kotlin.version>
+        <java.version>17</java.version>
+        <kotlin.version>1.9.25</kotlin.version>
         <nodeVersion>v18.19.0</nodeVersion>
         <npmVersion>8.19.4</npmVersion>
     </properties>
@@ -45,7 +45,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <artifactId>spring-boot-starter-validation</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop -->
@@ -55,14 +55,9 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>1.9.3</version>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
-            <version>2.13.4</version>
+            <version>2.17.2</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -77,14 +72,8 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <version>5.7.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-cas</artifactId>
-            <version>5.7.3</version>
+            <version>6.3.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -95,7 +84,7 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>3.0.6</version>
+            <version>3.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -119,24 +108,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.30</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.11.1</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.jadira.usertype/usertype.core -->
-        <dependency>
-            <groupId>org.jadira.usertype</groupId>
-            <artifactId>usertype.core</artifactId>
-            <version>6.0.1.GA</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-hibernate5</artifactId>
-            <version>2.13.4</version>
+            <version>8.0.33</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
@@ -166,36 +138,9 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-jcache</artifactId>
-            <version>5.6.7.Final</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-            <version>3.10.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.cache</groupId>
-            <artifactId>cache-api</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>5.2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>2.0.1.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>8.0.0.Final</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -216,8 +161,12 @@
         </dependency>
         <dependency>
             <groupId>com.vladmihalcea</groupId>
-            <artifactId>hibernate-types-55</artifactId>
+            <artifactId>hibernate-types-60</artifactId>
             <version>2.19.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-community-dialects</artifactId>
         </dependency>
     </dependencies>
 
@@ -262,7 +211,7 @@
                         <option>spring:annotation=javax.persistence.Entity</option>
                         <option>spring:annotation=javax.persistence.MappedSuperclass</option>
                     </pluginOptions>
-                    <jvmTarget>1.8</jvmTarget>
+                    <jvmTarget>17</jvmTarget>
                 </configuration>
                 <dependencies>
                     <dependency>

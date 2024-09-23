@@ -1,10 +1,9 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
-import org.hibernate.annotations.Type
-import org.joda.time.DateTime
-import javax.persistence.Column
-import javax.persistence.MappedSuperclass
-import javax.persistence.Version
+import jakarta.persistence.Column
+import jakarta.persistence.MappedSuperclass
+import jakarta.persistence.Version
+import java.time.LocalDateTime
 
 @MappedSuperclass
 open class BaseEntity {
@@ -18,7 +17,6 @@ open class BaseEntity {
 //    val modificationOracleUser: String? = null
 
     @Version
-    @Type(type = "pl.poznan.ue.matriculation.oracle.customHibernateTypes.OracleDateType")
     @Column(name = "MOD_DATA", nullable = false, columnDefinition = "DATE DEFAULT sysdate NOT NULL ENABLE")
-    open var modificationDate: DateTime = DateTime().secondOfDay().roundHalfEvenCopy()
+    open var modificationDate: LocalDateTime = LocalDateTime.now()
 }
