@@ -8,7 +8,7 @@ describe('SelectPersonDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [SelectPersonDialogComponent]
+      imports: [SelectPersonDialogComponent]
     })
       .compileComponents();
   });

@@ -8,9 +8,9 @@ describe('ImportStatusIndicatorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ImportStatusIndicatorComponent ]
+      imports: [ImportStatusIndicatorComponent]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

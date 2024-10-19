@@ -5,6 +5,7 @@ import {
   FormControl,
   FormGroup,
   FormGroupDirective,
+  ReactiveFormsModule,
   UntypedFormControl,
   UntypedFormGroup,
   Validators
@@ -14,16 +15,27 @@ import {map, switchMap, tap} from 'rxjs/operators';
 import {IndexType} from '../../../model/oracle/index-type';
 import {Registration} from '../../../model/applications/registration';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatSelectChange} from '@angular/material/select';
+import {MatSelect, MatSelectChange} from '@angular/material/select';
 import {DataSource, DataSourceAdditionalParameter} from '../../../model/import/dataSource';
 import {Programme} from '../../../model/applications/programme';
 import {UsosService} from '../../../service/usos-service/usos.service';
-import {APP_BASE_HREF} from '@angular/common';
+import {APP_BASE_HREF, AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
+import {MatFormField, MatLabel, MatPrefix, MatSuffix} from '@angular/material/form-field';
+import {MatOption} from '@angular/material/core';
+import {MatInput} from '@angular/material/input';
+import {ReactiveFileInputComponent} from '../../reactive-file-input/reactive-file-input.component';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';
+import {MatButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
+import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-import-setup',
   templateUrl: './import-setup.component.html',
-  styleUrls: ['./import-setup.component.sass']
+  styleUrls: ['./import-setup.component.sass'],
+  standalone: true,
+  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatSelect, NgFor, MatOption, NgSwitch, NgSwitchCase, MatInput, ReactiveFileInputComponent, MatPrefix, NgIf, MatProgressSpinner, MatAutocompleteTrigger, MatButton, MatSuffix, MatIcon, MatAutocomplete, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, AsyncPipe]
 })
 export class ImportSetupComponent implements OnInit, OnDestroy {
 

@@ -8,7 +8,7 @@ describe('ImportViewComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ImportViewComponent]
+      imports: [ImportViewComponent]
     })
       .compileComponents();
   }));

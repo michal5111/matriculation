@@ -1,9 +1,12 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {MatProgressBar} from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-progress-viewer',
   templateUrl: './progress-viewer.component.html',
-  styleUrls: ['./progress-viewer.component.sass']
+  styleUrls: ['./progress-viewer.component.sass'],
+  standalone: true,
+  imports: [MatProgressBar]
 })
 export class ProgressViewerComponent implements OnInit {
 

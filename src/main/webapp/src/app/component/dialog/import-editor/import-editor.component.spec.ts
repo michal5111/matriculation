@@ -8,7 +8,7 @@ describe('ImportEditorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ImportEditorComponent]
+      imports: [ImportEditorComponent]
     })
       .compileComponents();
 

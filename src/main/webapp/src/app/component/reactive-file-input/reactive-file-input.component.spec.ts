@@ -8,7 +8,7 @@ describe('ReactiveFileInputComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ReactiveFileInputComponent]
+      imports: [ReactiveFileInputComponent]
     })
       .compileComponents();
 

@@ -1,13 +1,26 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle
+} from '@angular/material/dialog';
 import {UpdateIndexNumberDialogData} from '../../../model/dialog/update-index-number-dialog-data';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {UsosService} from '../../../service/usos-service/usos.service';
+import {CdkScrollable} from '@angular/cdk/scrolling';
+import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {NgIf} from '@angular/common';
+import {MatButton} from '@angular/material/button';
 
 @Component({
   selector: 'app-update-index-number-dialog',
   templateUrl: './update-index-number-dialog.component.html',
-  styleUrls: ['./update-index-number-dialog.component.sass']
+  styleUrls: ['./update-index-number-dialog.component.sass'],
+  standalone: true,
+  imports: [MatDialogTitle, ReactiveFormsModule, CdkScrollable, MatDialogContent, MatFormField, MatLabel, MatInput, NgIf, MatError, MatDialogActions, MatButton]
 })
 export class UpdateIndexNumberDialogComponent implements OnInit {
 

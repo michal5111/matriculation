@@ -1,11 +1,23 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {UserService} from '../../service/user-service/user.service';
 import {User} from '../../model/user/user';
-import {MatTableDataSource} from '@angular/material/table';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+  MatTableDataSource
+} from '@angular/material/table';
 import {map, tap} from 'rxjs/operators';
 import {Page} from '../../model/dto/page/page';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatSort, Sort} from '@angular/material/sort';
+import {MatSort, MatSortHeader, Sort} from '@angular/material/sort';
 import {MatDialog} from '@angular/material/dialog';
 import {AddUserDialogComponent} from '../dialog/add-user-dialog/add-user-dialog.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -13,11 +25,15 @@ import {ConfirmationDialogData} from '../../model/dialog/confirmation-dialog-dat
 import {ConfirmationDialogComponent} from '../dialog/confirmation-dialog/confirmation-dialog.component';
 import {UserEditorComponent} from '../dialog/user-editor/user-editor.component';
 import {UserEditorData} from '../../model/user/UserEditorData';
+import {MatButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-user-manager',
   templateUrl: './user-manager.component.html',
-  styleUrls: ['./user-manager.component.sass']
+  styleUrls: ['./user-manager.component.sass'],
+  standalone: true,
+  imports: [MatButton, MatIcon, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator]
 })
 export class UserManagerComponent implements OnInit {
 

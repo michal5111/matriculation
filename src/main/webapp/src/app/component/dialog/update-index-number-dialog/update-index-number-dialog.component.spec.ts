@@ -8,7 +8,7 @@ describe('UpdateIndexNumberDialogComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [UpdateIndexNumberDialogComponent]
+      imports: [UpdateIndexNumberDialogComponent]
     })
       .compileComponents();
   }));

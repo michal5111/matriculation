@@ -1,16 +1,23 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {User} from '../../../model/user/user';
 import {UserService} from '../../../service/user-service/user.service';
 import {Role} from '../../../model/user/role';
 import {RoleService} from '../../../service/role-service/role.service';
-import {MatSelectionList} from '@angular/material/list';
+import {MatListOption, MatSelectionList} from '@angular/material/list';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {NgFor, NgIf} from '@angular/common';
+import {MatButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-add-user-dialog',
   templateUrl: './add-user-dialog.component.html',
-  styleUrls: ['./add-user-dialog.component.sass']
+  styleUrls: ['./add-user-dialog.component.sass'],
+  standalone: true,
+  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatInput, NgIf, MatSelectionList, NgFor, MatListOption, MatButton, MatIcon]
 })
 export class AddUserDialogComponent implements OnInit {
 

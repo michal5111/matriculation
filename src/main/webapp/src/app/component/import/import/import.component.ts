@@ -4,20 +4,45 @@ import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
 import {map, tap} from 'rxjs/operators';
 import {MatPaginator} from '@angular/material/paginator';
-import {MatSort} from '@angular/material/sort';
-import {MatExpansionPanel} from '@angular/material/expansion';
+import {MatSort, MatSortHeader} from '@angular/material/sort';
+import {
+  MatAccordion,
+  MatExpansionPanel,
+  MatExpansionPanelContent,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle
+} from '@angular/material/expansion';
 import {UserService} from '../../../service/user-service/user.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Message} from '@stomp/stompjs';
 import {RxStompService} from '@stomp/ng2-stompjs';
 import {BasicDataSource} from '../../../dataSource/basic-data-source';
 import {AbstractListWithPathParamsComponent} from '../../abstract-list-with-path-params.component';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ImportSetupComponent} from '../import-setup/import-setup.component';
+import {DatePipe, NgIf} from '@angular/common';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable
+} from '@angular/material/table';
+import {ImportStatusIndicatorComponent} from '../import-status-indicator/import-status-indicator.component';
+import {MatAnchor, MatButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-import',
   templateUrl: './import.component.html',
-  styleUrls: ['./import.component.sass']
+  styleUrls: ['./import.component.sass'],
+  standalone: true,
+  imports: [MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelContent, ImportSetupComponent, NgIf, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, ImportStatusIndicatorComponent, MatButton, MatIcon, MatAnchor, RouterLink, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]
 })
 export class ImportComponent extends AbstractListWithPathParamsComponent<Import, number, {}> implements OnInit, OnDestroy {
 

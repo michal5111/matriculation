@@ -6,7 +6,8 @@ import {Message} from '@stomp/stompjs';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.sass']
+  styleUrls: ['./home.component.sass'],
+  standalone: true
 })
 export class HomeComponent implements OnInit {
 

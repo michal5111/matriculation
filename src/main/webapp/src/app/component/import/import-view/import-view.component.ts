@@ -2,7 +2,7 @@ import {Component, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ImportService} from '../../../service/import-service/import.service';
 import {filter, map, switchMap, tap} from 'rxjs/operators';
 import {MatPaginator} from '@angular/material/paginator';
-import {MatSort} from '@angular/material/sort';
+import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {Application} from '../../../model/applications/application';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BehaviorSubject, merge, Observable, Subscription} from 'rxjs';
@@ -20,20 +20,41 @@ import {UrlDto} from '../../../model/import/urlDto';
 import {UsosService} from '../../../service/usos-service/usos.service';
 import {SelectPersonDialogComponent} from '../../dialog/select-person-dialog/select-person-dialog.component';
 import {ApplicationsService} from '../../../service/application-service/applications.service';
-import {MatCheckboxChange} from '@angular/material/checkbox';
+import {MatCheckbox, MatCheckboxChange} from '@angular/material/checkbox';
 import {RxStompService} from '@stomp/ng2-stompjs';
 import {Message} from '@stomp/stompjs';
 import {WS_URL} from '../../../injectableTokens/WS_URL';
 import {ImportEditorComponent} from '../../dialog/import-editor/import-editor.component';
 import {AbstractListWithPathParamsComponent} from '../../abstract-list-with-path-params.component';
 import {BasicDataSource} from 'src/app/dataSource/basic-data-source';
+import {DatePipe, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
+import {MatCard, MatCardActions, MatCardContent, MatCardSubtitle, MatCardTitle} from '@angular/material/card';
+import {MatAnchor, MatButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
+import {ImportStatusIndicatorComponent} from '../import-status-indicator/import-status-indicator.component';
+import {ProgressViewerComponent} from '../../progress-viewer/progress-viewer.component';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable
+} from '@angular/material/table';
+import {MatTooltip} from '@angular/material/tooltip';
 
 type filterType = { importId: number };
 
 @Component({
   selector: 'app-import-view',
   templateUrl: './import-view.component.html',
-  styleUrls: ['./import-view.component.sass']
+  styleUrls: ['./import-view.component.sass'],
+  standalone: true,
+  imports: [NgIf, MatCard, MatCardTitle, MatCardSubtitle, MatCardActions, MatButton, MatIcon, MatCardContent, ImportStatusIndicatorComponent, ProgressViewerComponent, MatCheckbox, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatAnchor, NgSwitch, NgSwitchCase, MatTooltip, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]
 })
 export class ImportViewComponent extends AbstractListWithPathParamsComponent<Application, number, filterType> implements OnInit, OnDestroy {
   dataSource: BasicDataSource<Application, number, filterType>;

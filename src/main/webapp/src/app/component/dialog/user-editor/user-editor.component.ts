@@ -2,16 +2,21 @@ import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {UserEditorData} from '../../../model/user/UserEditorData';
 import {User} from '../../../model/user/user';
-import {MatSelectionList} from '@angular/material/list';
+import {MatListOption, MatSelectionList} from '@angular/material/list';
 import {Role} from '../../../model/user/role';
 import {UserService} from '../../../service/user-service/user.service';
 import {RoleService} from '../../../service/role-service/role.service';
 import {tap} from 'rxjs/operators';
+import {NgFor, NgIf} from '@angular/common';
+import {MatButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-user-editor',
   templateUrl: './user-editor.component.html',
-  styleUrls: ['./user-editor.component.sass']
+  styleUrls: ['./user-editor.component.sass'],
+  standalone: true,
+  imports: [NgIf, MatSelectionList, NgFor, MatListOption, MatButton, MatIcon]
 })
 export class UserEditorComponent implements OnInit {
 

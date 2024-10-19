@@ -8,7 +8,7 @@ describe('UnauthorizedDialogComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [UnauthorizedDialogComponent]
+      imports: [UnauthorizedDialogComponent]
     })
       .compileComponents();
   }));

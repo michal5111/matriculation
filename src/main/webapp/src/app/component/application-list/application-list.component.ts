@@ -4,7 +4,7 @@ import {Application} from '../../model/applications/application';
 import {BehaviorSubject, debounceTime, distinctUntilChanged, tap} from 'rxjs';
 import {UrlDto} from '../../model/import/urlDto';
 import {MatPaginator} from '@angular/material/paginator';
-import {MatSort} from '@angular/material/sort';
+import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {UsosService} from '../../service/usos-service/usos.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../service/user-service/user.service';
@@ -13,8 +13,25 @@ import {ApplicationsService} from '../../service/application-service/application
 import {AbstractListWithPathParamsComponent} from '../abstract-list-with-path-params.component';
 import {ErrorDialogComponent} from '../dialog/error-dialog/error-dialog.component';
 import {ErrorDialogData} from '../../model/dialog/error-dialog-data';
-import {FormControl, FormGroup} from '@angular/forms';
-import {APP_BASE_HREF} from '@angular/common';
+import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {APP_BASE_HREF, DatePipe, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable
+} from '@angular/material/table';
+import {MatAnchor, MatButton} from '@angular/material/button';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatIcon} from '@angular/material/icon';
 
 type filterType = {
   importId?: number | null,
@@ -27,7 +44,9 @@ type filterType = {
 @Component({
   selector: 'app-application-list',
   templateUrl: './application-list.component.html',
-  styleUrls: ['./application-list.component.sass']
+  styleUrls: ['./application-list.component.sass'],
+  standalone: true,
+  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatAnchor, NgIf, NgSwitch, NgSwitchCase, MatTooltip, MatIcon, MatButton, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]
 })
 export class ApplicationListComponent extends AbstractListWithPathParamsComponent<Application, number, filterType>
   implements OnInit, OnDestroy {

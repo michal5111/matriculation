@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ProgressViewerComponent } from './progress-viewer.component';
+import {ProgressViewerComponent} from './progress-viewer.component';
 
 describe('ProgressViewerComponent', () => {
   let component: ProgressViewerComponent;
@@ -8,9 +8,9 @@ describe('ProgressViewerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ProgressViewerComponent ]
+      imports: [ProgressViewerComponent]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

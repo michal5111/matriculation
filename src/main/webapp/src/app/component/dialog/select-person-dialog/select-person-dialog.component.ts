@@ -1,17 +1,35 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef} from '@angular/material/dialog';
 import {ImportService} from '../../../service/import-service/import.service';
 import {SelectPersonDialogData} from '../../../model/dialog/select-person-dialog-data';
 import {Person} from '../../../model/oracle/Person';
-import {MatTableDataSource} from '@angular/material/table';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+  MatTableDataSource
+} from '@angular/material/table';
 import {Selectable} from '../../../generics/selectable';
 import {Applicant} from '../../../model/applications/applicant';
-import {MatCheckboxChange} from '@angular/material/checkbox';
+import {MatCheckbox, MatCheckboxChange} from '@angular/material/checkbox';
+import {CdkScrollable} from '@angular/cdk/scrolling';
+import {DatePipe, NgFor, NgIf} from '@angular/common';
+import {MatDivider} from '@angular/material/divider';
+import {MatButton} from '@angular/material/button';
 
 @Component({
   selector: 'app-select-person-dialog',
   templateUrl: './select-person-dialog.component.html',
-  styleUrls: ['./select-person-dialog.component.sass']
+  styleUrls: ['./select-person-dialog.component.sass'],
+  standalone: true,
+  imports: [CdkScrollable, MatDialogContent, NgIf, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, NgFor, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDivider, MatCheckbox, MatDialogActions, MatButton, DatePipe]
 })
 export class SelectPersonDialogComponent implements OnInit {
 
@@ -64,7 +82,7 @@ export class SelectPersonDialogComponent implements OnInit {
 
   getSelected(): Selectable<Person>[] {
     return this.dataSource.data.filter(person => {
-      return person.isSelected === true;
+      return person.isSelected;
     });
   }
 
