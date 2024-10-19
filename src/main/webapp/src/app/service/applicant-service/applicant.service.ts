@@ -17,7 +17,8 @@ export class ApplicantService {
 
   private apiUrl = `${this.baseHref}api/applicants`;
 
-  constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) { }
+  constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) {
+  }
 
   getApplicantsList() {
     return this.http.get<Page<Applicant>>(this.apiUrl, httpOptions);

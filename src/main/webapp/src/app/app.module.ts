@@ -5,7 +5,7 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from './module/material/material.module';
-import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {ReactiveFormsModule} from '@angular/forms';
 import {HomeComponent} from './component/home/home.component';
 import {ImportSetupComponent} from './component/import/import-setup/import-setup.component';
@@ -69,16 +69,12 @@ import {firstValueFrom} from 'rxjs';
     ImportEditorComponent,
     ApplicationListComponent
   ],
-  imports: [
-    BrowserModule,
+  bootstrap: [AppComponent], imports: [BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MaterialModule,
-    HttpClientModule,
     ReactiveFormsModule,
-    NgOptimizedImage
-  ],
-  providers: [
+    NgOptimizedImage], providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
@@ -97,8 +93,7 @@ import {firstValueFrom} from 'rxjs';
     },
     {
       provide: WS_URL,
-      useFactory: (s: PlatformLocation, baseHref: string) =>
-        (s.protocol === 'http:' ? 'ws://' : 'wss://') + s.hostname + ':' + (s.port === '4200' ? '8081' : s.port) + baseHref + 'ws',
+      useFactory: (s: PlatformLocation, baseHref: string) => (s.protocol === 'http:' ? 'ws://' : 'wss://') + s.hostname + ':' + (s.port === '4200' ? '8081' : s.port) + baseHref + 'ws',
       deps: [PlatformLocation, APP_BASE_HREF]
     },
     {
@@ -129,9 +124,9 @@ import {firstValueFrom} from 'rxjs';
       useFactory: getCsrfToken,
       deps: [HttpClient],
       multi: true
-    }
-  ],
-  bootstrap: [AppComponent]
+    },
+    provideHttpClient(withInterceptorsFromDi())
+  ]
 })
 export class AppModule {
   constructor() {
