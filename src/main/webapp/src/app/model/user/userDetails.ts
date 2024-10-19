@@ -10,4 +10,5 @@ export interface UserDetails {
   accountNonExpired: boolean;
   credentialsNonExpired: boolean;
   password?: any;
+  mail: string | null;
 }

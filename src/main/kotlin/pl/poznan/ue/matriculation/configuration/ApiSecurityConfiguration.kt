@@ -25,6 +25,7 @@ class ApiSecurityConfiguration {
         http {
             authorizeHttpRequests {
                 authorize("/api/user", permitAll)
+                authorize("/api/csrf", permitAll)
                 authorize(HttpMethod.POST, "/api/user", hasRole("ADMIN"))
                 authorize(HttpMethod.DELETE, "/api/user", hasRole("ADMIN"))
                 authorize(HttpMethod.PUT, "/api/user", hasRole("ADMIN"))

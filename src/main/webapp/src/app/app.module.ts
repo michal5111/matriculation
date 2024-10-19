@@ -1,11 +1,11 @@
 import {BrowserModule} from '@angular/platform-browser';
-import {ErrorHandler, LOCALE_ID, NgModule} from '@angular/core';
+import {APP_INITIALIZER, ErrorHandler, LOCALE_ID, NgModule} from '@angular/core';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from './module/material/material.module';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
 import {ReactiveFormsModule} from '@angular/forms';
 import {HomeComponent} from './component/home/home.component';
 import {ImportSetupComponent} from './component/import/import-setup/import-setup.component';
@@ -14,7 +14,7 @@ import {ImportViewComponent} from './component/import/import-view/import-view.co
 import {UnauthorizedDialogComponent} from './component/dialog/unauthorized-dialog/unauthorized-dialog.component';
 import {AuthInterceptor} from './interceptors/auth-interceptor';
 import {ForbiddenDialogComponent} from './component/dialog/forbidden-dialog/forbidden-dialog.component';
-import {APP_BASE_HREF, PlatformLocation, registerLocaleData} from '@angular/common';
+import {APP_BASE_HREF, NgOptimizedImage, PlatformLocation, registerLocaleData} from '@angular/common';
 import localePl from '@angular/common/locales/pl';
 import {MatPaginatorIntl} from '@angular/material/paginator';
 import {MatPaginatorIntlPl} from './customProviders/mat-paginator-intl-pl';
@@ -42,6 +42,8 @@ import {DatesValidatorDirective} from './validator/dates-validator.directive';
 import {ReactiveFileInputComponent} from './component/reactive-file-input/reactive-file-input.component';
 import {ImportEditorComponent} from './component/dialog/import-editor/import-editor.component';
 import {ApplicationListComponent} from './component/application-list/application-list.component';
+import {UserService} from './service/user-service/user.service';
+import {firstValueFrom} from 'rxjs';
 
 @NgModule({
   declarations: [
@@ -73,7 +75,8 @@ import {ApplicationListComponent} from './component/application-list/application
     BrowserAnimationsModule,
     MaterialModule,
     HttpClientModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgOptimizedImage
   ],
   providers: [
     {
@@ -114,6 +117,18 @@ import {ApplicationListComponent} from './component/application-list/application
     {
       provide: MAT_DATE_FORMATS,
       useValue: MY_DATE_FORMATS
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initUser,
+      deps: [UserService],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: getCsrfToken,
+      deps: [HttpClient],
+      multi: true
     }
   ],
   bootstrap: [AppComponent]
@@ -122,4 +137,12 @@ export class AppModule {
   constructor() {
     registerLocaleData(localePl, 'pl-PL');
   }
+}
+
+function initUser(userService: UserService) {
+  return (): Promise<any> => firstValueFrom(userService.init$());
+}
+
+function getCsrfToken(http: HttpClient) {
+  return (): Promise<any> => firstValueFrom(http.get('/api/csrf'));
 }

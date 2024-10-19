@@ -13,7 +13,7 @@
       </mat-expansion-panel>
     </mat-accordion>
   </div>
-  <ng-template [ngIf]="userService.isAuthenticated">
+  <ng-template [ngIf]="userService.isAuthenticated()">
     <h3 class="mat-h3">Utworzone importy</h3>
     <div class="mat-elevation-z2">
       <div class="loadingWrapper">
@@ -25,72 +25,72 @@
 
           <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
-            <td mat-cell *matCellDef="let element">{{element.id}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.id }}</td>
           </ng-container>
 
           <ng-container matColumnDef="dataSourceType">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Źródło danych</th>
-            <td mat-cell *matCellDef="let element">{{element.dataSourceName}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.dataSourceName }}</td>
           </ng-container>
 
           <ng-container matColumnDef="programmeCode">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Program kod</th>
-            <td mat-cell *matCellDef="let element">{{element.programmeCode}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.programmeCode }}</td>
           </ng-container>
 
           <ng-container matColumnDef="programmeForeignName">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Program nazwa</th>
-            <td mat-cell *matCellDef="let element">{{element.programmeForeignName}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.programmeForeignName }}</td>
           </ng-container>
 
           <ng-container matColumnDef="stageCode">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Etap</th>
-            <td mat-cell *matCellDef="let element">{{element.stageCode}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.stageCode }}</td>
           </ng-container>
 
           <ng-container matColumnDef="registration">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Rekrutacja</th>
-            <td mat-cell *matCellDef="let element">{{element.registration}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.registration }}</td>
           </ng-container>
 
           <ng-container matColumnDef="indexPoolCode">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Pula indeksów</th>
-            <td mat-cell *matCellDef="let element">{{element.indexPoolCode}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.indexPoolCode }}</td>
           </ng-container>
 
           <ng-container matColumnDef="indexPoolName">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Pula indeksów</th>
-            <td mat-cell *matCellDef="let element">{{element.indexPoolName}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.indexPoolName }}</td>
           </ng-container>
 
           <ng-container matColumnDef="startDate">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Data rozpoczęcia programu</th>
-            <td mat-cell *matCellDef="let element">{{element.startDate | date:'dd.MM.yyyy'}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.startDate | date:'dd.MM.yyyy' }}</td>
           </ng-container>
 
           <ng-container matColumnDef="dateOfAddmision">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Data przyjęcia na program</th>
-            <td mat-cell *matCellDef="let element">{{element.dateOfAddmision | date:'dd.MM.yyyy'}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.dateOfAddmision | date:'dd.MM.yyyy' }}</td>
           </ng-container>
 
           <ng-container matColumnDef="didacticCycleCode">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Kod cyklu dydaktycznego</th>
-            <td mat-cell *matCellDef="let element">{{element.didacticCycleCode}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.didacticCycleCode }}</td>
           </ng-container>
 
           <ng-container matColumnDef="countTotal">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>W sumie</th>
-            <td mat-cell *matCellDef="let element">{{element.totalCount}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.totalCount }}</td>
           </ng-container>
 
           <ng-container matColumnDef="countImported">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Zaimportowane</th>
-            <td mat-cell *matCellDef="let element">{{element.importedApplications}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.importedApplications }}</td>
           </ng-container>
 
           <ng-container matColumnDef="countSaved">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Zapisane</th>
-            <td mat-cell *matCellDef="let element">{{element.savedApplicants}}</td>
+            <td mat-cell *matCellDef="let element">{{ element.savedApplicants }}</td>
           </ng-container>
 
           <ng-container matColumnDef="status">

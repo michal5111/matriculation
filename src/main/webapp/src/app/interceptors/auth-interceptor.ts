@@ -26,13 +26,13 @@ export class AuthInterceptor implements HttpInterceptor {
               return;
             }
             if (err.status === 401) {
-              const dialogRef = this.dialog.open(UnauthorizedDialogComponent, {
+              this.dialog.open(UnauthorizedDialogComponent, {
                 width: '250px'
               });
-              this.userService.isAuthenticated = false;
+              this.userService.setUnauthenticated();
             }
             if (err.status === 403) {
-              const dialogRef = this.dialog.open(ForbiddenDialogComponent, {
+              this.dialog.open(ForbiddenDialogComponent, {
                 width: '250px'
               });
             }

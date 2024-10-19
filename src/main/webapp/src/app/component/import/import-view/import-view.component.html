@@ -1,4 +1,4 @@
-<ng-template [ngIf]="userService.isAuthenticated">
+<ng-template [ngIf]="userService.isAuthenticated()">
   <ng-template [ngIf]="import && rxStompService.connected()">
     <header *ngIf="import" class="card-wrapper">
       <mat-card appearance="outlined" class="card-centered">
