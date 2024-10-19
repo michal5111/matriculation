@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, inject} from '@angular/core';
-import {merge, tap} from 'rxjs';
+import {merge, of, tap} from 'rxjs';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AbstractListComponent} from './abstract-list.component';
 
@@ -15,45 +15,45 @@ export abstract class AbstractListWithPathParamsComponent<T, ID, F> extends Abst
     }
     this.subs.push(
       merge(
-        this.paginator.page,
-        this.sort.sortChange
+        this.paginator()?.page ?? of({}),
+        this.sort()?.sortChange ?? of({})
       ).pipe(
         tap(() => this.router.navigate([], {
           queryParams: {
-            page: this.paginator?.pageIndex,
-            pageSize: this.paginator?.pageSize,
-            sort: this.sort?.active
+            page: this.paginator()?.pageIndex,
+            pageSize: this.paginator()?.pageSize,
+            sort: this.sort()?.active
           }
         }))
       ).subscribe(),
       this.filtersSubject.pipe(
         tap(value => {
           this.dataSource.loadElements(
-            this.paginator?.pageIndex ?? 0,
-            this.paginator?.pageSize ?? 5,
+            this.paginator()?.pageIndex ?? 0,
+            this.paginator()?.pageSize ?? 5,
             value,
-            this.sortingMap.get(this.sort?.active ?? ''),
-            this.sort?.direction
+            this.sortingMap.get(this.sort()?.active ?? ''),
+            this.sort()?.direction
           );
         })
       ).subscribe(),
       this.route.queryParams.pipe(
         tap(params => {
           this.dataSource.loadElements(
-            params['page'] ?? this.paginator?.pageIndex,
-            params['pageSize'] ?? this.paginator?.pageSize,
+            params['page'] ?? this.paginator()?.pageIndex,
+            params['pageSize'] ?? this.paginator()?.pageSize,
             this.filtersSubject.getValue(),
-            this.sortingMap.get(params['sort'] ?? this.sort?.active),
-            this.sort?.direction
+            this.sortingMap.get(params['sort'] ?? this.sort()?.active),
+            this.sort()?.direction
           );
         }),
         tap(params => {
           console.log({
-            pageIndex: params['page'] ?? this.paginator?.pageIndex,
-            pageSize: params['pageSize'] ?? this.paginator?.pageSize,
+            pageIndex: params['page'] ?? this.paginator()?.pageIndex,
+            pageSize: params['pageSize'] ?? this.paginator()?.pageSize,
             filtersSubject: this.filtersSubject.getValue(),
-            sort: this.sortingMap.get(params['sort'] ?? this.sort?.active),
-            sortDir: this.sort?.direction
+            sort: this.sortingMap.get(params['sort'] ?? this.sort()?.active),
+            sortDir: this.sort()?.direction
           });
         })
       ).subscribe()

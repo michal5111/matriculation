@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import {Component, inject, OnInit, viewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {UserEditorData} from '../../../model/user/UserEditorData';
 import {User} from '../../../model/user/user';
@@ -28,7 +28,7 @@ export class UserEditorComponent implements OnInit {
   user: User = new User();
   rolesList: Role[] = [];
 
-  @ViewChild('roleSelectionList') roleSelectionList: MatSelectionList | null = null;
+  roleSelectionList = viewChild<MatSelectionList | null>('roleSelectionList');
 
   ngOnInit(): void {
     this.userService.findById(this.data.user.id ?? -1).pipe(
@@ -41,7 +41,7 @@ export class UserEditorComponent implements OnInit {
   }
 
   onUpdateUserClick() {
-    const roles = this.roleSelectionList?.selectedOptions.selected.map(selectedRole => {
+    const roles = this.roleSelectionList()?.selectedOptions.selected.map(selectedRole => {
       return selectedRole.value as Role;
     });
     if (roles != null) {

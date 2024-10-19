@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {Page} from '../../../model/dto/page/page';
 import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
@@ -113,10 +113,6 @@ export class ImportComponent extends AbstractListWithPathParamsComponent<Import,
     ['deleteImport', true],
     ['selectImport', true]
   ]);
-
-  @ViewChild(MatPaginator) override paginator: MatPaginator | null = null;
-  @ViewChild(MatSort) override sort: MatSort | null = null;
-  @ViewChild(MatExpansionPanel) importCreateExpansionPanel: MatExpansionPanel | null = null;
 
   constructor() {
     super();

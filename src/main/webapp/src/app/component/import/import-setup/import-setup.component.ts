@@ -1,4 +1,4 @@
-import {Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, viewChild} from '@angular/core';
 import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
 import {
@@ -104,7 +104,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
 
   @Output() importCreated = new EventEmitter<Import>();
   @Input() import: Import | null = new Import();
-  @ViewChild(FormGroupDirective) formGroupDirective: FormGroupDirective | null = null;
+  formGroupDirective = viewChild<FormGroupDirective | null>(FormGroupDirective);
 
   ngOnInit(): void {
     this.subs.push(this.onDidacticCycleInputChanges().subscribe());
@@ -186,7 +186,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
     this.subs.push(
       snackBarRef.onAction().subscribe(() => snackBarRef.dismiss())
     );
-    this.formGroupDirective?.resetForm();
+    this.formGroupDirective()?.resetForm();
     this.import = importObject;
     this.importCreated.next(this.import);
     this.isButtonDisabled = false;

@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {BasicDataSource} from '../../dataSource/basic-data-source';
 import {Application} from '../../model/applications/application';
 import {BehaviorSubject, debounceTime, distinctUntilChanged, tap} from 'rxjs';
@@ -125,8 +125,6 @@ export class ApplicationListComponent extends AbstractListWithPathParamsComponen
     ['duplicateStatus', 'applicant.potentialDuplicateStatus'],
     ['warnings', 'warnings']
   ]);
-  @ViewChild(MatPaginator) override paginator: MatPaginator | null = null;
-  @ViewChild(MatSort) override sort: MatSort | null = null;
   filterFormGroup: FormGroup<{
     importId: FormControl<number | null>,
     name: FormControl<string | null>,

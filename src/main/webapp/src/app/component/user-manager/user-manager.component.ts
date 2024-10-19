@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, ViewChild} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {UserService} from '../../service/user-service/user.service';
 import {User} from '../../model/user/user';
 import {
@@ -33,16 +33,28 @@ import {MatIcon} from '@angular/material/icon';
   templateUrl: './user-manager.component.html',
   styleUrls: ['./user-manager.component.sass'],
   standalone: true,
-  imports: [MatButton, MatIcon, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator]
+  imports: [
+    MatButton,
+    MatIcon,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatSortHeader,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator
+  ]
 })
 export class UserManagerComponent implements OnInit {
   private userService = inject(UserService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
-
-
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator | null = null;
-  @ViewChild(MatSort, {static: true}) sort: MatSort | null = null;
 
   pageSize = 5;
   pageNumber = 0;
@@ -64,8 +76,6 @@ export class UserManagerComponent implements OnInit {
   dataSource = new MatTableDataSource<User>();
 
   ngOnInit(): void {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
     this.getUserPage(this.pageNumber, this.pageSize, this.sortString, this.sortDirString).subscribe(
       () => {
       }

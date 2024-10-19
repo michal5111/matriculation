@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ImportService} from '../../../service/import-service/import.service';
 import {filter, map, switchMap, tap} from 'rxjs/operators';
 import {MatPaginator} from '@angular/material/paginator';
@@ -134,8 +134,6 @@ export class ImportViewComponent extends AbstractListWithPathParamsComponent<App
   ]);
 
   public import$: Observable<Import>;
-  @ViewChild(MatPaginator) override paginator: MatPaginator | null = null;
-  @ViewChild(MatSort) override sort: MatSort | null = null;
 
   constructor() {
     super();

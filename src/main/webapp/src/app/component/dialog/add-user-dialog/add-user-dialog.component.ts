@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {Component, inject, OnInit, viewChild} from '@angular/core';
+import {MatDialogRef} from '@angular/material/dialog';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {User} from '../../../model/user/user';
 import {UserService} from '../../../service/user-service/user.service';
@@ -22,7 +22,6 @@ import {MatIcon} from '@angular/material/icon';
 export class AddUserDialogComponent implements OnInit {
   dialogRef = inject<MatDialogRef<AddUserDialogComponent>>(MatDialogRef);
   private userService = inject(UserService);
-  private dialog = inject(MatDialog);
   private roleService = inject(RoleService);
 
 
@@ -31,7 +30,7 @@ export class AddUserDialogComponent implements OnInit {
   rolesList: Role[] = [];
   isButtonDisabled = false;
 
-  @ViewChild('roleSelectionList') roleSelectionList: MatSelectionList | null = null;
+  roleSelectionList = viewChild<MatSelectionList | null>('roleSelectionList');
 
   constructor() {
     this.addUserFormGroup = new FormGroup({
@@ -48,7 +47,7 @@ export class AddUserDialogComponent implements OnInit {
   }
 
   onSubmit() {
-    const selectedRoles = this.roleSelectionList?.selectedOptions.selected.map(selectedOption => {
+    const selectedRoles = this.roleSelectionList()?.selectedOptions.selected.map(selectedOption => {
       return selectedOption.value as Role;
     });
     this.user.uid = this.addUserFormGroup.controls.uid.value;

@@ -1,7 +1,7 @@
-import {AfterViewInit, Component, OnDestroy} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, viewChild} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
-import {BehaviorSubject, debounceTime, distinctUntilChanged, merge, Subscription, tap} from 'rxjs';
+import {BehaviorSubject, debounceTime, distinctUntilChanged, merge, of, Subscription, tap} from 'rxjs';
 import {BasicDataSource} from '../dataSource/basic-data-source';
 
 @Component({template: ''})
@@ -14,8 +14,8 @@ export abstract class AbstractListComponent<T, ID, F> implements AfterViewInit, 
 
   abstract sortingMap: Map<string, string>;
 
-  abstract paginator: MatPaginator | null;
-  abstract sort: MatSort | null;
+  protected paginator = viewChild<MatPaginator>(MatPaginator);
+  protected sort = viewChild<MatSort>(MatSort);
 
   abstract filtersSubject: BehaviorSubject<F>;
 
@@ -31,11 +31,11 @@ export abstract class AbstractListComponent<T, ID, F> implements AfterViewInit, 
 
   getPage() {
     this.dataSource.loadElements(
-      this.paginator?.pageIndex ?? 0,
-      this.paginator?.pageSize ?? 5,
+      this.paginator()?.pageIndex ?? 0,
+      this.paginator()?.pageSize ?? 5,
       this.filtersSubject.getValue(),
-      this.sortingMap.get(this.sort?.active ?? ''),
-      this.sort?.direction
+      this.sortingMap.get(this.sort()?.active ?? ''),
+      this.sort()?.direction
     );
   }
 
@@ -45,8 +45,8 @@ export abstract class AbstractListComponent<T, ID, F> implements AfterViewInit, 
     }
     this.subs.push(
       merge(
-        this.paginator.page,
-        this.sort.sortChange,
+        this.paginator()?.page ?? of({}),
+        this.sort()?.sortChange ?? of({}),
         this.filtersSubject.pipe(
           debounceTime(300),
           distinctUntilChanged()
