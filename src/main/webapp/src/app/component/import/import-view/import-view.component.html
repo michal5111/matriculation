@@ -24,25 +24,20 @@
         <mat-card appearance="outlined" class="card-centered">
           @if (import && rxStompService.connected()) {
             <mat-card-content>
-              <app-import-status-indicator
-                [importStatus]="import.importStatus"></app-import-status-indicator>
+              <app-import-status-indicator [importStatus]="import.importStatus"/>
               @if (import.error) {
                 <p class="error-container">Błąd importu:
                   <mark class="error-color">{{ import.error }}</mark>
                 </p>
                 <button mat-button (click)="showImportErrorDialog(import)">Pokaż błąd</button>
               }
-              <app-progress-viewer
-                header="Zaimportowane zgłoszenia:"
-                [value]="import.importedApplications"
-                [total]="import.totalCount">
-              </app-progress-viewer>
-              <app-progress-viewer
-                header="Zapisane zgłoszenia:"
-                [value]="import.savedApplicants"
-                [total]="import.totalCount"
-                [errorsCount]="import.saveErrors">
-              </app-progress-viewer>
+              <app-progress-viewer header="Zaimportowane zgłoszenia:"
+                                   [value]="import.importedApplications"
+                                   [total]="import.totalCount"/>
+              <app-progress-viewer header="Zapisane zgłoszenia:"
+                                   [value]="import.savedApplicants"
+                                   [total]="import.totalCount"
+                                   [errorsCount]="import.saveErrors"/>
               <p>Błędy przy zapisywaniu: {{ import.saveErrors }}</p>
             </mat-card-content>
           }
@@ -63,18 +58,14 @@
         </mat-card>
         <mat-card appearance="outlined" class="card-centered">
           <mat-card-content>
-            <app-progress-viewer
-              header="Znalezione UIDy:"
-              [value]="import.importedUids"
-              [total]="import.totalCount"
-              [errorsCount]="import.saveErrors">
-            </app-progress-viewer>
-            <app-progress-viewer
-              header="Wysłane powiadomienia:"
-              [value]="import.notificationsSend"
-              [total]="import.totalCount"
-              [errorsCount]="import.saveErrors">
-            </app-progress-viewer>
+            <app-progress-viewer header="Znalezione UIDy:"
+                                 [value]="import.importedUids"
+                                 [total]="import.totalCount"
+                                 [errorsCount]="import.saveErrors"/>
+            <app-progress-viewer header="Wysłane powiadomienia:"
+                                 [value]="import.notificationsSend"
+                                 [total]="import.totalCount"
+                                 [errorsCount]="import.saveErrors"/>
           </mat-card-content>
           <mat-card-actions>
             <button mat-button (click)="onFindUidsClick()" [disabled]="isFindUidsButtonDisabled()">
@@ -313,8 +304,7 @@
                      [length]="dataSource.page?.totalElements"
                      [pageSize]="dataSource.page?.size"
                      showFirstLastButtons
-                     [pageIndex]="dataSource.page?.number">
-      </mat-paginator>
+                     [pageIndex]="dataSource.page?.number"/>
     </div>
   </div>
 }

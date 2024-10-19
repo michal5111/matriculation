@@ -25,8 +25,7 @@
               } @case ('FILE') {
                 <div>
                   <app-reactive-file-input [formControlName]="parameter.name" [accept]="parameter.accept"
-                                           [templateHref]="getUrlWithBaseHref(parameter.fileTemplate)">
-                  </app-reactive-file-input>
+                                           [templateHref]="getUrlWithBaseHref(parameter.fileTemplate)"/>
                   <!--            <a mat-button href="{{getUrlWithBaseHref(parameter.fileTemplate)}}">Pobierz szablon</a>-->
                   <!--            <input [formControlName]="parameter.name" [accept]="parameter.accept"-->
                   <!--                   (change)="onFileSelected($event, parameter.name)"-->
@@ -71,7 +70,7 @@
       </mat-select>
       @if (areRegistrationLoading) {
         <ng-template matPrefix><p></p>
-          <mat-spinner diameter="20"></mat-spinner>
+          <mat-spinner diameter="20"/>
         </ng-template>
       }
     </mat-form-field>
@@ -89,7 +88,7 @@
       </mat-select>
       @if (areProgrammesLoading) {
         <ng-template matPrefix><p></p>
-          <mat-spinner diameter="20"></mat-spinner>
+          <mat-spinner diameter="20"/>
         </ng-template>
       }
     </mat-form-field>
@@ -105,7 +104,7 @@
       </mat-select>
       @if (areStagesLoading) {
         <ng-template matPrefix><p></p>
-          <mat-spinner diameter="20"></mat-spinner>
+          <mat-spinner diameter="20"/>
         </ng-template>
       }
     </mat-form-field>
@@ -141,14 +140,14 @@
       <mat-form-field class="form-field form-field-date">
         <mat-label>Data rozpoczęcia studiów</mat-label>
         <input matInput [matDatepicker]="startDatePicker" formControlName="startDate">
-        <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
-        <mat-datepicker #startDatePicker></mat-datepicker>
+        <mat-datepicker-toggle matSuffix [for]="startDatePicker"/>
+        <mat-datepicker #startDatePicker/>
       </mat-form-field>
       <mat-form-field class="form-field form-field-date">
         <mat-label>Data przyjęcia na program</mat-label>
         <input matInput [matDatepicker]="dateOfAddmisionPicker" formControlName="dateOfAddmision">
-        <mat-datepicker-toggle matSuffix [for]="dateOfAddmisionPicker"></mat-datepicker-toggle>
-        <mat-datepicker #dateOfAddmisionPicker></mat-datepicker>
+        <mat-datepicker-toggle matSuffix [for]="dateOfAddmisionPicker"/>
+        <mat-datepicker #dateOfAddmisionPicker/>
       </mat-form-field>
     </div>
     <button mat-button type="submit" [disabled]="!formGroup.valid || isButtonDisabled">
