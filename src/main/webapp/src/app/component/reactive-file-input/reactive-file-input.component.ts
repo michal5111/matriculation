@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {MatAnchor, MatMiniFabButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
@@ -18,15 +18,13 @@ import {MatIcon} from '@angular/material/icon';
   standalone: true,
   imports: [MatAnchor, MatIcon, MatMiniFabButton]
 })
-export class ReactiveFileInputComponent implements OnInit, ControlValueAccessor {
+export class ReactiveFileInputComponent implements ControlValueAccessor {
 
   file: File | undefined;
 
-  @Input()
-  templateHref: string | undefined;
+  templateHref = input<string>();
 
-  @Input()
-  accept: string | undefined;
+  accept = input<string>();
 
   touched = false;
 
@@ -36,12 +34,6 @@ export class ReactiveFileInputComponent implements OnInit, ControlValueAccessor 
   }
 
   onTouched = () => {
-  }
-
-  constructor() {
-  }
-
-  ngOnInit(): void {
   }
 
   onFileSelected(event: any) {

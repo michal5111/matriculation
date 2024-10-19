@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {ImportStatus} from '../../../model/import/import-status.enum';
 
 import {MatIcon} from '@angular/material/icon';
@@ -11,15 +11,8 @@ import {MatTooltip} from '@angular/material/tooltip';
   standalone: true,
   imports: [MatIcon, MatTooltip]
 })
-export class ImportStatusIndicatorComponent implements OnInit {
+export class ImportStatusIndicatorComponent {
 
-  @Input() importStatus: ImportStatus | null = null;
-  @Input() tooltip = false;
-
-  constructor() {
-  }
-
-  ngOnInit(): void {
-  }
-
+  importStatus = input<ImportStatus | null>(null);
+  tooltip = input(false);
 }

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {MatDivider} from '@angular/material/divider';
 
 @Component({
@@ -8,12 +8,5 @@ import {MatDivider} from '@angular/material/divider';
   standalone: true,
   imports: [MatDivider]
 })
-export class FooterComponent implements OnInit {
-
-  constructor() {
-  }
-
-  ngOnInit(): void {
-  }
-
+export class FooterComponent {
 }

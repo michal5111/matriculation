@@ -13,7 +13,7 @@
     </mat-form-field>
 
     <div formGroupName="additionalParameters">
-      @for (parameter of additionalParameters; track parameter) {
+      @for (parameter of additionalParameters(); track parameter.name) {
         <div>
           <div>
             @switch (parameter.type) {
@@ -61,14 +61,14 @@
       <mat-select formControlName="registration"
                   [compareWith]="registrationCompare"
                   (selectionChange)="onRegistrationSelectionChange($event)"
-                  [disabled]="areRegistrationLoading">
+                  [disabled]="areRegistrationLoading()">
         @for (registration of registrations; track registration) {
           <mat-option
             [value]="registration.id">[{{ registration.id }}] {{ registration.name }}
           </mat-option>
         }
       </mat-select>
-      @if (areRegistrationLoading) {
+      @if (areRegistrationLoading()) {
         <ng-template matPrefix><p></p>
           <mat-spinner diameter="20"/>
         </ng-template>
@@ -79,14 +79,14 @@
       <mat-select formControlName="registrationProgramme"
                   [compareWith]="registrationProgrammeCompare"
                   (selectionChange)="onRegistrationProgrammeChange($event)"
-                  [disabled]="areRegistrationLoading || areProgrammesLoading">
+                  [disabled]="areRegistrationLoading() || areProgrammesLoading()">
         @for (registrationProgramme of registrationProgrammes; track registrationProgramme) {
           <mat-option
             [value]="registrationProgramme">[{{ registrationProgramme.usosId }}] {{ registrationProgramme.name }}
           </mat-option>
         }
       </mat-select>
-      @if (areProgrammesLoading) {
+      @if (areProgrammesLoading()) {
         <ng-template matPrefix><p></p>
           <mat-spinner diameter="20"/>
         </ng-template>
@@ -95,14 +95,14 @@
     <mat-form-field class="form-field wide-field">
       <mat-label>Etap</mat-label>
       <mat-select formControlName="stage"
-                  [disabled]="areRegistrationLoading || areProgrammesLoading || areRegistrationLoading">
+                  [disabled]="areRegistrationLoading() || areProgrammesLoading() || areRegistrationLoading()">
         @for (stage of stages; track stage) {
           <mat-option
             [value]="stage">{{ stage }}
           </mat-option>
         }
       </mat-select>
-      @if (areStagesLoading) {
+      @if (areStagesLoading()) {
         <ng-template matPrefix><p></p>
           <mat-spinner diameter="20"/>
         </ng-template>
@@ -150,8 +150,8 @@
         <mat-datepicker #dateOfAddmisionPicker/>
       </mat-form-field>
     </div>
-    <button mat-button type="submit" [disabled]="!formGroup.valid || isButtonDisabled">
-      @if (this.import?.id == null) {
+    <button mat-button type="submit" [disabled]="!formGroup.valid || isButtonDisabled()">
+      @if (this.import()?.id == null) {
         <div>
           <mat-icon>add</mat-icon>
           Utwórz

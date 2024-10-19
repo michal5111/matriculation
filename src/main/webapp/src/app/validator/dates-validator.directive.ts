@@ -5,8 +5,4 @@ import {Directive} from '@angular/core';
   standalone: true
 })
 export class DatesValidatorDirective {
-
-  constructor() {
-  }
-
 }

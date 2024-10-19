@@ -1,7 +1,7 @@
-<a mat-button href="{{templateHref}}">
+<a mat-button href="{{templateHref()}}">
   <mat-icon>file_download</mat-icon>
   Pobierz szablon</a>
-<input accept="{{accept}}" (change)="onFileSelected($event)" multiple="multiple" type="file" class="file-input"
+<input accept="{{accept()}}" (change)="onFileSelected($event)" multiple="multiple" type="file" class="file-input"
        #fileUpload>
 <span class="file-upload">
   <button mat-mini-fab type="button" color="primary" class="upload-btn"

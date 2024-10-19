@@ -1,79 +1,79 @@
 <div>
-  @switch (importStatus) {
+  @switch (importStatus()) {
     @case ('PENDING') {
       <span>
-        <mat-icon matTooltip="Oczekujący" [matTooltipDisabled]="!tooltip">hourglass_empty</mat-icon>
-        @if (!tooltip) {
+        <mat-icon matTooltip="Oczekujący" [matTooltipDisabled]="!tooltip()">hourglass_empty</mat-icon>
+        @if (!tooltip()) {
           <span>Oczekujący</span>
         }
       </span>
     } @case ('STARTED') {
       <span>
-        <mat-icon matTooltip="Importowanie" [matTooltipDisabled]="!tooltip">cloud_download</mat-icon>
-        @if (!tooltip) {
+        <mat-icon matTooltip="Importowanie" [matTooltipDisabled]="!tooltip()">cloud_download</mat-icon>
+        @if (!tooltip()) {
           <span>Importowanie</span>
         }
       </span>
     } @case ('IMPORTED') {
       <span>
-        <mat-icon matTooltip="Zaimportowane" [matTooltipDisabled]="!tooltip">cloud_done</mat-icon>
-        @if (!tooltip) {
+        <mat-icon matTooltip="Zaimportowane" [matTooltipDisabled]="!tooltip()">cloud_done</mat-icon>
+        @if (!tooltip()) {
           <span>Zaimportowane</span>
         }
       </span>
     } @case ('SAVING') {
       <span>
-        <mat-icon matTooltip="Zapisywanie w usosie" [matTooltipDisabled]="!tooltip">cloud_upload</mat-icon>
-        @if (!tooltip) {
+        <mat-icon matTooltip="Zapisywanie w usosie" [matTooltipDisabled]="!tooltip()">cloud_upload</mat-icon>
+        @if (!tooltip()) {
           <span>Zapisywanie w usosie...</span>
         }
       </span>
     } @case ('COMPLETE') {
       <span>
-        <mat-icon matTooltip="Zakończono" [matTooltipDisabled]="!tooltip">done</mat-icon>
-        @if (!tooltip) {
+        <mat-icon matTooltip="Zakończono" [matTooltipDisabled]="!tooltip()">done</mat-icon>
+        @if (!tooltip()) {
           <span>Zakończono</span>
         }
       </span>
     } @case ('ARCHIVED') {
       <span>
-        <mat-icon matTooltip="Zarchiwizowany" [matTooltipDisabled]="!tooltip">archived</mat-icon>
-        @if (!tooltip) {
+        <mat-icon matTooltip="Zarchiwizowany" [matTooltipDisabled]="!tooltip()">archived</mat-icon>
+        @if (!tooltip()) {
           <span>Zarchiwizowany</span>
         }
       </span>
     } @case ('COMPLETED_WITH_ERRORS') {
       <span>
-        <mat-icon matTooltip="Zakończono z błędami" [matTooltipDisabled]="!tooltip">warning</mat-icon>
-        @if (!tooltip) {
+        <mat-icon matTooltip="Zakończono z błędami" [matTooltipDisabled]="!tooltip()">warning</mat-icon>
+        @if (!tooltip()) {
           <span>Zakończono z błędami</span>
         }
       </span>
     } @case ('ERROR') {
       <span>
-        <mat-icon matTooltip="Błąd" [matTooltipDisabled]="!tooltip">error</mat-icon>
-        @if (!tooltip) {
+        <mat-icon matTooltip="Błąd" [matTooltipDisabled]="!tooltip()">error</mat-icon>
+        @if (!tooltip()) {
           <span>Błąd</span>
         }
       </span>
     } @case ('SEARCHING_UIDS') {
       <span>
-        <mat-icon matTooltip="Szukam UIDów" [matTooltipDisabled]="!tooltip">search</mat-icon>
-        @if (!tooltip) {
+        <mat-icon matTooltip="Szukam UIDów" [matTooltipDisabled]="!tooltip()">search</mat-icon>
+        @if (!tooltip()) {
           <span>Szukam UIDów</span>
         }
       </span>
     } @case ('SENDING_NOTIFICATIONS') {
       <span>
-        <mat-icon matTooltip="Wysyłam powiadomienia" [matTooltipDisabled]="!tooltip">notifications_active</mat-icon>
-        @if (!tooltip) {
+        <mat-icon matTooltip="Wysyłam powiadomienia" [matTooltipDisabled]="!tooltip()">notifications_active</mat-icon>
+        @if (!tooltip()) {
           <span>Wysyłam powiadomienia</span>
         }
       </span>
     } @case ('CHECKING_POTENTIAL_DUPLICATES') {
       <span>
-        <mat-icon matTooltip="Sprawdzam potencjalne duplikaty" [matTooltipDisabled]="!tooltip">search</mat-icon>
-        @if (!tooltip) {
+        <mat-icon matTooltip="Sprawdzam potencjalne duplikaty" [matTooltipDisabled]="!tooltip()">search</mat-icon>
+        @if (!tooltip()) {
           <span>Sprawdzam potencjalne duplikaty</span>
         }
       </span>

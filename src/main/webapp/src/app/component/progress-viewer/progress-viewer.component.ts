@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 import {MatProgressBar} from '@angular/material/progress-bar';
 
 @Component({
@@ -8,24 +8,12 @@ import {MatProgressBar} from '@angular/material/progress-bar';
   standalone: true,
   imports: [MatProgressBar]
 })
-export class ProgressViewerComponent implements OnInit {
+export class ProgressViewerComponent {
 
-  @Input() value = 0;
-  @Input() total: number | null = null;
-  @Input() header: string | undefined;
-  @Input() errorsCount = 0;
+  value = input(0);
+  total = input<number | null>(null);
+  header = input<string>();
+  errorsCount = input(0);
 
-  constructor() {
-  }
-
-  ngOnInit(): void {
-  }
-
-  calculatePercentage(): number {
-    if (this.total == null) {
-      return 0;
-    }
-    return (this.value + this.errorsCount) * 100 / this.total;
-  }
-
+  percentage = computed(() => (this.value() + this.errorsCount()) * 100 / (this.total() ?? 0));
 }
