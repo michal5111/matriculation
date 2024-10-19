@@ -1,4 +1,4 @@
-import {Inject, Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Page} from '../../model/applications/page';
 import {Applicant} from '../../model/applications/applicant';
@@ -14,11 +14,11 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class ApplicantService {
+  baseHref = inject(APP_BASE_HREF);
+  private http = inject(HttpClient);
+
 
   private apiUrl = `${this.baseHref}api/applicants`;
-
-  constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) {
-  }
 
   getApplicantsList() {
     return this.http.get<Page<Applicant>>(this.apiUrl, httpOptions);

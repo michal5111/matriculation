@@ -1,4 +1,4 @@
-import {Inject, Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Person} from '../../model/oracle/Person';
 import {Observable} from 'rxjs';
@@ -15,11 +15,11 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class PersonService {
+  baseHref = inject(APP_BASE_HREF);
+  private http = inject(HttpClient);
+
 
   private apiUrl = `${this.baseHref}api/person`;
-
-  constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) {
-  }
 
   getPersonById(id: number): Observable<Person> {
     return this.http.get<Person>(`${this.apiUrl}/${id}`, httpOptions);

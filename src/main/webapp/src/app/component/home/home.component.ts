@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {map, tap} from 'rxjs/operators';
 import {RxStompService} from '@stomp/ng2-stompjs';
 import {Message} from '@stomp/stompjs';
@@ -10,9 +10,8 @@ import {Message} from '@stomp/stompjs';
   standalone: true
 })
 export class HomeComponent implements OnInit {
+  private rxStompService = inject(RxStompService);
 
-  constructor(private rxStompService: RxStompService) {
-  }
 
   ngOnInit() {
     this.rxStompService.watch('/topic/insert/import').pipe(

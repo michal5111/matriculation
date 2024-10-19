@@ -1,4 +1,4 @@
-import {APP_INITIALIZER, enableProdMode, ErrorHandler, importProvidersFrom, LOCALE_ID} from '@angular/core';
+import {APP_INITIALIZER, enableProdMode, ErrorHandler, importProvidersFrom} from '@angular/core';
 
 import {environment} from './environments/environment';
 import {HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
@@ -15,10 +15,12 @@ import {MY_DATE_FORMATS} from './app/configConsts/MY_DATE_FORMATS';
 import {UserService} from './app/service/user-service/user.service';
 import {firstValueFrom} from 'rxjs';
 import {bootstrapApplication, BrowserModule} from '@angular/platform-browser';
-import {AppRoutingModule} from './app/app-routing.module';
 import {provideAnimations} from '@angular/platform-browser/animations';
 import {ReactiveFormsModule} from '@angular/forms';
 import {AppComponent} from './app/app.component';
+import {provideRouter, withComponentInputBinding} from '@angular/router';
+import {routes} from './app/routes';
+import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 
 function initUser(userService: UserService) {
   return (): Promise<any> => firstValueFrom(userService.init$());
@@ -35,13 +37,12 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(BrowserModule, AppRoutingModule, ReactiveFormsModule, NgOptimizedImage),
+    importProvidersFrom(BrowserModule, ReactiveFormsModule, NgOptimizedImage),
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
     },
-    {provide: LOCALE_ID, useValue: 'pl-PL'},
     {provide: MatPaginatorIntl, useClass: MatPaginatorIntlPl},
     {
       provide: APP_BASE_HREF,
@@ -89,7 +90,9 @@ bootstrapApplication(AppComponent, {
       multi: true
     },
     provideHttpClient(withInterceptorsFromDi()),
-    provideAnimations()
+    provideAnimations(),
+    provideRouter(routes, withComponentInputBinding()),
+    provideMomentDateAdapter()
   ]
 })
   .catch(err => console.error(err));

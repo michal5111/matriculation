@@ -1,10 +1,9 @@
-import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import {Component, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ImportService} from '../../../service/import-service/import.service';
 import {filter, map, switchMap, tap} from 'rxjs/operators';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {Application} from '../../../model/applications/application';
-import {ActivatedRoute, Router} from '@angular/router';
 import {BehaviorSubject, merge, Observable, Subscription} from 'rxjs';
 import {Import} from '../../../model/import/import';
 import {UserService} from '../../../service/user-service/user.service';
@@ -54,13 +53,38 @@ type filterType = { importId: number };
   templateUrl: './import-view.component.html',
   styleUrls: ['./import-view.component.sass'],
   standalone: true,
-  imports: [MatCard, MatCardTitle, MatCardSubtitle, MatCardActions, MatButton, MatIcon, MatCardContent, ImportStatusIndicatorComponent, ProgressViewerComponent, MatCheckbox, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatAnchor, MatTooltip, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]
+  imports: [
+    MatCard,
+    MatCardTitle,
+    MatCardSubtitle,
+    MatCardActions,
+    MatButton,
+    MatIcon,
+    MatCardContent,
+    ImportStatusIndicatorComponent,
+    ProgressViewerComponent,
+    MatCheckbox,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatSortHeader,
+    MatAnchor,
+    MatTooltip,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+    DatePipe
+  ]
 })
 export class ImportViewComponent extends AbstractListWithPathParamsComponent<Application, number, filterType> implements OnInit, OnDestroy {
   private importService = inject(ImportService);
   private usosService = inject(UsosService);
-  protected override route: ActivatedRoute;
-  protected override router: Router;
   userService = inject(UserService);
   private dialog = inject(MatDialog);
   private applicationsService = inject(ApplicationsService);
@@ -114,12 +138,7 @@ export class ImportViewComponent extends AbstractListWithPathParamsComponent<App
   @ViewChild(MatSort) override sort: MatSort | null = null;
 
   constructor() {
-    const route = inject(ActivatedRoute);
-    const router = inject(Router);
-
-    super(route, router);
-    this.route = route;
-    this.router = router;
+    super();
     const applicationsService = this.applicationsService;
 
     this.importId = this.route.snapshot.params['id'];

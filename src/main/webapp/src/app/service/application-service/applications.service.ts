@@ -1,4 +1,4 @@
-import {Inject, Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Application} from '../../model/applications/application';
 import {APP_BASE_HREF} from '@angular/common';
@@ -14,16 +14,13 @@ import {Page} from '../../model/dto/page/page';
   providedIn: 'root'
 })
 export class ApplicationsService implements BasicService<Application, number> {
+  baseHref = inject(APP_BASE_HREF);
+  private http = inject(HttpClient);
+  private router = inject(Router);
+  private serializer = inject(UrlSerializer);
+
 
   private apiUrl = `${this.baseHref}api/applications`;
-
-  constructor(
-    @Inject(APP_BASE_HREF) public baseHref: string,
-    private http: HttpClient,
-    private router: Router,
-    private serializer: UrlSerializer
-  ) {
-  }
 
   findAll(
     page: number,

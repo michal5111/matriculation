@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {CdkScrollable} from '@angular/cdk/scrolling';
 import {MatButton} from '@angular/material/button';
@@ -11,9 +11,8 @@ import {MatButton} from '@angular/material/button';
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatButton]
 })
 export class ForbiddenDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<ForbiddenDialogComponent>>(MatDialogRef);
 
-  constructor(public dialogRef: MatDialogRef<ForbiddenDialogComponent>) {
-  }
 
   ngOnInit(): void {
   }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, inject } from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
 import {
@@ -35,7 +35,26 @@ import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/m
   templateUrl: './import-setup.component.html',
   styleUrls: ['./import-setup.component.sass'],
   standalone: true,
-  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatInput, ReactiveFileInputComponent, MatPrefix, MatProgressSpinner, MatAutocompleteTrigger, MatButton, MatSuffix, MatIcon, MatAutocomplete, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, AsyncPipe]
+  imports: [
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatSelect,
+    MatOption,
+    MatInput,
+    ReactiveFileInputComponent,
+    MatPrefix,
+    MatProgressSpinner,
+    MatAutocompleteTrigger,
+    MatButton,
+    MatSuffix,
+    MatIcon,
+    MatAutocomplete,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatDatepicker,
+    AsyncPipe
+  ]
 })
 export class ImportSetupComponent implements OnInit, OnDestroy {
   private importService = inject(ImportService);

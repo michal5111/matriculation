@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import {Component, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BasicDataSource} from '../../dataSource/basic-data-source';
 import {Application} from '../../model/applications/application';
 import {BehaviorSubject, debounceTime, distinctUntilChanged, tap} from 'rxjs';
@@ -6,7 +6,6 @@ import {UrlDto} from '../../model/import/urlDto';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {UsosService} from '../../service/usos-service/usos.service';
-import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../service/user-service/user.service';
 import {MatDialog} from '@angular/material/dialog';
 import {ApplicationsService} from '../../service/application-service/applications.service';
@@ -46,27 +45,42 @@ type filterType = {
   templateUrl: './application-list.component.html',
   styleUrls: ['./application-list.component.sass'],
   standalone: true,
-  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatAnchor, MatTooltip, MatIcon, MatButton, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]
+  imports: [
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatSortHeader,
+    MatAnchor,
+    MatTooltip,
+    MatIcon,
+    MatButton,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+    DatePipe
+  ]
 })
 export class ApplicationListComponent extends AbstractListWithPathParamsComponent<Application, number, filterType>
   implements OnInit, OnDestroy {
   private usosService = inject(UsosService);
-  protected override route: ActivatedRoute;
-  protected override router: Router;
   userService = inject(UserService);
   private dialog = inject(MatDialog);
   baseHref = inject(APP_BASE_HREF);
 
 
   constructor() {
-    const route = inject(ActivatedRoute);
-    const router = inject(Router);
+    super();
     const applicationsService = inject(ApplicationsService);
-
-    super(route, router);
-    this.route = route;
-    this.router = router;
-
     this.filtersSubject = new BehaviorSubject<filterType>({});
     this.dataSource = new BasicDataSource<Application, number, filterType>(applicationsService);
     this.filterFormGroup = new FormGroup({

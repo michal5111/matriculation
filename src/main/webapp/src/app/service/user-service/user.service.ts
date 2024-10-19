@@ -1,11 +1,12 @@
-import {Inject, Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {UserDetails} from '../../model/user/userDetails';
 import {filter, tap} from 'rxjs/operators';
 import {APP_BASE_HREF} from '@angular/common';
 import {User} from '../../model/user/user';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, map, Observable} from 'rxjs';
 import {Page} from '../../model/dto/page/page';
+import {ActivatedRouteSnapshot, CanActivate, GuardResult, MaybeAsync, RouterStateSnapshot} from '@angular/router';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -20,7 +21,10 @@ function nonNull<T>(value: T | null | undefined): value is T {
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class UserService implements CanActivate {
+  baseHref = inject(APP_BASE_HREF);
+  private http = inject(HttpClient);
+
 
   apiUrl = `${this.baseHref}api/users`;
   userUrl = `${this.baseHref}api/user`;
@@ -40,9 +44,6 @@ export class UserService {
 
   setUnauthenticated() {
     this.setUser(null);
-  }
-
-  constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) {
   }
 
   findById(userId: number) {
@@ -87,5 +88,17 @@ export class UserService {
         }
       })
     );
+  }
+
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): MaybeAsync<GuardResult> {
+    const authorities: string[] = route.data?.['authorities'];
+    if (!authorities || authorities.length === 0) {
+      return true;
+    } else {
+      return this.$user.pipe(
+        map(user => user.authorities),
+        map(() => this.hasAnyRole(...authorities))
+      );
+    }
   }
 }

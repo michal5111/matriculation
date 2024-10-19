@@ -1,4 +1,4 @@
-import {Inject, Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {Observable, shareReplay} from 'rxjs';
 import {APP_BASE_HREF} from '@angular/common';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
@@ -15,11 +15,11 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class UsosService {
+  baseHref = inject(APP_BASE_HREF);
+  private http = inject(HttpClient);
+
 
   private apiUrl = `${this.baseHref}api/usos`;
-
-  constructor(@Inject(APP_BASE_HREF) public baseHref: string, private http: HttpClient) {
-  }
 
   updateIndexNumberByUsosIdAndIndexType(personId: number, indexTypeCode: string, indexNumber: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/person/${personId}/indexNumber?indexType=${indexTypeCode}&indexNumber=${indexNumber}`, null, httpOptions);

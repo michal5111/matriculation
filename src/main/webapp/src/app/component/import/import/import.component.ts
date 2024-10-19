@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import {Component, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Page} from '../../../model/dto/page/page';
 import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
@@ -18,7 +18,7 @@ import {Message} from '@stomp/stompjs';
 import {RxStompService} from '@stomp/ng2-stompjs';
 import {BasicDataSource} from '../../../dataSource/basic-data-source';
 import {AbstractListWithPathParamsComponent} from '../../abstract-list-with-path-params.component';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {RouterLink} from '@angular/router';
 import {ImportSetupComponent} from '../import-setup/import-setup.component';
 import {DatePipe} from '@angular/common';
 import {
@@ -42,13 +42,37 @@ import {MatIcon} from '@angular/material/icon';
   templateUrl: './import.component.html',
   styleUrls: ['./import.component.sass'],
   standalone: true,
-  imports: [MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelContent, ImportSetupComponent, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, ImportStatusIndicatorComponent, MatButton, MatIcon, MatAnchor, RouterLink, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]
+  imports: [
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MatExpansionPanelContent,
+    ImportSetupComponent,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    ImportStatusIndicatorComponent,
+    MatButton,
+    MatIcon,
+    MatAnchor,
+    RouterLink,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+    DatePipe
+  ]
 })
 export class ImportComponent extends AbstractListWithPathParamsComponent<Import, number, {}> implements OnInit, OnDestroy {
   private importService = inject(ImportService);
   userService = inject(UserService);
-  protected override route: ActivatedRoute;
-  protected override router: Router;
   private rxStompService = inject(RxStompService);
 
 
@@ -95,13 +119,8 @@ export class ImportComponent extends AbstractListWithPathParamsComponent<Import,
   @ViewChild(MatExpansionPanel) importCreateExpansionPanel: MatExpansionPanel | null = null;
 
   constructor() {
-    const route = inject(ActivatedRoute);
-    const router = inject(Router);
-
-    super(route, router);
+    super();
     const importService = this.importService;
-    this.route = route;
-    this.router = router;
 
     this.filtersSubject = new BehaviorSubject<{}>({});
     this.dataSource = new BasicDataSource<Import, number, {}>(importService);

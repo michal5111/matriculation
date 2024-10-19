@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, inject, OnInit, ViewChild} from '@angular/core';
 import {UserService} from '../../service/user-service/user.service';
 import {User} from '../../model/user/user';
 import {
@@ -36,6 +36,10 @@ import {MatIcon} from '@angular/material/icon';
   imports: [MatButton, MatIcon, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator]
 })
 export class UserManagerComponent implements OnInit {
+  private userService = inject(UserService);
+  private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
+
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator | null = null;
   @ViewChild(MatSort, {static: true}) sort: MatSort | null = null;
@@ -58,13 +62,6 @@ export class UserManagerComponent implements OnInit {
   ];
 
   dataSource = new MatTableDataSource<User>();
-
-  constructor(
-    private userService: UserService,
-    private dialog: MatDialog,
-    private snackBar: MatSnackBar
-  ) {
-  }
 
   ngOnInit(): void {
     this.dataSource.paginator = this.paginator;

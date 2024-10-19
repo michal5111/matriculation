@@ -1,16 +1,13 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, inject} from '@angular/core';
 import {merge, tap} from 'rxjs';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AbstractListComponent} from './abstract-list.component';
 
 @Component({template: ''})
 export abstract class AbstractListWithPathParamsComponent<T, ID, F> extends AbstractListComponent<T, ID, F> implements AfterViewInit {
-  protected constructor(
-    protected route: ActivatedRoute,
-    protected router: Router
-  ) {
-    super();
-  }
+  protected route = inject(ActivatedRoute);
+  protected router = inject(Router);
+
 
   override ngAfterViewInit() {
     if (!this.paginator || !this.sort) {

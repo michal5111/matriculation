@@ -1,4 +1,4 @@
-import {ErrorHandler, Injectable, NgZone} from '@angular/core';
+import {ErrorHandler, inject, Injectable, NgZone} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ErrorDialogComponent} from '../component/dialog/error-dialog/error-dialog.component';
@@ -7,12 +7,9 @@ import {BackendError} from './backend-error';
 
 @Injectable()
 export class ExceptionHandler implements ErrorHandler {
+  private dialog = inject(MatDialog);
+  private ngZone = inject(NgZone);
 
-  constructor(
-    private dialog: MatDialog,
-    private ngZone: NgZone
-  ) {
-  }
 
   openedDialogs = 0;
   title = '?';

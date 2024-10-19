@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {APP_BASE_HREF, Location} from '@angular/common';
@@ -13,13 +13,11 @@ import {MatAnchor} from '@angular/material/button';
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatAnchor]
 })
 export class UnauthorizedDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<UnauthorizedDialogComponent>>(MatDialogRef);
+  router = inject(Router);
+  baseHref = inject(APP_BASE_HREF);
+  location = inject(Location);
 
-  constructor(
-    public dialogRef: MatDialogRef<UnauthorizedDialogComponent>,
-    public router: Router,
-    @Inject(APP_BASE_HREF) public baseHref: string, public location: Location
-  ) {
-  }
 
   ngOnInit(): void {
   }

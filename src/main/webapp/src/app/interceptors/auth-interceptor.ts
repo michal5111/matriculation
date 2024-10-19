@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {tap} from 'rxjs/operators';
@@ -9,9 +9,8 @@ import {ForbiddenDialogComponent} from '../component/dialog/forbidden-dialog/for
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-
-  constructor(private dialog: MatDialog, private userService: UserService) {
-  }
+  private dialog = inject(MatDialog);
+  private userService = inject(UserService);
 
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {

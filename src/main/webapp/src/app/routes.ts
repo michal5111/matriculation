@@ -1,5 +1,4 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
+import {Routes} from '@angular/router';
 import {HomeComponent} from './component/home/home.component';
 import {ImportComponent} from './component/import/import/import.component';
 import {ImportViewComponent} from './component/import/import-view/import-view.component';
@@ -7,7 +6,7 @@ import {UserManagerComponent} from './component/user-manager/user-manager.compon
 import {UserService} from './service/user-service/user.service';
 import {ApplicationListComponent} from './component/application-list/application-list.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   {path: '', component: HomeComponent},
   {
     path: 'import', component: ImportComponent, canActivate: [UserService], data: {
@@ -30,10 +29,3 @@ const routes: Routes = [
     }
   }
 ];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
-})
-export class AppRoutingModule {
-}

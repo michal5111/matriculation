@@ -1,6 +1,5 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {Import} from '../../../model/import/import';
 import {ImportSetupComponent} from '../../import/import-setup/import-setup.component';
 
 @Component({
@@ -11,12 +10,9 @@ import {ImportSetupComponent} from '../../import/import-setup/import-setup.compo
   imports: [ImportSetupComponent]
 })
 export class ImportEditorComponent implements OnInit {
+  data = inject(MAT_DIALOG_DATA);
+  dialogRef = inject<MatDialogRef<ImportEditorComponent>>(MatDialogRef);
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { import: Import | null } | null = null,
-    public dialogRef: MatDialogRef<ImportEditorComponent>
-  ) {
-  }
 
   ngOnInit(): void {
   }
