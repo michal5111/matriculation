@@ -52,8 +52,10 @@
       <ng-container matColumnDef="usosId">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> usos id</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
-          <a *ngIf="usosUrl" mat-button href="{{getPersonUsosUrl(element)}}"
-             target="_blank">{{ element.applicant.usosId }}</a>
+          @if (usosUrl) {
+            <a mat-button href="{{getPersonUsosUrl(element)}}"
+               target="_blank">{{ element.applicant.usosId }}</a>
+          }
         </td>
       </ng-container>
 
@@ -86,53 +88,69 @@
       <ng-container matColumnDef="certificateDocumentNumber">
         <th mat-header-cell *matHeaderCellDef> Dyplom</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
-          <div *ngIf="element.certificate">
-            {{ element.certificate.documentNumber }}
-          </div>
+          @if (element.certificate) {
+            <div>
+              {{ element.certificate.documentNumber }}
+            </div>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="certificateDocumentIssueDateAndPlace">
         <th mat-header-cell *matHeaderCellDef> Data wyd. Miejsce</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
-          <div *ngIf="element.certificate">
-            {{ element.certificate.issueDate | date:'dd.MM.yyyy' }} {{ element.certificate.issueCity }}
-          </div>
+          @if (element.certificate) {
+            <div>
+              {{ element.certificate.issueDate | date:'dd.MM.yyyy' }} {{ element.certificate.issueCity }}
+            </div>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="certificateDocumentIssueInstitution">
         <th mat-header-cell *matHeaderCellDef> Wystawiający</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
-          <div *ngIf="element.certificate">
-            {{ element.certificate.issueInstitution }}
-          </div>
+          @if (element.certificate) {
+            <div>
+              {{ element.certificate.issueInstitution }}
+            </div>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="indexNumber">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Nr albumu</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
-          <div *ngIf="element.applicant.assignedIndexNumber">{{ element.applicant.assignedIndexNumber }}</div>
+          @if (element.applicant.assignedIndexNumber) {
+            <div>{{ element.applicant.assignedIndexNumber }}</div>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="applicationImportStatus">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Status importu</th>
         <td mat-cell *matCellDef="let element" class="mat-cell">
-          <div [ngSwitch]="element.importStatus">
-            <div *ngSwitchCase="'NOT_IMPORTED'" matTooltip="Oczekujące">
-              <mat-icon>hourglass_empty</mat-icon>
-            </div>
-            <div *ngSwitchCase="'IMPORTED'" matTooltip="Powodzenie">
-              <mat-icon>done</mat-icon>
-            </div>
-            <div *ngSwitchCase="'ERROR'" matTooltip="Błąd">
-              <button mat-button *ngIf="element.importError" (click)="showApplicationErrorDialog(element)">
-                <mat-icon>error</mat-icon>
-                Wyświetl błąd
-              </button>
-            </div>
+          <div>
+            @switch (element.importStatus) {
+              @case ('NOT_IMPORTED') {
+                <div matTooltip="Oczekujące">
+                  <mat-icon>hourglass_empty</mat-icon>
+                </div>
+              } @case ('IMPORTED') {
+                <div matTooltip="Powodzenie">
+                  <mat-icon>done</mat-icon>
+                </div>
+              } @case ('ERROR') {
+                <div matTooltip="Błąd">
+                  @if (element.importError) {
+                    <button mat-button (click)="showApplicationErrorDialog(element)">
+                      <mat-icon>error</mat-icon>
+                      Wyświetl błąd
+                    </button>
+                  }
+                </div>
+              }
+            }
           </div>
         </td>
       </ng-container>
@@ -141,19 +159,26 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencjalny duplikat</th>
         <td mat-cell *matCellDef="let element" class="mat-cell"
             [class.red_backgroud]="element.applicant.potentialDuplicateStatus === 'POTENTIAL_DUPLICATE'">
-          <div [ngSwitch]="element.applicant.potentialDuplicateStatus">
-            <div *ngSwitchCase="'NOT_CHECKED'" matTooltip="Nie sprawdzono">
-              <mat-icon>help</mat-icon>
-            </div>
-            <div *ngSwitchCase="'OK'" matTooltip="W porządku">
-              <mat-icon>done</mat-icon>
-            </div>
-            <div *ngSwitchCase="'POTENTIAL_DUPLICATE'" matTooltip="Potencjalny duplikat">
-              <mat-icon>priority_high</mat-icon>
-            </div>
-            <div *ngSwitchCase="'CONFIRMED_NOT_DUPLICATE'" matTooltip="Potwierdzono">
-              <mat-icon>done_all</mat-icon>
-            </div>
+          <div>
+            @switch (element.applicant.potentialDuplicateStatus) {
+              @case ('NOT_CHECKED') {
+                <div matTooltip="Nie sprawdzono">
+                  <mat-icon>help</mat-icon>
+                </div>
+              } @case ('OK') {
+                <div matTooltip="W porządku">
+                  <mat-icon>done</mat-icon>
+                </div>
+              } @case ('POTENTIAL_DUPLICATE') {
+                <div matTooltip="Potencjalny duplikat">
+                  <mat-icon>priority_high</mat-icon>
+                </div>
+              } @case ('CONFIRMED_NOT_DUPLICATE') {
+                <div matTooltip="Potwierdzono">
+                  <mat-icon>done_all</mat-icon>
+                </div>
+              }
+            }
           </div>
         </td>
       </ng-container>
@@ -161,8 +186,10 @@
       <ng-container matColumnDef="importError">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Błąd przy importowaniu</th>
         <td mat-cell *matCellDef="let element" class="mat-column-error"> {{ element.importError }}
-          <button mat-button *ngIf="element.importError" (click)="showApplicationErrorDialog(element)">Wyświetl błąd
-          </button>
+          @if (element.importError) {
+            <button mat-button (click)="showApplicationErrorDialog(element)">Wyświetl błąd
+            </button>
+          }
         </td>
       </ng-container>
 

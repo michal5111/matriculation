@@ -1,4 +1,4 @@
-import {Component, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import {ImportService} from '../../../service/import-service/import.service';
 import {filter, map, switchMap, tap} from 'rxjs/operators';
 import {MatPaginator} from '@angular/material/paginator';
@@ -27,7 +27,7 @@ import {WS_URL} from '../../../injectableTokens/WS_URL';
 import {ImportEditorComponent} from '../../dialog/import-editor/import-editor.component';
 import {AbstractListWithPathParamsComponent} from '../../abstract-list-with-path-params.component';
 import {BasicDataSource} from 'src/app/dataSource/basic-data-source';
-import {DatePipe, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import {MatCard, MatCardActions, MatCardContent, MatCardSubtitle, MatCardTitle} from '@angular/material/card';
 import {MatAnchor, MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
@@ -54,9 +54,19 @@ type filterType = { importId: number };
   templateUrl: './import-view.component.html',
   styleUrls: ['./import-view.component.sass'],
   standalone: true,
-  imports: [NgIf, MatCard, MatCardTitle, MatCardSubtitle, MatCardActions, MatButton, MatIcon, MatCardContent, ImportStatusIndicatorComponent, ProgressViewerComponent, MatCheckbox, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatAnchor, NgSwitch, NgSwitchCase, MatTooltip, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]
+  imports: [MatCard, MatCardTitle, MatCardSubtitle, MatCardActions, MatButton, MatIcon, MatCardContent, ImportStatusIndicatorComponent, ProgressViewerComponent, MatCheckbox, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatAnchor, MatTooltip, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]
 })
 export class ImportViewComponent extends AbstractListWithPathParamsComponent<Application, number, filterType> implements OnInit, OnDestroy {
+  private importService = inject(ImportService);
+  private usosService = inject(UsosService);
+  protected override route: ActivatedRoute;
+  protected override router: Router;
+  userService = inject(UserService);
+  private dialog = inject(MatDialog);
+  private applicationsService = inject(ApplicationsService);
+  rxStompService = inject(RxStompService);
+  private wsUrl = inject(WS_URL);
+
   dataSource: BasicDataSource<Application, number, filterType>;
   filtersSubject: BehaviorSubject<filterType>;
   importId = -1;
@@ -103,18 +113,15 @@ export class ImportViewComponent extends AbstractListWithPathParamsComponent<App
   @ViewChild(MatPaginator) override paginator: MatPaginator | null = null;
   @ViewChild(MatSort) override sort: MatSort | null = null;
 
-  constructor(
-    private importService: ImportService,
-    private usosService: UsosService,
-    protected override route: ActivatedRoute,
-    protected override router: Router,
-    public userService: UserService,
-    private dialog: MatDialog,
-    private applicationsService: ApplicationsService,
-    public rxStompService: RxStompService,
-    @Inject(WS_URL) private wsUrl: string
-  ) {
+  constructor() {
+    const route = inject(ActivatedRoute);
+    const router = inject(Router);
+
     super(route, router);
+    this.route = route;
+    this.router = router;
+    const applicationsService = this.applicationsService;
+
     this.importId = this.route.snapshot.params['id'];
     this.filtersSubject = new BehaviorSubject<filterType>({
       importId: this.importId

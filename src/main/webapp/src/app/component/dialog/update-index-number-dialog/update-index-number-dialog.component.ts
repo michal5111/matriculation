@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -12,7 +12,7 @@ import {UsosService} from '../../../service/usos-service/usos.service';
 import {CdkScrollable} from '@angular/cdk/scrolling';
 import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
-import {NgIf} from '@angular/common';
+
 import {MatButton} from '@angular/material/button';
 
 @Component({
@@ -20,17 +20,17 @@ import {MatButton} from '@angular/material/button';
   templateUrl: './update-index-number-dialog.component.html',
   styleUrls: ['./update-index-number-dialog.component.sass'],
   standalone: true,
-  imports: [MatDialogTitle, ReactiveFormsModule, CdkScrollable, MatDialogContent, MatFormField, MatLabel, MatInput, NgIf, MatError, MatDialogActions, MatButton]
+  imports: [MatDialogTitle, ReactiveFormsModule, CdkScrollable, MatDialogContent, MatFormField, MatLabel, MatInput, MatError, MatDialogActions, MatButton]
 })
 export class UpdateIndexNumberDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<UpdateIndexNumberDialogComponent>>(MatDialogRef);
+  data = inject<UpdateIndexNumberDialogData>(MAT_DIALOG_DATA);
+  private usosService = inject(UsosService);
+
 
   updateIndexNumberFormGroup: FormGroup<{ indexNumber: FormControl<string | null> }>;
 
-  constructor(
-    public dialogRef: MatDialogRef<UpdateIndexNumberDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: UpdateIndexNumberDialogData,
-    private usosService: UsosService
-  ) {
+  constructor() {
     this.updateIndexNumberFormGroup = new FormGroup({
       indexNumber: new FormControl<string>('', Validators.required)
     });

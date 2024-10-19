@@ -10,6 +10,6 @@
   </button>
   Dodaj plik
 </span>
-<ng-template [ngIf]="file">
+@if (file) {
   {{ file.name }}
-</ng-template>
+}

@@ -4,48 +4,57 @@
       <mat-label>Źródło danych</mat-label>
       <mat-select [compareWith]="datasourceCompare" formControlName="dataSource"
                   (selectionChange)="onDataSourceSelectionChange($event)">
-        <mat-option
-          *ngFor="let dataSource of $availableDataSources | async"
-          [value]="dataSource">{{dataSource.name}}
-        </mat-option>
+        @for (dataSource of $availableDataSources | async; track dataSource) {
+          <mat-option
+            [value]="dataSource">{{ dataSource.name }}
+          </mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
     <div formGroupName="additionalParameters">
-      <div *ngFor="let parameter of additionalParameters">
-        <div [ngSwitch]="parameter.type">
-          <mat-form-field *ngSwitchCase="'TEXT'" class="form-field wide-field">
-            <mat-label>{{parameter.name}}</mat-label>
-            <input type="text" matInput [formControlName]="parameter.name">
-          </mat-form-field>
-          <div *ngSwitchCase="'FILE'">
-            <app-reactive-file-input [formControlName]="parameter.name" [accept]="parameter.accept"
-                                     [templateHref]="getUrlWithBaseHref(parameter.fileTemplate)">
-            </app-reactive-file-input>
-
-            <!--            <a mat-button href="{{getUrlWithBaseHref(parameter.fileTemplate)}}">Pobierz szablon</a>-->
-            <!--            <input [formControlName]="parameter.name" [accept]="parameter.accept"-->
-            <!--                   (change)="onFileSelected($event, parameter.name)"-->
-            <!--                   multiple="false" type="file" class="file-input" #fileUpload>-->
-            <!--            <div class="file-upload">-->
-            <!--              <button mat-mini-fab type="button" color="primary" class="upload-btn" (click)="fileUpload.click()">-->
-            <!--                <mat-icon>attach_file</mat-icon>-->
-            <!--              </button>-->
-            <!--              Dodaj plik-->
-            <!--            </div>-->
-            <!--            {{formGroup.controls.additionalParameters.value[parameter.name]}}-->
+      @for (parameter of additionalParameters; track parameter) {
+        <div>
+          <div>
+            @switch (parameter.type) {
+              @case ('TEXT') {
+                <mat-form-field class="form-field wide-field">
+                  <mat-label>{{ parameter.name }}</mat-label>
+                  <input type="text" matInput [formControlName]="parameter.name">
+                </mat-form-field>
+              } @case ('FILE') {
+                <div>
+                  <app-reactive-file-input [formControlName]="parameter.name" [accept]="parameter.accept"
+                                           [templateHref]="getUrlWithBaseHref(parameter.fileTemplate)">
+                  </app-reactive-file-input>
+                  <!--            <a mat-button href="{{getUrlWithBaseHref(parameter.fileTemplate)}}">Pobierz szablon</a>-->
+                  <!--            <input [formControlName]="parameter.name" [accept]="parameter.accept"-->
+                  <!--                   (change)="onFileSelected($event, parameter.name)"-->
+                  <!--                   multiple="false" type="file" class="file-input" #fileUpload>-->
+                  <!--            <div class="file-upload">-->
+                  <!--              <button mat-mini-fab type="button" color="primary" class="upload-btn" (click)="fileUpload.click()">-->
+                  <!--                <mat-icon>attach_file</mat-icon>-->
+                  <!--              </button>-->
+                  <!--              Dodaj plik-->
+                  <!--            </div>-->
+                  <!--            {{formGroup.controls.additionalParameters.value[parameter.name]}}-->
+                </div>
+              } @case ('SELECTION_LIST') {
+                <mat-form-field class="form-field wide-field">
+                  <mat-label>{{ parameter.name }}</mat-label>
+                  <mat-select [formControlName]="parameter.name">
+                    @for (selectionListValue of parameter.selectionListSource; track selectionListValue) {
+                      <mat-option
+                        [value]="selectionListValue.value">{{ selectionListValue.name }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              }
+            }
           </div>
-          <mat-form-field *ngSwitchCase="'SELECTION_LIST'" class="form-field wide-field">
-            <mat-label>{{parameter.name}}</mat-label>
-            <mat-select [formControlName]="parameter.name">
-              <mat-option
-                *ngFor="let selectionListValue of parameter.selectionListSource"
-                [value]="selectionListValue.value">{{selectionListValue.name}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
         </div>
-      </div>
+      }
     </div>
 
     <mat-form-field class="form-field wide-field">
@@ -54,14 +63,17 @@
                   [compareWith]="registrationCompare"
                   (selectionChange)="onRegistrationSelectionChange($event)"
                   [disabled]="areRegistrationLoading">
-        <mat-option
-          *ngFor="let registration of registrations"
-          [value]="registration.id">[{{registration.id}}] {{registration.name}}
-        </mat-option>
+        @for (registration of registrations; track registration) {
+          <mat-option
+            [value]="registration.id">[{{ registration.id }}] {{ registration.name }}
+          </mat-option>
+        }
       </mat-select>
-      <ng-template matPrefix [ngIf]="areRegistrationLoading"><p></p>
-        <mat-spinner diameter="20"></mat-spinner>
-      </ng-template>
+      @if (areRegistrationLoading) {
+        <ng-template matPrefix><p></p>
+          <mat-spinner diameter="20"></mat-spinner>
+        </ng-template>
+      }
     </mat-form-field>
     <mat-form-field class="form-field wide-field">
       <mat-label>Program</mat-label>
@@ -69,50 +81,61 @@
                   [compareWith]="registrationProgrammeCompare"
                   (selectionChange)="onRegistrationProgrammeChange($event)"
                   [disabled]="areRegistrationLoading || areProgrammesLoading">
-        <mat-option
-          *ngFor="let registrationProgramme of registrationProgrammes"
-          [value]="registrationProgramme">[{{registrationProgramme.usosId}}] {{registrationProgramme.name}}
-        </mat-option>
+        @for (registrationProgramme of registrationProgrammes; track registrationProgramme) {
+          <mat-option
+            [value]="registrationProgramme">[{{ registrationProgramme.usosId }}] {{ registrationProgramme.name }}
+          </mat-option>
+        }
       </mat-select>
-      <ng-template matPrefix [ngIf]="areProgrammesLoading"><p></p>
-        <mat-spinner diameter="20"></mat-spinner>
-      </ng-template>
+      @if (areProgrammesLoading) {
+        <ng-template matPrefix><p></p>
+          <mat-spinner diameter="20"></mat-spinner>
+        </ng-template>
+      }
     </mat-form-field>
     <mat-form-field class="form-field wide-field">
       <mat-label>Etap</mat-label>
       <mat-select formControlName="stage"
                   [disabled]="areRegistrationLoading || areProgrammesLoading || areRegistrationLoading">
-        <mat-option
-          *ngFor="let stage of stages"
-          [value]="stage">{{stage}}
-        </mat-option>
+        @for (stage of stages; track stage) {
+          <mat-option
+            [value]="stage">{{ stage }}
+          </mat-option>
+        }
       </mat-select>
-      <ng-template matPrefix [ngIf]="areStagesLoading"><p></p>
-        <mat-spinner diameter="20"></mat-spinner>
-      </ng-template>
+      @if (areStagesLoading) {
+        <ng-template matPrefix><p></p>
+          <mat-spinner diameter="20"></mat-spinner>
+        </ng-template>
+      }
     </mat-form-field>
     <div class="flex-container">
       <mat-form-field class="form-field flex-form-field">
         <mat-label>Cykl dydaktyczny</mat-label>
         <input type="text" matInput formControlName="didacticCycle" [matAutocomplete]="auto">
-        <button mat-button *ngIf="formGroup.value.didacticCycle" matSuffix
-                aria-label="Clear" (click)="formGroup.value.didacticCycle=''">
-          <mat-icon>close</mat-icon>
-        </button>
+        @if (formGroup.value.didacticCycle) {
+          <button mat-button matSuffix
+                  aria-label="Clear" (click)="formGroup.value.didacticCycle=''">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
         <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let didacticCycle of didacticCycles" [value]="didacticCycle">
-            {{didacticCycle}}
-          </mat-option>
+          @for (didacticCycle of didacticCycles; track didacticCycle) {
+            <mat-option [value]="didacticCycle">
+              {{ didacticCycle }}
+            </mat-option>
+          }
         </mat-autocomplete>
       </mat-form-field>
       <mat-form-field class="form-field flex-form-field">
         <mat-label>Pula indeksów</mat-label>
         <mat-select formControlName="indexPoolCode" [compareWith]="indexTypeCompare">
           <mat-option>--</mat-option>
-          <mat-option
-            *ngFor="let indexPool of $indexPools | async"
-            [value]="indexPool">{{indexPool.description}}
-          </mat-option>
+          @for (indexPool of $indexPools | async; track indexPool) {
+            <mat-option
+              [value]="indexPool">{{ indexPool.description }}
+            </mat-option>
+          }
         </mat-select>
       </mat-form-field>
       <mat-form-field class="form-field form-field-date">
@@ -129,14 +152,15 @@
       </mat-form-field>
     </div>
     <button mat-button type="submit" [disabled]="!formGroup.valid || isButtonDisabled">
-      <div *ngIf="this.import?.id == null; else elseButton">
-        <mat-icon>add</mat-icon>
-        Utwórz
-      </div>
-      <ng-template #elseButton>
-        <mat-icon>edit</mat-icon>
-        Aktualizuj
-      </ng-template>
+      @if (this.import?.id == null) {
+        <div>
+          <mat-icon>add</mat-icon>
+          Utwórz
+        </div>
+      } @else {
+      <mat-icon>edit</mat-icon>
+      Aktualizuj
+    }
     </button>
   </form>
 </div>

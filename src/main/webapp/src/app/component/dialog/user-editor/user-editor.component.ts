@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {UserEditorData} from '../../../model/user/UserEditorData';
 import {User} from '../../../model/user/user';
@@ -7,7 +7,7 @@ import {Role} from '../../../model/user/role';
 import {UserService} from '../../../service/user-service/user.service';
 import {RoleService} from '../../../service/role-service/role.service';
 import {tap} from 'rxjs/operators';
-import {NgFor, NgIf} from '@angular/common';
+
 import {MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 
@@ -16,22 +16,19 @@ import {MatIcon} from '@angular/material/icon';
   templateUrl: './user-editor.component.html',
   styleUrls: ['./user-editor.component.sass'],
   standalone: true,
-  imports: [NgIf, MatSelectionList, NgFor, MatListOption, MatButton, MatIcon]
+  imports: [MatSelectionList, MatListOption, MatButton, MatIcon]
 })
 export class UserEditorComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<UserEditorComponent>>(MatDialogRef);
+  data = inject<UserEditorData>(MAT_DIALOG_DATA);
+  private userService = inject(UserService);
+  private roleService = inject(RoleService);
+
 
   user: User = new User();
   rolesList: Role[] = [];
 
   @ViewChild('roleSelectionList') roleSelectionList: MatSelectionList | null = null;
-
-  constructor(
-    public dialogRef: MatDialogRef<UserEditorComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: UserEditorData,
-    private userService: UserService,
-    private roleService: RoleService
-  ) {
-  }
 
   ngOnInit(): void {
     this.userService.findById(this.data.user.id ?? -1).pipe(

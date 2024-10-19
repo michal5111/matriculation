@@ -5,34 +5,31 @@
                                         width="132"/>
         Immatrykulator 5000
       </a>
-      <ng-template [ngIf]="userService.isAuthenticated()">
+      @if (userService.isAuthenticated()) {
         <a mat-stroked-button class="toolbarButton" routerLink="/import"
            [disabled]="!userService.hasAnyRole('ROLE_IMPORT_VIEW','ROLE_ADMIN')">Importy
         </a>
-      </ng-template>
-      <ng-template [ngIf]="userService.isAuthenticated()">
-        <a mat-stroked-button class="toolbarButton" routerLink="/applications"
-           [disabled]="!userService.hasAnyRole('ROLE_IMPORT_VIEW','ROLE_ADMIN')">Zgłoszenia rekrutacyjne
-        </a>
-      </ng-template>
-      <ng-template [ngIf]="userService.hasRole('ROLE_ADMIN')">
-        <a mat-stroked-button class="toolbarButton" routerLink="/userManager">
-          <mat-icon>admin_panel_settings</mat-icon>
-          Zarządzaj użytkownikami
-        </a>
-      </ng-template>
+      } @if (userService.isAuthenticated()) {
+      <a mat-stroked-button class="toolbarButton" routerLink="/applications"
+         [disabled]="!userService.hasAnyRole('ROLE_IMPORT_VIEW','ROLE_ADMIN')">Zgłoszenia rekrutacyjne
+      </a>
+    } @if (userService.hasRole('ROLE_ADMIN')) {
+      <a mat-stroked-button class="toolbarButton" routerLink="/userManager">
+        <mat-icon>admin_panel_settings</mat-icon>
+        Zarządzaj użytkownikami
+      </a>
+    }
       <span class="fill-remaining-space"></span>
-      <ng-template [ngIf]="userService.isAuthenticated()" [ngIfElse]="loggedOut">
+      @if (userService.isAuthenticated()) {
         @if (userService.$user | async; as user) {
           <span
             class="username">{{ user?.casAssertion?.principal?.attributes?.givenname }} {{ user?.casAssertion?.principal?.attributes?.lastname }}</span>
         }
         <a mat-stroked-button class="toolbarButton" href="{{baseHref}}logout">Wyloguj</a>
-      </ng-template>
-      <ng-template #loggedOut>
-        <a mat-stroked-button class="toolbarButton"
-           href="{{baseHref}}login?service={{getServiceUrl()}}">Zaloguj</a>
-      </ng-template>
+      } @else {
+      <a mat-stroked-button class="toolbarButton"
+         href="{{baseHref}}login?service={{getServiceUrl()}}">Zaloguj</a>
+    }
     </mat-toolbar>
     <router-outlet></router-outlet>
     <div class="push"></div>

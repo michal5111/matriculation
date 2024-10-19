@@ -1,6 +1,6 @@
-import {Component, Inject} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {UserService} from './service/user-service/user.service';
-import {APP_BASE_HREF, AsyncPipe, Location, NgIf, NgOptimizedImage} from '@angular/common';
+import {APP_BASE_HREF, AsyncPipe, Location, NgOptimizedImage} from '@angular/common';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {FooterComponent} from './component/footer/footer.component';
 import {MatAnchor} from '@angular/material/button';
@@ -16,7 +16,6 @@ import {MatIcon} from '@angular/material/icon';
   imports: [
     RouterLink,
     NgOptimizedImage,
-    NgIf,
     RouterOutlet,
     FooterComponent,
     AsyncPipe,
@@ -27,14 +26,11 @@ import {MatIcon} from '@angular/material/icon';
   ]
 })
 export class AppComponent {
-  title = 'matriculation';
+  userService = inject(UserService);
+  baseHref = inject(APP_BASE_HREF);
+  private location = inject(Location);
 
-  constructor(
-    public userService: UserService,
-    @Inject(APP_BASE_HREF) public baseHref: string,
-    private location: Location
-  ) {
-  }
+  title = 'matriculation';
 
   getServiceUrl() {
     return this.baseHref + this.location.path().slice(1, this.location.path().length);

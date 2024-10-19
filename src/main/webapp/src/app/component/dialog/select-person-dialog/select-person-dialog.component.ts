@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef} from '@angular/material/dialog';
 import {ImportService} from '../../../service/import-service/import.service';
 import {SelectPersonDialogData} from '../../../model/dialog/select-person-dialog-data';
@@ -20,7 +20,7 @@ import {Selectable} from '../../../generics/selectable';
 import {Applicant} from '../../../model/applications/applicant';
 import {MatCheckbox, MatCheckboxChange} from '@angular/material/checkbox';
 import {CdkScrollable} from '@angular/cdk/scrolling';
-import {DatePipe, NgFor, NgIf} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
 import {MatButton} from '@angular/material/button';
 
@@ -29,9 +29,13 @@ import {MatButton} from '@angular/material/button';
   templateUrl: './select-person-dialog.component.html',
   styleUrls: ['./select-person-dialog.component.sass'],
   standalone: true,
-  imports: [CdkScrollable, MatDialogContent, NgIf, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, NgFor, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDivider, MatCheckbox, MatDialogActions, MatButton, DatePipe]
+  imports: [CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDivider, MatCheckbox, MatDialogActions, MatButton, DatePipe]
 })
 export class SelectPersonDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<SelectPersonDialogComponent>>(MatDialogRef);
+  private importService = inject(ImportService);
+  data = inject<SelectPersonDialogData>(MAT_DIALOG_DATA);
+
 
   persons: Person[] = [];
   applicant: Applicant | null = null;
@@ -61,13 +65,6 @@ export class SelectPersonDialogComponent implements OnInit {
   ];
   dataSource = new MatTableDataSource<Selectable<Person>>();
   applicantDataSource = new MatTableDataSource<Applicant>();
-
-  constructor(
-    public dialogRef: MatDialogRef<SelectPersonDialogComponent>,
-    private importService: ImportService,
-    @Inject(MAT_DIALOG_DATA) public data: SelectPersonDialogData
-  ) {
-  }
 
   ngOnInit(): void {
     this.applicant = this.data.application.applicant;

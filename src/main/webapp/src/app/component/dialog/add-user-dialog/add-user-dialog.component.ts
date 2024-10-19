@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {User} from '../../../model/user/user';
@@ -8,7 +8,7 @@ import {RoleService} from '../../../service/role-service/role.service';
 import {MatListOption, MatSelectionList} from '@angular/material/list';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
-import {NgFor, NgIf} from '@angular/common';
+
 import {MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 
@@ -17,9 +17,14 @@ import {MatIcon} from '@angular/material/icon';
   templateUrl: './add-user-dialog.component.html',
   styleUrls: ['./add-user-dialog.component.sass'],
   standalone: true,
-  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatInput, NgIf, MatSelectionList, NgFor, MatListOption, MatButton, MatIcon]
+  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatSelectionList, MatListOption, MatButton, MatIcon]
 })
 export class AddUserDialogComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<AddUserDialogComponent>>(MatDialogRef);
+  private userService = inject(UserService);
+  private dialog = inject(MatDialog);
+  private roleService = inject(RoleService);
+
 
   addUserFormGroup: FormGroup<{ uid: FormControl<number | null> }>;
   user: User = new User();
@@ -28,12 +33,7 @@ export class AddUserDialogComponent implements OnInit {
 
   @ViewChild('roleSelectionList') roleSelectionList: MatSelectionList | null = null;
 
-  constructor(
-    public dialogRef: MatDialogRef<AddUserDialogComponent>,
-    private userService: UserService,
-    private dialog: MatDialog,
-    private roleService: RoleService
-  ) {
+  constructor() {
     this.addUserFormGroup = new FormGroup({
       uid: new FormControl<number | null>(null, Validators.required)
     });

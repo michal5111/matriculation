@@ -4,11 +4,15 @@
       <mat-label>Podaj UID (NIU)</mat-label>
       <input type="text" matInput formControlName="uid" required="true">
     </mat-form-field>
-    <mat-selection-list *ngIf="rolesList" #roleSelectionList>
-      <mat-list-option class="item" *ngFor="let role of rolesList" [value]="role">
-        {{role.name}}
-      </mat-list-option>
-    </mat-selection-list>
+    @if (rolesList) {
+      <mat-selection-list #roleSelectionList>
+        @for (role of rolesList; track role) {
+          <mat-list-option class="item" [value]="role">
+            {{ role.name }}
+          </mat-list-option>
+        }
+      </mat-selection-list>
+    }
     <button mat-button type="submit" [disabled]="!addUserFormGroup.valid || isButtonDisabled">
       <mat-icon>add</mat-icon>
       Dodaj

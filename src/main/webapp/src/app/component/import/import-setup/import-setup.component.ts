@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, inject } from '@angular/core';
 import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
 import {
@@ -19,7 +19,7 @@ import {MatSelect, MatSelectChange} from '@angular/material/select';
 import {DataSource, DataSourceAdditionalParameter} from '../../../model/import/dataSource';
 import {Programme} from '../../../model/applications/programme';
 import {UsosService} from '../../../service/usos-service/usos.service';
-import {APP_BASE_HREF, AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
+import {APP_BASE_HREF, AsyncPipe} from '@angular/common';
 import {MatFormField, MatLabel, MatPrefix, MatSuffix} from '@angular/material/form-field';
 import {MatOption} from '@angular/material/core';
 import {MatInput} from '@angular/material/input';
@@ -35,9 +35,14 @@ import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/m
   templateUrl: './import-setup.component.html',
   styleUrls: ['./import-setup.component.sass'],
   standalone: true,
-  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatSelect, NgFor, MatOption, NgSwitch, NgSwitchCase, MatInput, ReactiveFileInputComponent, MatPrefix, NgIf, MatProgressSpinner, MatAutocompleteTrigger, MatButton, MatSuffix, MatIcon, MatAutocomplete, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, AsyncPipe]
+  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatInput, ReactiveFileInputComponent, MatPrefix, MatProgressSpinner, MatAutocompleteTrigger, MatButton, MatSuffix, MatIcon, MatAutocomplete, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, AsyncPipe]
 })
 export class ImportSetupComponent implements OnInit, OnDestroy {
+  private importService = inject(ImportService);
+  private usosService = inject(UsosService);
+  private snackBar = inject(MatSnackBar);
+  baseHref = inject(APP_BASE_HREF);
+
 
   dataSourceId = '?';
   $availableDataSources: Observable<[DataSource]> = this.importService.getAvailableDataSources();
@@ -64,12 +69,7 @@ export class ImportSetupComponent implements OnInit, OnDestroy {
   subs: Subscription[] = [];
   additionalParameters: DataSourceAdditionalParameter[] = [];
 
-  constructor(
-    private importService: ImportService,
-    private usosService: UsosService,
-    private snackBar: MatSnackBar,
-    @Inject(APP_BASE_HREF) public baseHref: string
-  ) {
+  constructor() {
     this.formGroup = new FormGroup({
       dataSource: new FormControl<DataSource | null>(null, Validators.required),
       registration: new FormControl<string | null>(null, Validators.required),

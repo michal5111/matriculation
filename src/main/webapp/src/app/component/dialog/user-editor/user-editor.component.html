@@ -1,14 +1,18 @@
 <div class="container">
-  <ng-template [ngIf]="user">
-    <h3>UID: {{user.uid}}</h3>
-    <mat-selection-list *ngIf="rolesList" #roleSelectionList>
-      <mat-list-option *ngFor="let role of rolesList" [value]="role" [selected]="hasRole(role)">
-        {{role.name}}
-      </mat-list-option>
-    </mat-selection-list>
+  @if (user) {
+    <h3>UID: {{ user.uid }}</h3>
+    @if (rolesList) {
+      <mat-selection-list #roleSelectionList>
+        @for (role of rolesList; track role) {
+          <mat-list-option [value]="role" [selected]="hasRole(role)">
+            {{ role.name }}
+          </mat-list-option>
+        }
+      </mat-selection-list>
+    }
     <button mat-button (click)="onUpdateUserClick()">
       <mat-icon>add</mat-icon>
       Zapisz
     </button>
-  </ng-template>
+  }
 </div>

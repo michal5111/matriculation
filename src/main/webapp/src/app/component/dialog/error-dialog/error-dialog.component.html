@@ -1,19 +1,23 @@
 <h2 class="mat-dialog-title">
   <mat-icon>error</mat-icon>
-  {{data.title}}
-  <ng-template [ngIf]="data.path"><p>Path: {{data.path}}</p></ng-template>
+  {{ data.title }}
+  @if (data.path) {
+    <p>Path: {{ data.path }}</p>
+  }
 </h2>
 <mat-dialog-content>
-  <b>{{data.message}}</b>
-  <div *ngIf="data.stacktrace">
-    <mat-divider class="divider-margin"></mat-divider>
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>Stacktrace</mat-expansion-panel-header>
-      <ng-template matExpansionPanelContent>
-        <div [innerHTML]="data.stacktrace"></div>
-      </ng-template>
-    </mat-expansion-panel>
-  </div>
+  <b>{{ data.message }}</b>
+  @if (data.stacktrace) {
+    <div>
+      <mat-divider class="divider-margin"></mat-divider>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>Stacktrace</mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <div [innerHTML]="data.stacktrace"></div>
+        </ng-template>
+      </mat-expansion-panel>
+    </div>
+  }
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button matDialogClose>Ok</button>

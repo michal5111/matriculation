@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import {Page} from '../../../model/dto/page/page';
 import {Import} from '../../../model/import/import';
 import {ImportService} from '../../../service/import-service/import.service';
@@ -20,7 +20,7 @@ import {BasicDataSource} from '../../../dataSource/basic-data-source';
 import {AbstractListWithPathParamsComponent} from '../../abstract-list-with-path-params.component';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ImportSetupComponent} from '../import-setup/import-setup.component';
-import {DatePipe, NgIf} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import {
   MatCell,
   MatCellDef,
@@ -42,9 +42,15 @@ import {MatIcon} from '@angular/material/icon';
   templateUrl: './import.component.html',
   styleUrls: ['./import.component.sass'],
   standalone: true,
-  imports: [MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelContent, ImportSetupComponent, NgIf, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, ImportStatusIndicatorComponent, MatButton, MatIcon, MatAnchor, RouterLink, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]
+  imports: [MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelContent, ImportSetupComponent, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, ImportStatusIndicatorComponent, MatButton, MatIcon, MatAnchor, RouterLink, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]
 })
 export class ImportComponent extends AbstractListWithPathParamsComponent<Import, number, {}> implements OnInit, OnDestroy {
+  private importService = inject(ImportService);
+  userService = inject(UserService);
+  protected override route: ActivatedRoute;
+  protected override router: Router;
+  private rxStompService = inject(RxStompService);
+
 
   page: Page<Import> | null = null;
   dataSource: BasicDataSource<Import, number, {}>;
@@ -88,14 +94,15 @@ export class ImportComponent extends AbstractListWithPathParamsComponent<Import,
   @ViewChild(MatSort) override sort: MatSort | null = null;
   @ViewChild(MatExpansionPanel) importCreateExpansionPanel: MatExpansionPanel | null = null;
 
-  constructor(
-    private importService: ImportService,
-    public userService: UserService,
-    protected override route: ActivatedRoute,
-    protected override router: Router,
-    private rxStompService: RxStompService
-  ) {
+  constructor() {
+    const route = inject(ActivatedRoute);
+    const router = inject(Router);
+
     super(route, router);
+    const importService = this.importService;
+    this.route = route;
+    this.router = router;
+
     this.filtersSubject = new BehaviorSubject<{}>({});
     this.dataSource = new BasicDataSource<Import, number, {}>(importService);
   }

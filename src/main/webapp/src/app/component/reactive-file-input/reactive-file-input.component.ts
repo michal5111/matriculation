@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {MatAnchor, MatMiniFabButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
-import {NgIf} from '@angular/common';
+
 
 @Component({
   selector: 'app-reactive-file-input',
@@ -16,7 +16,7 @@ import {NgIf} from '@angular/common';
     }
   ],
   standalone: true,
-  imports: [MatAnchor, MatIcon, MatMiniFabButton, NgIf]
+  imports: [MatAnchor, MatIcon, MatMiniFabButton]
 })
 export class ReactiveFileInputComponent implements OnInit, ControlValueAccessor {
 
