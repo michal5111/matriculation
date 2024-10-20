@@ -318,8 +318,8 @@ export class ImportViewComponent extends AbstractListWithPathParamsComponent<App
       if (result !== undefined && result !== '') {
         this.subs.push(
           this.applicationsService.updatePotentialDuplicateStatus(application.id, {
-            usosId: (result.notDuplicate ? undefined : result.person.id),
-            potentialDuplicateStatus: (result.notDuplicate ? 'CONFIRMED_NOT_DUPLICATE' : 'OK')
+            usosId: result.person?.id,
+            potentialDuplicateStatus: result.person?.id ? 'CONFIRMED_DUPLICATE' : 'CONFIRMED_NOT_DUPLICATE'
           }).subscribe(updatedApplication => {
             application.applicant.potentialDuplicateStatus = updatedApplication.applicant.potentialDuplicateStatus;
             application.applicant.usosId = updatedApplication.applicant.usosId;

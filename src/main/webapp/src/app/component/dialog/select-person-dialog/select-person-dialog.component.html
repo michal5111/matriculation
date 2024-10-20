@@ -2,62 +2,56 @@
   <div>
     Aplikant:
   </div>
-  @if (applicant) {
-    <ng-template class="table">
-      <table mat-table [dataSource]="applicantDataSource">
-        <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef>id</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.id }}</td>
-        </ng-container>
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Imię</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.given }}</td>
-        </ng-container>
-        <ng-container matColumnDef="middleName">
-          <th mat-header-cell *matHeaderCellDef>Drugie imię</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.middle }}</td>
-        </ng-container>
-        <ng-container matColumnDef="surname">
-          <th mat-header-cell *matHeaderCellDef>Nazwisko</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.family }}</td>
-        </ng-container>
-        <ng-container matColumnDef="birthDate">
-          <th mat-header-cell *matHeaderCellDef>Data urodzenia</th>
-          <td mat-cell *matCellDef="let element"
-              class="mat-cell">{{ element.dateOfBirth | date:'dd.MM.yyyy' }}
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="idNumber">
-          <th mat-header-cell *matHeaderCellDef>Numer dokumentów</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">
-            <ul>
-              @for (item of element.identityDocuments; track item) {
-                <li>{{ item.number }}</li>
-              }
-            </ul>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="sex">
-          <th mat-header-cell *matHeaderCellDef>Płeć</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.sex }}</td>
-        </ng-container>
-        <ng-container matColumnDef="email">
-          <th mat-header-cell *matHeaderCellDef>Email</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.email }}</td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="applicantDisplayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: applicantDisplayedColumns;"></tr>
-      </table>
-    </ng-template>
-  }
+  <table mat-table [dataSource]="applicantDataSource">
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>id</th>
+      <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.id }}</td>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Imię</th>
+      <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.given }}</td>
+    </ng-container>
+    <ng-container matColumnDef="middleName">
+      <th mat-header-cell *matHeaderCellDef>Drugie imię</th>
+      <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.middle }}</td>
+    </ng-container>
+    <ng-container matColumnDef="surname">
+      <th mat-header-cell *matHeaderCellDef>Nazwisko</th>
+      <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.family }}</td>
+    </ng-container>
+    <ng-container matColumnDef="birthDate">
+      <th mat-header-cell *matHeaderCellDef>Data urodzenia</th>
+      <td mat-cell *matCellDef="let element"
+          class="mat-cell">{{ element.dateOfBirth | date:'dd.MM.yyyy' }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="idNumber">
+      <th mat-header-cell *matHeaderCellDef>Numer dokumentu</th>
+      <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.primaryIdentityDocument.number }}</td>
+    </ng-container>
+    <ng-container matColumnDef="pesel">
+      <th mat-header-cell *matHeaderCellDef>PESEL</th>
+      <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.pesel }}</td>
+    </ng-container>
+    <ng-container matColumnDef="sex">
+      <th mat-header-cell *matHeaderCellDef>Płeć</th>
+      <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.sex }}</td>
+    </ng-container>
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef>Email</th>
+      <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.email }}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="applicantDisplayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: applicantDisplayedColumns;"></tr>
+  </table>
   <mat-divider class="separator"/>
   <div>
     Potencjalne duplikaty:
   </div>
   @if (getSelected().length > 1) {
     Wybierz maksymalnie jedną osobę!
-  } @if (persons) {
-  <ng-template class="table">
+  }
+  @if (people$ | async) {
     <table mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="checkbox">
         <th mat-header-cell *matHeaderCellDef>Wybierz</th>
@@ -108,8 +102,7 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-  </ng-template>
-}
+  }
 </mat-dialog-content>
 @if (dataSource.data) {
   <mat-dialog-actions>

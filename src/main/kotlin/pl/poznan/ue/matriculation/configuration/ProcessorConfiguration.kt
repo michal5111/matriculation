@@ -9,6 +9,7 @@ import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.repo.*
 import pl.poznan.ue.matriculation.oracle.service.AddressService
 import pl.poznan.ue.matriculation.oracle.service.ImmatriculationService
+import pl.poznan.ue.matriculation.oracle.service.PersonService
 
 @Configuration
 class ProcessorConfiguration {
@@ -76,7 +77,7 @@ class ProcessorConfiguration {
 
     @Bean
     fun personProcessor(
-        personRepository: PersonRepository,
+        personService: PersonService,
         citizenshipRepository: CitizenshipRepository,
         schoolRepository: SchoolRepository,
         organizationalUnitRepository: OrganizationalUnitRepository,
@@ -85,7 +86,7 @@ class ProcessorConfiguration {
         ownedDocumentRepository: OwnedDocumentRepository
     ): TargetSystemProcessor<Person> {
         return PersonProcessor(
-            personRepository = personRepository,
+            personService = personService,
             citizenshipRepository = citizenshipRepository,
             schoolRepository = schoolRepository,
             organizationalUnitRepository = organizationalUnitRepository,

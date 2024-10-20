@@ -47,6 +47,12 @@ class ApiSecurityConfiguration {
                 authorize(HttpMethod.GET, "/api/import/*/ldap", hasAnyRole("IMPORT_LDAP", "ADMIN"))
                 authorize(HttpMethod.GET, "/api/import/*/importUids", hasAnyRole("IMPORT_LDAP", "ADMIN"))
                 authorize(HttpMethod.GET, "/api/applications", hasAnyRole("IMPORT_VIEW", "ADMIN"))
+                authorize(HttpMethod.GET, "/api/applicant/*/potentialDuplicates", hasAnyRole("IMPORT_VIEW", "ADMIN"))
+                authorize(
+                    HttpMethod.PUT,
+                    "/api/applications/*/potentialDuplicateStatus",
+                    hasAnyRole("IMPORT_SAVE", "ADMIN")
+                )
             }
             exceptionHandling {
                 authenticationEntryPoint = HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)

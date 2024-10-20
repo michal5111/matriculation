@@ -11,14 +11,14 @@ import pl.poznan.ue.matriculation.local.service.ApplicantService
 import pl.poznan.ue.matriculation.local.service.JobService
 import pl.poznan.ue.matriculation.local.service.RoleService
 import pl.poznan.ue.matriculation.oracle.entityRepresentations.PersonBasicData
-import pl.poznan.ue.matriculation.oracle.repo.PersonRepository
+import pl.poznan.ue.matriculation.oracle.service.PersonService
 
 @RestController
 @RequestMapping("/api")
 class RestController(
     private val roleService: RoleService,
     private val jobService: JobService,
-    private val personRepository: PersonRepository,
+    private val personService: PersonService,
     private val applicantService: ApplicantService
 ) {
 
@@ -44,15 +44,14 @@ class RestController(
     fun getPotentialDuplicates(@PathVariable("id") applicantId: Long): List<PersonBasicData> {
         val applicant =
             applicantService.findWithIdentityDocumentsById(applicantId) ?: throw ApplicantNotFoundException()
-        return personRepository.findPotentialDuplicate(
+        return personService.findPotentialDuplicate(
             name = applicant.given,
             surname = applicant.family,
             birthDate = applicant.dateOfBirth!!,
             idNumbers = applicant.identityDocuments.map {
                 it.number!!
             },
-            privateEmail = applicant.email,
-            email = applicant.email
+            pesel = applicant.pesel
         )
     }
 

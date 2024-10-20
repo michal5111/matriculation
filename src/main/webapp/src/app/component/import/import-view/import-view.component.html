@@ -230,11 +230,13 @@
                   <div matTooltip="Oczekujące">
                     <mat-icon>hourglass_empty</mat-icon>
                   </div>
-                } @case ('IMPORTED') {
+                }
+                @case ('IMPORTED') {
                   <div matTooltip="Powodzenie">
                     <mat-icon>done</mat-icon>
                   </div>
-                } @case ('ERROR') {
+                }
+                @case ('ERROR') {
                   <div matTooltip="Błąd">
                     @if (element.importError) {
                       <button mat-button (click)="showApplicationErrorDialog(element)">
@@ -258,18 +260,26 @@
                   <div matTooltip="Nie sprawdzono">
                     <mat-icon>help</mat-icon>
                   </div>
-                } @case ('OK') {
+                }
+                @case ('OK') {
                   <div matTooltip="W porządku">
                     <mat-icon>done</mat-icon>
                   </div>
-                } @case ('POTENTIAL_DUPLICATE') {
+                }
+                @case ('POTENTIAL_DUPLICATE') {
                   <div matTooltip="Potencjalny duplikat">
                     <button mat-button (click)="onPotentialDuplicateClick(element)">
                       <mat-icon>priority_high</mat-icon>
                     </button>
                   </div>
-                } @case ('CONFIRMED_NOT_DUPLICATE') {
-                  <div matTooltip="Potwierdzono">
+                }
+                @case ('CONFIRMED_NOT_DUPLICATE') {
+                  <div matTooltip="Potwierdzono - to nie duplikat">
+                    <mat-icon>done_all</mat-icon>
+                  </div>
+                }
+                @case ('CONFIRMED_DUPLICATE') {
+                  <div matTooltip="Potwierdzono - to był duplikat">
                     <mat-icon>done_all</mat-icon>
                   </div>
                 }

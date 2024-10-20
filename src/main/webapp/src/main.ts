@@ -1,11 +1,11 @@
-import {APP_INITIALIZER, enableProdMode, ErrorHandler, importProvidersFrom} from '@angular/core';
+import {APP_INITIALIZER, enableProdMode, ErrorHandler, importProvidersFrom, LOCALE_ID} from '@angular/core';
 
 import {environment} from './environments/environment';
 import {HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {AuthInterceptor} from './app/interceptors/auth-interceptor';
 import {MatPaginatorIntl} from '@angular/material/paginator';
 import {MatPaginatorIntlPl} from './app/customProviders/mat-paginator-intl-pl';
-import {APP_BASE_HREF, NgOptimizedImage, PlatformLocation} from '@angular/common';
+import {APP_BASE_HREF, NgOptimizedImage, PlatformLocation, registerLocaleData} from '@angular/common';
 import {ExceptionHandler} from './app/exceptionHandler/exception-handler';
 import {WS_URL} from './app/injectableTokens/WS_URL';
 import {InjectableRxStompConfig, RxStompService, rxStompServiceFactory} from '@stomp/ng2-stompjs';
@@ -21,6 +21,7 @@ import {AppComponent} from './app/app.component';
 import {provideRouter, withComponentInputBinding} from '@angular/router';
 import {routes} from './app/routes';
 import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+import localePl from '@angular/common/locales/pl';
 
 function initUser(userService: UserService) {
   return (): Promise<any> => firstValueFrom(userService.init$());
@@ -29,6 +30,8 @@ function initUser(userService: UserService) {
 function getCsrfToken(http: HttpClient) {
   return (): Promise<any> => firstValueFrom(http.get('/api/csrf'));
 }
+
+registerLocaleData(localePl, 'pl-PL');
 
 
 if (environment.production) {
@@ -68,6 +71,7 @@ bootstrapApplication(AppComponent, {
       },
       deps: [WS_URL]
     },
+    {provide: LOCALE_ID, useValue: 'pl-PL'},
     {
       provide: RxStompService,
       useFactory: rxStompServiceFactory,

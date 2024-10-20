@@ -11,11 +11,12 @@ import pl.poznan.ue.matriculation.oracle.domain.OwnedDocument
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.domain.PersonChangeHistory
 import pl.poznan.ue.matriculation.oracle.repo.*
+import pl.poznan.ue.matriculation.oracle.service.PersonService
 import java.util.*
 
 
 open class PersonProcessor(
-    private val personRepository: PersonRepository,
+    private val personService: PersonService,
     private val citizenshipRepository: CitizenshipRepository,
     private val schoolRepository: SchoolRepository,
     private val organizationalUnitRepository: OrganizationalUnitRepository,
@@ -43,7 +44,7 @@ open class PersonProcessor(
     private val logger = LoggerFactory.getLogger(PersonProcessor::class.java)
 
     private fun createOrUpdatePerson(applicant: Applicant): Person {
-        val person = personRepository.findOneByPeselOrIdNumberOrPersonId(
+        val person = personService.findOneByPeselOrIdNumberOrPersonId(
             applicant.usosId,
             applicant.pesel.orEmpty(),
             applicant.identityDocuments.filterNot {
@@ -114,7 +115,7 @@ open class PersonProcessor(
             militaryCategory = applicant.militaryCategory,
             militaryStatus = applicant.militaryStatus
         )
-        return personRepository.save(person)
+        return personService.save(person)
     }
 
     @LogExecutionTime

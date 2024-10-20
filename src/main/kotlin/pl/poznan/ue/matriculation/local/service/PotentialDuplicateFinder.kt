@@ -39,8 +39,7 @@ class PotentialDuplicateFinder(
                 it.number
                     ?: throw IllegalArgumentException("Identity document number is null. Applicant foreign id: ${applicant.foreignId}")
             },
-            email = applicant.email,
-            privateEmail = applicant.email
+            pesel = applicant.pesel
         )
         if (potentialDuplicatesList.isNotEmpty()) {
             logger.warn("Wykryto potencjalny duplikat! Applicant foreign id: ${applicant.foreignId}")

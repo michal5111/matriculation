@@ -84,6 +84,8 @@ class Applicant(
     @Enumerated(EnumType.STRING)
     var potentialDuplicateStatus: DuplicateStatus = DuplicateStatus.NOT_CHECKED,
 
+    var potentialDuplicateStatusConfirmedBy: String? = null,
+
     @OneToMany(mappedBy = "applicant", fetch = FetchType.LAZY)
     var applications: MutableSet<Application> = HashSet(),
 

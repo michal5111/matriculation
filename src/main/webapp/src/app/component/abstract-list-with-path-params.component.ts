@@ -10,7 +10,7 @@ export abstract class AbstractListWithPathParamsComponent<T, ID, F> extends Abst
 
 
   override ngAfterViewInit() {
-    if (!this.paginator || !this.sort) {
+    if (!this.paginator() || !this.sort()) {
       throw Error('Paginator or sort is null');
     }
     this.subs.push(
@@ -46,15 +46,6 @@ export abstract class AbstractListWithPathParamsComponent<T, ID, F> extends Abst
             this.sortingMap.get(params['sort'] ?? this.sort()?.active),
             this.sort()?.direction
           );
-        }),
-        tap(params => {
-          console.log({
-            pageIndex: params['page'] ?? this.paginator()?.pageIndex,
-            pageSize: params['pageSize'] ?? this.paginator()?.pageSize,
-            filtersSubject: this.filtersSubject.getValue(),
-            sort: this.sortingMap.get(params['sort'] ?? this.sort()?.active),
-            sortDir: this.sort()?.direction
-          });
         })
       ).subscribe()
     );

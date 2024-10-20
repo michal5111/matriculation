@@ -1,10 +1,12 @@
 package pl.poznan.ue.matriculation.local.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.exception.ApplicantNotFoundException
@@ -32,22 +34,27 @@ class ApplicationService(
     private val applicationRepository: ApplicationRepository,
     private val applicantService: ApplicantService
 ) {
+    private val logger = LoggerFactory.getLogger(ApplicationService::class.java)
+
     fun findAllApplicationsByImportId(pageable: Pageable, importId: Long): Page<Application> {
         return applicationRepository.findAllByImportId(pageable, importId)
     }
 
     fun updatePotentialDuplicateStatus(
         applicationId: Long,
-        potentialDuplicateStatusDto: ApplicantUsosIdAndPotentialDuplicateStatusDto
+        potentialDuplicateStatusDto: ApplicantUsosIdAndPotentialDuplicateStatusDto,
+        userDetails: UserDetails
     ): ApplicationDto {
         val application = applicationRepository.findByIdOrNull(applicationId) ?: throw ApplicationNotFoundException()
         val applicantId = application.applicant?.id ?: throw ApplicantNotFoundException()
         val applicant = applicantService.findWithIdentityDocumentsById(applicantId)
             ?: throw ApplicantNotFoundException()
         applicant.potentialDuplicateStatus = potentialDuplicateStatusDto.potentialDuplicateStatus
+        applicant.potentialDuplicateStatusConfirmedBy = userDetails.username
         applicant.usosId = potentialDuplicateStatusDto.usosId
         val import = application.import ?: throw ImportNotFoundException()
         import.potentialDuplicates--
+        logger.info("Potential duplicate status updated by $userDetails for application with id: $applicationId to ${potentialDuplicateStatusDto.potentialDuplicateStatus}")
         return application.toDto()
     }
 

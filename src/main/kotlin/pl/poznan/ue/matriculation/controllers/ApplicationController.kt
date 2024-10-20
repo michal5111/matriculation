@@ -1,6 +1,8 @@
 package pl.poznan.ue.matriculation.controllers
 
 import org.springframework.data.domain.Pageable
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
 import pl.poznan.ue.matriculation.kotlinExtensions.toDto
@@ -22,9 +24,14 @@ class ApplicationController(private val applicationService: ApplicationService) 
     @PutMapping("/{id}/potentialDuplicateStatus")
     fun updatePotentialDuplicateStatus(
         @PathVariable("id") applicationId: Long,
-        @RequestBody potentialDuplicateStatusDto: ApplicantUsosIdAndPotentialDuplicateStatusDto
+        @RequestBody potentialDuplicateStatusDto: ApplicantUsosIdAndPotentialDuplicateStatusDto,
+        @AuthenticationPrincipal userDetails: UserDetails
     ): ApplicationDto {
-        return applicationService.updatePotentialDuplicateStatus(applicationId, potentialDuplicateStatusDto)
+        return applicationService.updatePotentialDuplicateStatus(
+            applicationId,
+            potentialDuplicateStatusDto,
+            userDetails
+        )
     }
 
     @GetMapping
