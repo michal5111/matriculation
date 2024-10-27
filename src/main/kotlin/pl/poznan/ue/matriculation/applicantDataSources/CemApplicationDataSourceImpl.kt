@@ -23,7 +23,7 @@ import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
 import pl.poznan.ue.matriculation.oracle.service.CitizenshipService
 import pl.poznan.ue.matriculation.oracle.service.ProgrammeService
-import java.util.*
+import java.time.ZonedDateTime
 
 class CemApplicationDataSourceImpl(
     override val name: String,
@@ -116,7 +116,7 @@ class CemApplicationDataSourceImpl(
                 ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim(),
             mothersName = applicantDto.motherName
                 ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim(),
-            modificationDate = Date(),
+            modificationDate = ZonedDateTime.now(),
             dateOfBirth = applicantDto.birthdate,
             cityOfBirth = applicantDto.birthPlace
                 ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim(),
@@ -245,7 +245,7 @@ class CemApplicationDataSourceImpl(
                 ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim()
             mothersName = applicantDto.motherName
                 ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim()
-            modificationDate = Date()
+            modificationDate = ZonedDateTime.now()
             dateOfBirth = applicantDto.birthdate
             cityOfBirth = applicantDto.birthPlace
                 ?.takeIf { it.isNotBlank() && !it.matches(nonAlphabeticalCharactersRegex) }?.trim()

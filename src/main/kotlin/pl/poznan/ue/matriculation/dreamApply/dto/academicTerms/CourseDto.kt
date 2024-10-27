@@ -1,11 +1,11 @@
 package pl.poznan.ue.matriculation.dreamApply.dto.academicTerms
 
-import java.util.*
+import java.time.LocalDate
 
 data class CourseDto(
     val id: Long,
     val status: String,
-    val updated: Date,
+    val updated: LocalDate,
     val institution: String,
     //val intakes: Map<Long, String>,
     val featured: String,

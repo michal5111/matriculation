@@ -2,7 +2,7 @@ package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
 import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Table(name = "DZ_PRZYJAZDY")
@@ -16,11 +16,11 @@ class Arrival(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_POCZ", nullable = false)
-    val startDate: Date,
+    val startDate: LocalDate,
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_KON", nullable = false)
-    val endDate: Date,
+    val endDate: LocalDate,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OS_ID", referencedColumnName = "ID", nullable = true)
@@ -82,15 +82,15 @@ class Arrival(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_PRZYJAZDU", nullable = true)
-    val arrivalDate: Date? = null,
+    val arrivalDate: LocalDate? = null,
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_WYJAZDU", nullable = true)
-    val leavingDate: Date? = null,
+    val leavingDate: LocalDate? = null,
 
     @Temporal(TemporalType.DATE)
     @Column(name = "PRZEDLUZENIE", nullable = true)
-    val extension: Date? = null,
+    val extension: LocalDate? = null,
 
     @Column(name = "NUMER_TECZKI", nullable = true, length = 200)
     val fileNumber: String? = null,

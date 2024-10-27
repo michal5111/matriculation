@@ -24,7 +24,7 @@ export const routes: Routes = [
     }
   },
   {
-    path: 'import/:id',
+    path: 'import/:importId',
     loadComponent: () => import('./component/import/import-view/import-view.component').then(m => m.ImportViewComponent),
     canActivate: [UserService],
     data: {

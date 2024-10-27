@@ -14,7 +14,8 @@ import pl.poznan.ue.matriculation.local.service.ApplicationDataSourceFactory
 import pl.poznan.ue.matriculation.oracle.domain.*
 import pl.poznan.ue.matriculation.oracle.repo.*
 import pl.poznan.ue.matriculation.properties.ClauseAndRegulationPropertiesList
-import java.util.*
+import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters.lastDayOfMonth
 
 @Service
 class ImmatriculationService(
@@ -94,7 +95,7 @@ class ImmatriculationService(
         application: Application,
         didacticCycleCode: String,
         personProgramme: PersonProgramme,
-        startDate: Date
+        startDate: LocalDate
     ) = application.applicant?.erasmusData?.let {
         val didacticCycle = didacticCycleRepository.findByIdOrNull(didacticCycleCode)
             ?: error("Nie można znaleźć cyklu dydaktycznego")
@@ -117,18 +118,16 @@ class ImmatriculationService(
     private fun addClauseAndRegulationConfirmation(
         person: Person,
         personProgramme: PersonProgramme,
-        startDate: Date,
+        startDate: LocalDate,
         regulationCode: String
     ) {
         val clauseAndRegulation = clauseAndRegulationRepository.findLatestByCode(regulationCode)
             ?: error("Unable to find clause and regulation with id: $regulationCode")
-        val calendar = Calendar.getInstance()
-        calendar.time = startDate
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+        val decisionDeadline = startDate.with(lastDayOfMonth())
         val clauseAndRegulationConfirmation = ClauseAndRegulationConfirmation(
             person = person,
             personProgramme = personProgramme,
-            decisionDeadline = calendar.time,
+            decisionDeadline = decisionDeadline,
             terminationDate = clauseAndRegulation.endOfApplication,
             clauseAndRegulation = clauseAndRegulation
         )
@@ -203,7 +202,7 @@ class ImmatriculationService(
     private fun addBasisOfAdmission(
         basisOfAdmission: String?,
         personProgramme: PersonProgramme,
-        dateOfAddmision: Date
+        dateOfAddmision: LocalDate
     ) = basisOfAdmission?.let {
         personProgramme.addPersonProgrammeBasisOfAdmission(
             PersonProgrammeBasisOfAdmission(
@@ -217,7 +216,7 @@ class ImmatriculationService(
     private fun addSourceOfFinancing(
         sourceOfFinancing: String?,
         personProgramme: PersonProgramme,
-        dateOfAddmision: Date
+        dateOfAddmision: LocalDate
     ) = sourceOfFinancing?.let {
         personProgramme.addPersonProgrammeSourceOfFinancing(
             PersonProgrammeSourceOfFinancing(

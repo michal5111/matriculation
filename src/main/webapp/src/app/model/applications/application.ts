@@ -1,7 +1,7 @@
 import {Applicant} from './applicant';
 import {Document} from './document';
 
-export interface Application {
+export type Application = {
   id: number;
   foreignId: number;
   user: number;
@@ -15,8 +15,8 @@ export interface Application {
   turn: {
     programme: string;
     registration: string;
-    dateFrom: Date;
-    dateTo: Date;
+    dateFrom: string;
+    dateTo: string;
   };
   foreignerData: {
     baseOfStay: string;
@@ -31,4 +31,4 @@ export interface Application {
   dataSourceId: string;
   editUrl: string;
   importId: number;
-}
+};

@@ -1,320 +1,321 @@
-@if (userService.isAuthenticated()) {
-  @if (import && rxStompService.connected()) {
-    @if (import) {
-      <header class="card-wrapper">
-        <mat-card appearance="outlined" class="card-centered">
-          <mat-card-title>
-            <p>Import rekrutacji {{ import.registration }}</p>
-          </mat-card-title>
-          <mat-card-subtitle>
-            <p>Kod programu: {{ import.programmeCode }}</p>
-            <p>Kod etapu: {{ import.stageCode }}</p>
-            <p>Kod cyklu dydaktycznego: {{ import.didacticCycleCode }}</p>
-            <p>Kod puli indeksów: {{ import.indexPoolCode }}</p>
-            <p>Data rozpoczęcia programu: {{ import.startDate | date: 'dd.MM.yyyy' }}</p>
-            <p>Data przyjęcia na program: {{ import.dateOfAddmision | date: 'dd.MM.yyyy' }}</p>
-          </mat-card-subtitle>
-          <mat-card-actions>
-            <button mat-button (click)="openEditorDialog()" [disabled]="isEditButtonDisabled()">
-              <mat-icon>edit</mat-icon>
-              Edytuj
-            </button>
-          </mat-card-actions>
-        </mat-card>
-        <mat-card appearance="outlined" class="card-centered">
-          @if (import && rxStompService.connected()) {
-            <mat-card-content>
-              <app-import-status-indicator [importStatus]="import.importStatus"/>
-              @if (import.error) {
-                <p class="error-container">Błąd importu:
-                  <mark class="error-color">{{ import.error }}</mark>
-                </p>
-                <button mat-button (click)="showImportErrorDialog(import)">Pokaż błąd</button>
-              }
-              <app-progress-viewer header="Zaimportowane zgłoszenia:"
-                                   [value]="import.importedApplications"
-                                   [total]="import.totalCount"/>
-              <app-progress-viewer header="Zapisane zgłoszenia:"
-                                   [value]="import.savedApplicants"
-                                   [total]="import.totalCount"
-                                   [errorsCount]="import.saveErrors"/>
-              <p>Błędy przy zapisywaniu: {{ import.saveErrors }}</p>
-            </mat-card-content>
+@let usosUrl = usosUrl$ | async ;
+@let importObj = import$ | async ;
+@if (importObj) {
+  <header class="card-wrapper">
+    <mat-card appearance="outlined" class="card-centered">
+      <mat-card-title>
+        <p>Import rekrutacji {{ importObj.registration }}</p>
+      </mat-card-title>
+      <mat-card-subtitle>
+        <p>Kod programu: {{ importObj.programmeCode }}</p>
+        <p>Kod etapu: {{ importObj.stageCode }}</p>
+        <p>Kod cyklu dydaktycznego: {{ importObj.didacticCycleCode }}</p>
+        <p>Kod puli indeksów: {{ importObj.indexPoolCode }}</p>
+        <p>Data rozpoczęcia programu: {{ importObj.startDate | date: 'dd.MM.yyyy' }}</p>
+        <p>Data przyjęcia na program: {{ importObj.dateOfAddmision | date: 'dd.MM.yyyy' }}</p>
+      </mat-card-subtitle>
+      <mat-card-actions>
+        <button mat-button (click)="openEditorDialog(importObj)" [disabled]="isEditButtonDisabled(importObj)">
+          <mat-icon>edit</mat-icon>
+          Edytuj
+        </button>
+      </mat-card-actions>
+    </mat-card>
+    <mat-card appearance="outlined" class="card-centered">
+      @if (importObj && rxStompService.connected()) {
+        <mat-card-content>
+          <app-import-status-indicator [importStatus]="importObj.importStatus"/>
+          @if (importObj.error) {
+            <p class="error-container">Błąd importu:
+              <mark class="error-color">{{ importObj.error }}</mark>
+            </p>
+            <button mat-button (click)="showImportErrorDialog(importObj)">Pokaż błąd</button>
           }
-          <mat-card-actions>
-            <button mat-button (click)="startImport()" [disabled]="isStartImportButtonDisabled()">
-              <mat-icon>cloud_download</mat-icon>
-              Importuj osoby
-            </button>
-            <button mat-button (click)="savePersons()" [disabled]="isSavePersonsButtonDisabled()">
-              <mat-icon>save</mat-icon>
-              Zapisz osoby
-            </button>
-            <button mat-button (click)="onArchiveClick()" [disabled]="isArchiveButtonDisabled()">
-              <mat-icon>archived</mat-icon>
-              Archiwizuj
-            </button>
-          </mat-card-actions>
-        </mat-card>
-        <mat-card appearance="outlined" class="card-centered">
-          <mat-card-content>
-            <app-progress-viewer header="Znalezione UIDy:"
-                                 [value]="import.importedUids"
-                                 [total]="import.totalCount"
-                                 [errorsCount]="import.saveErrors"/>
-            <app-progress-viewer header="Wysłane powiadomienia:"
-                                 [value]="import.notificationsSend"
-                                 [total]="import.totalCount"
-                                 [errorsCount]="import.saveErrors"/>
-          </mat-card-content>
-          <mat-card-actions>
-            <button mat-button (click)="onFindUidsClick()" [disabled]="isFindUidsButtonDisabled()">
-              <mat-icon>search</mat-icon>
-              Znajdź UIDy
-            </button>
-            <button mat-button (click)="onSendNotificationsClick()"
-                    [disabled]="isSendNotificationsDisabled()">
-              <mat-icon>notifications_active</mat-icon>
-              Wyślij powiadomienia
-            </button>
-          </mat-card-actions>
-        </mat-card>
-        <mat-card appearance="outlined" class="card-centered">
-          <mat-card-content>
-            Potencjalne duplikaty: <span
-            [class.red_backgroud]="import.potentialDuplicates > 0">{{ import.potentialDuplicates }}</span>
-          </mat-card-content>
-        </mat-card>
-      </header>
-    }
-  }
-  <div>
-    <mat-card appearance="outlined">
-      <section class="checkbox-section">
-        Wyświetlaj:
-        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('id') ?? false"
-                      (change)="onColumnCheckboxChange($event, 'id')">id
-        </mat-checkbox>
-        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('foreignId') ?? false"
-                      (change)="onColumnCheckboxChange($event, 'foreignId')">obcy id
-        </mat-checkbox>
-        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('usosId') ?? false"
-                      (change)="onColumnCheckboxChange($event, 'usosId')">usos id
-        </mat-checkbox>
-        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('uid') ?? false"
-                      (change)="onColumnCheckboxChange($event, 'uid')">uid
-        </mat-checkbox>
-        <mat-checkbox class="card-centered"
-                      [checked]="displayedColumns.get('certificateDocumentNumber') ?? false"
-                      (change)="onColumnCheckboxChange($event,
+          <app-progress-viewer header="Zaimportowane zgłoszenia:"
+                               [value]="importObj.importedApplications"
+                               [total]="importObj.totalCount"/>
+          <app-progress-viewer header="Zapisane zgłoszenia:"
+                               [value]="importObj.savedApplicants"
+                               [total]="importObj.totalCount"
+                               [errorsCount]="importObj.saveErrors"/>
+          <p>Błędy przy zapisywaniu: {{ importObj.saveErrors }}</p>
+        </mat-card-content>
+      }
+      <mat-card-actions>
+        <button mat-button (click)="startImport()" [disabled]="isStartImportButtonDisabled(importObj)">
+          <mat-icon>cloud_download</mat-icon>
+          Importuj osoby
+        </button>
+        <button mat-button (click)="savePersons()" [disabled]="isSavePersonsButtonDisabled(importObj)">
+          <mat-icon>save</mat-icon>
+          Zapisz osoby
+        </button>
+        <button mat-button (click)="onArchiveClick()" [disabled]="isArchiveButtonDisabled(importObj)">
+          <mat-icon>archived</mat-icon>
+          Archiwizuj
+        </button>
+      </mat-card-actions>
+    </mat-card>
+    <mat-card appearance="outlined" class="card-centered">
+      <mat-card-content>
+        <app-progress-viewer header="Znalezione UIDy:"
+                             [value]="importObj.importedUids"
+                             [total]="importObj.totalCount"
+                             [errorsCount]="importObj.saveErrors"/>
+        <app-progress-viewer header="Wysłane powiadomienia:"
+                             [value]="importObj.notificationsSend"
+                             [total]="importObj.totalCount"
+                             [errorsCount]="importObj.saveErrors"/>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button (click)="onFindUidsClick(importObj.id!!)" [disabled]="isFindUidsButtonDisabled(importObj)">
+          <mat-icon>search</mat-icon>
+          Znajdź UIDy
+        </button>
+        <button mat-button (click)="onSendNotificationsClick(importObj.id!!)"
+                [disabled]="isSendNotificationsDisabled(importObj)">
+          <mat-icon>notifications_active</mat-icon>
+          Wyślij powiadomienia
+        </button>
+      </mat-card-actions>
+    </mat-card>
+    <mat-card appearance="outlined" class="card-centered">
+      <mat-card-content>
+        Potencjalne duplikaty: <span
+        [class.red_backgroud]="importObj.potentialDuplicates > 0">{{ importObj.potentialDuplicates }}</span>
+      </mat-card-content>
+    </mat-card>
+  </header>
+}
+<div>
+  <mat-card appearance="outlined">
+    <section class="checkbox-section">
+      Wyświetlaj:
+      <mat-checkbox class="card-centered" [checked]="displayedColumns.get('id') ?? false"
+                    (change)="onColumnCheckboxChange($event, 'id')">id
+      </mat-checkbox>
+      <mat-checkbox class="card-centered" [checked]="displayedColumns.get('foreignId') ?? false"
+                    (change)="onColumnCheckboxChange($event, 'foreignId')">obcy id
+      </mat-checkbox>
+      <mat-checkbox class="card-centered" [checked]="displayedColumns.get('usosId') ?? false"
+                    (change)="onColumnCheckboxChange($event, 'usosId')">usos id
+      </mat-checkbox>
+      <mat-checkbox class="card-centered" [checked]="displayedColumns.get('uid') ?? false"
+                    (change)="onColumnCheckboxChange($event, 'uid')">uid
+      </mat-checkbox>
+      <mat-checkbox class="card-centered"
+                    [checked]="displayedColumns.get('certificateDocumentNumber') ?? false"
+                    (change)="onColumnCheckboxChange($event,
                       'certificateDocumentNumber',
                       'certificateDocumentIssueDateAndPlace',
                       'certificateDocumentIssueInstitution')">
-          dokument uprawniający do podjęcia studiów
-        </mat-checkbox>
-        <!--        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('importError')"-->
-        <!--                      (change)="onColumnCheckboxChange($event, 'importError')">błąd przy importowaniu-->
-        <!--        </mat-checkbox>-->
-        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('duplicateStatus') ?? false"
-                      (change)="onColumnCheckboxChange($event, 'duplicateStatus')">potencjalny duplikat
-        </mat-checkbox>
-        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('warnings') ?? false"
-                      (change)="onColumnCheckboxChange($event, 'warnings')">Ostrzeżenia
-        </mat-checkbox>
-      </section>
-    </mat-card>
-  </div>
-  <div class="mat-elevation-z2">
-    <div class="loadingWrapper">
-      <!--      <div class="loadingOverlay" *ngIf="dataSource.loading$ | async">-->
-      <!--        <mat-spinner class="loadingSpinner"></mat-spinner>-->
-      <!--      </div>-->
-      <table mat-table [dataSource]="dataSource" matSort matSortActive="names"
-             matSortDirection="asc" matSortDisableClear>
-        <ng-container matColumnDef="lp">
-          <th mat-header-cell *matHeaderCellDef>L.p.</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell"> {{ getElementNumber(element) }}</td>
-        </ng-container>
-        <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Id</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell"> {{ element.id }}</td>
-        </ng-container>
-        <ng-container matColumnDef="foreignId">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Obcy id</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">
-            <a mat-button href="{{element.editUrl}}" target="_blank"
-               [disabled]="!element.editUrl">{{ element.foreignId }}</a>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="usosId">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> usos id</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">
-            @if (usosUrl) {
-              <a mat-button href="{{getPersonUsosUrl(element)}}"
-                 target="_blank">{{ element.applicant.usosId }}</a>
-            }
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="uid">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> uid</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.applicant.uid }}</td>
-        </ng-container>
-        <ng-container matColumnDef="names">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Nazwisko i imię/imiona</th>
-          <td mat-cell
-              *matCellDef="let element"
-              class="mat-cell">{{ element.applicant.family }} {{ element.applicant.given }} {{ element.applicant.middle }}
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="birthDateAndPlace">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Data urodzenia Miejsce urodzenia</th>
-          <td mat-cell
-              *matCellDef="let element"
-              class="mat-cell">{{ element.applicant.dateOfBirth | date:'dd.MM.yyyy' }} {{ element.applicant.cityOfBirth }}
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="pesel">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Pesel / Nr. dokumentu</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">{{ getPeselOrIdNumber(element) }}</td>
-        </ng-container>
-        <ng-container matColumnDef="certificateDocumentNumber">
-          <th mat-header-cell *matHeaderCellDef> Dyplom</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">
-            @if (element.certificate) {
-              <div>
-                {{ element.certificate.documentNumber }}
-              </div>
-            }
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="certificateDocumentIssueDateAndPlace">
-          <th mat-header-cell *matHeaderCellDef> Data wyd. Miejsce</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">
-            @if (element.certificate) {
-              <div>
-                {{ element.certificate.issueDate | date:'dd.MM.yyyy' }} {{ element.certificate.issueCity }}
-              </div>
-            }
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="certificateDocumentIssueInstitution">
-          <th mat-header-cell *matHeaderCellDef> Wystawiający</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">
-            @if (element.certificate) {
-              <div>
-                {{ element.certificate.issueInstitution }}
-              </div>
-            }
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="indexNumber">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Nr albumu</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">
-            @if (element.applicant.assignedIndexNumber) {
-              <div>
-                <button mat-button (click)="updateIndexNumber(element)"
-                        [disabled]="import?.importStatus === 'ARCHIVED'
+        dokument uprawniający do podjęcia studiów
+      </mat-checkbox>
+      <!--        <mat-checkbox class="card-centered" [checked]="displayedColumns.get('importError')"-->
+      <!--                      (change)="onColumnCheckboxChange($event, 'importError')">błąd przy importowaniu-->
+      <!--        </mat-checkbox>-->
+      <mat-checkbox class="card-centered" [checked]="displayedColumns.get('duplicateStatus') ?? false"
+                    (change)="onColumnCheckboxChange($event, 'duplicateStatus')">potencjalny duplikat
+      </mat-checkbox>
+      <mat-checkbox class="card-centered" [checked]="displayedColumns.get('warnings') ?? false"
+                    (change)="onColumnCheckboxChange($event, 'warnings')">Ostrzeżenia
+      </mat-checkbox>
+    </section>
+  </mat-card>
+</div>
+<div class="mat-elevation-z2">
+  <div class="loadingWrapper">
+    <!--      <div class="loadingOverlay" *ngIf="dataSource.loading$ | async">-->
+    <!--        <mat-spinner class="loadingSpinner"></mat-spinner>-->
+    <!--      </div>-->
+    <table mat-table [dataSource]="dataSource" matSort matSortActive="names"
+           matSortDirection="asc" matSortDisableClear>
+      <ng-container matColumnDef="lp">
+        <th mat-header-cell *matHeaderCellDef>L.p.</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell"> {{ getElementNumber(element) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Id</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell"> {{ element.id }}</td>
+      </ng-container>
+      <ng-container matColumnDef="foreignId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Obcy id</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">
+          <a mat-button href="{{element.editUrl}}" target="_blank"
+             [disabled]="!element.editUrl">{{ element.foreignId }}</a>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="usosId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> usos id</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">
+          @if (usosUrl) {
+            <a mat-button href="{{getPersonUsosUrl(element, usosUrl)}}"
+               target="_blank">{{ element.applicant.usosId }}</a>
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="uid">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> uid</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.applicant.uid }}</td>
+      </ng-container>
+      <ng-container matColumnDef="names">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nazwisko i imię/imiona</th>
+        <td mat-cell
+            *matCellDef="let element"
+            class="mat-cell">{{ element.applicant.family }} {{ element.applicant.given }} {{ element.applicant.middle }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="birthDateAndPlace">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Data urodzenia Miejsce urodzenia</th>
+        <td mat-cell
+            *matCellDef="let element"
+            class="mat-cell">{{ element.applicant.dateOfBirth | date:'dd.MM.yyyy' }} {{ element.applicant.cityOfBirth }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="pesel">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Pesel / Nr. dokumentu</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{ getPeselOrIdNumber(element) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="certificateDocumentNumber">
+        <th mat-header-cell *matHeaderCellDef> Dyplom</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">
+          @if (element.certificate) {
+            <div>
+              {{ element.certificate.documentNumber }}
+            </div>
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="certificateDocumentIssueDateAndPlace">
+        <th mat-header-cell *matHeaderCellDef> Data wyd. Miejsce</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">
+          @if (element.certificate) {
+            <div>
+              {{ element.certificate.issueDate | date:'dd.MM.yyyy' }} {{ element.certificate.issueCity }}
+            </div>
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="certificateDocumentIssueInstitution">
+        <th mat-header-cell *matHeaderCellDef> Wystawiający</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">
+          @if (element.certificate) {
+            <div>
+              {{ element.certificate.issueInstitution }}
+            </div>
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="indexNumber">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nr albumu</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">
+          @if (element.applicant.assignedIndexNumber && importObj) {
+            <div>
+              <button mat-button (click)="updateIndexNumber(element, importObj)"
+                      [disabled]="importObj?.importStatus === 'ARCHIVED'
                     || !(userService.hasRole('ROLE_IMPORT_CHANGE_INDEX') || userService.hasRole('ROLE_ADMIN'))">
-                  {{ element.applicant.assignedIndexNumber }}
-                </button>
-              </div>
-            }
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="applicationImportStatus">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Status importu</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">
-            <div>
-              @switch (element.importStatus) {
-                @case ('NOT_IMPORTED') {
-                  <div matTooltip="Oczekujące">
-                    <mat-icon>hourglass_empty</mat-icon>
-                  </div>
-                }
-                @case ('IMPORTED') {
-                  <div matTooltip="Powodzenie">
-                    <mat-icon>done</mat-icon>
-                  </div>
-                }
-                @case ('ERROR') {
-                  <div matTooltip="Błąd">
-                    @if (element.importError) {
-                      <button mat-button (click)="showApplicationErrorDialog(element)">
-                        <mat-icon>error</mat-icon>
-                        Wyświetl błąd
-                      </button>
-                    }
-                  </div>
-                }
-              }
+                {{ element.applicant.assignedIndexNumber }}
+              </button>
             </div>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="duplicateStatus">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencjalny duplikat</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell"
-              [class.red_backgroud]="element.applicant.potentialDuplicateStatus === 'POTENTIAL_DUPLICATE'">
-            <div>
-              @switch (element.applicant.potentialDuplicateStatus) {
-                @case ('NOT_CHECKED') {
-                  <div matTooltip="Nie sprawdzono">
-                    <mat-icon>help</mat-icon>
-                  </div>
-                }
-                @case ('OK') {
-                  <div matTooltip="W porządku">
-                    <mat-icon>done</mat-icon>
-                  </div>
-                }
-                @case ('POTENTIAL_DUPLICATE') {
-                  <div matTooltip="Potencjalny duplikat">
-                    <button mat-button (click)="onPotentialDuplicateClick(element)">
-                      <mat-icon>priority_high</mat-icon>
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="applicationImportStatus">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Status importu</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">
+          <div>
+            @switch (element.importStatus) {
+              @case ('NOT_IMPORTED') {
+                <div matTooltip="Oczekujące">
+                  <mat-icon>hourglass_empty</mat-icon>
+                </div>
+              }
+              @case ('IMPORTED') {
+                <div matTooltip="Powodzenie">
+                  <mat-icon>done</mat-icon>
+                </div>
+              }
+              @case ('ERROR') {
+                <div matTooltip="Błąd">
+                  @if (element.importError) {
+                    <button mat-button (click)="showApplicationErrorDialog(element)">
+                      <mat-icon>error</mat-icon>
+                      Wyświetl błąd
                     </button>
-                  </div>
-                }
-                @case ('CONFIRMED_NOT_DUPLICATE') {
-                  <div matTooltip="Potwierdzono - to nie duplikat">
-                    <mat-icon>done_all</mat-icon>
-                  </div>
-                }
-                @case ('CONFIRMED_DUPLICATE') {
-                  <div matTooltip="Potwierdzono - to był duplikat">
-                    <mat-icon>done_all</mat-icon>
-                  </div>
-                }
+                  }
+                </div>
               }
-            </div>
-          </td>
-        </ng-container>
-        <!--      <ng-container matColumnDef="importError">-->
-        <!--        <th mat-header-cell *matHeaderCellDef mat-sort-header> Błąd przy importowaniu</th>-->
-        <!--        <td mat-cell *matCellDef="let element" class="mat-column-error"> {{element.importError}}-->
-        <!--          <button mat-button *ngIf="element.importError" (click)="showApplicationErrorDialog(element)">Wyświetl błąd-->
-        <!--          </button>-->
-        <!--        </td>-->
-        <!--      </ng-container>-->
-        <ng-container matColumnDef="warnings">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Ostrzeżenia</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.warnings }}</td>
-        </ng-container>
-        <ng-container matColumnDef="delete">
-          <th mat-header-cell *matHeaderCellDef> Usuń</th>
-          <td mat-cell *matCellDef="let element" class="mat-cell">
+            }
+          </div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="duplicateStatus">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencjalny duplikat</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell"
+            [class.red_backgroud]="element.applicant.potentialDuplicateStatus === 'POTENTIAL_DUPLICATE'">
+          <div>
+            @switch (element.applicant.potentialDuplicateStatus) {
+              @case ('NOT_CHECKED') {
+                <div matTooltip="Nie sprawdzono">
+                  <mat-icon>help</mat-icon>
+                </div>
+              }
+              @case ('OK') {
+                <div matTooltip="W porządku">
+                  <mat-icon>done</mat-icon>
+                </div>
+              }
+              @case ('POTENTIAL_DUPLICATE') {
+                <div matTooltip="Potencjalny duplikat">
+                  <button mat-button (click)="onPotentialDuplicateClick(element)">
+                    <mat-icon>priority_high</mat-icon>
+                  </button>
+                </div>
+              }
+              @case ('CONFIRMED_NOT_DUPLICATE') {
+                <div matTooltip="Potwierdzono - to nie duplikat">
+                  <mat-icon>done_all</mat-icon>
+                </div>
+              }
+              @case ('CONFIRMED_DUPLICATE') {
+                <div matTooltip="Potwierdzono - to był duplikat">
+                  <mat-icon>done_all</mat-icon>
+                </div>
+              }
+            }
+          </div>
+        </td>
+      </ng-container>
+      <!--      <ng-container matColumnDef="importError">-->
+      <!--        <th mat-header-cell *matHeaderCellDef mat-sort-header> Błąd przy importowaniu</th>-->
+      <!--        <td mat-cell *matCellDef="let element" class="mat-column-error"> {{element.importError}}-->
+      <!--          <button mat-button *ngIf="element.importError" (click)="showApplicationErrorDialog(element)">Wyświetl błąd-->
+      <!--          </button>-->
+      <!--        </td>-->
+      <!--      </ng-container>-->
+      <ng-container matColumnDef="warnings">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Ostrzeżenia</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">{{ element.warnings }}</td>
+      </ng-container>
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef> Usuń</th>
+        <td mat-cell *matCellDef="let element" class="mat-cell">
+          @if (importObj) {
             <button mat-button (click)="deleteApplication(element.id)"
-                    [disabled]="isDeleteButtonDisabled(element)">
+                    [disabled]="isDeleteButtonDisabled(element, importObj)">
               <mat-icon>delete</mat-icon>
             </button>
-          </td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()"></tr>
-        <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();"></tr>
-      </table>
-      <mat-paginator [pageSizeOptions]="[5, 10, 15, 20, 25, 50, 100]"
-                     [length]="dataSource.page?.totalElements"
-                     [pageSize]="dataSource.page?.size"
-                     showFirstLastButtons
-                     [pageIndex]="dataSource.page?.number"/>
-    </div>
+          }
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()"></tr>
+      <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();"></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[5, 10, 15, 20, 25, 50, 100]"
+                   [length]="dataSource.page?.totalElements"
+                   [pageSize]="dataSource.page?.size"
+                   showFirstLastButtons
+                   [pageIndex]="dataSource.page?.number"/>
   </div>
-}
+</div>
+

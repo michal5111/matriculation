@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Table(name = "DZ_PRACOWNICY")
@@ -34,7 +34,7 @@ class Employee(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "BADANIA_OKRESOWE", nullable = true)
-    val periodicExaminations: Date?,
+    val periodicExaminations: LocalDate?,
 
     @Column(name = "KONS_DO_ZMIANY", nullable = true, length = 1)
     val shouldUpdateConsultationDate: Char?,
@@ -50,18 +50,18 @@ class Employee(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "EMERYTURA_DATA", nullable = true)
-    val retirementDate: Date?,
+    val retirementDate: LocalDate?,
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_NADANIA_TYTULU", nullable = true)
-    val dateOfConferringTheTitle: Date?,
+    val dateOfConferringTheTitle: LocalDate?,
 
     @Column(name = "AKTYWNY", nullable = false, length = 1)
     val active: Char,
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_PRZESWIETLENIA", nullable = true)
-    val XRayDate: Date?,
+    val XRayDate: LocalDate?,
 
     @OneToMany(
         mappedBy = "coordinatorEmployee",

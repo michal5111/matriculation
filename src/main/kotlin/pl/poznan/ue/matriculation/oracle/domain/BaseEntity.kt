@@ -3,7 +3,7 @@ package pl.poznan.ue.matriculation.oracle.domain
 import jakarta.persistence.Column
 import jakarta.persistence.MappedSuperclass
 import jakarta.persistence.Version
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 @MappedSuperclass
 open class BaseEntity {
@@ -18,5 +18,5 @@ open class BaseEntity {
 
     @Version
     @Column(name = "MOD_DATA", nullable = false, columnDefinition = "DATE DEFAULT sysdate NOT NULL ENABLE")
-    open var modificationDate: LocalDateTime = LocalDateTime.now()
+    open var modificationDate: ZonedDateTime = ZonedDateTime.now()
 }

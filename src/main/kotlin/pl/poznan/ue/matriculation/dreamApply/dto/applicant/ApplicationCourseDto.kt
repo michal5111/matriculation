@@ -1,10 +1,10 @@
 package pl.poznan.ue.matriculation.dreamApply.dto.applicant
 
-import java.util.*
+import java.time.LocalDate
 
 data class ApplicationCourseDto(
     val priority: Int?,
-    val submitted: Date?,
+    val submitted: LocalDate?,
     val course: String?,
     val intake: String?,
     val modifier: String?

@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Table(name = "DZ_DOKUMENTY_POSIADANE")
@@ -23,11 +23,11 @@ class OwnedDocument(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_WYDANIA", nullable = true)
-    var issueDate: Date? = null,
+    var issueDate: LocalDate? = null,
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_WAZNOSCI", nullable = true)
-    var expirationDate: Date? = null,
+    var expirationDate: LocalDate? = null,
 
     @Column(name = "NUMER", length = 50, nullable = true)
     var number: String? = null,

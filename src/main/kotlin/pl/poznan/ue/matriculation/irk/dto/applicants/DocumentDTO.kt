@@ -2,7 +2,8 @@ package pl.poznan.ue.matriculation.irk.dto.applicants
 
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.util.*
+import java.time.LocalDate
+import java.time.ZonedDateTime
 
 data class DocumentDTO(
     @JsonProperty("certificate_type")
@@ -21,11 +22,11 @@ data class DocumentDTO(
     @JsonProperty("issue_country")
     val issueCountry: String?,
     @JsonProperty("issue_date")
-    val issueDate: Date?,
+    val issueDate: LocalDate?,
     @JsonProperty("issue_institution")
     val issueInstitution: String?,
     @JsonProperty("issue_institution_usos_code")
     val issueInstitutionUsosCode: Long?,
     @JsonProperty("modification_date")
-    val modificationDate: Date?
+    val modificationDate: ZonedDateTime?
 )

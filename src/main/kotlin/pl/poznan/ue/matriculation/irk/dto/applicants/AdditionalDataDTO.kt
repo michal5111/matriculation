@@ -2,7 +2,7 @@ package pl.poznan.ue.matriculation.irk.dto.applicants
 
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.util.*
+import java.time.LocalDate
 
 data class AdditionalDataDTO(
     @JsonProperty("city_of_birth")
@@ -12,7 +12,7 @@ data class AdditionalDataDTO(
     @JsonProperty("document_country")
     val documentCountry: String?,
     @JsonProperty("document_exp_date")
-    val documentExpDate: Date?,
+    val documentExpDate: LocalDate?,
     @JsonProperty("document_number")
     val documentNumber: String?,
     @JsonProperty("document_type")

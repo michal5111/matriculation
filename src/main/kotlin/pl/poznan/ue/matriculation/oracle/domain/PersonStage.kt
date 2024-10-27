@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Table(name = "DZ_ETAPY_OSOB")
@@ -14,7 +14,7 @@ class PersonStage(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_ZAKON", nullable = false)
-    var endDate: Date,
+    var endDate: LocalDate,
 
     @Column(name = "STATUS_ZALICZENIA", length = 1, nullable = false)
     var passStatus: Char,

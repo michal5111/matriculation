@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.irk.dto.applicants
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.util.*
+import java.time.LocalDate
 
 data class BasicDataDTO(
     val sex: Char,
@@ -9,7 +9,7 @@ data class BasicDataDTO(
     val pesel: String?,
 
     @JsonProperty("date_of_birth")
-    val dateOfBirth: Date?,
+    val dateOfBirth: LocalDate?,
 
     @JsonProperty("city_of_birth")
     val cityOfBirth: String?,

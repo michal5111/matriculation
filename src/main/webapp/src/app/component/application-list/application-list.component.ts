@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {BasicDataSource} from '../../dataSource/basic-data-source';
 import {Application} from '../../model/applications/application';
 import {BehaviorSubject, debounceTime, distinctUntilChanged, tap} from 'rxjs';
@@ -13,7 +13,7 @@ import {AbstractListWithPathParamsComponent} from '../abstract-list-with-path-pa
 import {ErrorDialogComponent} from '../dialog/error-dialog/error-dialog.component';
 import {ErrorDialogData} from '../../model/dialog/error-dialog-data';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {APP_BASE_HREF, DatePipe} from '@angular/common';
+import {APP_BASE_HREF, AsyncPipe, DatePipe} from '@angular/common';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {
@@ -67,33 +67,22 @@ type filterType = {
     MatRowDef,
     MatRow,
     MatPaginator,
-    DatePipe
-  ]
+    DatePipe,
+    AsyncPipe
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ApplicationListComponent extends AbstractListWithPathParamsComponent<Application, number, filterType>
   implements OnInit, OnDestroy {
-  private usosService = inject(UsosService);
-  userService = inject(UserService);
-  private dialog = inject(MatDialog);
-  baseHref = inject(APP_BASE_HREF);
-
-
-  constructor() {
-    super();
-    const applicationsService = inject(ApplicationsService);
-    this.filtersSubject = new BehaviorSubject<filterType>({});
-    this.dataSource = new BasicDataSource<Application, number, filterType>(applicationsService);
-    this.filterFormGroup = new FormGroup({
-      importId: new FormControl<number | null>(null),
-      name: new FormControl<string | null>(null),
-      surname: new FormControl<string | null>(null),
-      pesel: new FormControl<string | null>(null)
-    });
-  }
-
-  dataSource: BasicDataSource<Application, number, filterType>;
-  filtersSubject: BehaviorSubject<filterType>;
-  usosUrl: UrlDto | null = null;
+  private readonly usosService = inject(UsosService);
+  protected readonly userService = inject(UserService);
+  private readonly dialog = inject(MatDialog);
+  protected readonly baseHref = inject(APP_BASE_HREF);
+  private readonly applicationsService = inject(ApplicationsService);
+  dataSource: BasicDataSource<Application, number, filterType> =
+    new BasicDataSource<Application, number, filterType>(this.applicationsService);
+  filtersSubject: BehaviorSubject<filterType> = new BehaviorSubject<filterType>({});
+  usosUrl$ = this.usosService.getUsosUrl();
   displayedColumns: Map<string, boolean> = new Map<string, boolean>([
     ['lp', true],
     ['id', true],
@@ -130,15 +119,15 @@ export class ApplicationListComponent extends AbstractListWithPathParamsComponen
     name: FormControl<string | null>,
     surname: FormControl<string | null>,
     pesel: FormControl<string | null>
-  }>;
-
-  protected readonly APP_BASE_HREF = APP_BASE_HREF;
+  }> = new FormGroup({
+    importId: new FormControl<number | null>(null),
+    name: new FormControl<string | null>(null),
+    surname: new FormControl<string | null>(null),
+    pesel: new FormControl<string | null>(null)
+  });
 
   ngOnInit(): void {
     this.subs.push(
-      this.usosService.getUsosUrl().subscribe(
-        result => this.usosUrl = result
-      ),
       this.filterFormGroup.valueChanges.pipe(
         distinctUntilChanged(),
         debounceTime(200),
@@ -147,8 +136,8 @@ export class ApplicationListComponent extends AbstractListWithPathParamsComponen
     );
   }
 
-  getPersonUsosUrl(application: Application): string {
-    return `${this.usosUrl?.url}/studenci/programyOsob.jsf?osobaId=${application.applicant.usosId}`;
+  getPersonUsosUrl(application: Application, usosUrl: UrlDto): string {
+    return `${usosUrl?.url}/studenci/programyOsob.jsf?osobaId=${application.applicant.usosId}`;
   }
 
   getPeselOrIdNumber(application: Application) {

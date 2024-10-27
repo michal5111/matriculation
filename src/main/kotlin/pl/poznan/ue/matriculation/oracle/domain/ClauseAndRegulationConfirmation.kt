@@ -2,7 +2,8 @@ package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
 import org.hibernate.annotations.CacheConcurrencyStrategy
-import java.util.*
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Entity
 @Cacheable
@@ -23,8 +24,9 @@ class ClauseAndRegulationConfirmation(
     @JoinColumn(name = "KL_REG_ID", referencedColumnName = "ID")
     val clauseAndRegulation: ClauseAndRegulation,
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "DATA_PODJECIA_DECYZJI")
-    val confirmationDate: Date? = null,
+    val confirmationDate: LocalDateTime? = null,
 
     @Column(name = "DECYZJA", length = 1, nullable = false)
     val decision: String = "X",
@@ -33,12 +35,14 @@ class ClauseAndRegulationConfirmation(
     @JoinColumn(name = "PRGOS_ID", referencedColumnName = "ID")
     val personProgramme: PersonProgramme,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "TERMIN_PODJECIA_DECYZJI")
-    val decisionDeadline: Date,
+    val decisionDeadline: LocalDate?,
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "ZAKONCZENIE_OBOWIAZYWANIA")
-    val terminationDate: Date?,
+    val terminationDate: LocalDate?,
 
     @Column(name = "DATA_OD", nullable = false)
-    val dateFrom: Date? = Date(),
+    val dateFrom: LocalDate? = LocalDate.now(),
 ) : BaseEntity()

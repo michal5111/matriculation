@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Table(name = "DZ_DOKUMENTY_OSOB")
@@ -25,7 +25,7 @@ class PersonDocument(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_WYDANIA", nullable = false)
-    var issueDate: Date,
+    var issueDate: LocalDate,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "JZK_KOD", referencedColumnName = "KOD", nullable = true)
@@ -41,7 +41,7 @@ class PersonDocument(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_POTW_ODBIORU", nullable = true)
-    var receiptDate: Date,
+    var receiptDate: LocalDate,
 
     @Column(name = "DOKUMENT_ID_BLOBBOX", length = 20, nullable = true)
     var documentBlobboxId: String? = null,

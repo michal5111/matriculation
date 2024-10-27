@@ -7,16 +7,13 @@ import {User} from '../../model/user/user';
 import {BehaviorSubject, map, Observable} from 'rxjs';
 import {Page} from '../../model/dto/page/page';
 import {ActivatedRouteSnapshot, CanActivate, GuardResult, MaybeAsync, RouterStateSnapshot} from '@angular/router';
+import {nonNull} from '../../util/util';
 
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type': 'application/json'
   })
 };
-
-function nonNull<T>(value: T | null | undefined): value is T {
-  return value !== null && value !== undefined;
-}
 
 @Injectable({
   providedIn: 'root'

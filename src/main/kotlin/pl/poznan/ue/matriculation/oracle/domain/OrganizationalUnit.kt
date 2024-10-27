@@ -3,7 +3,7 @@ package pl.poznan.ue.matriculation.oracle.domain
 import jakarta.persistence.*
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 //@Immutable
@@ -91,7 +91,7 @@ class OrganizationalUnit(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_ZALOZENIA", nullable = true)
-    val dateOfEstablishment: Date?,
+    val dateOfEstablishment: LocalDate?,
 
     @Column(name = "REGON", length = 14, nullable = true)
     val regon: String?,

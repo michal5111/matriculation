@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.entityRepresentations.PersonBasicData
 import pl.poznan.ue.matriculation.oracle.repo.PersonRepository
-import java.util.*
+import java.time.LocalDate
 
 @Service
 @Transactional(transactionManager = "oracleTransactionManager")
@@ -31,7 +31,7 @@ class PersonService(
     fun findPotentialDuplicate(
         name: String,
         surname: String,
-        birthDate: Date,
+        birthDate: LocalDate,
         pesel: String?,
         idNumbers: List<String>
     ): List<PersonBasicData> {

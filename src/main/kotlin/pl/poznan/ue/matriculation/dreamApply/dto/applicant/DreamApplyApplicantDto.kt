@@ -2,11 +2,11 @@ package pl.poznan.ue.matriculation.dreamApply.dto.applicant
 
 import pl.poznan.ue.matriculation.dreamApply.dto.application.DreamApplyApplicationDto
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
-import java.util.*
+import java.time.ZonedDateTime
 
 data class DreamApplyApplicantDto(
     val id: Long,
-    val registered: Date,
+    val registered: ZonedDateTime,
     val name: NameDto,
     val email: String,
     val phone: String?,

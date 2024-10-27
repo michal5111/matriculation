@@ -10,9 +10,6 @@ export abstract class AbstractListWithPathParamsComponent<T, ID, F> extends Abst
 
 
   override ngAfterViewInit() {
-    if (!this.paginator() || !this.sort()) {
-      throw Error('Paginator or sort is null');
-    }
     this.subs.push(
       merge(
         this.paginator()?.page ?? of({}),

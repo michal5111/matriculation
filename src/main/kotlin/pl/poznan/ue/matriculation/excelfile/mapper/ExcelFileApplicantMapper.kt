@@ -8,7 +8,8 @@ import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.domain.applicants.IdentityDocument
 import pl.poznan.ue.matriculation.local.domain.applicants.PhoneNumber
 import pl.poznan.ue.matriculation.local.domain.enum.AddressType
-import java.util.*
+import java.time.LocalDate
+import java.time.ZonedDateTime
 
 class ExcelFileApplicantMapper {
 
@@ -33,7 +34,7 @@ class ExcelFileApplicantMapper {
             citizenship = excelFileApplicant.citizenship,
             applicantForeignerData = null,
             indexNumber = null,
-            modificationDate = Date(),
+            modificationDate = ZonedDateTime.now(),
             password = null,
             photo = null,
             photoPermission = null
@@ -53,7 +54,7 @@ class ExcelFileApplicantMapper {
                         type = "P",
                         number = it.replace("[^a-zA-Z0-9]+", ""),
                         country = "PL",
-                        expDate = Date()
+                        expDate = LocalDate.now()
                     )
                 )
             }
@@ -90,7 +91,7 @@ class ExcelFileApplicantMapper {
             fathersName = excelFileApplicant.fathersName
             mothersName = excelFileApplicant.mothersName
             citizenship = excelFileApplicant.citizenship.trim()
-            modificationDate = Date()
+            modificationDate = ZonedDateTime.now()
             excelFileApplicant.phoneNumber?.trimPhoneNumber()?.let {
                 phoneNumbers += PhoneNumber(
                     comment = "Podstawowy numer telefonu",
@@ -104,7 +105,7 @@ class ExcelFileApplicantMapper {
                         type = "P",
                         number = it.replace("[^a-zA-Z0-9]+", ""),
                         country = "PL",
-                        expDate = Date()
+                        expDate = LocalDate.now()
                     )
                 )
             }

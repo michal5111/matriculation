@@ -1,10 +1,10 @@
-export interface Person {
+export type Person = {
   id: number;
   pesel: string;
   name: string;
   secondName: string;
   surname: string;
-  birthDate?: Date;
+  birthDate?: string;
   birthCity: string;
   fathersName: string;
   mothersName: string;
@@ -23,8 +23,8 @@ export interface Person {
   citizenship: string;
   organizationalUnit: string;
   creatorOracleUser: string;
-  creationDate: Date;
-  modificationDate: Date;
+  creationDate: string;
+  modificationDate: string;
   sex: string;
   titlePrefix?: any;
   titleSuffix?: any;
@@ -53,4 +53,4 @@ export interface Person {
   graduateClubJoinApprovalDate?: any;
   graduateClubJoinResignDate?: any;
   modificationOracleUser: string;
-}
+};

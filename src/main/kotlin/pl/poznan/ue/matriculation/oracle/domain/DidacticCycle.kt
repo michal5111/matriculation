@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import org.hibernate.annotations.Immutable
 import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Immutable
@@ -21,11 +21,11 @@ class DidacticCycle(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_OD", nullable = false)
-    val dateFrom: Date,
+    val dateFrom: LocalDate,
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_DO", nullable = false)
-    val dateTo: Date,
+    val dateTo: LocalDate,
 
     @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_WYSWIETLAC", length = 1, nullable = false)
@@ -33,7 +33,7 @@ class DidacticCycle(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_ZAKON", nullable = false)
-    val endDate: Date,
+    val endDate: LocalDate,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TCDYD_KOD", referencedColumnName = "KOD")
@@ -50,14 +50,14 @@ class DidacticCycle(
     val passArchive: Boolean = false,
 
     @Column(name = "DATA_MOD_ARCH_ZAL", nullable = false)
-    val passArchiveModDate: Date,
+    val passArchiveModDate: LocalDate,
 
     @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "ARCHIWIZACJA_ETAPOW", length = 1, nullable = false)
     val stageArchive: Boolean = false,
 
     @Column(name = "DATA_MOD_ARCH_ETP", nullable = false)
-    val stageArchiveModDate: Date,
+    val stageArchiveModDate: LocalDate,
 
     @Column(name = "KOLEJNOSC", length = 10, nullable = false)
     val order: Int = 0,

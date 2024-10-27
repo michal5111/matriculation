@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.oracle.domain.PersonProgramme
-import java.util.*
+import java.time.LocalDate
 
 @Repository
 interface PersonProgrammeRepository : JpaRepository<PersonProgramme, Long> {
@@ -25,7 +25,5 @@ interface PersonProgrammeRepository : JpaRepository<PersonProgramme, Long> {
         ) and person.id = :personId
     """
     )
-    fun updateToNotDefault(personId: Long, dateOfAddmision: Date): Int
-
-    fun existsByIsDefault(isDefault: Boolean): Boolean
+    fun updateToNotDefault(personId: Long, dateOfAddmision: LocalDate): Int
 }

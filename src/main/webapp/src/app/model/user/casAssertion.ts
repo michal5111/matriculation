@@ -1,9 +1,9 @@
 import {Principal} from './principal';
 
 export interface CasAssertion {
-  validFromDate: Date;
+  validFromDate: string;
   validUntilDate?: any;
-  authenticationDate: Date;
+  authenticationDate: string;
   attributes: any;
   principal: Principal;
   valid: boolean;

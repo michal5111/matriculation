@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Table(name = "DZ_DOKUMENTY_UPR")
@@ -24,7 +24,7 @@ class EntitlementDocument(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_WYSTAWIENIA")
-    var issueDate: Date?,
+    var issueDate: LocalDate?,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SZK_ID", referencedColumnName = "ID", nullable = true)

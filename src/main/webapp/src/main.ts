@@ -10,7 +10,7 @@ import {ExceptionHandler} from './app/exceptionHandler/exception-handler';
 import {WS_URL} from './app/injectableTokens/WS_URL';
 import {InjectableRxStompConfig, RxStompService, rxStompServiceFactory} from '@stomp/ng2-stompjs';
 import {MyRxStompConfig} from './app/configConsts/my-rx-stomp-config';
-import {MAT_DATE_FORMATS} from '@angular/material/core';
+import {MAT_DATE_FORMATS, provideNativeDateAdapter} from '@angular/material/core';
 import {MY_DATE_FORMATS} from './app/configConsts/MY_DATE_FORMATS';
 import {UserService} from './app/service/user-service/user.service';
 import {firstValueFrom} from 'rxjs';
@@ -20,7 +20,6 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {AppComponent} from './app/app.component';
 import {provideRouter, withComponentInputBinding} from '@angular/router';
 import {routes} from './app/routes';
-import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 import localePl from '@angular/common/locales/pl';
 
 function initUser(userService: UserService) {
@@ -96,7 +95,7 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     provideRouter(routes, withComponentInputBinding()),
-    provideMomentDateAdapter()
+    provideNativeDateAdapter()
   ]
 })
   .catch(err => console.error(err));

@@ -2,7 +2,7 @@ package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
 import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
-import java.util.*
+import java.time.LocalDate
 
 @NamedEntityGraphs(
     NamedEntityGraph(
@@ -73,7 +73,7 @@ class Person(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_UR", length = 60, nullable = true)
-    var birthDate: Date? = null,
+    var birthDate: LocalDate? = null,
 
     @Column(name = "MIASTO_UR", length = 60, nullable = true)
     var birthCity: String? = null,
@@ -207,7 +207,7 @@ class Person(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_WAZNOSCI_DOWODU", nullable = true)
-    var identityDocumentExpirationDate: Date? = null,
+    var identityDocumentExpirationDate: LocalDate? = null,
 
     @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     val addresses: MutableList<Address> = mutableListOf(),

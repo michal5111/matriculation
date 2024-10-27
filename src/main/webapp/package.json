@@ -26,8 +26,6 @@
     "tslib": "^2.0.0",
     "zone.js": "~0.14.10",
     "@stomp/ng2-stompjs": "^8.0.0",
-    "moment": "^2.29.4",
-    "@angular/material-moment-adapter": "^18.2.9",
     "ngxtension": "^4.0.0"
   },
   "devDependencies": {

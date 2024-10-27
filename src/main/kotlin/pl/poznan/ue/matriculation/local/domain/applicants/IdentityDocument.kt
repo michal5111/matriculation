@@ -2,7 +2,7 @@ package pl.poznan.ue.matriculation.local.domain.applicants
 
 import jakarta.persistence.*
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 class IdentityDocument(
@@ -14,7 +14,7 @@ class IdentityDocument(
     var country: String?,
 
     @Temporal(TemporalType.DATE)
-    var expDate: Date?,
+    var expDate: LocalDate?,
 
     var number: String?,
 

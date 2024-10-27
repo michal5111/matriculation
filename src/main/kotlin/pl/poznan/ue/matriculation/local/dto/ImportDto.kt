@@ -2,9 +2,9 @@ package pl.poznan.ue.matriculation.local.dto
 
 import jakarta.validation.constraints.NotNull
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
-import java.util.*
+import java.time.LocalDate
 
-class ImportDto(
+data class ImportDto(
     val id: Long? = null,
     @NotNull
     val programmeCode: String? = null,
@@ -19,9 +19,9 @@ class ImportDto(
 
     val indexPoolName: String? = null,
     @NotNull
-    val startDate: Date? = null,
+    val startDate: LocalDate? = null,
     @NotNull
-    val dateOfAddmision: Date? = null,
+    val dateOfAddmision: LocalDate? = null,
     @NotNull
     val stageCode: String? = null,
     @NotNull

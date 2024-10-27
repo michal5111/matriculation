@@ -6,7 +6,7 @@ import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.repo.AddressTypeRepository
 import pl.poznan.ue.matriculation.oracle.repo.CitizenshipRepository
 import pl.poznan.ue.matriculation.oracle.repo.PostalCodeRepository
-import java.util.*
+import java.time.LocalDate
 
 @Service
 class AddressService(
@@ -25,7 +25,7 @@ class AddressService(
         zipCode: String?,
         cityIsCity: Boolean?,
         countryCode: String?,
-        dateFrom: Date? = null
+        dateFrom: LocalDate? = null
     ): Address {
         return Address(
             person = person,

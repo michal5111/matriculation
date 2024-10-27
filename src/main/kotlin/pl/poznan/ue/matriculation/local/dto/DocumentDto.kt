@@ -1,6 +1,7 @@
 package pl.poznan.ue.matriculation.local.dto
 
-import java.util.*
+import java.time.LocalDate
+import java.time.ZonedDateTime
 
 data class DocumentDto(
     val applicantId: Long?,
@@ -12,8 +13,8 @@ data class DocumentDto(
     val documentYear: Int?,
     val issueCity: String?,
     val issueCountry: String?,
-    val issueDate: Date?,
+    val issueDate: LocalDate?,
     val issueInstitution: String?,
     val issueInstitutionUsosCode: Long?,
-    val modificationDate: Date?,
+    val modificationDate: ZonedDateTime?,
 )

@@ -1,6 +1,6 @@
 import {ImportStatus} from './import-status.enum';
 
-export class ImportProgress {
+export type ImportProgress = {
   id: number;
 
   importedApplications: number;
@@ -20,4 +20,4 @@ export class ImportProgress {
   potentialDuplicates: number;
 
   error: string;
-}
+};

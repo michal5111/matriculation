@@ -2,13 +2,13 @@ package pl.poznan.ue.matriculation.irk.dto
 
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.util.*
+import java.time.ZonedDateTime
 
 data class TurnDTO(
     @JsonProperty("date_from")
-    val dateFrom: Date?,
+    val dateFrom: ZonedDateTime?,
     @JsonProperty("date_to")
-    val dateTo: Date?,
+    val dateTo: ZonedDateTime?,
     val programme: String?,
     val registration: String?
 )

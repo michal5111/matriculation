@@ -1,4 +1,4 @@
-export interface Registration {
+export type Registration = {
   id: string;
   name: string;
-}
+};

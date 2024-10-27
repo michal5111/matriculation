@@ -8,7 +8,7 @@ import pl.poznan.ue.matriculation.oracle.domain.Arrival
 import pl.poznan.ue.matriculation.oracle.domain.DidacticCycle
 import pl.poznan.ue.matriculation.oracle.repo.DidacticCycleRepository
 import pl.poznan.ue.matriculation.oracle.repo.SchoolRepository
-import java.util.*
+import java.time.LocalDate
 
 @Service
 class ErasmusService(
@@ -21,7 +21,7 @@ class ErasmusService(
         didacticCycleCode: String,
         didacticCycle: DidacticCycle,
         didacticCycleYear: DidacticCycle,
-        startDate: Date
+        startDate: LocalDate
     ): Arrival {
         return Arrival(
             wantAccommodation = erasmusData.accommodationPreference == AccommodationPreference.DORMITORY,

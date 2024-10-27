@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, input, OnDestroy} from '@angular/core';
 import {ImportService} from '../../../service/import-service/import.service';
 import {filter, map, switchMap, tap} from 'rxjs/operators';
 import {MatPaginator} from '@angular/material/paginator';
@@ -22,11 +22,10 @@ import {ApplicationsService} from '../../../service/application-service/applicat
 import {MatCheckbox, MatCheckboxChange} from '@angular/material/checkbox';
 import {RxStompService} from '@stomp/ng2-stompjs';
 import {Message} from '@stomp/stompjs';
-import {WS_URL} from '../../../injectableTokens/WS_URL';
 import {ImportEditorComponent} from '../../dialog/import-editor/import-editor.component';
 import {AbstractListWithPathParamsComponent} from '../../abstract-list-with-path-params.component';
 import {BasicDataSource} from 'src/app/dataSource/basic-data-source';
-import {DatePipe} from '@angular/common';
+import {AsyncPipe, DatePipe} from '@angular/common';
 import {MatCard, MatCardActions, MatCardContent, MatCardSubtitle, MatCardTitle} from '@angular/material/card';
 import {MatAnchor, MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
@@ -45,6 +44,8 @@ import {
   MatTable
 } from '@angular/material/table';
 import {MatTooltip} from '@angular/material/tooltip';
+import {toObservable} from '@angular/core/rxjs-interop';
+import {nonNull} from '../../../util/util';
 
 type filterType = { importId: number };
 
@@ -79,28 +80,32 @@ type filterType = { importId: number };
     MatRowDef,
     MatRow,
     MatPaginator,
-    DatePipe
-  ]
+    DatePipe,
+    AsyncPipe
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ImportViewComponent extends AbstractListWithPathParamsComponent<Application, number, filterType> implements OnInit, OnDestroy {
-  private importService = inject(ImportService);
-  private usosService = inject(UsosService);
-  userService = inject(UserService);
-  private dialog = inject(MatDialog);
-  private applicationsService = inject(ApplicationsService);
-  rxStompService = inject(RxStompService);
-  private wsUrl = inject(WS_URL);
+export class ImportViewComponent extends AbstractListWithPathParamsComponent<Application, number, filterType> implements OnDestroy {
+  private readonly importService = inject(ImportService);
+  private readonly usosService = inject(UsosService);
+  protected readonly userService = inject(UserService);
+  private readonly dialog = inject(MatDialog);
+  private readonly applicationsService = inject(ApplicationsService);
+  protected readonly rxStompService = inject(RxStompService);
 
-  dataSource: BasicDataSource<Application, number, filterType>;
-  filtersSubject: BehaviorSubject<filterType>;
-  importId = -1;
-  import: Import | null = null;
+  dataSource: BasicDataSource<Application, number, filterType> =
+    new BasicDataSource<Application, number, filterType>(this.applicationsService);
+  importId = input<number>();
+  filtersSubject: BehaviorSubject<filterType> = new BehaviorSubject<filterType>({
+    importId: -1
+  });
+  importId$ = toObservable(this.importId).pipe(
+    filter(nonNull),
+    tap(importId => this.filtersSubject.next({importId}))
+  );
+
   progressSubscription: Subscription | null = null;
-  usosUrl: UrlDto | null = null;
-  // override pageSize = parseInt(localStorage.getItem('importViewPageSize') ?? '5', 10);
-  // page: Page<Application> | null = null;
-  // override sortString = 'applicant.family';
-  // override sortDirString = 'asc';
+  usosUrl$ = this.usosService.getUsosUrl();
   displayedColumns: Map<string, boolean> = new Map<string, boolean>([
     ['lp', true],
     ['id', true],
@@ -133,57 +138,45 @@ export class ImportViewComponent extends AbstractListWithPathParamsComponent<App
     ['warnings', 'warnings']
   ]);
 
-  public import$: Observable<Import>;
-
-  constructor() {
-    super();
-    const applicationsService = this.applicationsService;
-
-    this.importId = this.route.snapshot.params['id'];
-    this.filtersSubject = new BehaviorSubject<filterType>({
-      importId: this.importId
-    });
-    this.dataSource = new BasicDataSource<Application, number, filterType>(applicationsService);
-    this.import$ = merge(
-      this.importService.findById(this.importId),
-      this.rxStompService.watch(`/topic/import/${this.importId}`).pipe(
-        map((message: Message) => JSON.parse(message.body))
-      )
-    ).pipe(
-      tap((importObject: Import) => this.import = importObject),
-      // distinctUntilChanged((previous, current) => previous.importStatus === current.importStatus),
-      tap(() => this.getPage())
-    );
-  }
-
-  ngOnInit(): void {
-    this.subs.push(
-      this.import$.subscribe(),
-      this.usosService.getUsosUrl().subscribe(
-        result => this.usosUrl = result
-      )
-    );
-  }
+  public import$: Observable<Import> = merge(
+    this.importId$.pipe(
+      filter(nonNull),
+      switchMap(id => this.importService.findById(id))
+    ),
+    this.importId$.pipe(
+      filter(nonNull),
+      switchMap(id => this.rxStompService.watch(`/topic/import/${id}`)),
+      map((message: Message) => JSON.parse(message.body))
+    )
+  ).pipe(
+    tap(() => this.getPage())
+  );
 
   startImport(): void {
     this.subs.push(
-      this.progressSubscription = this.importService.startImport(this.importId).subscribe()
+      this.progressSubscription = this.importId$.pipe(
+        filter(nonNull),
+        switchMap(id => this.importService.startImport(id))
+      ).subscribe()
     );
   }
 
   savePersons(): void {
     this.subs.push(
-      this.progressSubscription = this.importService.savePersons(this.importId).subscribe()
+      this.progressSubscription = this.importId$.pipe(
+        filter(nonNull),
+        switchMap(id => this.importService.savePersons(id))
+      ).subscribe()
     );
   }
 
-  updateIndexNumber(application: Application): void {
+  updateIndexNumber(application: Application, importObj: Import): void {
     const dialogRef = this.dialog.open(UpdateIndexNumberDialogComponent, {
       width: '300px',
       height: '250px',
       data: {
         personId: application.applicant.usosId,
-        indexTypeCode: this.import?.indexPoolCode,
+        indexTypeCode: importObj?.indexPoolCode,
         indexNumber: application.applicant.assignedIndexNumber
       }
     });
@@ -204,13 +197,15 @@ export class ImportViewComponent extends AbstractListWithPathParamsComponent<App
     this.subs.push(
       dialogRef.afterClosed().pipe(
         filter(result => result === true),
-        switchMap(() => this.importService.archiveImport(this.importId))
+        switchMap(() => this.importId$),
+        filter(nonNull),
+        switchMap(importId => this.importService.archiveImport(importId))
       ).subscribe()
     );
   }
 
-  getPersonUsosUrl(application: Application): string {
-    return `${this.usosUrl?.url}/studenci/programyOsob.jsf?osobaId=${application.applicant.usosId}`;
+  getPersonUsosUrl(application: Application, usosUrl: UrlDto): string {
+    return `${usosUrl?.url}/studenci/programyOsob.jsf?osobaId=${application.applicant.usosId}`;
   }
 
   showApplicationErrorDialog(application: Application): void {
@@ -243,8 +238,8 @@ export class ImportViewComponent extends AbstractListWithPathParamsComponent<App
     }
   }
 
-  isStartImportButtonDisabled(): boolean {
-    switch (this.import?.importStatus) {
+  isStartImportButtonDisabled(importObj: Import): boolean {
+    switch (importObj?.importStatus) {
       case 'ARCHIVED':
       case 'SAVING':
       case 'STARTED':
@@ -253,18 +248,18 @@ export class ImportViewComponent extends AbstractListWithPathParamsComponent<App
       case 'SENDING_NOTIFICATIONS':
         return true;
       case 'ERROR':
-        return this.import.savedApplicants === this.import.totalCount
-          && this.import.totalCount > 0;
+        return importObj.savedApplicants === importObj.totalCount
+          && importObj.totalCount > 0;
       default:
         return false;
     }
   }
 
-  isSavePersonsButtonDisabled(): boolean {
-    if (this.import?.potentialDuplicates != null && this.import?.potentialDuplicates > 0) {
+  isSavePersonsButtonDisabled(importObj: Import): boolean {
+    if (importObj?.potentialDuplicates != null && importObj?.potentialDuplicates > 0) {
       return true;
     }
-    switch (this.import?.importStatus) {
+    switch (importObj?.importStatus) {
       case 'COMPLETED_WITH_ERRORS':
       case 'IMPORTED':
         return false;
@@ -273,12 +268,12 @@ export class ImportViewComponent extends AbstractListWithPathParamsComponent<App
     }
   }
 
-  isArchiveButtonDisabled(): boolean {
-    return this.import?.importStatus !== 'COMPLETE';
+  isArchiveButtonDisabled(importObj: Import): boolean {
+    return importObj?.importStatus !== 'COMPLETE';
   }
 
-  isFindUidsButtonDisabled(): boolean {
-    switch (this.import?.importStatus) {
+  isFindUidsButtonDisabled(importObj: Import): boolean {
+    switch (importObj?.importStatus) {
       case 'COMPLETE':
       case 'COMPLETED_WITH_ERRORS':
       case 'ERROR':
@@ -288,19 +283,19 @@ export class ImportViewComponent extends AbstractListWithPathParamsComponent<App
     }
   }
 
-  onFindUidsClick() {
-    this.subs.push(this.progressSubscription = this.importService.findUids(this.importId).subscribe());
+  onFindUidsClick(importId: number) {
+    this.subs.push(this.progressSubscription = this.importService.findUids(importId).subscribe());
   }
 
-  onSendNotificationsClick() {
-    this.subs.push(this.progressSubscription = this.importService.sendNotifications(this.importId).subscribe());
+  onSendNotificationsClick(importId: number) {
+    this.subs.push(this.progressSubscription = this.importService.sendNotifications(importId).subscribe());
   }
 
-  isSendNotificationsDisabled(): boolean {
-    switch (this.import?.importStatus) {
+  isSendNotificationsDisabled(importObj: Import): boolean {
+    switch (importObj?.importStatus) {
       case 'COMPLETE':
       case 'COMPLETED_WITH_ERRORS':
-        return this.import.notificationsSend === this.import.totalCount;
+        return importObj.notificationsSend === importObj.totalCount;
       default:
         return true;
     }
@@ -348,27 +343,27 @@ export class ImportViewComponent extends AbstractListWithPathParamsComponent<App
     });
   }
 
-  openEditorDialog() {
+  openEditorDialog(importObj: Import) {
     this.dialog.open(ImportEditorComponent, {
       data: {
-        import: this.import
+        import: importObj
       }
     });
   }
 
-  isEditButtonDisabled(): boolean {
-    return this.import?.importStatus != null ? !(
-      this.import?.importStatus === 'PENDING'
-      || this.import?.importStatus === 'IMPORTED'
-      || this.import?.importStatus === 'COMPLETED_WITH_ERRORS'
-      || (this.import?.importStatus === 'ERROR' && this.import.totalCount !== this.import.savedApplicants)
+  isEditButtonDisabled(importObj: Import): boolean {
+    return importObj?.importStatus != null ? !(
+      importObj?.importStatus === 'PENDING'
+      || importObj?.importStatus === 'IMPORTED'
+      || importObj?.importStatus === 'COMPLETED_WITH_ERRORS'
+      || (importObj?.importStatus === 'ERROR' && importObj.totalCount !== importObj.savedApplicants)
     ) : true;
   }
 
-  isDeleteButtonDisabled(application: Application): boolean {
+  isDeleteButtonDisabled(application: Application, importObj: Import): boolean {
     if (application.importStatus === 'IMPORTED') {
       return true;
     }
-    return this.isStartImportButtonDisabled();
+    return this.isStartImportButtonDisabled(importObj);
   }
 }

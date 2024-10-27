@@ -3,12 +3,12 @@ package pl.poznan.ue.matriculation.dreamApply.dto.application
 import com.fasterxml.jackson.annotation.JsonProperty
 import pl.poznan.ue.matriculation.dreamApply.dto.academicTerms.CourseDto
 import pl.poznan.ue.matriculation.local.dto.IApplicationDto
-import java.util.*
+import java.time.LocalDate
 
 data class DreamApplyApplicationDto(
     var id: Long,
-    val created: Date,
-    val revised: Date,
+    val created: LocalDate,
+    val revised: LocalDate,
     val submitted: String?,
     val status: String,
     @JsonProperty("academic_term")

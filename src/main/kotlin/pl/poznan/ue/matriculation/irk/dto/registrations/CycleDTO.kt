@@ -3,13 +3,13 @@ package pl.poznan.ue.matriculation.irk.dto.registrations
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import pl.poznan.ue.matriculation.local.domain.Name
-import java.util.*
+import java.time.LocalDate
 
 data class CycleDTO(
     val code: String?,
     @JsonProperty("date_from")
-    val dateFrom: Date?,
+    val dateFrom: LocalDate?,
     @JsonProperty("date_to")
-    val dateTo: Date?,
+    val dateTo: LocalDate?,
     val name: Name?
 )

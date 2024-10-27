@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import pl.poznan.ue.matriculation.AbstractIT
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
-import java.util.*
+import java.time.LocalDate
 import kotlin.test.assertEquals
 
 class ApplicantRepositoryTest : AbstractIT() {
@@ -19,7 +19,7 @@ class ApplicantRepositoryTest : AbstractIT() {
             foreignId = 1,
             dataSourceId = "test",
             email = "email",
-            dateOfBirth = Date(),
+            dateOfBirth = LocalDate.now(),
             family = "family",
             given = "given",
             sex = 'K'

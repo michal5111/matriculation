@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 import pl.poznan.ue.matriculation.oracle.domain.DocumentType
 import pl.poznan.ue.matriculation.oracle.domain.OwnedDocument
 import pl.poznan.ue.matriculation.oracle.domain.Person
-import java.util.*
+import java.time.LocalDate
 
 @Repository
 interface OwnedDocumentRepository : JpaRepository<OwnedDocument, Long> {
@@ -20,5 +20,5 @@ interface OwnedDocumentRepository : JpaRepository<OwnedDocument, Long> {
         and od.person.id = :personId
     """
     )
-    fun findMaxExpirationDateByDocumentTypeAndPersonId(documentTypeCode: String, personId: Long): Date?
+    fun findMaxExpirationDateByDocumentTypeAndPersonId(documentTypeCode: String, personId: Long): LocalDate?
 }

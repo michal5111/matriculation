@@ -11,6 +11,7 @@ import pl.poznan.ue.matriculation.local.domain.const.PhoneNumberType
 import pl.poznan.ue.matriculation.local.domain.const.PhotoPermissionType
 import pl.poznan.ue.matriculation.local.domain.enum.AddressType
 import pl.poznan.ue.matriculation.oracle.repo.SchoolRepository
+import java.time.ZonedDateTime
 import java.util.*
 
 open class DreamApplyApplicantMapper(private val schoolRepository: SchoolRepository) {
@@ -172,11 +173,7 @@ open class DreamApplyApplicantMapper(private val schoolRepository: SchoolReposit
                 },
                 comment = null,
                 documentNumber = it.diploma!!.number!!.trim(),
-                documentYear = it.diploma.issue!!.date!!.let { date ->
-                    val cal = Calendar.getInstance()
-                    cal.time = date
-                    cal.get(Calendar.YEAR)
-                },
+                documentYear = it.diploma.issue!!.date!!.year,
                 issueCity = it.city?.trim(),
                 issueCountry = it.country?.trim(),
                 issueDate = it.diploma.issue.date!!,
@@ -194,7 +191,7 @@ open class DreamApplyApplicantMapper(private val schoolRepository: SchoolReposit
                         ?.uppercase(Locale.getDefault()) == "POZNAN UNIVERSITY OF ECONOMICS AND BUSINESS"
                 ) 110825L
                 else null,
-                modificationDate = Date()
+                modificationDate = ZonedDateTime.now()
             )
         }?.forEach {
             applicant.addDocument(it)

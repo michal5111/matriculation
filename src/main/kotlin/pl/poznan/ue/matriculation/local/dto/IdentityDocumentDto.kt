@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.local.dto
 
 import java.io.Serializable
-import java.util.*
+import java.time.LocalDate
 
 /**
  * A DTO for the {@link pl.poznan.ue.matriculation.local.domain.applicants.IdentityDocument} entity
@@ -9,7 +9,7 @@ import java.util.*
 data class IdentityDocumentDto(
     val id: Long? = null,
     val country: String? = null,
-    val expDate: Date? = null,
+    val expDate: LocalDate? = null,
     val number: String? = null,
     val type: String? = null
 ) : Serializable

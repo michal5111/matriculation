@@ -21,10 +21,10 @@ export class Applicant {
   image: any;
   image$: Observable<Blob>;
   photoPermission: null;
-  modification_date: Date;
+  modification_date: string;
   sex: string;
   pesel: string;
-  dateOfBirth: Date;
+  dateOfBirth: string;
   cityOfBirth: string;
   countryOfBirth: string;
   dataSource: string;
@@ -32,7 +32,7 @@ export class Applicant {
   phoneNumbers: PhoneNumber[];
   documentType: string;
   documentNumber: string;
-  documentExpDate: Date;
+  documentExpDate: string;
   documentCountry: string;
   militaryStatus: string;
   militaryCategory: string;
@@ -41,8 +41,8 @@ export class Applicant {
   fathersName: string;
   foreignerData: {
     foreigner_status: string[];
-    polish_card_issue_date: Date;
-    polish_card_valid_to: Date;
+    polish_card_issue_date: string;
+    polish_card_valid_to: string;
     polish_card_number: string;
     polish_card_issue_country: string;
     base_of_stay: string;
@@ -75,10 +75,10 @@ export class Applicant {
     photo: string,
     image: any, image$: Observable<Blob>,
     photoPermission: null,
-    modificationDate: Date,
+    modificationDate: string,
     sex: string,
     pesel: string,
-    dateOfBirth: Date,
+    dateOfBirth: string,
     cityOfBirth: string,
     countryOfBirth: string,
     dataSource: string,
@@ -86,7 +86,7 @@ export class Applicant {
     phoneNumbers: PhoneNumber[],
     documentType: string,
     documentNumber: string,
-    documentExpDate: Date,
+    documentExpDate: string,
     documentCountry: string,
     militaryStatus: string,
     militaryCategory: string,
@@ -95,8 +95,8 @@ export class Applicant {
     fathersName: string,
     foreignerData: {
       foreigner_status: string[];
-      polish_card_issue_date: Date;
-      polish_card_valid_to: Date;
+      polish_card_issue_date: string;
+      polish_card_valid_to: string;
       polish_card_number: string;
       polish_card_issue_country:
         string; base_of_stay: string

@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Table(name = "DZ_OSOBY_HISTORIA_ZMIAN")
@@ -58,7 +58,7 @@ class PersonChangeHistory(
     var comment: String? = "Dane zmienione w trakcie immatrykulacji przez Immatrykulator 5000",
 
     @Column(name = "DATA_ZMIANY", nullable = false)
-    var changeDate: Date = Date(),
+    var changeDate: LocalDate = LocalDate.now(),
 
     @Column(name = "PLEC", nullable = true, length = 1)
     var sex: Char? = null,

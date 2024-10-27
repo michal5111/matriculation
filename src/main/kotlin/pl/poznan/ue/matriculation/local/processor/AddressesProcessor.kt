@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.local.dto.ProcessResult
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.service.AddressService
-import java.util.*
+import java.time.LocalDate
 
 open class AddressesProcessor(
     private val addressService: AddressService,
@@ -66,7 +66,7 @@ open class AddressesProcessor(
     ) {
         val existingAddress = person.addresses.filter {
             val date = it.dateTo
-            date == null || date <= Date()
+            date == null || date <= LocalDate.now()
         }.find { it.addressType.code == addressTypeCode }
         if (
             existingAddress?.city == city
@@ -78,7 +78,7 @@ open class AddressesProcessor(
         ) {
             return
         } else {
-            existingAddress?.dateTo = Date()
+            existingAddress?.dateTo = LocalDate.now()
         }
         person.addAddress(
             addressService.create(

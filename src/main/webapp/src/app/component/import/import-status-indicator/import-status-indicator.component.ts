@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {ImportStatus} from '../../../model/import/import-status.enum';
 
 import {MatIcon} from '@angular/material/icon';
@@ -9,7 +9,8 @@ import {MatTooltip} from '@angular/material/tooltip';
   templateUrl: './import-status-indicator.component.html',
   styleUrls: ['./import-status-indicator.component.sass'],
   standalone: true,
-  imports: [MatIcon, MatTooltip]
+  imports: [MatIcon, MatTooltip],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ImportStatusIndicatorComponent {
 

@@ -9,7 +9,7 @@ import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.repo.CitizenshipRepository
 import pl.poznan.ue.matriculation.oracle.repo.DocumentTypeRepository
 import pl.poznan.ue.matriculation.oracle.repo.OwnedDocumentRepository
-import java.util.*
+import java.time.LocalDate
 
 open class OwnedDocumentsProcessor(
     private val documentTypeRepository: DocumentTypeRepository,
@@ -46,7 +46,7 @@ open class OwnedDocumentsProcessor(
                 OwnedDocument(
                     documentType = documentTypeRepository.getReferenceById(baseOfStay),
                     person = person,
-                    issueDate = afd.polishCardIssueDate ?: Date(),
+                    issueDate = afd.polishCardIssueDate ?: LocalDate.now(),
                     issueCountry = afd.polishCardIssueCountry?.let { countryCode ->
                         citizenshipRepository.getReferenceById(countryCode)
                     },

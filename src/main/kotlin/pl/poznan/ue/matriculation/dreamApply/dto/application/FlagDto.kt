@@ -1,8 +1,8 @@
 package pl.poznan.ue.matriculation.dreamApply.dto.application
 
-import java.util.*
+import java.time.LocalDate
 
 data class FlagDto(
-    val created: Date,
+    val created: LocalDate,
     val name: String
 )

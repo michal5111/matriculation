@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {MatDivider} from '@angular/material/divider';
 
 @Component({
@@ -6,7 +6,8 @@ import {MatDivider} from '@angular/material/divider';
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.sass'],
   standalone: true,
-  imports: [MatDivider]
+  imports: [MatDivider],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FooterComponent {
 }

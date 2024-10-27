@@ -3,7 +3,7 @@ package pl.poznan.ue.matriculation.irk.dto.applicants
 import com.fasterxml.jackson.annotation.JsonProperty
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
 import java.io.Serializable
-import java.util.*
+import java.time.ZonedDateTime
 
 data class IrkApplicantDto(
     val id: Long,
@@ -30,7 +30,7 @@ data class IrkApplicantDto(
     val casPasswordOverride: String?,
 
     @JsonProperty("modification_date")
-    val modificationDate: Date,
+    val modificationDate: ZonedDateTime,
 
     @JsonProperty("basic_data")
     val basicData: BasicDataDTO,

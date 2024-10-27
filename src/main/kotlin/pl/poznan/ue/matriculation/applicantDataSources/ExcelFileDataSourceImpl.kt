@@ -24,6 +24,7 @@ import pl.poznan.ue.matriculation.local.dto.ProgrammeDto
 import pl.poznan.ue.matriculation.local.dto.RegistrationDto
 import pl.poznan.ue.matriculation.oracle.service.ProgrammeService
 import java.text.SimpleDateFormat
+import java.time.ZoneId
 import java.util.*
 
 
@@ -208,14 +209,18 @@ class ExcelFileDataSourceImpl(
                 pesel = row.getCellStringOrNull(PESEL_CELL),
                 passport = row.getCellStringOrNull(PASSPORT_NUMBER_CELL),
                 issueCountry = row.getCellStringOrNull(PASSPORT_COUNTRY),
-                issueDate = if (row.getCell(PASSPORT_VALID_DATE_CELL)?.cellType == CellType.NUMERIC)
+                issueDate = (if (row.getCell(PASSPORT_VALID_DATE_CELL)?.cellType == CellType.NUMERIC)
                     row.getCell(PASSPORT_VALID_DATE_CELL)?.dateCellValue
                 else row.getCellStringOrNull(PASSPORT_VALID_DATE_CELL)?.let {
                     simpleDateFormat.parse(it)
-                },
-                birthDate = if (row.getCell(BIRTH_DATE_CELL)?.cellType == CellType.NUMERIC)
+                })?.toInstant()
+                    ?.atZone(ZoneId.systemDefault())
+                    ?.toLocalDate(),
+                birthDate = (if (row.getCell(BIRTH_DATE_CELL)?.cellType == CellType.NUMERIC)
                     row.getCell(BIRTH_DATE_CELL).dateCellValue
-                else simpleDateFormat.parse(row.getCell(BIRTH_DATE_CELL)?.toString()),
+                else simpleDateFormat.parse(row.getCell(BIRTH_DATE_CELL)?.toString())).toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate(),
                 birthPlace = row.getCellString(BIRTH_PLACE_CELL),
                 fathersName = row.getCellStringOrNull(FATHERS_NAME_CELL),
                 mothersName = row.getCellStringOrNull(MOTHERS_NAME_CELL),

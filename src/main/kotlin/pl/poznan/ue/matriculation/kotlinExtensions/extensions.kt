@@ -10,7 +10,7 @@ import pl.poznan.ue.matriculation.local.domain.user.User
 import pl.poznan.ue.matriculation.local.dto.*
 import pl.poznan.ue.matriculation.local.service.AsyncService
 import java.sql.Blob
-import java.util.*
+import java.time.LocalDate
 import javax.sql.rowset.serial.SerialBlob
 import javax.sql.rowset.serial.SerialClob
 
@@ -241,6 +241,6 @@ fun IdentityDocument.toDto(): IdentityDocumentDto {
 fun Collection<IdentityDocument>.active(): List<IdentityDocument> {
     return filter {
         val expDate = it.expDate
-        if (expDate != null) expDate >= Date() else true
+        if (expDate != null) expDate >= LocalDate.now() else true
     }
 }

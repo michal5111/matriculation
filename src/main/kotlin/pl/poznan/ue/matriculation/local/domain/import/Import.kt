@@ -8,7 +8,7 @@ import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.ImportStatus
 import pl.poznan.ue.matriculation.local.entityListeners.MessageAfterUpdateListener
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @EntityListeners(MessageAfterUpdateListener::class)
@@ -52,10 +52,10 @@ class Import(
     val indexPoolName: String?,
 
     @Temporal(TemporalType.DATE)
-    val startDate: Date,
+    val startDate: LocalDate,
 
     @Temporal(TemporalType.DATE)
-    val dateOfAddmision: Date,
+    val dateOfAddmision: LocalDate,
 
     val didacticCycleCode: String,
 

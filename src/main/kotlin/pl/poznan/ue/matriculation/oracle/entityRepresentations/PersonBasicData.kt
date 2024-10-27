@@ -1,6 +1,6 @@
 package pl.poznan.ue.matriculation.oracle.entityRepresentations
 
-import java.util.*
+import java.time.LocalDate
 
 interface PersonBasicData {
     val id: Long
@@ -9,7 +9,7 @@ interface PersonBasicData {
     val surname: String
     val idNumber: String?
     val pesel: String?
-    val birthDate: Date
+    val birthDate: LocalDate
     val privateEmail: String?
     val email: String?
     val sex: Char

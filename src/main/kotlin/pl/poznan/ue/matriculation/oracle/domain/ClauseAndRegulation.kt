@@ -2,7 +2,7 @@ package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
 import org.hibernate.annotations.CacheConcurrencyStrategy
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Cacheable
@@ -28,10 +28,10 @@ class ClauseAndRegulation(
     val type: String,
 
     @Column(name = "POCZATEK_OBOWIAZYWANIA", nullable = false)
-    val startOfApplication: Date,
+    val startOfApplication: LocalDate,
 
     @Column(name = "KONIEC_OBOWIAZYWANIA", nullable = false)
-    val endOfApplication: Date,
+    val endOfApplication: LocalDate,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "JED_ORG_KOD", referencedColumnName = "KOD")

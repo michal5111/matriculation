@@ -5,7 +5,8 @@ import jakarta.validation.constraints.Email
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
-import java.util.*
+import java.time.LocalDate
+import java.time.ZonedDateTime
 import java.util.concurrent.Future
 
 @NamedEntityGraphs(
@@ -60,7 +61,7 @@ class Applicant(
 
     var photoPermission: String? = null,
 
-    var modificationDate: Date? = null,
+    var modificationDate: ZonedDateTime? = null,
 
     @OneToOne(mappedBy = "applicant", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var applicantForeignerData: ApplicantForeignerData? = null,
@@ -106,7 +107,7 @@ class Applicant(
     var pesel: String? = null,
 
     @Temporal(TemporalType.DATE)
-    var dateOfBirth: Date?,
+    var dateOfBirth: LocalDate?,
 
     var cityOfBirth: String? = null,
 

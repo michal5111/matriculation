@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 import pl.poznan.ue.matriculation.exception.ApplicantCheckException
 import pl.poznan.ue.matriculation.local.domain.applicants.Applicant
 import pl.poznan.ue.matriculation.local.repo.ApplicantRepository
-import java.util.*
+import java.time.ZonedDateTime
 
 @Service
 @Transactional(rollbackFor = [Exception::class])
@@ -48,7 +48,7 @@ class ApplicantService(
         citizenship = null
         photo = null
         photoPermission = null
-        modificationDate = Date()
+        modificationDate = ZonedDateTime.now()
 
         cityOfBirth = null
         countryOfBirth = null

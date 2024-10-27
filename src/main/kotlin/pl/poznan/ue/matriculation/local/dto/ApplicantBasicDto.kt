@@ -1,6 +1,6 @@
 package pl.poznan.ue.matriculation.local.dto
 
-import java.util.*
+import java.time.ZonedDateTime
 
 data class ApplicantBasicDto(
     val foreignId: Long,
@@ -11,6 +11,6 @@ data class ApplicantBasicDto(
     val nationality: String?,
     val photo: String?,
     val photoPermission: String?,
-    val modificationDate: Date,
+    val modificationDate: ZonedDateTime,
     val usosId: Long?,
 )

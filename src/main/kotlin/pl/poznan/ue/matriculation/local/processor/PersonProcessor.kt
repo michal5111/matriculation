@@ -12,7 +12,7 @@ import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.domain.PersonChangeHistory
 import pl.poznan.ue.matriculation.oracle.repo.*
 import pl.poznan.ue.matriculation.oracle.service.PersonService
-import java.util.*
+import java.time.LocalDate
 
 
 open class PersonProcessor(
@@ -125,7 +125,7 @@ open class PersonProcessor(
         transactionManager = "oracleTransactionManager"
     )
     open fun update(applicant: Applicant, person: Person): Person {
-        val changeHistory = person.personChangeHistories.find { it.changeDate == Date() }
+        val changeHistory = person.personChangeHistories.find { it.changeDate == LocalDate.now() }
             ?: PersonChangeHistory(
                 person = null,
                 pesel = person.pesel,
@@ -254,12 +254,10 @@ open class PersonProcessor(
                     issueDate = person.id?.let {
                         ownedDocumentRepository.findMaxExpirationDateByDocumentTypeAndPersonId(
                             type,
-                            person.id ?: -1
+                            person.id
                         )?.let {
-                            val c = Calendar.getInstance()
-                            c.time = it
-                            c.add(Calendar.DATE, 1)
-                            if (c.time > identityDocument.expDate) null else c.time
+                            val nextDay = it.plusDays(1)
+                            if (nextDay > identityDocument.expDate) null else nextDay
                         }
                     },
                     documentType = documentTypeRepository.getReferenceById(type),
@@ -271,7 +269,7 @@ open class PersonProcessor(
             }
         } else {
             person.identityDocumentExpirationDate?.let {
-                if (it < Date()) {
+                if (it < LocalDate.now()) {
                     person.apply {
                         identityDocumentIssuerCountry = null
                         identityDocumentExpirationDate = null

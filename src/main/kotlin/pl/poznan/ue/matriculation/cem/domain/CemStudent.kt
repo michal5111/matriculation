@@ -3,7 +3,7 @@ package pl.poznan.ue.matriculation.cem.domain
 import jakarta.persistence.*
 import org.hibernate.annotations.Immutable
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Immutable
@@ -38,7 +38,7 @@ class CemStudent : IApplicantDto {
 
     @Temporal(TemporalType.DATE)
     @Column(name = "birthday")
-    var birthdate: Date? = null
+    var birthdate: LocalDate? = null
 
     @Column(name = "birth_place")
     var birthPlace: String? = null
@@ -69,7 +69,7 @@ class CemStudent : IApplicantDto {
 
     @Temporal(TemporalType.DATE)
     @Column(name = "id_issue_date")
-    var idIssuedDate: Date? = null
+    var idIssuedDate: LocalDate? = null
 
     @Column(name = "address")
     var address: String? = null

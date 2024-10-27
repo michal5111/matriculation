@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Table(name = "DZ_PODSTAWY_STUDIOW_PRGOS")
@@ -22,11 +22,11 @@ class PersonProgrammeBasisOfAdmission(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_OD", nullable = false)
-    val dateFrom: Date,
+    val dateFrom: LocalDate,
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_DO", nullable = true)
-    val dateTo: Date? = null
+    val dateTo: LocalDate? = null
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

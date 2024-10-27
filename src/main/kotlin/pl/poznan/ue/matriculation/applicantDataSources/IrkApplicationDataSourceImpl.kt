@@ -8,6 +8,7 @@ import pl.poznan.ue.matriculation.irk.dto.ErrorMessageDto
 import pl.poznan.ue.matriculation.irk.dto.NotificationDto
 import pl.poznan.ue.matriculation.irk.dto.applicants.IrkApplicantDto
 import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
+import pl.poznan.ue.matriculation.irk.dto.registrations.RegistrationStatus
 import pl.poznan.ue.matriculation.irk.mapper.IrkApplicantMapper
 import pl.poznan.ue.matriculation.irk.mapper.IrkApplicationMapper
 import pl.poznan.ue.matriculation.irk.service.IrkService
@@ -97,7 +98,11 @@ open class IrkApplicationDataSourceImpl(
         var currentPage = 1
         var hasNext: Boolean
         do {
-            val page = irkService.getAvailableRegistrationsPage(currentPage, filter)
+            val page = irkService.getAvailableRegistrationsPage(
+                pageNumber = currentPage,
+                code = filter?.let { "^$filter".toRegex() },
+                status = RegistrationStatus.ENDED
+            )
             page?.results?.forEach {
                 val registration = RegistrationDto(it.code, it.name.pl)
                 availableRegistrations.add(registration)

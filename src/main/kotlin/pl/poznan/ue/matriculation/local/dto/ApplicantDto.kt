@@ -2,7 +2,8 @@ package pl.poznan.ue.matriculation.local.dto
 
 import pl.poznan.ue.matriculation.local.domain.enum.DuplicateStatus
 import java.io.Serializable
-import java.util.*
+import java.time.LocalDate
+import java.time.ZonedDateTime
 
 data class ApplicantDto(
     val id: Long? = null,
@@ -25,7 +26,7 @@ data class ApplicantDto(
 
     val photoPermission: String? = null,
 
-    val modificationDate: Date? = null,
+    val modificationDate: ZonedDateTime? = null,
 
     val usosId: Long? = null,
 
@@ -49,7 +50,7 @@ data class ApplicantDto(
 
     val pesel: String? = null,
 
-    val dateOfBirth: Date? = null,
+    val dateOfBirth: LocalDate? = null,
 
     val cityOfBirth: String? = null,
 

@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.excelfile.dto
 
 import pl.poznan.ue.matriculation.local.dto.IApplicantDto
-import java.util.*
+import java.time.LocalDate
 
 data class ExcelFileApplicantDto(
     val id: Long,
@@ -12,8 +12,8 @@ data class ExcelFileApplicantDto(
     val pesel: String?,
     val passport: String?,
     val issueCountry: String?,
-    val issueDate: Date?,
-    val birthDate: Date,
+    val issueDate: LocalDate?,
+    val birthDate: LocalDate,
     val birthPlace: String,
     val fathersName: String?,
     val mothersName: String?,

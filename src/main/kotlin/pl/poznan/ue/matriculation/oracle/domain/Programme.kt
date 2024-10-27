@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import org.hibernate.annotations.Immutable
 import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Immutable
@@ -22,11 +22,11 @@ class Programme(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_OD", nullable = false)
-    val dateFrom: Date,
+    val dateFrom: LocalDate,
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_DO", nullable = true)
-    val dateTo: Date? = null,
+    val dateTo: LocalDate? = null,
 
     @Column(name = "TRYB_STUDIOW", length = 100, nullable = true)
     val studyMode: String? = null,

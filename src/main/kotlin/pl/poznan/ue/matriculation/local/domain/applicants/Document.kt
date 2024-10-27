@@ -6,7 +6,8 @@ import jakarta.persistence.*
 import pl.poznan.ue.matriculation.local.domain.BaseEntityLongId
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import java.io.Serializable
-import java.util.*
+import java.time.LocalDate
+import java.time.ZonedDateTime
 
 @Entity
 @Table(
@@ -43,13 +44,13 @@ class Document(
     var issueCountry: String?,
 
     @Temporal(TemporalType.DATE)
-    var issueDate: Date?,
+    var issueDate: LocalDate?,
 
     var issueInstitution: String?,
 
     var issueInstitutionUsosCode: Long?,
 
-    var modificationDate: Date?,
+    var modificationDate: ZonedDateTime?,
 
     @get:JsonIgnore
     @OneToMany(mappedBy = "certificate", fetch = FetchType.LAZY)

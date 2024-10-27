@@ -3,7 +3,7 @@ package pl.poznan.ue.matriculation.oracle.domain
 import jakarta.persistence.*
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import org.hibernate.annotations.Immutable
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Immutable
@@ -43,11 +43,11 @@ class Building(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_OD", nullable = true)
-    val dateFrom: Date? = null,
+    val dateFrom: LocalDate? = null,
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_DO", nullable = true)
-    val dateTO: Date? = null,
+    val dateTO: LocalDate? = null,
 
     @OneToOne(mappedBy = "building", fetch = FetchType.LAZY)
     val address: Address,

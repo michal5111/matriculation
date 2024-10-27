@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import pl.poznan.ue.matriculation.oracle.domain.Person
 import pl.poznan.ue.matriculation.oracle.entityRepresentations.PersonBasicData
-import java.util.*
+import java.time.LocalDate
 
 @Repository
 interface PersonRepository : JpaRepository<Person, Long> {
@@ -47,7 +47,7 @@ interface PersonRepository : JpaRepository<Person, Long> {
     fun findPotentialDuplicate(
         name: String,
         surname: String,
-        birthDate: Date,
+        birthDate: LocalDate,
         idNumbers: List<String>
     ): List<PersonBasicData>
 
@@ -64,7 +64,7 @@ interface PersonRepository : JpaRepository<Person, Long> {
     fun findPotentialDuplicateWithNullPesel(
         name: String,
         surname: String,
-        birthDate: Date,
+        birthDate: LocalDate,
         idNumbers: List<String>
     ): List<PersonBasicData>
 }

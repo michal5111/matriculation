@@ -9,8 +9,8 @@ export type Import = {
   registration: string | null;
   indexPoolCode: string | null;
   indexPoolName: string | null;
-  startDate: Date | null;
-  dateOfAddmision: Date | null;
+  startDate: string | null;
+  dateOfAddmision: string | null;
   didacticCycleCode: string | null;
   dataSourceId: string | null;
   dataSourceName: string | null;

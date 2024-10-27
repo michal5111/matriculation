@@ -1,7 +1,3 @@
-export class UrlDto {
+export type UrlDto = {
   url: string;
-
-  constructor(url: string) {
-    this.url = url;
-  }
-}
+};

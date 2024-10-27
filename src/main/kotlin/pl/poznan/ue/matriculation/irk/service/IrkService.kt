@@ -14,6 +14,7 @@ import pl.poznan.ue.matriculation.irk.dto.applicants.MatriculationDataDTO
 import pl.poznan.ue.matriculation.irk.dto.applications.IrkApplicationDTO
 import pl.poznan.ue.matriculation.irk.dto.programmes.ProgrammeGroupsDTO
 import pl.poznan.ue.matriculation.irk.dto.registrations.RegistrationDTO
+import pl.poznan.ue.matriculation.irk.dto.registrations.RegistrationStatus
 import pl.poznan.ue.matriculation.local.domain.applications.Application
 import pl.poznan.ue.matriculation.local.domain.programmes.ProgrammeGroups
 import pl.poznan.ue.matriculation.local.domain.registrations.Registration
@@ -88,11 +89,28 @@ class IrkService(
         return response.body
     }
 
-    fun getAvailableRegistrationsPage(pageNumber: Int, code: String? = null): Page<RegistrationDTO>? {
-        val url = UriComponentsBuilder.fromHttpUrl("${apiUrl}registrations/")
+    fun getAvailableRegistrationsPage(
+        pageNumber: Int,
+        code: Regex? = null,
+        tag: String? = null,
+        status: RegistrationStatus?,
+        programme: Regex? = null
+    ): Page<RegistrationDTO>? {
+        val builder = UriComponentsBuilder.fromHttpUrl("${apiUrl}registrations/")
             .queryParam("page", pageNumber)
-            //.queryParam("code", "^$code.*")
-            .build().toUriString()
+        if (code != null) {
+            builder.queryParam("code", code.pattern)
+        }
+        if (tag != null) {
+            builder.queryParam("tag", tag)
+        }
+        if (status != null) {
+            builder.queryParam("status", status.status)
+        }
+        if (programme != null) {
+            builder.queryParam("programme", programme.pattern)
+        }
+        val url = builder.build().toUriString()
         return restTemplate.exchange(
             url,
             HttpMethod.GET,

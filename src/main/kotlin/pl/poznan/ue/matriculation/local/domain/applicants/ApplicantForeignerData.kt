@@ -3,7 +3,7 @@ package pl.poznan.ue.matriculation.local.domain.applicants
 import jakarta.persistence.*
 import pl.poznan.ue.matriculation.local.domain.BaseEntityApplicantId
 import java.io.Serializable
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Table(name = "ApplicantForeignerData")
@@ -17,12 +17,12 @@ class ApplicantForeignerData(
     var polishCardIssueCountry: String?,
 
     @Temporal(TemporalType.DATE)
-    var polishCardIssueDate: Date?,
+    var polishCardIssueDate: LocalDate?,
 
     var polishCardNumber: String?,
 
     @Temporal(TemporalType.DATE)
-    var polishCardValidTo: Date?,
+    var polishCardValidTo: LocalDate?,
 
     applicant: Applicant? = null
 ) : BaseEntityApplicantId(applicant), Serializable {

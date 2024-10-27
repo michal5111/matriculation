@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Parameter
 import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Table(name = "DZ_ADRESY")
@@ -87,11 +87,11 @@ class Address(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_OD", nullable = true)
-    var dateFrom: Date? = null,
+    var dateFrom: LocalDate? = null,
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_DO", nullable = true)
-    var dateTo: Date? = null,
+    var dateTo: LocalDate? = null,
 
     @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_MIASTO", length = 1, nullable = true)

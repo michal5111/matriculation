@@ -71,14 +71,14 @@ import {MatIcon} from '@angular/material/icon';
   ]
 })
 export class ImportComponent extends AbstractListWithPathParamsComponent<Import, number, {}> implements OnInit, OnDestroy {
-  private importService = inject(ImportService);
-  userService = inject(UserService);
-  private rxStompService = inject(RxStompService);
+  private readonly importService = inject(ImportService);
+  readonly userService = inject(UserService);
+  private readonly rxStompService = inject(RxStompService);
 
 
   page: Page<Import> | null = null;
-  dataSource: BasicDataSource<Import, number, {}>;
-  filtersSubject: BehaviorSubject<{}>;
+  dataSource: BasicDataSource<Import, number, {}> = new BasicDataSource<Import, number, {}>(this.importService);
+  filtersSubject: BehaviorSubject<{}> = new BehaviorSubject<{}>({});
   sortingMap: Map<string, string> = new Map<string, string>([
     ['id', 'id'],
     ['dataSourceType', 'dataSourceName'],
@@ -113,14 +113,6 @@ export class ImportComponent extends AbstractListWithPathParamsComponent<Import,
     ['deleteImport', true],
     ['selectImport', true]
   ]);
-
-  constructor() {
-    super();
-    const importService = this.importService;
-
-    this.filtersSubject = new BehaviorSubject<{}>({});
-    this.dataSource = new BasicDataSource<Import, number, {}>(importService);
-  }
 
   ngOnInit(): void {
     this.subs.push(

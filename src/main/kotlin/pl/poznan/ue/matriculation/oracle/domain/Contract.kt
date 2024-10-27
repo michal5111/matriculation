@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Table(name = "DZ_UMOWY")
@@ -17,7 +17,7 @@ class Contract(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_POCZ", nullable = false)
-    val startDate: Date,
+    val startDate: LocalDate,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STATUS", referencedColumnName = "ID", nullable = false)
@@ -25,7 +25,7 @@ class Contract(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_KON", nullable = true)
-    val endDate: Date,
+    val endDate: LocalDate,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SZK_ID", referencedColumnName = "ID", nullable = true)
@@ -43,7 +43,7 @@ class Contract(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_PODPIS", nullable = false)
-    val signatureDate: Date,
+    val signatureDate: LocalDate,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OS_ID", referencedColumnName = "ID", nullable = true)

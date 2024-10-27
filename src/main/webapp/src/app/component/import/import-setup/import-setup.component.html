@@ -2,9 +2,8 @@
   <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
     <mat-form-field class="form-field wide-field">
       <mat-label>Źródło danych</mat-label>
-      <mat-select [compareWith]="datasourceCompare" formControlName="dataSource"
-                  (selectionChange)="onDataSourceSelectionChange($event)">
-        @for (dataSource of $availableDataSources | async; track dataSource) {
+      <mat-select [compareWith]="datasourceCompare" formControlName="dataSource">
+        @for (dataSource of $availableDataSources | async; track dataSource.id) {
           <mat-option
             [value]="dataSource">{{ dataSource.name }}
           </mat-option>
@@ -22,7 +21,8 @@
                   <mat-label>{{ parameter.name }}</mat-label>
                   <input type="text" matInput [formControlName]="parameter.name">
                 </mat-form-field>
-              } @case ('FILE') {
+              }
+              @case ('FILE') {
                 <div>
                   <app-reactive-file-input [formControlName]="parameter.name" [accept]="parameter.accept"
                                            [templateHref]="getUrlWithBaseHref(parameter.fileTemplate)"/>
@@ -38,7 +38,8 @@
                   <!--            </div>-->
                   <!--            {{formGroup.controls.additionalParameters.value[parameter.name]}}-->
                 </div>
-              } @case ('SELECTION_LIST') {
+              }
+              @case ('SELECTION_LIST') {
                 <mat-form-field class="form-field wide-field">
                   <mat-label>{{ parameter.name }}</mat-label>
                   <mat-select [formControlName]="parameter.name">
@@ -60,52 +61,40 @@
       <mat-label>Rekrutacja</mat-label>
       <mat-select formControlName="registration"
                   [compareWith]="registrationCompare"
-                  (selectionChange)="onRegistrationSelectionChange($event)"
                   [disabled]="areRegistrationLoading()">
-        @for (registration of registrations; track registration) {
-          <mat-option
-            [value]="registration.id">[{{ registration.id }}] {{ registration.name }}
-          </mat-option>
+        @for (registration of registrations$ | async; track registration.id) {
+          <mat-option [value]="registration.id">[{{ registration.id }}] {{ registration.name }}</mat-option>
         }
       </mat-select>
       @if (areRegistrationLoading()) {
-        <ng-template matPrefix><p></p>
-          <mat-spinner diameter="20"/>
-        </ng-template>
+        <mat-spinner matPrefix diameter="20"/>
       }
     </mat-form-field>
     <mat-form-field class="form-field wide-field">
       <mat-label>Program</mat-label>
       <mat-select formControlName="registrationProgramme"
                   [compareWith]="registrationProgrammeCompare"
-                  (selectionChange)="onRegistrationProgrammeChange($event)"
                   [disabled]="areRegistrationLoading() || areProgrammesLoading()">
-        @for (registrationProgramme of registrationProgrammes; track registrationProgramme) {
+        @for (registrationProgramme of registrationProgrammes$ | async; track registrationProgramme.id) {
           <mat-option
             [value]="registrationProgramme">[{{ registrationProgramme.usosId }}] {{ registrationProgramme.name }}
           </mat-option>
         }
       </mat-select>
       @if (areProgrammesLoading()) {
-        <ng-template matPrefix><p></p>
-          <mat-spinner diameter="20"/>
-        </ng-template>
+        <mat-spinner matPrefix diameter="20"/>
       }
     </mat-form-field>
     <mat-form-field class="form-field wide-field">
       <mat-label>Etap</mat-label>
       <mat-select formControlName="stage"
                   [disabled]="areRegistrationLoading() || areProgrammesLoading() || areRegistrationLoading()">
-        @for (stage of stages; track stage) {
-          <mat-option
-            [value]="stage">{{ stage }}
-          </mat-option>
+        @for (stage of stages$ | async; track stage) {
+          <mat-option [value]="stage">{{ stage }}</mat-option>
         }
       </mat-select>
       @if (areStagesLoading()) {
-        <ng-template matPrefix><p></p>
-          <mat-spinner diameter="20"/>
-        </ng-template>
+        <mat-spinner matPrefix diameter="20"/>
       }
     </mat-form-field>
     <div class="flex-container">
@@ -119,10 +108,8 @@
           </button>
         }
         <mat-autocomplete #auto="matAutocomplete">
-          @for (didacticCycle of didacticCycles; track didacticCycle) {
-            <mat-option [value]="didacticCycle">
-              {{ didacticCycle }}
-            </mat-option>
+          @for (didacticCycle of didacticCycles$ | async; track didacticCycle) {
+            <mat-option [value]="didacticCycle">{{ didacticCycle }}</mat-option>
           }
         </mat-autocomplete>
       </mat-form-field>
@@ -151,15 +138,15 @@
       </mat-form-field>
     </div>
     <button mat-button type="submit" [disabled]="!formGroup.valid || isButtonDisabled()">
-      @if (this.import()?.id == null) {
+      @if (this.dialogData?.import?.id == null) {
         <div>
           <mat-icon>add</mat-icon>
           Utwórz
         </div>
       } @else {
-      <mat-icon>edit</mat-icon>
-      Aktualizuj
-    }
+        <mat-icon>edit</mat-icon>
+        Aktualizuj
+      }
     </button>
   </form>
 </div>

@@ -1,7 +1,7 @@
 package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Table(name = "DZ_WSPOLPRACE")
@@ -61,11 +61,11 @@ class Cooperation(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_POCZ", nullable = false)
-    var startDate: Date,
+    var startDate: LocalDate,
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_KON", nullable = false)
-    var endDate: Date,
+    var endDate: LocalDate,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TYP", nullable = false)

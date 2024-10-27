@@ -6,7 +6,6 @@ import {MatListOption, MatSelectionList} from '@angular/material/list';
 import {Role} from '../../../model/user/role';
 import {UserService} from '../../../service/user-service/user.service';
 import {RoleService} from '../../../service/role-service/role.service';
-import {tap} from 'rxjs/operators';
 
 import {MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
@@ -31,9 +30,7 @@ export class UserEditorComponent implements OnInit {
   roleSelectionList = viewChild<MatSelectionList | null>('roleSelectionList');
 
   ngOnInit(): void {
-    this.userService.findById(this.data.user.id ?? -1).pipe(
-      tap(user => console.log(user))
-    ).subscribe(user => this.user = user);
+    this.userService.findById(this.data.user.id ?? -1).subscribe(user => this.user = user);
     this.roleService.getRoles().subscribe(results => {
         this.rolesList = results;
       }

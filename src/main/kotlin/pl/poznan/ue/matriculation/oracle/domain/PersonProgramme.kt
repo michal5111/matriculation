@@ -2,7 +2,7 @@ package pl.poznan.ue.matriculation.oracle.domain
 
 import jakarta.persistence.*
 import pl.poznan.ue.matriculation.oracle.jpaConverters.TAndNToBooleanConverter
-import java.util.*
+import java.time.LocalDate
 
 @Entity
 @Table(name = "DZ_PROGRAMY_OSOB")
@@ -31,7 +31,7 @@ class PersonProgramme(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_NAST_ZAL", nullable = true)
-    var dateToNextPass: Date? = null,
+    var dateToNextPass: LocalDate? = null,
 
     @Column(name = "UPRAWNIENIA_ZAWODOWE", length = 4000, nullable = true)
     var professionalPowers: String? = null,
@@ -49,11 +49,11 @@ class PersonProgramme(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_PRZYJECIA", nullable = true)
-    var dateOfAddmision: Date? = null,
+    var dateOfAddmision: LocalDate? = null,
 
     @Temporal(TemporalType.DATE)
     @Column(name = "PLAN_DATA_UKON", nullable = true)
-    var plannedDateOfCompletion: Date? = null,
+    var plannedDateOfCompletion: LocalDate? = null,
 
     @Convert(converter = TAndNToBooleanConverter::class)
     @Column(name = "CZY_ZGLOSZONY", length = 1, nullable = false)
@@ -64,7 +64,7 @@ class PersonProgramme(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_ROZPOCZECIA", nullable = true)
-    var startDate: Date,
+    var startDate: LocalDate,
 
     @Column(name = "NUMER_S", length = 10, nullable = true)
     var certificateNumberNumeric: Int? = null,
@@ -78,7 +78,7 @@ class PersonProgramme(
 
     @Temporal(TemporalType.DATE)
     @Column(name = "DATA_ARCH", nullable = true)
-    var archiveDate: Date? = null,
+    var archiveDate: LocalDate? = null,
 
     @Column(name = "WARUNKI_PRZYJEC_NA_PROG", length = 2000, nullable = true)
     var programmeAdmissionConditions: String? = null,
@@ -143,10 +143,10 @@ class PersonProgramme(
     var studyScoreEng: String? = null,
 
     @Column(name = "UMOWA_DATA_PRZECZYTANIA", nullable = true)
-    var agreementReadDate: Date? = null,
+    var agreementReadDate: LocalDate? = null,
 
     @Column(name = "UMOWA_DATA_PODPISANIA", nullable = true)
-    var agreementSignDate: Date? = null,
+    var agreementSignDate: LocalDate? = null,
 
     @Column(name = "UMOWA_SYGNATURA", length = 20, nullable = true)
     var agreementSignature: String? = null,

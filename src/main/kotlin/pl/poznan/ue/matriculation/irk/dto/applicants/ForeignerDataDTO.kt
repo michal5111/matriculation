@@ -2,7 +2,7 @@ package pl.poznan.ue.matriculation.irk.dto.applicants
 
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.util.*
+import java.time.LocalDate
 
 data class ForeignerDataDTO(
     @JsonProperty("base_of_stay")
@@ -12,9 +12,9 @@ data class ForeignerDataDTO(
     @JsonProperty("polish_card_issue_country")
     val polishCardIssueCountry: String?,
     @JsonProperty("polish_card_issue_date")
-    val polishCardIssueDate: Date?,
+    val polishCardIssueDate: LocalDate?,
     @JsonProperty("polish_card_number")
     val polishCardNumber: String?,
     @JsonProperty("polish_card_valid_to")
-    val polishCardValidTo: Date?
+    val polishCardValidTo: LocalDate?
 )
